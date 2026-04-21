@@ -16,10 +16,11 @@ const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 
 const PREP_SECS    = 120 // 2 minutes
 const RECORD_SECS  = 180 // 3 minutes
+const CORAL        = '#FF8B6B' // pastel recording accent (FIX 4)
 
 const TOPIC = {
   prompt:
-    'Certains pensent que les r\u00e9seaux sociaux ont rapproch\u00e9 les gens. D\u2019autres estiment qu\u2019ils ont au contraire d\u00e9t\u00e9rior\u00e9 nos relations. Qu\u2019en pensez-vous\u00a0?',
+    'Certains pensent que les réseaux sociaux ont rapproché les gens. D\u2019autres estiment qu\u2019ils ont au contraire détérioré nos relations. Qu\u2019en pensez-vous\u00a0?',
   difficulty: 'B1-B2',
   theme: 'Society',
 }
@@ -179,7 +180,7 @@ export default function Tache3Session() {
                   maxWidth: 280,
                 }}
               >
-                Think about your structure: introduction, 2\u20133 arguments, conclusion.
+                Think about your structure: introduction, 2–3 arguments, conclusion.
               </p>
 
               <CountdownTimer
@@ -209,7 +210,7 @@ export default function Tache3Session() {
                   marginTop: 4,
                 }}
               >
-                Ready \u2014 Record now
+                Ready — Record now
               </button>
 
               <button
@@ -270,33 +271,36 @@ export default function Tache3Session() {
                 size={140}
                 countUp
                 maxSeconds={RECORD_SECS}
-                accentColor="#EF4444"
+                accentColor={phase === 'processing' ? INK_MUTED : CORAL}
               />
 
               <RecordButton
                 mode="tap"
                 recordingState={recordingState}
-                idleColor="#EF4444"
+                idleColor={CORAL}
                 onTap={stopRecording}
               />
 
-              {phase === 'recording' && <VuMeter active color="#EF4444" />}
+              {phase === 'recording' && <VuMeter active color={CORAL} />}
 
-              <button
-                onClick={stopRecording}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  fontFamily: DISPLAY_FONT,
-                  fontWeight: 500,
-                  fontSize: 13,
-                  color: INK_MUTED,
-                  cursor: 'pointer',
-                  padding: 0,
-                }}
-              >
-                Stop recording
-              </button>
+              {/* FIX 2: only show during recording, not during analyzing */}
+              {phase === 'recording' && (
+                <button
+                  onClick={stopRecording}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontFamily: DISPLAY_FONT,
+                    fontWeight: 500,
+                    fontSize: 13,
+                    color: INK_MUTED,
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
+                >
+                  Stop recording
+                </button>
+              )}
             </div>
           )}
 

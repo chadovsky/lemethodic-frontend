@@ -20,7 +20,7 @@ type Turn = { side: 'examiner' | 'user'; text: string }
 const INITIAL_TURNS: Turn[] = [
   { side: 'examiner', text: 'Bonjour, comment puis-je vous aider\u00a0?' },
   { side: 'user',     text: 'Bonjour. Je voudrais partir en vacances dans un pays francophone.' },
-  { side: 'examiner', text: 'Tr\u00e8s bien. Avez-vous une p\u00e9riode en t\u00eate\u00a0?' },
+  { side: 'examiner', text: 'Très bien. Avez-vous une période en tête\u00a0?' },
 ]
 
 const INFO_TARGETS = [
@@ -74,7 +74,7 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
       ...prev,
       {
         side: 'user',
-        text: 'Oui, je pensais partir en juillet ou ao\u00fbt. Quelles destinations me recommandez-vous\u00a0?',
+        text: 'Oui, je pensais partir en juillet ou août. Quelles destinations me recommandez-vous\u00a0?',
       },
     ])
     setRecordingState('idle')
@@ -248,7 +248,7 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
           </div>
         )}
 
-        {/* Scrollable conversation */}
+        {/* Scrollable conversation — FIX 3: extra bottom padding during recording so last bubble stays visible */}
         <div
           ref={scrollRef}
           style={{
@@ -258,7 +258,8 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
             display: 'flex',
             flexDirection: 'column',
             gap: 16,
-            paddingBottom: 220,
+            paddingBottom: recordingState === 'recording' ? 340 : 220,
+            transition: 'padding-bottom 0.2s ease',
           }}
         >
           {turns.map((turn, i) => (
@@ -354,8 +355,8 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
               }}
             >
               {recordingState === 'idle'      ? 'Hold to talk' :
-               recordingState === 'recording' ? 'Recording\u2026 release to stop' :
-               recordingState === 'processing' ? 'Processing\u2026' :
+               recordingState === 'recording' ? 'Recording… release to stop' :
+               recordingState === 'processing' ? 'Processing…' :
                'Reviewing\u2026'}
             </p>
 
@@ -390,7 +391,7 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
       {/* Transcript review panel */}
       <TranscriptReviewPanel
         visible={showTranscript}
-        transcript="Oui, je pensais partir en juillet ou ao\u00fbt. Quelles destinations me recommandez-vous\u00a0?"
+        transcript="Oui, je pensais partir en juillet ou août. Quelles destinations me recommandez-vous\u00a0?"
         onConfirm={handleConfirmTranscript}
         onRedo={handleRedoTranscript}
       />

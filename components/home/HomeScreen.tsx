@@ -260,7 +260,7 @@ export default function HomeScreen({
               {/* Card B — Today's practice */}
               <DailyActionCard
                 background={SAGE}
-                label="Tache 2 · Role-play"
+                label="Tâche 2 · Role-play"
                 title="Agence de voyages"
                 descriptor="Gather travel info from an agent. 10 min."
                 meta={[

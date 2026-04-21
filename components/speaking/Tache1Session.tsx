@@ -22,15 +22,15 @@ type Turn = {
 const INITIAL_TURNS: Turn[] = [
   {
     side: 'examiner',
-    text: 'Bonjour. Pour commencer, pr\u00e9sentez-vous, s\u2019il vous pla\u00eet.',
+    text: 'Bonjour. Pour commencer, présentez-vous, s\u2019il vous plaît.',
   },
   {
     side: 'user',
-    text: 'Bonjour, je m\u2019appelle Chadi, j\u2019ai 32 ans, j\u2019habite \u00e0 Casablanca au Maroc.',
+    text: 'Bonjour, je m\u2019appelle Chadi, j\u2019ai 32 ans, j\u2019habite à Casablanca au Maroc.',
   },
   {
     side: 'examiner',
-    text: 'Tr\u00e8s bien, Chadi. Vous avez dit que vous habitez \u00e0 Casablanca \u2014 pouvez-vous me d\u00e9crire une journ\u00e9e typique chez vous\u00a0?',
+    text: 'Très bien, Chadi. Vous avez dit que vous habitez à Casablanca — pouvez-vous me décrire une journée typique chez vous\u00a0?',
   },
 ]
 
@@ -68,12 +68,12 @@ export default function Tache1Session() {
 
   const statusLabel =
     recordingState === 'idle'       ? 'Tap to record your response' :
-    recordingState === 'recording'  ? 'Recording\u2026 Tap to stop' :
-    recordingState === 'processing' ? 'Processing your response\u2026' :
-    'Examiner is thinking\u2026'
+    recordingState === 'recording'  ? 'Recording… Tap to stop' :
+    recordingState === 'processing' ? 'Processing your response…' :
+    'Examiner is thinking…'
 
   const statusSub =
-    recordingState === 'idle' ? "Take your time. There\u2019s no timer." : ''
+    recordingState === 'idle' ? "Take your time. There's no timer." : ''
 
   return (
     <div
