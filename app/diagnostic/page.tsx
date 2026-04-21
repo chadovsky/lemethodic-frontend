@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import RadarChart from '@/components/diagnostic/RadarChart'
+import CouchesDiagnostic from '@/components/diagnostic/CouchesDiagnostic'
 import GouletCard from '@/components/diagnostic/GouletCard'
 import OrdonnanceExerciseCard from '@/components/diagnostic/OrdonnanceExerciseCard'
 import CorrectedLine, { Correction } from '@/components/diagnostic/CorrectedLine'
@@ -15,14 +15,6 @@ const SAGE         = '#D4E4D0'
 const BUTTER       = '#FFF0C2'
 const BG           = '#FAFAF7'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
-
-// ─── radar data ───────────────────────────────────────────────────────────────
-const RADAR_AXES = [
-  { label: 'Le Fond',               score: 78 },
-  { label: 'Les Moules des Idées',  score: 62 },
-  { label: 'Les Moules',            score: 71 },
-  { label: 'Les Réflexes Anglais',  score: 45 },
-]
 
 // ─── transcript data ──────────────────────────────────────────────────────────
 type Segment = { text?: string; correction?: Correction }
@@ -346,26 +338,7 @@ export default function DiagnosticPage() {
             <SectionLabel>La Méthode en Couches</SectionLabel>
             <SectionHeading>Where you stand on each layer</SectionHeading>
 
-            {/* Legend row */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' as const }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <div style={{ width: 24, height: 3, backgroundColor: INK, borderRadius: 2 }} />
-                <span style={{ fontFamily: DISPLAY_FONT, fontWeight: 500, fontSize: 11, color: INK_SOFT }}>
-                  Your score
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <div style={{ width: 24, height: 8, backgroundColor: SAGE, border: '1px solid #1A1A1A20', borderRadius: 3 }} />
-                <span style={{ fontFamily: DISPLAY_FONT, fontWeight: 500, fontSize: 11, color: INK_SOFT }}>
-                  Target band (70–85)
-                </span>
-              </div>
-            </div>
-
-            {/* Chart */}
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0' }}>
-              <RadarChart axes={RADAR_AXES} size={300} />
-            </div>
+            <CouchesDiagnostic />
           </SectionCard>
 
           {/* ══ SECTION 3 — LE GOULET ═══════════════════════════════════════ */}
