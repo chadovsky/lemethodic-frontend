@@ -68,7 +68,7 @@ export default function LanguageSelect({ onContinue }: LanguageSelectProps) {
         {/* Illustration */}
         <div className="flex justify-center mt-10">
           <Image
-            src="/illustration-language.png"
+            src="/illustration-language.jpg"
             alt="3D speech bubble with globe illustration"
             width={160}
             height={160}

@@ -56,7 +56,7 @@ export default function TCFGoalSelect({ onContinue, onBack }: TCFGoalSelectProps
       bg="#D4E4D0"
       progressFilledUpTo={2}
       progressCurrent={2}
-      illustration="/illustration-goal.png"
+      illustration="/illustration-goal.jpg"
       illustrationAlt="Passport with boarding pass illustration"
       headline="Why are you learning French?"
       descriptor="This helps us tune your practice to your exam."

@@ -74,7 +74,7 @@ export default function ExamDateSelect({ onContinue, onBack }: ExamDateSelectPro
         {/* Illustration */}
         <div className="flex justify-center mt-10">
           <Image
-            src="/illustration-date.png"
+            src="/illustration-date.jpg"
             alt="Calendar with highlighted date illustration"
             width={160}
             height={160}

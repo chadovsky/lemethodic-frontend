@@ -51,7 +51,7 @@ export default function CurrentLevelSelect({ onContinue, onBack }: CurrentLevelS
       bg="#FFF0C2"
       progressFilledUpTo={3}
       progressCurrent={3}
-      illustration="/illustration-level.png"
+      illustration="/illustration-level.jpg"
       illustrationAlt="Stepping-stones path illustration"
       headline="Where are you right now?"
       descriptor="Pick the sentence that sounds most like you. You can change this later."

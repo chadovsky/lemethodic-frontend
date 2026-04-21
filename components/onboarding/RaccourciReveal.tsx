@@ -54,7 +54,7 @@ export default function RaccourciReveal({
         {/* Illustration */}
         <div className="flex justify-center mt-10">
           <Image
-            src="/illustration-raccourci.png"
+            src="/illustration-raccourci.jpg"
             alt="Golden key illustration"
             width={160}
             height={160}
