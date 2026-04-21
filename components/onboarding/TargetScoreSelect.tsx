@@ -64,7 +64,7 @@ export default function TargetScoreSelect({ goal, onContinue, onBack }: TargetSc
       bg="#E0D4F0"
       progressFilledUpTo={4}
       progressCurrent={4}
-      illustration="/illustration-score.jpg"
+      illustration="/illustrations/target.png"
       illustrationAlt="Target with arrow in bullseye illustration"
       headline="What score do you need?"
       descriptor={getDescriptor(goal)}

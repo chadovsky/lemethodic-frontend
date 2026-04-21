@@ -18,13 +18,13 @@ const languages: {
   {
     id: 'en',
     label: 'English',
-    icon: '/icon-flag-gb.png',
+    icon: '/icons/flag-uk.png',
     iconAlt: 'United Kingdom flag',
   },
   {
     id: 'es',
     label: 'Español',
-    icon: '/icon-flag-es.png',
+    icon: '/icons/flag-spain.png',
     iconAlt: 'Spanish flag',
   },
 ]
@@ -68,12 +68,12 @@ export default function LanguageSelect({ onContinue }: LanguageSelectProps) {
         {/* Illustration */}
         <div className="flex justify-center mt-10">
           <Image
-            src="/illustration-language.jpg"
+            src="/illustrations/speech-bubble.png"
             alt="3D speech bubble with globe illustration"
-            width={160}
-            height={160}
+            width={240}
+            height={240}
             className="object-contain"
-            style={{ filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.12))' }}
+            style={{ filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.15))' }}
             priority
           />
         </div>

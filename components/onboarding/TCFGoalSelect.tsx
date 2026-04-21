@@ -27,21 +27,21 @@ const GOALS: {
 }[] = [
   {
     id: 'immigration',
-    icon: '/icon-flag-ca.png',
+    icon: '/icons/flag-canada.png',
     iconAlt: 'Canadian flag',
     title: 'Canadian immigration',
     descriptor: 'TCF / TEF Canada, CLB scoring',
   },
   {
     id: 'studies',
-    icon: '/icon-grad-cap.png',
+    icon: '/icons/graduation-cap.png',
     iconAlt: 'Graduation cap',
     title: 'Studies in France',
     descriptor: 'DELF, DALF, academic admissions',
   },
   {
     id: 'general',
-    icon: '/icon-globe.png',
+    icon: '/icons/globe.png',
     iconAlt: 'Globe',
     title: 'General French level',
     descriptor: 'I want to improve my speaking',
@@ -56,7 +56,7 @@ export default function TCFGoalSelect({ onContinue, onBack }: TCFGoalSelectProps
       bg="#D4E4D0"
       progressFilledUpTo={2}
       progressCurrent={2}
-      illustration="/illustration-goal.jpg"
+      illustration="/illustrations/passport.png"
       illustrationAlt="Passport with boarding pass illustration"
       headline="Why are you learning French?"
       descriptor="This helps us tune your practice to your exam."

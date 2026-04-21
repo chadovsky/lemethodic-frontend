@@ -54,12 +54,12 @@ export default function RaccourciReveal({
         {/* Illustration */}
         <div className="flex justify-center mt-10">
           <Image
-            src="/illustration-raccourci.jpg"
+            src="/illustrations/key.png"
             alt="Golden key illustration"
-            width={160}
-            height={160}
+            width={240}
+            height={240}
             className="object-contain"
-            style={{ filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.12))' }}
+            style={{ filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.15))' }}
             priority
           />
         </div>
