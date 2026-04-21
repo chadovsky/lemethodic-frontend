@@ -48,12 +48,12 @@ export default function LanguageSelect({ onContinue }: LanguageSelectProps) {
       {/* Inner column */}
       <div className="w-full max-w-[440px] flex flex-col flex-1 min-h-screen px-5">
 
-        {/* Progress dots */}
+        {/* Progress dots — step 1 current, only 1 filled */}
         <div className="flex items-center justify-center gap-2 pt-4" aria-label="Step 1 of 6">
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="rounded-full transition-all duration-200"
+              className="rounded-full transition-all duration-300"
               style={{
                 width: i === 0 ? 20 : 8,
                 height: 8,
