@@ -97,7 +97,7 @@ function labelPos(
 export default function RadarChart({ axes, size = 300 }: Props) {
   const cx = size / 2
   const cy = size / 2
-  const radius = size * 0.35 // leaves room for labels
+  const radius = size * 0.40 // 80% fill at value=100 (was 0.35 → ~70%)
 
   const gridRings = [25, 50, 75, 100]
 
@@ -139,26 +139,32 @@ export default function RadarChart({ axes, size = 300 }: Props) {
       })}
 
       {/* ── Target band: fill between 70 and 85 ── */}
+      {/* Outer 85 polygon — sage fill */}
       <polygon
         points={targetPolygon(85, cx, cy, radius)}
         fill={SAGE}
         fillOpacity={0.35}
-        stroke="none"
+        stroke={SAGE}
+        strokeWidth={1}
+        strokeOpacity={0.8}
       />
+      {/* Inner 70 polygon — cuts out the centre, restores background */}
       <polygon
         points={targetPolygon(70, cx, cy, radius)}
         fill="#FAFAF7"
         fillOpacity={0.9}
-        stroke="none"
+        stroke={SAGE}
+        strokeWidth={1}
+        strokeOpacity={0.8}
       />
 
       {/* ── User polygon ── */}
       <polygon
         points={userPolygon(axes, cx, cy, radius)}
         fill={INK}
-        fillOpacity={0.15}
+        fillOpacity={0.25}
         stroke={INK}
-        strokeWidth={2}
+        strokeWidth={2.5}
         strokeLinejoin="round"
       />
 
@@ -178,7 +184,7 @@ export default function RadarChart({ axes, size = 300 }: Props) {
 
       {/* ── Labels ── */}
       {axes.map((a, i) => {
-        const { x, y, textAnchor } = labelPos(i, cx, cy, radius, 22)
+        const { x, y, textAnchor } = labelPos(i, cx, cy, radius, radius * 0.10)
         // For top/bottom, stack lines; for left/right, keep on one line
         const isTopBottom = i === 0 || i === 2
         const lineH = 14
