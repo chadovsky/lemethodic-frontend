@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { Bell } from 'lucide-react'
 import DailyActionCard from './DailyActionCard'
 import RaccourciProgress from './RaccourciProgress'
@@ -92,32 +93,37 @@ export default function HomeScreen({
             padding: '0 16px',
           }}
         >
-          {/* Avatar */}
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              backgroundColor: PEACH,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-            aria-label={`${userName}'s avatar`}
+          {/* Avatar — taps to /profile */}
+          <Link
+            href="/profile"
+            aria-label={`${userName}'s profile`}
+            style={{ textDecoration: 'none', WebkitTapHighlightColor: 'transparent' }}
           >
-            <span
+            <div
               style={{
-                fontFamily: DISPLAY_FONT,
-                fontWeight: 800,
-                fontSize: 15,
-                color: INK,
-                lineHeight: 1,
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                backgroundColor: PEACH,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
               }}
             >
-              {userName[0].toUpperCase()}
-            </span>
-          </div>
+              <span
+                style={{
+                  fontFamily: DISPLAY_FONT,
+                  fontWeight: 800,
+                  fontSize: 15,
+                  color: INK,
+                  lineHeight: 1,
+                }}
+              >
+                {userName[0].toUpperCase()}
+              </span>
+            </div>
+          </Link>
 
           {/* Title */}
           <h1
