@@ -80,11 +80,6 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
     setRecordingState('idle')
   }
 
-  function handleRedoTranscript() {
-    setShowTranscript(false)
-    setRecordingState('idle')
-  }
-
   function handleStartConversation() {
     setBriefExpanded(false)
     setBriefDismissed(true)
@@ -391,9 +386,7 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
       {/* Transcript review panel */}
       <TranscriptReviewPanel
         visible={showTranscript}
-        transcript="Oui, je pensais partir en juillet ou août. Quelles destinations me recommandez-vous\u00a0?"
         onConfirm={handleConfirmTranscript}
-        onRedo={handleRedoTranscript}
       />
     </div>
   )
