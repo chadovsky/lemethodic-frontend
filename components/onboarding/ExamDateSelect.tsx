@@ -32,6 +32,7 @@ const QUICK_OPTIONS: { id: string; label: string }[] = [
 export default function ExamDateSelect({ onContinue, onBack }: ExamDateSelectProps) {
   const [selectedQuick, setSelectedQuick] = useState<string | null>(null)
   const [dateValue, setDateValue] = useState<string>('')
+  const [dateInputFocused, setDateInputFocused] = useState(false)
 
   const isEnabled = !!selectedQuick || !!dateValue
 
@@ -155,28 +156,53 @@ export default function ExamDateSelect({ onContinue, onBack }: ExamDateSelectPro
           >
             Or pick a date:
           </label>
-          <input
-            id="exam-month"
-            type="month"
-            value={dateValue}
-            onChange={(e) => handleDateChange(e.target.value)}
-            style={{
-              height: 52,
-              borderRadius: 16,
-              border: dateValue ? `2px solid ${INK}` : `1.5px solid ${INK_MUTED}`,
-              backgroundColor: PAPER,
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              padding: '0 20px',
-              fontFamily: DISPLAY_FONT,
-              fontWeight: 600,
-              fontSize: 15,
-              color: INK,
-              outline: 'none',
-              width: '100%',
-              cursor: 'pointer',
-            }}
-          />
+          <div style={{ position: 'relative', width: '100%' }}>
+            {/* Friendly placeholder overlay — hidden once a value is set or the input is focused */}
+            {!dateValue && !dateInputFocused && (
+              <span
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: 20,
+                  transform: 'translateY(-50%)',
+                  fontFamily: DISPLAY_FONT,
+                  fontWeight: 600,
+                  fontSize: 15,
+                  color: INK_MUTED,
+                  pointerEvents: 'none',
+                  zIndex: 1,
+                }}
+              >
+                Select month and year
+              </span>
+            )}
+            <input
+              id="exam-month"
+              type="month"
+              value={dateValue}
+              onChange={(e) => handleDateChange(e.target.value)}
+              onFocus={() => setDateInputFocused(true)}
+              onBlur={() => setDateInputFocused(false)}
+              style={{
+                height: 52,
+                borderRadius: 16,
+                border: dateValue ? `2px solid ${INK}` : dateInputFocused ? `2px solid ${INK_MUTED}` : `1.5px solid ${INK_MUTED}`,
+                backgroundColor: PAPER,
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                padding: '0 20px',
+                fontFamily: DISPLAY_FONT,
+                fontWeight: 600,
+                fontSize: 15,
+                color: dateValue ? INK : 'transparent',
+                outline: 'none',
+                width: '100%',
+                cursor: 'pointer',
+                position: 'relative',
+              }}
+            />
+          </div>
         </div>
 
         {/* Spacer */}

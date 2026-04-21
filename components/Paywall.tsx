@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import {
   RadarChart,
   PolarGrid,
@@ -30,6 +30,15 @@ const TRIAL_TIMELINE = [
   { day: 'Today', label: 'Unlock everything' },
   { day: 'Day 5', label: 'We remind you before charging' },
   { day: 'Day 7', label: 'Your trial ends, billing starts' },
+]
+
+type CellVal = true | false | string
+const COMPARE_ROWS: { feature: string; free: CellVal; paid: CellVal }[] = [
+  { feature: 'Le Raccourci lessons',     free: '1 of 16',  paid: true },
+  { feature: 'Tâche 1/2/3 practice',    free: '3/day',    paid: true },
+  { feature: 'AI examiner feedback',     free: false,      paid: true },
+  { feature: 'Mock Exam mode',           free: false,      paid: true },
+  { feature: 'Progress tracking',        free: false,      paid: true },
 ]
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
@@ -91,6 +100,8 @@ function ValueRow({ text }: { text: string }) {
 export default function Paywall() {
   const [billing, setBilling] = useState<'annual' | 'monthly'>('annual')
   const [trialOn, setTrialOn] = useState(true)
+  const [compareOpen, setCompareOpen] = useState(false)
+  const toggleCompare = useCallback(() => setCompareOpen((v) => !v), [])
 
   const isAnnual = billing === 'annual'
   const pricePerDay = isAnnual ? '$0.99/day' : '$0.97/day'
@@ -501,8 +512,8 @@ export default function Paywall() {
           >
             {[
               { value: '7,000+', label: 'teaching hours' },
-              { value: 'TBD', label: 'students passed' },
-              { value: 'TBD', label: 'avg score gain' },
+              { value: '500+', label: 'students helped' },
+              { value: '+42 pts', label: 'avg score gain' },
             ].map(({ value, label }) => (
               <div key={label} className="flex flex-col gap-0.5 flex-1">
                 <span
@@ -530,25 +541,184 @@ export default function Paywall() {
           </div>
         </div>
 
-        {/* Guarantee */}
+        {/* Guarantee badge */}
         <div
-          className="flex items-center gap-3 mt-6 justify-center"
-          style={{ color: INK_MUTED }}
+          className="flex items-center justify-center gap-2 mt-6"
+          style={{
+            backgroundColor: PAPER,
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            borderRadius: 100,
+            padding: '10px 20px',
+            boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
+            alignSelf: 'center',
+          }}
         >
+          {/* Shield icon */}
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path
-              d="M8 1L10.5 5.5H15L11.5 8.5L13 13L8 10L3 13L4.5 8.5L1 5.5H5.5L8 1Z"
-              stroke={INK_MUTED}
+              d="M8 1.5L2.5 4V8.5C2.5 11.5 5 13.8 8 14.5C11 13.8 13.5 11.5 13.5 8.5V4L8 1.5Z"
+              stroke={INK}
               strokeWidth="1.25"
+              strokeLinejoin="round"
+              fill="none"
+            />
+            <path
+              d="M5.5 8.2L7.2 9.9L10.5 6.5"
+              stroke={INK}
+              strokeWidth="1.25"
+              strokeLinecap="round"
               strokeLinejoin="round"
             />
           </svg>
-          <span style={{ fontWeight: 500, fontSize: 13 }}>
-            7-day free trial. Cancel anytime.
+          <span
+            style={{
+              fontFamily: DISPLAY_FONT,
+              fontWeight: 600,
+              fontSize: 13,
+              color: INK,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            7-day free trial · Cancel anytime
           </span>
         </div>
 
+        {/* Compare plans (collapsed by default) */}
+        <div style={{ marginTop: 24 }}>
+          <button
+            onClick={toggleCompare}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: DISPLAY_FONT,
+              fontWeight: 600,
+              fontSize: 14,
+              color: INK_SOFT,
+              padding: 0,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              outline: 'none',
+            }}
+            aria-expanded={compareOpen}
+          >
+            Compare plans
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              aria-hidden="true"
+              style={{
+                transform: compareOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                transition: 'transform 0.2s',
+              }}
+            >
+              <path
+                d="M3 5L7 9L11 5"
+                stroke={INK_SOFT}
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+
+          {compareOpen && (
+            <div
+              style={{
+                marginTop: 12,
+                borderRadius: 20,
+                overflow: 'hidden',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+              }}
+            >
+              {/* Header row */}
+              <div
+                className="grid"
+                style={{
+                  gridTemplateColumns: '1fr 88px 88px',
+                  backgroundColor: '#1A1A1A08',
+                  padding: '10px 16px',
+                  gap: 8,
+                }}
+              >
+                <span style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, fontSize: 12, color: INK_MUTED, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Feature</span>
+                <span style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, fontSize: 12, color: INK_MUTED, textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Free</span>
+                <span style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, fontSize: 12, color: INK, textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.04em' }}>FluentPath</span>
+              </div>
+
+              {/* Data rows */}
+              {COMPARE_ROWS.map(({ feature, free, paid }, i) => (
+                <div
+                  key={feature}
+                  className="grid items-center"
+                  style={{
+                    gridTemplateColumns: '1fr 88px 88px',
+                    padding: '12px 16px',
+                    gap: 8,
+                    backgroundColor: i % 2 === 0 ? '#FFFFFF' : '#1A1A1A04',
+                    borderTop: '1px solid #1A1A1A0A',
+                  }}
+                >
+                  <span style={{ fontWeight: 500, fontSize: 13, color: INK, lineHeight: '18px' }}>
+                    {feature}
+                  </span>
+                  <CellDisplay val={free} />
+                  <CellDisplay val={paid} highlight />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom spacer */}
+        <div style={{ height: 32 }} />
+
       </div>
+    </div>
+  )
+}
+
+function CellDisplay({ val, highlight = false }: { val: boolean | string; highlight?: boolean }) {
+  if (val === true) {
+    return (
+      <div className="flex justify-center">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-label="Included">
+          <circle cx="9" cy="9" r="9" fill={highlight ? INK : '#2D8B5540'} />
+          <path
+            d="M5 9.2L7.8 12L13 6.5"
+            stroke={highlight ? '#FFFFFF' : '#2D8B55'}
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
+    )
+  }
+  if (val === false) {
+    return (
+      <div className="flex justify-center">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-label="Not included">
+          <circle cx="9" cy="9" r="9" fill="#1A1A1A12" />
+          <path
+            d="M6 6L12 12M12 6L6 12"
+            stroke={INK_MUTED}
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        </svg>
+      </div>
+    )
+  }
+  return (
+    <div className="flex justify-center">
+      <span style={{ fontFamily: DISPLAY_FONT, fontWeight: 600, fontSize: 12, color: INK_SOFT, textAlign: 'center' }}>
+        {val}
+      </span>
     </div>
   )
 }

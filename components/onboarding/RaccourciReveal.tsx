@@ -14,10 +14,10 @@ interface RaccourciRevealProps {
 }
 
 const LEVEL_LABELS: Record<CurrentLevel, string> = {
-  A1_A2: 'Beginner (A1-A2)',
-  A2_B1: 'Elementary (A2-B1)',
-  B1_B2: 'Intermediate (B1-B2)',
-  B2_plus: 'Upper-intermediate (B2+)',
+  A1_A2: 'Basic everyday situations',
+  A2_B1: 'Familiar topics',
+  B1_B2: 'Most topics, with mistakes',
+  B2_plus: 'Polishing fluency',
 }
 
 function formatExamDate(d: ExamDate): string {
