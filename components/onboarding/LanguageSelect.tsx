@@ -12,20 +12,20 @@ interface LanguageSelectProps {
 const languages: {
   id: Language
   label: string
-  flag: string
-  flagAlt: string
+  icon: string
+  iconAlt: string
 }[] = [
   {
     id: 'en',
     label: 'English',
-    flag: '🇬🇧',
-    flagAlt: 'UK flag',
+    icon: '/icon-flag-gb.png',
+    iconAlt: 'United Kingdom flag',
   },
   {
     id: 'es',
     label: 'Español',
-    flag: '🇪🇸',
-    flagAlt: 'Spanish flag',
+    icon: '/icon-flag-es.png',
+    iconAlt: 'Spanish flag',
   },
 ]
 
@@ -68,11 +68,12 @@ export default function LanguageSelect({ onContinue }: LanguageSelectProps) {
         {/* Illustration */}
         <div className="flex justify-center mt-10">
           <Image
-            src="/onboarding-illustration.jpg"
+            src="/illustration-language.png"
             alt="3D speech bubble with globe illustration"
             width={160}
             height={160}
-            className="object-contain drop-shadow-md"
+            className="object-contain"
+            style={{ filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.12))' }}
             priority
           />
         </div>
@@ -144,15 +145,16 @@ export default function LanguageSelect({ onContinue }: LanguageSelectProps) {
                     : 'scale(1)'
                 }}
               >
-                {/* Left: flag + label */}
+                {/* Left: icon + label */}
                 <div className="flex items-center gap-4">
-                  <span
-                    role="img"
-                    aria-label={lang.flagAlt}
-                    style={{ fontSize: 32, lineHeight: 1, userSelect: 'none' }}
-                  >
-                    {lang.flag}
-                  </span>
+                  <Image
+                    src={lang.icon}
+                    alt={lang.iconAlt}
+                    width={44}
+                    height={44}
+                    className="object-contain shrink-0"
+                    style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.14))' }}
+                  />
                   <span
                     style={{
                       fontFamily: "'Cabinet Grotesk', 'Geist', sans-serif",

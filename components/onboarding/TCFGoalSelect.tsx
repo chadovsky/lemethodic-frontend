@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import {
   OnboardingScreen,
   OnboardingCard,
@@ -19,29 +20,29 @@ interface TCFGoalSelectProps {
 
 const GOALS: {
   id: TCFGoal
-  flag: string
-  flagAlt: string
+  icon: string
+  iconAlt: string
   title: string
   descriptor: string
 }[] = [
   {
     id: 'immigration',
-    flag: '🇨🇦',
-    flagAlt: 'Canadian flag',
+    icon: '/icon-flag-ca.png',
+    iconAlt: 'Canadian flag',
     title: 'Canadian immigration',
     descriptor: 'TCF / TEF Canada, CLB scoring',
   },
   {
     id: 'studies',
-    flag: '🎓',
-    flagAlt: 'Graduation cap',
+    icon: '/icon-grad-cap.png',
+    iconAlt: 'Graduation cap',
     title: 'Studies in France',
     descriptor: 'DELF, DALF, academic admissions',
   },
   {
     id: 'general',
-    flag: '🌍',
-    flagAlt: 'Globe',
+    icon: '/icon-globe.png',
+    iconAlt: 'Globe',
     title: 'General French level',
     descriptor: 'I want to improve my speaking',
   },
@@ -55,7 +56,7 @@ export default function TCFGoalSelect({ onContinue, onBack }: TCFGoalSelectProps
       bg="#D4E4D0"
       progressFilledUpTo={2}
       progressCurrent={2}
-      illustration="/illustration-goal.jpg"
+      illustration="/illustration-goal.png"
       illustrationAlt="Passport with boarding pass illustration"
       headline="Why are you learning French?"
       descriptor="This helps us tune your practice to your exam."
@@ -71,15 +72,16 @@ export default function TCFGoalSelect({ onContinue, onBack }: TCFGoalSelectProps
             isSelected={isSelected}
             onClick={() => setSelected(goal.id)}
           >
-            {/* Left: flag + text */}
+            {/* Left: icon + text */}
             <div className="flex items-start gap-4 flex-1">
-              <span
-                role="img"
-                aria-label={goal.flagAlt}
-                style={{ fontSize: 28, lineHeight: 1, userSelect: 'none', marginTop: 2 }}
-              >
-                {goal.flag}
-              </span>
+              <Image
+                src={goal.icon}
+                alt={goal.iconAlt}
+                width={44}
+                height={44}
+                className="object-contain shrink-0"
+                style={{ marginTop: 2, filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.14))' }}
+              />
               <div className="flex flex-col gap-0.5">
                 <span
                   style={{

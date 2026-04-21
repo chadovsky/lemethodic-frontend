@@ -275,14 +275,15 @@ export function OnboardingScreen({
           </div>
         </div>
 
-        {/* Illustration */}
+        {/* Illustration — floats directly on pastel bg, no container */}
         <div className="flex justify-center mt-10">
           <Image
             src={illustration}
             alt={illustrationAlt}
             width={160}
             height={160}
-            className="object-contain drop-shadow-md"
+            className="object-contain"
+            style={{ filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.12))' }}
             priority
           />
         </div>
