@@ -4,6 +4,26 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* FluentPath onboarding pastel palette */
+  --fp-peach: #FFD8C2;
+  --fp-sage: #D4E4D0;
+  --fp-butter: #FFF0C2;
+  --fp-lavender: #E0D4F0;
+  --fp-sky: #CFE4F5;
+  --fp-blush: #F5D6D6;
+
+  /* FluentPath neutrals */
+  --fp-ink: #1A1A1A;
+  --fp-ink-soft: #1A1A1AB3;
+  --fp-ink-muted: #1A1A1A66;
+  --fp-paper: #FFFFFFCC;
+  --fp-paper-solid: #FFFFFF;
+
+  /* FluentPath CTA */
+  --fp-cta-bg: #1A1A1A;
+  --fp-cta-text: #FFFFFF;
+  --fp-cta-disabled: #1A1A1A4D;
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -77,6 +97,23 @@
 @theme inline {
   --font-sans: 'Geist', 'Geist Fallback';
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-display: 'Cabinet Grotesk', 'Geist', sans-serif;
+
+  /* FluentPath design tokens */
+  --color-fp-peach: var(--fp-peach);
+  --color-fp-sage: var(--fp-sage);
+  --color-fp-butter: var(--fp-butter);
+  --color-fp-lavender: var(--fp-lavender);
+  --color-fp-sky: var(--fp-sky);
+  --color-fp-blush: var(--fp-blush);
+  --color-fp-ink: var(--fp-ink);
+  --color-fp-ink-soft: var(--fp-ink-soft);
+  --color-fp-ink-muted: var(--fp-ink-muted);
+  --color-fp-paper: var(--fp-paper);
+  --color-fp-paper-solid: var(--fp-paper-solid);
+  --color-fp-cta-bg: var(--fp-cta-bg);
+  --color-fp-cta-text: var(--fp-cta-text);
+  --color-fp-cta-disabled: var(--fp-cta-disabled);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
