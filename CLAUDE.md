@@ -30,7 +30,7 @@ The root route (`app/page.tsx`) renders `components/onboarding/OnboardingFlow.ts
 3. `CurrentLevelSelect` — self-assessed CEFR band (`A1_A2` | `A2_B1` | `B1_B2` | `B2_plus`)
 4. `TargetScoreSelect` — depends on the chosen goal
 5. `ExamDateSelect` — either a real `YYYY-MM` date or a "quick" label
-6. `RaccourciReveal` — summary screen; its continue CTA `router.push('/test-drive')`
+6. `RaccourciReveal` — summary screen; its continue CTA `router.push('/paywall')`
 
 Each step component is self-contained and calls `onContinue(value)` + optional `onBack()` props. Step 6's types (`CurrentLevel`, `TargetScore`, `ExamDate`) are re-exported from their step files — `OnboardingFlow` imports types from each step.
 
@@ -60,8 +60,7 @@ Geist/Geist Mono are loaded via `next/font/google` in `app/layout.tsx` but the r
 
 ### Other routes
 
-- `/paywall` — `components/Paywall.tsx`, a long client component using Recharts (`RadarChart`) plus an expandable comparison table. Imports design tokens from the onboarding primitives.
-- `/test-drive` — placeholder stub ("Test drive coming in F-057").
+- `/paywall` — `components/Paywall.tsx`, a long client component using Recharts (`RadarChart`) plus an expandable comparison table. Imports design tokens from the onboarding primitives. This is the final step of the onboarding funnel — the step-6 `RaccourciReveal` CTA pushes here.
 
 ### Build config gotchas
 

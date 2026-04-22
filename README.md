@@ -24,6 +24,30 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Backend / API
+
+This frontend talks to the FluentPath FastAPI backend (`tcf-oral-tool`, separate repo). The API base URL is read from `NEXT_PUBLIC_API_URL` — see `.env.example`. For local dev, copy it to `.env.local`:
+
+```bash
+cp .env.example .env.local
+# then edit so NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+### CORS — backend must allow the dev origin
+
+Because the frontend runs on `http://localhost:3000` and the backend on `http://localhost:8000`, browsers block the cross-origin requests unless FastAPI explicitly permits them. The backend needs `CORSMiddleware` configured with:
+
+- `allow_origins=["http://localhost:3000"]` (add the production origin later)
+- `allow_methods=["*"]`, `allow_headers=["*"]`
+
+Auth is JWT-only: the frontend injects `Authorization: Bearer <token>` from localStorage, so `allow_credentials` is not required.
+
+If you see `CORS error` / `No 'Access-Control-Allow-Origin'` in the browser console, that's the fix — land it on the backend repo, not here.
+
+## Deferred features
+
+- **Test-drive recording screen** (free diagnostic before paywall) — deferred to post-launch Phase 2 for conversion-optimization A/B testing. The `/test-drive` route has been removed; the onboarding funnel now routes step 6 (`RaccourciReveal`) directly to `/paywall`.
+
 ## Learn More
 
 To learn more, take a look at the following resources:

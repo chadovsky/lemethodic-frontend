@@ -104,7 +104,7 @@ export default function OnboardingFlow() {
         currentLevel={state.currentLevel ?? 'A2_B1'}
         targetScore={state.targetScore ?? ''}
         examDate={state.examDate ?? { type: 'quick', label: 'No exam scheduled' }}
-        onContinue={() => router.push('/test-drive')}
+        onContinue={() => router.push('/paywall')}
       />
     )
   }

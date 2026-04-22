@@ -5,7 +5,19 @@
       "Bash(npm --version)",
       "Bash(npm install *)",
       "Bash(pnpm install *)",
-      "Bash(pnpm dev *)"
+      "Bash(pnpm dev *)",
+      "Bash(pnpm add *)",
+      "Bash(npx tsc *)",
+      "Bash(git -C \"C:\\\\Users\\\\pc\\\\Downloads\\\\fluentpath-frontend\" log --oneline -- components/onboarding/TargetScoreSelect.tsx)",
+      "Bash(git -C \"C:\\\\Users\\\\pc\\\\Downloads\\\\fluentpath-frontend\" diff HEAD -- components/onboarding/TargetScoreSelect.tsx)",
+      "Bash(git -C \"C:\\\\Users\\\\pc\\\\Downloads\\\\fluentpath-frontend\" status --short)",
+      "Bash(curl -s -o /dev/null -w \"GET /          -> %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"GET /paywall   -> %{http_code}\\\\n\" http://localhost:3000/paywall)",
+      "Bash(curl -s -o /dev/null -w \"GET /test-drive -> %{http_code}\\\\n\" http://localhost:3000/test-drive)",
+      "Bash(python -m scripts.add_onboarding_columns)",
+      "Bash(python -c \"import sqlite3; c = sqlite3.connect\\('tcf_oral.db'\\); print\\('\\\\n'.join\\(f'{r[1]:25} {r[2]}' for r in c.execute\\('PRAGMA table_info\\(users\\)'\\)\\)\\)\")",
+      "Bash(python -c \"from main import app; print\\('routes:'\\); [print\\(f'  {r.methods} {r.path}'\\) for r in app.routes if hasattr\\(r, 'methods'\\) and any\\(p in str\\(r.path\\) for p in ['/api/users', '/api/auth/me']\\)]\")",
+      "Bash(curl -s -o /dev/null -w \"GET /raccourci -> %{http_code}\\\\n\" http://localhost:3000/raccourci)"
     ]
   }
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   RadarChart,
   PolarGrid,
@@ -98,10 +99,24 @@ function ValueRow({ text }: { text: string }) {
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function Paywall() {
+  const router = useRouter()
   const [billing, setBilling] = useState<'annual' | 'monthly'>('annual')
   const [trialOn, setTrialOn] = useState(true)
   const [compareOpen, setCompareOpen] = useState(false)
   const toggleCompare = useCallback(() => setCompareOpen((v) => !v), [])
+
+  // Phase 3 will flush the onboarding store with
+  // api.users.completeOnboarding(onboardingStoreData) before this push, and a
+  // future ticket will route through Stripe checkout first. For now, direct.
+  const handleStartTrial = () => {
+    router.push('/raccourci')
+  }
+
+  // Phase 3 will mark this user as "trial skipped" on their profile for
+  // remarketing before pushing. For now, direct.
+  const handleMaybeLater = () => {
+    router.push('/raccourci')
+  }
 
   const isAnnual = billing === 'annual'
   const pricePerDay = isAnnual ? '$0.99/day' : '$0.97/day'
@@ -118,7 +133,7 @@ export default function Paywall() {
         style={{ paddingTop: 48 }}
       >
 
-        {/* ── Test-drive section ─────────────────────────────── */}
+        {/* ── Diagnostic preview section ─────── */}
         <h2
           style={{
             fontFamily: DISPLAY_FONT,
@@ -128,7 +143,7 @@ export default function Paywall() {
             color: INK,
           }}
         >
-          Your test-drive
+          Where you stand today
         </h2>
         <p
           style={{
@@ -437,6 +452,8 @@ export default function Paywall() {
 
           {/* CTA */}
           <button
+            type="button"
+            onClick={handleStartTrial}
             style={{
               marginTop: 20,
               width: '100%',
@@ -462,6 +479,8 @@ export default function Paywall() {
           {/* Maybe later */}
           <div className="flex justify-center mt-4">
             <button
+              type="button"
+              onClick={handleMaybeLater}
               style={{
                 background: 'transparent',
                 border: 'none',
