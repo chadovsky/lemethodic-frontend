@@ -150,16 +150,32 @@ _(none — F-062 + F-062.1 + F-062.2 closed. F-063 (T1), F-061.1 (picker), F-062
 
 ---
 
+F-062.3 ✅ Tâche 2 re-record current turn — "Refaire cette prise"
+  - User-facing: new secondary button in the TurnReviewSheet alongside "Confirmer". Tap → current transcript discarded, user's optimistic bubble popped from chat, turn counter unchanged, phase resets to user-idle, user can hold PTT to re-record the same turn position. No max-attempts cap.
+  - Backend (tcf-oral-tool):
+      · Migration `scripts/add_turn_supersede_columns.py` (repo convention: direct sqlite3 ALTER TABLE + idempotent PRAGMA guard; no Alembic — project doesn't use it and the F-062.3 ticket's "Use Alembic" line was superseded by its own "File naming per repo convention" line). Adds `superseded_at TIMESTAMP NULL` + `superseded_by_turn_id INTEGER NULL` columns to `conversation_turns`, plus partial index `ix_conversation_turns_active` on (conversation_id, speaker) WHERE superseded_at IS NULL for hot-path queries.
+      · New endpoint `POST /api/conversations/{id}/turn/{turn_number}/supersede` — sets superseded_at=now() on the target turn, cascades to the immediately-following examiner turn (if active) since that reply was generated in context of the now-rejected candidate transcript. Returns `{superseded_turn_id, superseded_turn_number, superseded_at, cascaded_examiner_turn_numbers, status: 'superseded'}`. Idempotent (second call returns the original superseded_at), 404 on unknown turn, 400 on non-candidate target or non-in_progress conversation, 403 on owner mismatch.
+      · `_candidate_turns(conv)` helper now filters superseded — this one change propagates the soft-flag semantics through the hard-cap check in `/turn`, the zero-turns check in `/end`, and the combined-transcript build in `_run_conversation_analysis_and_persist`.
+      · `_active_turns(conversation)` helper added to both `app/services/tache_1.py` and `app/services/tache_2.py` (mirror helpers — shared module is a future refactor). Applied to `generate_examiner_turn_*` (so the next examiner turn isn't prompted with stale context) AND `analyze_tache_*` (so superseded turns don't leak into final scoring).
+      · `recordings.py::_conversation_snapshot_for` — filters superseded turns out of the /diagnostic page's conversation replay.
+      · `_serialize_turn` exposes `superseded_at` + `superseded_by_turn_id` for debugability; frontend doesn't need them in the happy path.
+      · Auto-supersede defensive path in `/turn` (spec item 3): **skipped**. The current backend assigns turn_number monotonically via `len(conv.turns)`, so a "new turn with same turn_number N" collision can't occur unless the frontend skips /supersede and re-uploads — in which case we'd have two active candidate turns in a row, not a collision. Documented deviation. The explicit `/supersede` endpoint is the single sanctioned path.
+      · Turn response for `/turn` now includes `candidate_turn_number` — the frontend needs it to know what row to supersede on Refaire.
+      · Audio file NOT deleted on supersede — kept for audit. Future async cleanup job is out of scope for F-062.3 and not tracked here yet.
+  - Frontend (fluentpath-frontend):
+      · `api.sessions.supersedeTurn(sessionId, turnNumber)` — new method + `ConversationSupersedeResult` type in lib/types.ts. Posts empty body to the cascade endpoint.
+      · `ConversationTurnResult` type gains `candidateTurnNumber: number` (non-null; backend always populates).
+      · Tache2Session state machine: new `'supersede-in-flight'` phase + `supersedingRef` double-tap guard. `pendingCandidateTurnNumber` state tracks the just-uploaded turn from upload → review → commit/discard. `handleReRecord` calls /supersede, pops the last (optimistic) user bubble, resets pendingCandidateTurnNumber, transitions to user-idle. On supersede error: reuses ErrorOverlay with a new `secondaryAction` prop offering "Keep this take" (falls back to Confirmer behavior so the user isn't stranded against a broken /supersede).
+      · **Deferred-commit refactor**: `userTurnCount` now increments in `proceedAfterCommit` (Confirmer path) instead of in `uploadTurn`. This means the "Turn X of 6" indicator correctly stays on the current turn through a re-record cycle, and no decrement dance is needed.
+      · TurnReviewSheet: "Refaire cette prise" as a ghost/outline secondary button below "Confirmer" (primary). The "Ne plus afficher cette revue" checkbox semantics are unchanged — it affects the NEXT turn regardless of this turn's resolution.
+      · New `SupersedeInFlightOverlay` — brief "Discarding this take…" spinner, lighter visual weight than FinalizingOverlay since the action is sub-second.
+  - Edge cases handled: double-tap Refaire (second tap short-circuits via supersedingRef), supersede during examiner-speaking (blocked — review sheet is only visible in 'reviewing' phase), network failure on supersede (error overlay + Keep-this-take fallback), multiple supersedes on the same turn position (backend monotonic turn_numbers and cascade logic handle it cleanly).
+  - Final verification (Recording #25): DB soft-flag cascade confirmed on a 7-candidate-row conversation where 1 row was re-recorded — `conversation_turns` had (candidate 0, examiner 1, candidate 2 superseded, examiner 3 superseded via cascade, candidate 4, examiner 5, ...) with 6 active candidate turns total. `/end` analysis built the combined transcript from active rows only. Diagnostic page rendered real 4-couche scores matching conversation content (Le Goulet explanation cited "says 'I'm going to Marrakech' but explains neither preferences, needs, budget" — content from the kept turns, not the discarded retake).
+  - `tsc --noEmit` clean on ship (only the pre-existing TargetScoreSelect.tsx:98 known error). Migration ran cleanly on dev SQLite.
+
 ## Queued — follow-ups
 
-**F-062.3** 📋 Tâche 2 re-record current turn — **HIGH PRIORITY, ship before F-063**
-- Add a third button to the per-turn review sheet (currently the inline `TurnReviewSheet` in `Tache2Session.tsx`) labeled "Refaire cette prise" alongside "Confirmer".
-- When tapped: panel closes, turn counter is NOT incremented, current turn's transcript is discarded (not committed to conversation history), phase resets to `user-idle`, user can hold PTT to re-record the same turn.
-- Backend: the turn that was already uploaded to `/conversations/{id}/turn` needs to be invalidated. Two options, confirm least-invasive with backend:
-    · `DELETE /api/conversations/{id}/turn/{turn_number}` — removes the ConversationTurn row + its audio file. Note: backend already has the examiner's reply turn appended after the candidate turn; that examiner row also needs deleting, OR we leave it and the model re-prompts on re-upload (messier conversation state).
-    · Soft flag on ConversationTurn — new `superseded` bool column; `/turn` and `/end` filter to non-superseded rows. Less destructive, preserves audit trail, but touches more backend query sites.
-- Rationale: STT mis-transcription is common — AssemblyAI is ~90-92% word accuracy on French speakers with non-native accents. Without a re-record path, a single bad transcript derails the entire 6-turn conversation and the user's only option is to abandon + restart the session. Launch blocker for paid product quality.
-- Shared impact: the UX pattern (and backend delete/soft-flag path) will be reused by F-063 for T1, so shipping this before T1 means F-063 inherits it for free. That's the priority argument.
+_(none — F-062.3 closed; T2 loop is now re-record-capable.)_
 
 ---
 
@@ -299,6 +315,32 @@ Previously called "F-060 launch prep" umbrella. Split into discrete tickets here
 - `components/onboarding/TargetScoreSelect.tsx:98` — pre-existing v0 unknown-narrowing TypeScript error. Cosmetic, doesn't break build.
 - Backend `main.py` CORS has `allow_credentials=True` — not needed for JWT-only but harmless; leave it.
 - Paywall.tsx has a lingering `{/* ── Test-drive section ─────── */}` code comment referencing deprecated feature. Cosmetic.
+
+---
+
+## Architectural lessons (ops gotchas from shipped tickets)
+
+### Uvicorn `--reload` on Windows: worker processes go stale silently
+
+Learned during F-062.3. On Windows, `uvicorn --reload` with the WatchFiles backend has edge cases where:
+
+- WatchFiles doesn't always detect edits in nested subdirectories (`app/routers/*.py` in particular — `scripts/*.py` edits were detected in the same session).
+- Worker processes don't fully terminate on reload, accumulating zombie workers that continue answering requests with their original in-memory module state.
+- The `.pyc` file timestamp can reflect a *past* import (leaving you reasoning about fresh bytecode when the serving process is holding old code).
+
+Symptom: source code on disk provably contains a change (grep, `inspect.getsource(<fresh import>)`), but the HTTP response body doesn't reflect it. F-062.3's /turn endpoint was missing `candidate_turn_number` in the wire response for 2+ hours of debugging despite the field being on disk in two return dicts.
+
+**Nuclear restart protocol** (when response doesn't match source):
+
+```
+taskkill /F /IM python.exe
+find . -type d -name __pycache__ -exec rm -rf {} +
+python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+The `taskkill /F` is the non-negotiable part — stops every Python process bound to the workspace, not just the foreground one. WatchFiles will not save you from a zombie worker holding a stale module.
+
+Belt-and-braces diagnostic pattern: add `print(..., flush=True)` calls in the live handler (not just the return dict — also entry with `__file__`) and watch uvicorn stdout. If the prints don't fire, you're not looking at the right process. If they fire with the right `__file__` but the wire body still doesn't match, the serving process is new but the browser/cache/DevTools is showing a stale response — reload the network tab.
 
 ---
 

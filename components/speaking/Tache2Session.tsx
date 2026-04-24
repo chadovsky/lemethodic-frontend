@@ -60,6 +60,8 @@ type Phase =
   | 'user-recording'
   | 'user-transcribing'
   | 'reviewing'
+  // F-062.3 Refaire cette prise is in flight — supersede API call running.
+  | 'supersede-in-flight'
   | 'examiner-speaking'
   | 'finalizing'
   | 'error'
@@ -185,6 +187,10 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
   const [userTurnCount, setUserTurnCount] = useState(0)
   const [pendingTranscript, setPendingTranscript] = useState<string | null>(null)
   const [pendingExaminerBubble, setPendingExaminerBubble] = useState<BubbleEntry | null>(null)
+  // F-062.3: the just-uploaded candidate turn's backend turn_number. Set
+  // when review sheet opens, used to supersede if the user hits Refaire,
+  // cleared when the turn is either committed or superseded.
+  const [pendingCandidateTurnNumber, setPendingCandidateTurnNumber] = useState<number | null>(null)
   const [reviewSuppressed, setReviewSuppressed] = useState(false)
   const [muted, setMuted] = useState(false)
   const [briefExpanded, setBriefExpanded] = useState(false)
@@ -197,6 +203,9 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
   // cap effect racing a user tap.
   const stoppingRef = useRef(false)
   const finalizingRef = useRef(false)
+  // F-062.3: guards /supersede from firing twice if the user double-taps
+  // Refaire while the network call is in flight.
+  const supersedingRef = useRef(false)
   // Latest user-turn count — used by the examiner-audio-ended callback so it
   // doesn't close over a stale count when the effect fires.
   const userTurnCountRef = useRef(0)
@@ -304,14 +313,16 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
       try {
         const result = await api.sessions.uploadConversationTurn(conversationId, blob)
 
-        // Commit candidate bubble immediately so the user sees their line.
-        const nextCount = userTurnCountRef.current + 1
+        // F-062.3: show the user's line optimistically so it's visible
+        // under the review sheet, BUT don't yet increment userTurnCount.
+        // The count increments in proceedAfterCommit (on Confirmer); if
+        // the user taps Refaire, we pop this bubble in handleReRecord.
         setBubbles((prev) => [
           ...prev,
           { side: 'user', text: result.candidateTranscript || '…' },
         ])
-        setUserTurnCount(nextCount)
         setPendingTranscript(result.candidateTranscript)
+        setPendingCandidateTurnNumber(result.candidateTurnNumber)
 
         // Stash the examiner reply — it plays after review (or immediately
         // if review is suppressed).
@@ -327,7 +338,7 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
 
         // Branch: review or skip?
         if (reviewSuppressed) {
-          proceedAfterCommit(nextCount, {
+          proceedAfterCommit({
             side: 'examiner',
             text: result.examinerTurnText ?? '',
             audioUrl: result.examinerTurnAudioUrl,
@@ -398,12 +409,18 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
 
   // Central "user turn committed → what next" router. Called from both
   // the review-confirm path and the review-suppressed path.
+  // F-062.3: this is where userTurnCount actually increments. Prior to this
+  // call, the user bubble is shown on screen but the turn hasn't "counted"
+  // — a Refaire tap between upload and Confirmer rolls it back.
   const proceedAfterCommit = useCallback(
     (
-      committedCount: number,
       examinerBubble: BubbleEntry,
       hasExaminerReply: boolean,
     ) => {
+      const committedCount = userTurnCountRef.current + 1
+      setUserTurnCount(committedCount)
+      setPendingCandidateTurnNumber(null)
+
       if (hasExaminerReply) {
         setBubbles((prev) => [...prev, examinerBubble])
         setPhase('examiner-speaking')
@@ -419,6 +436,58 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
     },
     [finalize],
   )
+
+  // F-062.3: user tapped Refaire cette prise in the review sheet. Supersede
+  // the just-uploaded candidate turn (backend cascades to the examiner
+  // follow-up if it generated one), pop the optimistic VOUS bubble, reset
+  // to user-idle. Turn counter is NOT touched because it was never
+  // incremented for this attempt — see proceedAfterCommit.
+  const handleReRecord = useCallback(async () => {
+    if (phase !== 'reviewing' && phase !== 'error') return
+    if (!conversationId || pendingCandidateTurnNumber == null) {
+      handleApiError(
+        new Error('Missing turn context.'),
+        'Could not identify this take. Start the conversation again.',
+      )
+      return
+    }
+    if (supersedingRef.current) return
+    supersedingRef.current = true
+    setPhase('supersede-in-flight')
+    try {
+      await api.sessions.supersedeTurn(conversationId, pendingCandidateTurnNumber)
+      // Pop the optimistic user bubble. Examiner follow-up was not yet
+      // added to bubbles (that happens in proceedAfterCommit), so nothing
+      // to pop on that side.
+      setBubbles((prev) => prev.slice(0, -1))
+      setPendingTranscript(null)
+      setPendingExaminerBubble(null)
+      setPendingCandidateTurnNumber(null)
+      stoppingRef.current = false
+      supersedingRef.current = false
+      setPhase('user-idle')
+    } catch (err) {
+      supersedingRef.current = false
+      handleApiError(err, 'Could not discard this take. Retry?')
+    }
+  }, [phase, conversationId, pendingCandidateTurnNumber, handleApiError])
+
+  // F-062.3: fallback from the supersede error state. Pretend the user hit
+  // Confirmer — commits the take as-is. Safer than stranding them in an
+  // error loop if /supersede is broken (network, auth, whatever).
+  const keepTakeFromSupersedeError = useCallback(() => {
+    if (!pendingExaminerBubble) {
+      // Shouldn't happen — the review sheet only opens when we have a
+      // response in hand. Defensive.
+      setPhase('user-idle')
+      setPendingCandidateTurnNumber(null)
+      setPendingTranscript(null)
+      supersedingRef.current = false
+      return
+    }
+    supersedingRef.current = false
+    proceedAfterCommit(pendingExaminerBubble, true)
+  }, [pendingExaminerBubble, proceedAfterCommit])
 
   // Examiner audio playback driver. Runs whenever we enter examiner-speaking
   // and there's a bubble with audio to play.
@@ -488,11 +557,7 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
     const examiner = pendingExaminerBubble
     setPendingExaminerBubble(null)
     setPendingTranscript(null)
-    proceedAfterCommit(
-      userTurnCountRef.current,
-      examiner ?? { side: 'examiner', text: '' },
-      examiner != null,
-    )
+    proceedAfterCommit(examiner ?? { side: 'examiner', text: '' }, examiner != null)
   }, [pendingExaminerBubble, proceedAfterCommit])
 
   // ── Error recovery ───────────────────────────────────────────────────────
@@ -500,10 +565,18 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
   const retryFromError = useCallback(() => {
     finalizingRef.current = false
     stoppingRef.current = false
+    supersedingRef.current = false
     setError(null)
     if (!conversationId) {
       // Error happened before /start succeeded — retry from briefing.
       setPhase('briefing')
+      return
+    }
+    // F-062.3: if the failed action was /supersede (review sheet visible
+    // before failure, pending turn number still set), retry it. The user
+    // can bail out via "Keep this take" in the error overlay.
+    if (pendingCandidateTurnNumber != null) {
+      void handleReRecord()
       return
     }
     if (userTurnCount >= TARGET_USER_TURNS) {
@@ -513,7 +586,8 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
       // Mid-conversation error — let the user re-record the last turn.
       setPhase('user-idle')
     }
-  }, [conversationId, userTurnCount, finalize])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId, userTurnCount, pendingCandidateTurnNumber, finalize, handleReRecord])
 
   // ── Derived values ───────────────────────────────────────────────────────
 
@@ -641,11 +715,14 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
         <TurnReviewSheet
           transcript={pendingTranscript ?? ''}
           onConfirm={confirmReview}
+          onReRecord={handleReRecord}
           suppressed={reviewSuppressed}
           onToggleSuppress={setReviewSuppressed}
           bg={brief.bg}
         />
       )}
+
+      {phase === 'supersede-in-flight' && <SupersedeInFlightOverlay />}
 
       {showFinalizingOverlay && <FinalizingOverlay />}
 
@@ -653,6 +730,15 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
         <ErrorOverlay
           message={error ?? 'Something went wrong.'}
           onRetry={retryFromError}
+          // F-062.3: if the failed action was /supersede, offer "Keep this
+          // take" as an escape so the user doesn't get stuck in a retry
+          // loop against a broken endpoint. Detected by the presence of a
+          // pending candidate turn (only set between upload and commit).
+          secondaryAction={
+            pendingCandidateTurnNumber != null
+              ? { label: 'Keep this take', onClick: keepTakeFromSupersedeError }
+              : undefined
+          }
         />
       )}
     </div>
@@ -957,12 +1043,16 @@ function BottomBar({
 function TurnReviewSheet({
   transcript,
   onConfirm,
+  onReRecord,
   suppressed,
   onToggleSuppress,
   bg,
 }: {
   transcript: string
   onConfirm: () => void
+  /** F-062.3: "Refaire cette prise" — discard this take, supersede the
+   *  backend turn, reset to user-idle so the user can hold PTT again. */
+  onReRecord: () => void
   suppressed: boolean
   onToggleSuppress: (v: boolean) => void
   bg: string
@@ -1092,10 +1182,33 @@ function TurnReviewSheet({
               color: '#FFFFFF',
               cursor: 'pointer',
               outline: 'none',
-              marginBottom: 14,
+              marginBottom: 10,
             }}
           >
             Confirmer
+          </button>
+          {/* F-062.3: Refaire cette prise. Ghost/outline styling so it
+              reads as the safer, less-destructive secondary — users should
+              feel Confirmer is the default "happy path". */}
+          <button
+            onClick={onReRecord}
+            style={{
+              width: '100%',
+              height: 48,
+              borderRadius: 14,
+              border: `1.5px solid ${INK_MUTED}`,
+              backgroundColor: 'transparent',
+              fontFamily: DISPLAY_FONT,
+              fontWeight: 600,
+              fontSize: 14,
+              color: INK_SOFT,
+              cursor: 'pointer',
+              outline: 'none',
+              marginBottom: 14,
+            }}
+            aria-label="Re-record this take"
+          >
+            Refaire cette prise
           </button>
           <label
             style={{
@@ -1169,7 +1282,58 @@ function FinalizingOverlay() {
   )
 }
 
-function ErrorOverlay({ message, onRetry }: { message: string; onRetry: () => void }) {
+// F-062.3: brief overlay while /supersede is in flight. Intentionally
+// shorter copy than FinalizingOverlay — this is a <1s interaction and
+// should not feel heavy.
+function SupersedeInFlightOverlay() {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(250, 250, 247, 0.72)',
+        zIndex: 80,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 12,
+        fontFamily: DISPLAY_FONT,
+      }}
+    >
+      <div
+        aria-hidden="true"
+        style={{
+          width: 32,
+          height: 32,
+          border: `3px solid ${INK}22`,
+          borderTopColor: INK,
+          borderRadius: '50%',
+          animation: 'spin 0.9s linear infinite',
+        }}
+      />
+      <p style={{ fontWeight: 600, fontSize: 14, color: INK_SOFT, margin: 0 }}>
+        Discarding this take…
+      </p>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  )
+}
+
+function ErrorOverlay({
+  message,
+  onRetry,
+  secondaryAction,
+}: {
+  message: string
+  onRetry: () => void
+  /** F-062.3: optional escape hatch. Currently used by the supersede-error
+   *  path to offer "Keep this take" so the user isn't stranded if
+   *  /supersede is broken. */
+  secondaryAction?: { label: string; onClick: () => void }
+}) {
   return (
     <div
       role="alert"
@@ -1210,6 +1374,23 @@ function ErrorOverlay({ message, onRetry }: { message: string; onRetry: () => vo
       >
         Try again
       </button>
+      {secondaryAction && (
+        <button
+          onClick={secondaryAction.onClick}
+          style={{
+            fontFamily: DISPLAY_FONT,
+            fontWeight: 600,
+            fontSize: 14,
+            color: INK_SOFT,
+            backgroundColor: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '6px 12px',
+          }}
+        >
+          {secondaryAction.label}
+        </button>
+      )}
     </div>
   )
 }

@@ -154,8 +154,12 @@ export interface ConversationStart {
 // `autoEnded` flips when the backend-side hard cap is hit — for clients
 // enforcing a tighter cap (F-062's 6-turn T2 loop) this stays false and the
 // client calls finalizeConversation itself.
+// `candidateTurnNumber` is needed by the F-062.3 Refaire cette prise flow —
+// it's the id to pass to supersedeTurn() when the user rejects the
+// transcript.
 export interface ConversationTurnResult {
   candidateTranscript: string
+  candidateTurnNumber: number
   examinerTurnText: string | null
   examinerTurnAudioUrl: string | null
   examinerTurnNumber: number | null
@@ -172,6 +176,19 @@ export interface ConversationFinalizeResult {
   conversationStatus: Conversation['status']
   recordingId: number | null
   underMinTurns: boolean
+}
+
+// Return shape of api.sessions.supersedeTurn (POST /conversations/{id}/turn/{N}/supersede).
+// F-062.3: the backend cascades to immediately-following examiner turns,
+// so `cascadedExaminerTurnNumbers` surfaces which turn(s) were also marked
+// superseded. Frontend typically ignores this — but it's useful for the
+// debug path when the UI's chat log needs to be reconciled.
+export interface ConversationSupersedeResult {
+  supersededTurnId: number
+  supersededTurnNumber: number
+  supersededAt: string
+  cascadedExaminerTurnNumbers: number[]
+  status: 'superseded'
 }
 
 export interface Recording {

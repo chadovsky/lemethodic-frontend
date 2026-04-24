@@ -9,6 +9,7 @@ import type {
   Conversation,
   ConversationFinalizeResult,
   ConversationStart,
+  ConversationSupersedeResult,
   ConversationTurn,
   ConversationTurnResult,
   Couche,
@@ -740,6 +741,7 @@ export const api = {
       fd.append('audio', audioBlob, 'turn.webm')
       const raw = await request<{
         candidate_transcript: string
+        candidate_turn_number: number
         examiner_turn_text: string | null
         examiner_turn_audio_url: string | null
         examiner_turn_number: number | null
@@ -750,6 +752,7 @@ export const api = {
       }>(`/api/conversations/${sessionId}/turn`, { formData: fd })
       return {
         candidateTranscript: raw.candidate_transcript,
+        candidateTurnNumber: raw.candidate_turn_number,
         examinerTurnText: raw.examiner_turn_text,
         examinerTurnAudioUrl: raw.examiner_turn_audio_url,
         examinerTurnNumber: raw.examiner_turn_number,
@@ -757,6 +760,38 @@ export const api = {
         recordingId: raw.recording_id,
         autoEnded: raw.auto_ended,
         wrapUpHint: raw.wrap_up_hint,
+      }
+    },
+
+    // F-062.3: mark a candidate turn as superseded so the candidate can
+    // re-record it. Use this BEFORE re-uploading audio on the same turn
+    // position. Idempotent (calling twice on the same turn returns the
+    // original supersede timestamp).
+    //
+    // Backend cascades: also supersedes the immediately-following examiner
+    // turn if present. Frontend generally doesn't need to act on
+    // `cascadedExaminerTurnNumbers`, but can use it to reconcile its own
+    // chat log view if it was showing the examiner reply.
+    async supersedeTurn(
+      sessionId: string,
+      turnNumber: number,
+    ): Promise<ConversationSupersedeResult> {
+      const raw = await request<{
+        superseded_turn_id: number
+        superseded_turn_number: number
+        superseded_at: string
+        cascaded_examiner_turn_numbers: number[]
+        status: 'superseded'
+      }>(`/api/conversations/${sessionId}/turn/${turnNumber}/supersede`, {
+        method: 'POST',
+        body: {},
+      })
+      return {
+        supersededTurnId: raw.superseded_turn_id,
+        supersededTurnNumber: raw.superseded_turn_number,
+        supersededAt: raw.superseded_at,
+        cascadedExaminerTurnNumbers: raw.cascaded_examiner_turn_numbers,
+        status: raw.status,
       }
     },
 
