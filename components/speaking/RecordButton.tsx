@@ -40,11 +40,45 @@ export default function RecordButton({
   function handleClick() {
     if (mode === 'tap') onTap?.()
   }
-  function handlePointerDown() {
-    if (mode === 'ptt') onPTTStart?.()
+  // PTT handlers use setPointerCapture so the button receives pointerup even
+  // if the pointer drifts out of the element — or, critically, if layout
+  // shifts (timer + VU meter mounting during the idle→recording transition)
+  // move the button out from under a stationary pointer. Without capture,
+  // that shift would fire pointerleave and stop the recording ~10ms in.
+  // See F-062.2 diagnosis for the full trace.
+  function handlePointerDown(e: React.PointerEvent<HTMLButtonElement>) {
+    if (mode !== 'ptt') return
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId)
+    } catch {
+      // Very old browsers or pointer types that don't support capture —
+      // fall through to the normal event flow. No visible regression; we
+      // just lose the layout-shift protection.
+    }
+    onPTTStart?.()
   }
-  function handlePointerUp() {
-    if (mode === 'ptt') onPTTEnd?.()
+  function handlePointerUp(e: React.PointerEvent<HTMLButtonElement>) {
+    if (mode !== 'ptt') return
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    } catch {
+      // pointerId may already have been released by the OS (e.g.
+      // pointercancel fired first); ignore.
+    }
+    onPTTEnd?.()
+  }
+  // Treat OS-level pointer takeaway (phone call, tab switch, app
+  // backgrounded, stylus lifted without a normal up event) as a release —
+  // otherwise the recorder would leak and the user would never get the
+  // review panel.
+  function handlePointerCancel(e: React.PointerEvent<HTMLButtonElement>) {
+    if (mode !== 'ptt') return
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    } catch {
+      /* ignore */
+    }
+    onPTTEnd?.()
   }
 
   return (
@@ -73,7 +107,7 @@ export default function RecordButton({
         onClick={handleClick}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
         disabled={isProcessing}
         style={{
           width: 88,

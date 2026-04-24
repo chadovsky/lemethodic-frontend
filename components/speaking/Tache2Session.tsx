@@ -48,6 +48,11 @@ const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 
 const TARGET_USER_TURNS = 6
 const TURN_CAP_MS       = 60_000
+// Belt-and-braces against spurious pointer releases (slip fingers, OS
+// events firing during the recorder startup window, etc.). The real
+// F-062.2 root cause (layout-shift-triggered pointerleave) is fixed by
+// pointer capture in RecordButton; this guard catches anything else.
+const MIN_HOLD_MS       = 200
 
 type Phase =
   | 'briefing'
@@ -342,8 +347,21 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
   const finishRecording = useCallback(async () => {
     if (stoppingRef.current) return
     stoppingRef.current = true
+    // Snapshot duration BEFORE stopRecording runs. stopRecording releases
+    // the stream and stops the tick interval, so durationMs freezes — but
+    // reading it before is explicit about intent.
+    const heldMs = recorder.durationMs
     try {
       const blob = await recorder.stopRecording()
+      if (heldMs < MIN_HOLD_MS) {
+        // Spurious release (slip finger, stray pointer event). Discard and
+        // reset — user will see the button pop back to idle and can
+        // re-press. Silent by design: showing an error would be more
+        // confusing than the state reset for an accidental tap.
+        setPhase('user-idle')
+        stoppingRef.current = false
+        return
+      }
       await uploadTurn(blob)
     } catch {
       handleApiError(new Error('Could not stop the recording cleanly.'), 'Could not stop the recording cleanly.')

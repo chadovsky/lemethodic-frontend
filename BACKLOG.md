@@ -92,7 +92,7 @@ F-061.3 ✅ Ordonnance shape normalization
   - `lib/api.ts`: new `RawOrdonnanceExercise` / `RawOrdonnanceBlock` types + a dedicated `mapOrdonnance(raw: unknown)` guard that returns `[]` for any unrecognized shape and key-maps present exercises (`numero→priority`, `consigne→action` with `type` fallback, `type→pattern`, `modele ?? phrase→example`). `RawDiagnosticBlock.ordonnance` retyped to `unknown` so the guard owns the shape check.
   - `app/diagnostic/page.tsx:316`: belt-and-braces `(diagnostic.ordonnance ?? []).slice(0, 3)` — if a future backend shape change breaks the mapper invariant, the page renders fewer cards instead of crashing. Mock-card padding (tops up to 3) still kicks in when backend returns fewer exercises.
 
-F-062 ✅ Tâche 2 real recording (multi-turn role-play conversation)
+F-062 ✅ Tâche 2 multi-turn role-play shipped end-to-end — 6-turn flow with examiner persona, per-turn review sheet with per-session suppression, final /end routes to diagnostic with real 4-couche analysis on combined audio.
   - `components/speaking/Tache2Session.tsx` — full rewrite against a phase state machine: `briefing → user-idle → user-recording → user-transcribing → reviewing → examiner-speaking → finalizing` (plus `error` recovery). Fixed 6-turn client-side cap (`TARGET_USER_TURNS`); backend hard cap is 12 so the client's cap always wins and we explicitly call finalize.
   - Reuses F-061 primitives unchanged: `useAudioRecorder` (60s per-turn cap via effect on `durationMs`, same pattern as T3's 180s but with a different threshold) and `VuMeter` (stream-driven AnalyserNode). No fork.
   - PTT flow — hold to record, release to stop. Idempotency guards (`stoppingRef`, `finalizingRef`) prevent the 60s cap effect racing a user tap, and prevent double-finalize on error-retry.
@@ -123,15 +123,22 @@ F-062.1 ✅ Scenario slug↔backend code mapping + dev sanity check
   - New API method: `api.sessions.listTache2Scenarios()` — GET /api/conversations/scenarios, returns trimmed `{scenarios: [{id, code, difficulty}], aboveA2}`. Reused by the sanity check; eventually consumed by F-061.1 picker wiring as the source-of-truth replacement for the client literal.
   - TODO(F-061.1) comment on both sides points at the long-term fix: have the picker consume `/scenarios` directly, eliminating the drift problem by construction.
 
+F-062.2 ✅ PTT pointer capture + minimum-hold guard
+  - Bug: turn 2 of a T2 session produced a 110-byte empty webm; backend rejected with `500: Transcription failed: ... File does not appear to contain audio. File type is video/webm`. Turn 1 always worked.
+  - Diagnosis (via transient REC:/T2: instrumentation, removed on ship): `RecordButton.tsx` wired `onPointerLeave={handlePointerUp}`. On turn 1, the getUserMedia permission prompt absorbs the pointer-down gesture — by the time the MediaRecorder starts, no layout shift matters. On turn 2, permission is cached, getUserMedia returns in ~10ms, the phase transition `user-idle → user-recording` mounts the turn-timer text + VuMeter above the button, the button shifts down in the layout → `pointerleave` fires against the user's still-held finger → `onPTTEnd` → `finishRecording` → recorder stops ~10ms after start → 0 audio chunks → 110-byte header-only webm. Full trace in conversation thread.
+  - Fix 1 — pointer capture in `components/speaking/RecordButton.tsx`: `setPointerCapture(pointerId)` on pointerdown routes all subsequent pointer events to the button regardless of cursor position. `pointerleave` no longer fires while captured. `pointerup` still delivered correctly even if the user's finger drifts off the button. Dropped `onPointerLeave={handlePointerUp}`; added `onPointerCancel` handler (releases capture + fires onPTTEnd) to handle OS-level pointer takeaway (phone call, tab switch, app backgrounded, stylus lifted without a normal up event). Tap mode (`mode === 'tap'`, used by T3) is untouched — every new handler bails with `if (mode !== 'ptt') return`.
+  - Fix 2 — `MIN_HOLD_MS = 200` guard in `components/speaking/Tache2Session.tsx` `finishRecording`: if `recorder.durationMs < 200` when stop fires, discard the blob, reset phase to `user-idle`, no upload, no error card. Silent design — a user slip-finger should feel like the button just didn't register, not like an error. Belt-and-braces on top of pointer capture; also catches genuine accidental taps.
+  - Verification: 6 turns end-to-end, landed on /diagnostic?session=<id> with real 4-couche analysis. T3 tap flow re-tested — no regression (shared RecordButton component but tap mode bypasses every new handler).
+
 ---
 
 ## In progress
 
-_(none — F-062 + F-062.1 closed. F-063 (T1) and F-061.1 (picker) both open.)_
+_(none — F-062 + F-062.1 + F-062.2 closed. F-063 (T1), F-061.1 (picker), F-062.3 (T2 re-record) open.)_
 
 ---
 
-## Queued — core product wiring (F-061.1, F-062 to F-064)
+## Queued — core product wiring (F-061.1, F-063, F-064)
 
 **F-061.1** 📋 Tâche 3 topic picker + slug resolution
 - Hardcoded `TOPIC` literal in `components/speaking/Tache3Session.tsx:29-34` still renders the "réseaux sociaux" prompt regardless of URL slug. Silent `topicId=1` fallback in `Tache3Session.tsx:48` sends the same topic_id for every session.
@@ -141,9 +148,22 @@ _(none — F-062 + F-062.1 closed. F-063 (T1) and F-061.1 (picker) both open.)_
 - Replace `Tache3Session`'s hardcoded TOPIC literal with a fetch on mount; show real prompt/difficulty/theme; proper "topic not found" error state instead of `|| 1`.
 - Does not block core functionality — F-061 works end-to-end today with the fallback. This is UX cleanup.
 
-**F-062** 📋 Tâche 2 real recording (multi-turn conversation)
+---
 
-These complete the MVP loop: user can do a real TCF session, get real analysis, see real feedback.
+## Queued — follow-ups
+
+**F-062.3** 📋 Tâche 2 re-record current turn — **HIGH PRIORITY, ship before F-063**
+- Add a third button to the per-turn review sheet (currently the inline `TurnReviewSheet` in `Tache2Session.tsx`) labeled "Refaire cette prise" alongside "Confirmer".
+- When tapped: panel closes, turn counter is NOT incremented, current turn's transcript is discarded (not committed to conversation history), phase resets to `user-idle`, user can hold PTT to re-record the same turn.
+- Backend: the turn that was already uploaded to `/conversations/{id}/turn` needs to be invalidated. Two options, confirm least-invasive with backend:
+    · `DELETE /api/conversations/{id}/turn/{turn_number}` — removes the ConversationTurn row + its audio file. Note: backend already has the examiner's reply turn appended after the candidate turn; that examiner row also needs deleting, OR we leave it and the model re-prompts on re-upload (messier conversation state).
+    · Soft flag on ConversationTurn — new `superseded` bool column; `/turn` and `/end` filter to non-superseded rows. Less destructive, preserves audit trail, but touches more backend query sites.
+- Rationale: STT mis-transcription is common — AssemblyAI is ~90-92% word accuracy on French speakers with non-native accents. Without a re-record path, a single bad transcript derails the entire 6-turn conversation and the user's only option is to abandon + restart the session. Launch blocker for paid product quality.
+- Shared impact: the UX pattern (and backend delete/soft-flag path) will be reused by F-063 for T1, so shipping this before T1 means F-063 inherits it for free. That's the priority argument.
+
+---
+
+## Queued — core product wiring (continued)
 
 **F-063** 📋 Tâche 1 real recording (AI examiner conversation)
 - Reuse useAudioRecorder + VuMeter primitives
