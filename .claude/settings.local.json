@@ -17,7 +17,20 @@
       "Bash(python -m scripts.add_onboarding_columns)",
       "Bash(python -c \"import sqlite3; c = sqlite3.connect\\('tcf_oral.db'\\); print\\('\\\\n'.join\\(f'{r[1]:25} {r[2]}' for r in c.execute\\('PRAGMA table_info\\(users\\)'\\)\\)\\)\")",
       "Bash(python -c \"from main import app; print\\('routes:'\\); [print\\(f'  {r.methods} {r.path}'\\) for r in app.routes if hasattr\\(r, 'methods'\\) and any\\(p in str\\(r.path\\) for p in ['/api/users', '/api/auth/me']\\)]\")",
-      "Bash(curl -s -o /dev/null -w \"GET /raccourci -> %{http_code}\\\\n\" http://localhost:3000/raccourci)"
+      "Bash(curl -s -o /dev/null -w \"GET /raccourci -> %{http_code}\\\\n\" http://localhost:3000/raccourci)",
+      "Bash(uvicorn main:app --host 127.0.0.1 --port 8000 --reload)",
+      "Bash(python -c \"import sqlite3; c=sqlite3.connect\\('tcf_oral.db'\\); rows=c.execute\\(\\\\\"SELECT id, email FROM users WHERE email LIKE 'test+phase3%'\\\\\"\\).fetchall\\(\\); print\\('existing test rows:', rows\\); c.execute\\(\\\\\"DELETE FROM users WHERE email LIKE 'test+phase3%'\\\\\"\\); c.commit\\(\\); print\\('deleted', c.total_changes\\)\")",
+      "Bash(curl -s -o /dev/null -w \"GET localhost:3000 -> %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(python -c \"import uvicorn; print\\('uvicorn version:', uvicorn.__version__\\)\")",
+      "Bash(python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload)",
+      "Bash(curl -s -o /dev/null -w \"GET :8000/openapi.json -> %{http_code}\\\\n\" http://127.0.0.1:8000/openapi.json)",
+      "Bash(python -c ' *)",
+      "Bash(curl *)",
+      "Read(//c/Users/pc/Downloads/**)",
+      "Read(//c/Users/pc/Downloads/tcf-oral-tool/**)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
     ]
   }
 }

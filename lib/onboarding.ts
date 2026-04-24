@@ -24,7 +24,19 @@ export const useOnboardingStore = create<OnboardingState>()(
       data: {},
       setField: (key, value) =>
         set((state) => ({ data: { ...state.data, [key]: value } })),
-      reset: () => set({ data: {} }),
+      reset: () => {
+        set({ data: {} })
+        // Persist middleware would rewrite the key with {data: {}}; drop the
+        // localStorage entry entirely so a reset leaves no trace and any
+        // subsequent setField creates a fresh record.
+        if (typeof window !== 'undefined') {
+          try {
+            window.localStorage.removeItem('fluentpath_onboarding')
+          } catch {
+            // privacy mode / quota — ignore
+          }
+        }
+      },
     }),
     {
       name: 'fluentpath_onboarding',

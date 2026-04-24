@@ -22,19 +22,27 @@ export interface OnboardingData {
 
 // ── User ─────────────────────────────────────────────────────────────────────
 
-// Backend GET /api/auth/me returns {id, email, full_name, is_admin}.
-// The onboarding fields are additive — backend needs F-060 to persist them;
-// until then the frontend composes them client-side from the onboarding store.
+// Backend GET /api/auth/me (and /api/users/onboarding) returns the basic
+// identity plus six onboarding fields once completed. Fields are optional so
+// that login/register responses — which only return {id, email, full_name} —
+// still fit this shape; HomeScreen calls getMe() to refresh the richer view.
+//
+// Note on shapes: the backend stores onboarding data after the mapper in
+// lib/api.ts has already flattened the tagged-union exam_date to an ISO
+// string, so here exam_date is always either a "YYYY-MM-DD" string or null.
+// The tagged-union lives in OnboardingData above, which describes what the
+// frontend collects before sending.
 export interface User {
   id: number
   email: string
   fullName: string | null
   isAdmin: boolean
-  uiLanguage?: UiLanguage
-  goal?: TCFGoal
-  currentLevel?: CurrentLevel
-  targetScore?: string
-  examDate?: OnboardingData['examDate']
+  targetLevel?: string | null
+  examProfile?: string | null
+  examDate?: string | null
+  goal?: string | null
+  currentLevel?: string | null
+  interfaceLanguage?: string | null
 }
 
 // ── Lessons (Le Raccourci) ───────────────────────────────────────────────────

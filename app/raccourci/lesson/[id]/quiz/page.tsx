@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import QuizClient from './QuizClient'
 import BottomNav from '@/components/home/BottomNav'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 const INK = '#1A1A1A'
@@ -15,6 +16,7 @@ export default async function QuizPage({ params }: Props) {
   const { id } = await params
 
   return (
+    <ProtectedRoute>
     <div style={{ minHeight: '100dvh', backgroundColor: BG, fontFamily: DISPLAY_FONT }}>
       <div style={{ maxWidth: 440, margin: '0 auto' }}>
         <header
@@ -62,5 +64,6 @@ export default async function QuizPage({ params }: Props) {
       </div>
       <BottomNav />
     </div>
+    </ProtectedRoute>
   )
 }

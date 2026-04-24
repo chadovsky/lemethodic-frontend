@@ -1,10 +1,12 @@
 import BottomNav from '@/components/home/BottomNav'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 const INK_MUTED = '#1A1A1A66'
 
 export default function WritingPage() {
   return (
+    <ProtectedRoute>
     <div style={{ minHeight: '100dvh', backgroundColor: '#FAFAF7', fontFamily: DISPLAY_FONT }}>
       <div
         style={{
@@ -28,5 +30,6 @@ export default function WritingPage() {
       </div>
       <BottomNav />
     </div>
+    </ProtectedRoute>
   )
 }

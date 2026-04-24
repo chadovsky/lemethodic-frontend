@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import BottomNav from '@/components/home/BottomNav'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import { ArrowLeft, ChevronRight, Pencil } from 'lucide-react'
 
 // ─── design tokens ────────────────────────────────────────────────────────────
@@ -119,6 +120,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 // ─── page ─────────────────────────────────────────────────────────────────────
 export default function ProfilePage() {
   return (
+    <ProtectedRoute>
     <div
       style={{
         minHeight: '100dvh',
@@ -427,5 +429,6 @@ export default function ProfilePage() {
 
       <BottomNav />
     </div>
+    </ProtectedRoute>
   )
 }

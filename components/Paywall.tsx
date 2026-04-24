@@ -105,17 +105,16 @@ export default function Paywall() {
   const [compareOpen, setCompareOpen] = useState(false)
   const toggleCompare = useCallback(() => setCompareOpen((v) => !v), [])
 
-  // Phase 3 will flush the onboarding store with
-  // api.users.completeOnboarding(onboardingStoreData) before this push, and a
-  // future ticket will route through Stripe checkout first. For now, direct.
   const handleStartTrial = () => {
-    router.push('/raccourci')
+    router.push('/signup?trial=true')
   }
 
-  // Phase 3 will mark this user as "trial skipped" on their profile for
-  // remarketing before pushing. For now, direct.
+  // TODO(F-060): revisit whether "skipped trial" still needs to create an
+  // account (likely yes for analytics + diagnostic attribution). Routing
+  // through /signup with trial=false preserves the user's preference so
+  // Stripe wiring can pick it up later.
   const handleMaybeLater = () => {
-    router.push('/raccourci')
+    router.push('/signup?trial=false')
   }
 
   const isAnnual = billing === 'annual'

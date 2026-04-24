@@ -1,11 +1,15 @@
 'use client'
 
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Bell } from 'lucide-react'
 import DailyActionCard from './DailyActionCard'
 import RaccourciProgress from './RaccourciProgress'
-import LessonListItem, { LessonStatus } from './LessonListItem'
+import LessonListItem, { type LessonStatus as ItemStatus } from './LessonListItem'
 import BottomNav from './BottomNav'
+import { useAuthStore } from '@/lib/auth'
+import { api, ApiError } from '@/lib/api'
+import type { Lesson } from '@/lib/types'
 
 // ─── design tokens ───────────────────────────────────────────────────────────
 const INK         = '#1A1A1A'
@@ -17,34 +21,49 @@ const LAVENDER    = '#E0D4F0'
 const BG          = '#FAFAF7'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 
-// ─── lesson data ─────────────────────────────────────────────────────────────
-interface Lesson {
-  number: number
-  title: string
-  descriptor: string
-  status: LessonStatus
+const TOTAL_LESSONS = 16
+
+// ─── helpers ─────────────────────────────────────────────────────────────────
+
+// Backend statuses ("locked" | "unlocked" | "in_progress" | "completed") flatten
+// to the three visual states LessonListItem renders. "unlocked" (prereq met,
+// not started yet) collapses into "in-progress" so it shows the play icon and
+// is clickable — same UX as a lesson the user has opened but not finished.
+function toItemStatus(s: Lesson['status']): ItemStatus {
+  if (s === 'completed') return 'complete'
+  if (s === 'in_progress' || s === 'unlocked') return 'in-progress'
+  return 'locked'
 }
 
-const LESSONS: Lesson[] = [
-  { number: 1,  title: 'Conjugaison',                       descriptor: 'Present tense patterns that don\'t match English.',         status: 'complete'    },
-  { number: 2,  title: 'Les articles',                      descriptor: 'Le/la/les — English speakers overuse "the".',               status: 'complete'    },
-  { number: 3,  title: 'Féminin / masculin',                descriptor: 'Gender rules that matter at B2.',                          status: 'complete'    },
-  { number: 4,  title: 'Articles (suite)',                   descriptor: 'Partitive and contracted articles.',                       status: 'complete'    },
-  { number: 5,  title: 'Prépositions',                      descriptor: 'À, de, en, dans — the big four.',                         status: 'in-progress' },
-  { number: 6,  title: 'Pronoms relatifs',                   descriptor: 'Qui, que, dont, où — relative clauses made clear.',       status: 'locked'      },
-  { number: 7,  title: 'Comment dire "what" — en question', descriptor: 'Qu\'est-ce que, quel, quoi — choosing the right form.',    status: 'locked'      },
-  { number: 8,  title: 'Comment dire "what" — non-question',descriptor: 'Ce que, ce qui — embedded clauses.',                      status: 'locked'      },
-  { number: 9,  title: 'Discours indirect au présent',      descriptor: 'Reported speech, present-tense backshift.',                status: 'locked'      },
-  { number: 10, title: 'Conditionnel + plus-que-parfait',   descriptor: 'Hypothesis and the unmet past condition.',                 status: 'locked'      },
-  { number: 11, title: 'Discours indirect au passé',        descriptor: 'Past reported speech — the tense cascade.',               status: 'locked'      },
-  { number: 12, title: 'Subjonctif + mise en relief',       descriptor: 'Subjunctive triggers and fronting structures.',            status: 'locked'      },
-  { number: 13, title: 'Voix passive (4 structures)',        descriptor: 'Four passive constructions examiners test.',              status: 'locked'      },
-  { number: 14, title: 'Adverbes',                          descriptor: 'Placement rules that trip up fluent speakers.',           status: 'locked'      },
-  { number: 15, title: 'Nominalisation',                    descriptor: 'Turning verbs and adjectives into formal nouns.',         status: 'locked'      },
-  { number: 16, title: 'Gérondif',                          descriptor: 'En + present participle — simultaneous actions.',         status: 'locked'      },
-]
+// The card at the top picks the "what should I do next" lesson. Priority:
+// 1) any in_progress lesson, 2) first unlocked-but-not-started, 3) first lesson.
+function pickNextLesson(lessons: Lesson[]): Lesson | null {
+  if (!lessons.length) return null
+  return (
+    lessons.find((l) => l.status === 'in_progress') ??
+    lessons.find((l) => l.status === 'unlocked') ??
+    lessons[0]
+  )
+}
+
+// exam_date is stored as YYYY-MM-DD. Compute whole-day delta, clamped at 0.
+// Returns null when there's no exam date set (user should see a CTA instead).
+function daysUntilExam(isoDate: string | null | undefined): number | null {
+  if (!isoDate) return null
+  const exam = new Date(isoDate)
+  if (Number.isNaN(exam.getTime())) return null
+  exam.setHours(0, 0, 0, 0)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const diff = Math.round(
+    (exam.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+  )
+  return Math.max(0, diff)
+}
 
 // ─── props ───────────────────────────────────────────────────────────────────
+// Props are overrides for storybook/testing. In normal use they're all
+// undefined and HomeScreen sources data from the auth store + API.
 interface HomeScreenProps {
   userName?: string
   streakDays?: number
@@ -52,15 +71,64 @@ interface HomeScreenProps {
   completedLessons?: number
 }
 
+// TODO(Phase 4.5): streak tracking — there's no /api/users/me streak field
+// today. Leaving displayStreak = 0 with a neutral "Start your streak" affordance
+// until a real streak endpoint lands.
 export default function HomeScreen({
-  userName = 'Chadi',
-  streakDays = 7,
-  daysUntilExam = 47,
-  completedLessons = 4,
+  userName,
+  streakDays,
+  daysUntilExam: daysUntilExamProp,
+  completedLessons: completedLessonsProp,
 }: HomeScreenProps) {
-  const totalLessons = 16
-  const nextLesson = LESSONS.find((l) => l.status === 'in-progress') ?? LESSONS[0]
+  // ─── auth-store backed user data ─────────────────────────────────────────
+  const storeUser = useAuthStore((s) => s.user)
+  const firstName = storeUser?.fullName?.trim().split(/\s+/)[0] ?? ''
+  const resolvedName = userName ?? firstName
+  const displayName = resolvedName || 'there'
+  const avatarInitial = (resolvedName || 'F').charAt(0).toUpperCase()
 
+  // ─── fetch state ─────────────────────────────────────────────────────────
+  const [lessons, setLessons] = useState<Lesson[] | null>(null)
+  const [fetchError, setFetchError] = useState<string | null>(null)
+  const [retryKey, setRetryKey] = useState(0)
+
+  const load = useCallback(async () => {
+    setFetchError(null)
+    try {
+      // Lessons drive progress + the "Today" card. /me is refreshed in the
+      // background to pick up any backend updates (e.g. exam_date edited
+      // elsewhere); its failure must not block lesson rendering.
+      const [lessonList, me] = await Promise.all([
+        api.lessons.list(),
+        api.users.getMe().catch(() => null),
+      ])
+      setLessons(lessonList)
+      if (me) {
+        const token = useAuthStore.getState().token
+        if (token) useAuthStore.getState().setAuth(token, me)
+      }
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setFetchError("Couldn't load your path.")
+      } else {
+        setFetchError("Couldn't reach the server.")
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    load()
+  }, [load, retryKey])
+
+  // ─── derived values ──────────────────────────────────────────────────────
+  const fetchedCompleted = lessons?.filter((l) => l.status === 'completed').length ?? 0
+  const effectiveCompleted = completedLessonsProp ?? fetchedCompleted
+  const nextLesson = lessons ? pickNextLesson(lessons) : null
+
+  const effectiveExamDays = daysUntilExamProp ?? daysUntilExam(storeUser?.examDate ?? null)
+  const displayStreak = streakDays ?? 0
+
+  // ─── render ──────────────────────────────────────────────────────────────
   return (
     <div
       style={{
@@ -69,7 +137,6 @@ export default function HomeScreen({
         fontFamily: DISPLAY_FONT,
       }}
     >
-      {/* ── Max-width column ─────────────────────────────────────── */}
       <div
         style={{
           maxWidth: 440,
@@ -77,8 +144,7 @@ export default function HomeScreen({
           position: 'relative',
         }}
       >
-
-        {/* ── Top bar (sticky) ─────────────────────────────────────── */}
+        {/* ── Top bar ─────────────────────────────────────────────── */}
         <header
           style={{
             position: 'sticky',
@@ -93,10 +159,9 @@ export default function HomeScreen({
             padding: '0 16px',
           }}
         >
-          {/* Avatar — taps to /profile */}
           <Link
             href="/profile"
-            aria-label={`${userName}'s profile`}
+            aria-label={`${displayName}'s profile`}
             style={{ textDecoration: 'none', WebkitTapHighlightColor: 'transparent' }}
           >
             <div
@@ -120,12 +185,11 @@ export default function HomeScreen({
                   lineHeight: 1,
                 }}
               >
-                {userName[0].toUpperCase()}
+                {avatarInitial}
               </span>
             </div>
           </Link>
 
-          {/* Title */}
           <h1
             style={{
               fontFamily: DISPLAY_FONT,
@@ -138,7 +202,6 @@ export default function HomeScreen({
             Le Raccourci
           </h1>
 
-          {/* Bell */}
           <button
             aria-label="Notifications"
             style={{
@@ -157,14 +220,8 @@ export default function HomeScreen({
           </button>
         </header>
 
-        {/* ── Scrollable body ──────────────────────────────────────── */}
-        <main
-          style={{
-            padding: '24px 16px',
-            paddingBottom: 88, // space for bottom nav
-          }}
-        >
-
+        {/* ── Body ─────────────────────────────────────────────────── */}
+        <main style={{ padding: '24px 16px', paddingBottom: 88 }}>
           {/* Greeting + streak */}
           <div style={{ marginBottom: 16 }}>
             <h2
@@ -178,10 +235,9 @@ export default function HomeScreen({
                 marginBottom: 6,
               }}
             >
-              Bonjour, {userName}
+              Bonjour, {displayName}
             </h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              {/* Flame SVG inline (lucide has no Flame in this version) */}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF6B35" stroke="none" aria-hidden="true">
                 <path d="M12 2C12 2 6 7.5 6 13a6 6 0 0012 0c0-2.5-1.5-5-3-7l-1.5 3C12.5 10.5 12 11.8 12 13a2 2 0 01-4 0c0-3 3-6 4-11z" />
               </svg>
@@ -193,35 +249,65 @@ export default function HomeScreen({
                   color: INK_MUTED,
                 }}
               >
-                Day {streakDays} · Current streak
+                {displayStreak > 0
+                  ? `Day ${displayStreak} · Current streak`
+                  : 'Start your streak today'}
               </span>
             </div>
           </div>
 
-          {/* Exam countdown chip */}
+          {/* Exam countdown chip — or CTA when exam_date isn't set */}
           <div style={{ marginBottom: 32 }}>
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                height: 32,
-                padding: '0 14px',
-                borderRadius: 100,
-                backgroundColor: LAVENDER,
-                gap: 6,
-              }}
-            >
-              <span
+            {effectiveExamDays !== null ? (
+              <div
                 style={{
-                  fontFamily: DISPLAY_FONT,
-                  fontWeight: 700,
-                  fontSize: 12,
-                  color: '#6B4EAA',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  height: 32,
+                  padding: '0 14px',
+                  borderRadius: 100,
+                  backgroundColor: LAVENDER,
+                  gap: 6,
                 }}
               >
-                TCF in {daysUntilExam} days
-              </span>
-            </div>
+                <span
+                  style={{
+                    fontFamily: DISPLAY_FONT,
+                    fontWeight: 700,
+                    fontSize: 12,
+                    color: '#6B4EAA',
+                  }}
+                >
+                  TCF in {effectiveExamDays} days
+                </span>
+              </div>
+            ) : (
+              <Link
+                href="/profile"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  height: 32,
+                  padding: '0 14px',
+                  borderRadius: 100,
+                  backgroundColor: '#1A1A1A0C',
+                  gap: 6,
+                  textDecoration: 'none',
+                  WebkitTapHighlightColor: 'transparent',
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: DISPLAY_FONT,
+                    fontWeight: 700,
+                    fontSize: 12,
+                    color: INK_MUTED,
+                  }}
+                >
+                  Set your exam date →
+                </span>
+              </Link>
+            )}
           </div>
 
           {/* ── Zone 1: Daily action ───────────────────────────────── */}
@@ -242,30 +328,46 @@ export default function HomeScreen({
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {/* Card A — Today's lesson */}
-              <DailyActionCard
-                background={BUTTER}
-                label={`Lesson ${nextLesson.number} of ${totalLessons}`}
-                title={nextLesson.title}
-                descriptor="À, de, en, dans — English speakers' most common gap."
-                meta={[
-                  { icon: 'clock',     label: '15 min'   },
-                  { icon: 'lock-open', label: 'Unlocked' },
-                ]}
-                illustrationSrc="/illustration-level.jpg"
-                illustrationAlt="Staircase steps illustration"
-                href={`/raccourci/lesson/${nextLesson.number}`}
-              />
+              {/* Card A — Today's lesson. Shows skeleton while fetching, and
+                  nothing (gracefully) if the user has already completed all 16. */}
+              {nextLesson ? (
+                <DailyActionCard
+                  background={BUTTER}
+                  label={`Lesson ${nextLesson.lessonNumber} of ${TOTAL_LESSONS}`}
+                  title={nextLesson.title}
+                  descriptor={nextLesson.shortDescription}
+                  meta={[
+                    {
+                      icon: 'clock',
+                      label: `${nextLesson.estimatedDurationMinutes ?? 15} min`,
+                    },
+                    { icon: 'lock-open', label: 'Unlocked' },
+                  ]}
+                  illustrationSrc="/illustration-level.jpg"
+                  illustrationAlt="Lesson illustration"
+                  href={`/raccourci/lesson/${nextLesson.lessonNumber}`}
+                />
+              ) : lessons === null && !fetchError ? (
+                <div
+                  className="animate-pulse"
+                  style={{
+                    backgroundColor: '#1A1A1A0A',
+                    borderRadius: 20,
+                    minHeight: 180,
+                  }}
+                />
+              ) : null}
 
-              {/* Card B — Today's practice */}
+              {/* Card B — Today's practice (out of scope for this ticket; Tâche 2
+                  picker is still mock-linked. See Phase 4 practice ticket). */}
               <DailyActionCard
                 background={SAGE}
                 label="Tâche 2 · Role-play"
                 title="Agence de voyages"
                 descriptor="Gather travel info from an agent. 10 min."
                 meta={[
-                  { icon: 'clock', label: '10 min'   },
-                  { icon: 'mic',   label: 'Speaking' },
+                  { icon: 'clock', label: '10 min' },
+                  { icon: 'mic', label: 'Speaking' },
                 ]}
                 illustrationSrc="/illustration-language.jpg"
                 illustrationAlt="Speech bubble illustration"
@@ -289,29 +391,80 @@ export default function HomeScreen({
           </section>
 
           {/* ── Zone 2: Le Raccourci journey ──────────────────────── */}
-          <section
-            aria-label="Le Raccourci journey"
-            style={{ marginTop: 48 }}
-          >
+          <section aria-label="Le Raccourci journey" style={{ marginTop: 48 }}>
             <RaccourciProgress
-              completedCount={completedLessons}
-              totalCount={totalLessons}
+              completedCount={effectiveCompleted}
+              totalCount={TOTAL_LESSONS}
             />
 
-            {/* 16-lesson list */}
             <div style={{ marginTop: 16 }}>
-              {LESSONS.map((lesson) => (
-                <LessonListItem
-                  key={lesson.number}
-                  number={lesson.number}
-                  title={lesson.title}
-                  descriptor={lesson.descriptor}
-                  status={lesson.status}
-                />
-              ))}
+              {fetchError ? (
+                <div
+                  role="alert"
+                  style={{
+                    padding: '24px 16px',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 10,
+                  }}
+                >
+                  <p
+                    style={{
+                      fontFamily: DISPLAY_FONT,
+                      fontWeight: 500,
+                      fontSize: 14,
+                      color: INK_MUTED,
+                      margin: 0,
+                    }}
+                  >
+                    {fetchError} Retry?
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setRetryKey((k) => k + 1)}
+                    style={{
+                      fontFamily: DISPLAY_FONT,
+                      fontWeight: 700,
+                      fontSize: 14,
+                      color: '#FFFFFF',
+                      backgroundColor: INK,
+                      padding: '8px 18px',
+                      borderRadius: 12,
+                      border: 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : lessons === null ? (
+                // Loading skeleton — five pulse rows at the lesson-item shape.
+                Array.from({ length: 5 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="animate-pulse"
+                    style={{
+                      height: 56,
+                      borderBottom: '1px solid #1A1A1A0A',
+                      backgroundColor: '#1A1A1A06',
+                    }}
+                  />
+                ))
+              ) : (
+                lessons.map((lesson) => (
+                  <LessonListItem
+                    key={lesson.id}
+                    number={lesson.lessonNumber}
+                    title={lesson.title}
+                    descriptor={lesson.shortDescription}
+                    status={toItemStatus(lesson.status)}
+                  />
+                ))
+              )}
             </div>
           </section>
-
         </main>
       </div>
 

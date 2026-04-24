@@ -8,6 +8,7 @@ import CurrentLevelSelect, { type CurrentLevel } from './CurrentLevelSelect'
 import TargetScoreSelect, { type TargetScore } from './TargetScoreSelect'
 import ExamDateSelect, { type ExamDate } from './ExamDateSelect'
 import RaccourciReveal from './RaccourciReveal'
+import { useOnboardingStore } from '@/lib/onboarding'
 
 interface OnboardingState {
   uiLanguage: 'en' | 'es' | null
@@ -32,11 +33,17 @@ export default function OnboardingFlow() {
     setStep((s) => Math.max(1, s - 1))
   }
 
+  // Each step's onContinue mirrors the selection into the onboarding store
+  // in addition to local React state. Local state drives the step-6 summary
+  // render; the store drives the signup flush (mapOnboardingToBackend reads
+  // from the store, not from this component).
+
   // Step 1 — Language
   if (step === 1) {
     return (
       <LanguageSelect
         onContinue={(lang) => {
+          useOnboardingStore.getState().setField('uiLanguage', lang)
           setState((s) => ({ ...s, uiLanguage: lang }))
           setStep(2)
         }}
@@ -49,6 +56,7 @@ export default function OnboardingFlow() {
     return (
       <TCFGoalSelect
         onContinue={(goal) => {
+          useOnboardingStore.getState().setField('goal', goal)
           setState((s) => ({ ...s, goal }))
           setStep(3)
         }}
@@ -62,6 +70,7 @@ export default function OnboardingFlow() {
     return (
       <CurrentLevelSelect
         onContinue={(level) => {
+          useOnboardingStore.getState().setField('currentLevel', level)
           setState((s) => ({ ...s, currentLevel: level }))
           setStep(4)
         }}
@@ -76,6 +85,7 @@ export default function OnboardingFlow() {
       <TargetScoreSelect
         goal={state.goal ?? 'general'}
         onContinue={(score) => {
+          useOnboardingStore.getState().setField('targetScore', score)
           setState((s) => ({ ...s, targetScore: score }))
           setStep(5)
         }}
@@ -89,6 +99,7 @@ export default function OnboardingFlow() {
     return (
       <ExamDateSelect
         onContinue={(date) => {
+          useOnboardingStore.getState().setField('examDate', date)
           setState((s) => ({ ...s, examDate: date }))
           setStep(6)
         }}

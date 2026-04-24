@@ -1,5 +1,10 @@
 import SpeakingLanding from '@/components/speaking/SpeakingLanding'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 export default function SpeakingPage() {
-  return <SpeakingLanding />
+  return (
+    <ProtectedRoute>
+      <SpeakingLanding />
+    </ProtectedRoute>
+  )
 }

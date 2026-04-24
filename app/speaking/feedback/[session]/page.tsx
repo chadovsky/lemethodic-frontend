@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 const INK          = '#1A1A1A'
@@ -7,6 +8,7 @@ const BG           = '#FAFAF7'
 
 export default function FeedbackPlaceholderPage() {
   return (
+    <ProtectedRoute>
     <div
       style={{
         minHeight: '100dvh',
@@ -45,5 +47,6 @@ export default function FeedbackPlaceholderPage() {
         Back to Speaking
       </Link>
     </div>
+    </ProtectedRoute>
   )
 }

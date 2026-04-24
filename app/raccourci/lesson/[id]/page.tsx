@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import BottomNav from '@/components/home/BottomNav'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 const INK        = '#1A1A1A'
@@ -36,6 +37,7 @@ export default async function LessonPage({ params }: Props) {
   const title = LESSON_TITLES[id] ?? `Lesson ${id}`
 
   return (
+    <ProtectedRoute>
     <div style={{ minHeight: '100dvh', backgroundColor: BG, fontFamily: DISPLAY_FONT }}>
       <div style={{ maxWidth: 440, margin: '0 auto' }}>
 
@@ -197,5 +199,6 @@ export default async function LessonPage({ params }: Props) {
       </div>
       <BottomNav />
     </div>
+    </ProtectedRoute>
   )
 }
