@@ -1,4 +1,5 @@
 import Tache3Session from '@/components/speaking/Tache3Session'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 interface Props {
   params: Promise<{ topic: string }>
@@ -6,5 +7,9 @@ interface Props {
 
 export default async function Tache3TopicPage({ params }: Props) {
   const { topic } = await params
-  return <Tache3Session />
+  return (
+    <ProtectedRoute>
+      <Tache3Session topicSlug={topic} />
+    </ProtectedRoute>
+  )
 }

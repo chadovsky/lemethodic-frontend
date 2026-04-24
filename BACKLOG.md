@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-23
+**Last updated:** 2026-04-24
 **Sprint window:** April 21 – May 4, 2026
 
 ---
@@ -63,28 +63,56 @@ F-059 ✅ Phase 3 integration
   - /test-drive route deleted (deferred post-launch)
   - Paywall heading renamed "Where you stand today"
 
+F-061 ✅ Tâche 3 full loop shipped — audio capture, upload, backend analysis, diagnostic page render with real data. Verified end-to-end on recording #22.
+  - `hooks/useAudioRecorder.ts` — MediaRecorder wrapper exposing status, error, durationMs, stream, startRecording, stopRecording, reset; Date.now()-based timing (sidesteps the hidden-tab throttle called out in F-076); releases getUserMedia tracks on stop/reset/unmount so the browser recording indicator doesn't linger
+  - Maps getUserMedia errors (NotAllowedError, NotFoundError, NotReadableError, SecurityError) to human-readable copy; "permission" keyword in the string is what Tache3Session uses to switch into the permission-help card
+  - `components/speaking/VuMeter.tsx` — stream prop drives a Web Audio AnalyserNode (fftSize 64, smoothing 0.55) read via requestAnimationFrame; AudioContext torn down on stream change / unmount; falls back to idle bars when no stream
+  - `components/speaking/Tache3Session.tsx` — wired to useAudioRecorder; phase state machine (prep → recording → processing → error); 3-minute hard cap via useEffect on durationMs; stopRecording idempotency guard; CountdownTimer driven from durationMs in count-up mode
+  - Upload path: `api.sessions.createRecording(topicId, blob, { targetLevel, uiLanguage, examProfile })` posts multipart to /api/recordings/upload; on success router.push(`/diagnostic?session=${id}`); on failure, blob is cached in a ref so the retry button re-uploads the same audio
+  - Permission denial UX: dedicated "Microphone access needed" card with retry that re-enters prep and waits for a fresh user gesture (some browsers require this after denial)
+  - `app/diagnostic/page.tsx` — reads `session` search param, calls `api.sessions.getDiagnostic`, renders real 4-couche scores (couchesToRows sorted worst-first), goulet, and up to 3 ordonnance steps (tops up with mock cards if backend returns <3); peach loader during fetch; dedicated error card with retry; falls back to mock data when no session param (so /diagnostic still works for design review)
+  - Topic slug parsing is defensive: numeric slug → topic_id, non-numeric → fallback to 1 (see queued F-061.1 for the real picker + slug resolver)
+  - tsc --noEmit: clean except the pre-existing TargetScoreSelect.tsx:98 error noted under "Known issues"
+  - Out of scope and deferred to F-062/F-063: Tâche 1 and Tâche 2 session wiring (they share the useAudioRecorder + VuMeter primitives but have different state machines — multi-turn conversations vs single recording)
+
+## Shipped — Week 2 (April 24)
+
+F-061.2a ✅ Tâche 3 upload hotfix — tache_mode + error surfacing hardening
+  - `lib/api.ts` `createRecording`: added `tacheMode` option accepting `1|2|3|'tache_1'|'tache_2'|'tache_3'`; normalizes bare digits to `tache_${n}` before posting. Defaults to `'tache_3'`. Unblocks F-062/F-063 reuse. Backend's `_validate_tache_mode_for_oral` rejects anything other than the full string form with a 400.
+  - `components/speaking/Tache3Session.tsx` uploadBlob catch: differentiates `ApiError` (prefix with status code, surface backend `detail` verbatim), `TypeError` from fetch (actual network failure → "Couldn't reach the server"), and other errors (generic fallback). Stops mislabeling server-side errors as connectivity problems.
+  - Tache3Session call site passes `tacheMode: 3` explicitly — normalized to `'tache_3'` at the API boundary.
+
+F-061.2 ✅ Fetch method inference fix
+  - Fixed fetch method inference in `lib/api.ts` `request()` — bodies now force POST. Affected `createRecording` and `uploadAudio` (would have bit F-062 too). Caller audit confirmed all 16 endpoints use correct methods.
+  - Root cause: the request wrapper defaulted `method = 'GET'`. The two FormData callers passed only `{ formData: fd }` with no explicit method, so fetch was invoked with `GET + body` and the browser rejected it synchronously with "Request with GET/HEAD method cannot have body." This silent failure never reached the Network tab and was only pinpointed by transient `REC:` / `SESSION:` console instrumentation (removed on ship).
+  - Fix: `method = opts.method ?? (body !== undefined || formData ? 'POST' : 'GET')`. Explicit overrides still work; all other callers already passed `method: 'POST'` explicitly so only the two FormData sites changed behavior.
+
+F-061.3 ✅ Ordonnance shape normalization
+  - Backend `ordonnance` is a wrapper object `{ couche_ciblee, nom_couche, exercices: [...] }` with per-exercise keys `{numero, type, consigne, modele, phrase, options, reponse, explication}`. Empty recordings serialize as `{}` (per `recordings.py:645`). Frontend was typing it as `OrdonnanceStep[]` and calling `.slice(0, 3)` on the object — instant runtime TypeError on first real diagnostic render.
+  - `lib/api.ts`: new `RawOrdonnanceExercise` / `RawOrdonnanceBlock` types + a dedicated `mapOrdonnance(raw: unknown)` guard that returns `[]` for any unrecognized shape and key-maps present exercises (`numero→priority`, `consigne→action` with `type` fallback, `type→pattern`, `modele ?? phrase→example`). `RawDiagnosticBlock.ordonnance` retyped to `unknown` so the guard owns the shape check.
+  - `app/diagnostic/page.tsx:316`: belt-and-braces `(diagnostic.ordonnance ?? []).slice(0, 3)` — if a future backend shape change breaks the mapper invariant, the page renders fewer cards instead of crashing. Mock-card padding (tops up to 3) still kicks in when backend returns fewer exercises.
+
 ---
 
 ## In progress
 
-_(none — F-059 closed, F-061 opens next)_
+_(none — F-061 closed end-to-end. F-061.1 opens next if picker/slug work is prioritized, else F-062.)_
 
 ---
 
-## Queued — core product wiring (F-061 to F-064)
+## Queued — core product wiring (F-061.1, F-062 to F-064)
+
+**F-061.1** 📋 Tâche 3 topic picker + slug resolution
+- Hardcoded `TOPIC` literal in `components/speaking/Tache3Session.tsx:29-34` still renders the "réseaux sociaux" prompt regardless of URL slug. Silent `topicId=1` fallback in `Tache3Session.tsx:48` sends the same topic_id for every session.
+- Add `app/speaking/tache-3/page.tsx` — Tache3Picker, mirroring Tache2Picker. Consume existing backend `GET /api/recordings/tache3-topics` (recordings.py:487) which already returns `{topics: [{id, title, theme, sous_theme, difficulty, prompt_{fr,en,es}}], gates: {above_a2}}` — frontend isn't calling it yet.
+- Decide on slug-vs-id URL shape: `TestTopic` model has no `slug` column today (only `id, title, theme, sous_theme, tache_3_prompt_*, tache_3_difficulty, is_active`). Either add a `slug` column backend-side OR keep numeric-id URLs and have the picker route to `/speaking/tache-3/<id>`.
+- Update `components/speaking/SpeakingLanding.tsx:56` — currently hardcodes `'/speaking/tache-3/environnement'`. Route to the picker instead.
+- Replace `Tache3Session`'s hardcoded TOPIC literal with a fetch on mount; show real prompt/difficulty/theme; proper "topic not found" error state instead of `|| 1`.
+- Does not block core functionality — F-061 works end-to-end today with the fallback. This is UX cleanup.
+
+**F-062** 📋 Tâche 2 real recording (multi-turn conversation)
 
 These complete the MVP loop: user can do a real TCF session, get real analysis, see real feedback.
-
-**F-061** 📋 Tâche 3 real recording + upload + diagnostic routing
-- Create `hooks/useAudioRecorder.ts` wrapping MediaRecorder API
-- Wire `components/speaking/Tache3Session.tsx` to real recording (replace mock)
-- VuMeter reads real audio levels via Web Audio API AnalyserNode
-- CountdownTimer synced to recorder.durationMs
-- Hard cap at 3 minutes (180_000 ms)
-- Mic permission denial UX
-- On stop: POST /api/recordings/upload, route to /diagnostic?session=<id>
-- Diagnostic page reads `session` query param, fetches real data via api.sessions.getDiagnostic
-- Out of scope: T1, T2 sessions (separate tickets below)
 
 **F-062** 📋 Tâche 2 real recording (multi-turn conversation)
 - Reuse useAudioRecorder + VuMeter primitives from F-061

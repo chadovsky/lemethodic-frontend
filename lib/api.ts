@@ -23,8 +23,10 @@ import type {
   QuizResult,
   Recording,
   TacheMode,
+  TCFGoal,
   User,
 } from './types'
+import { useAuthStore } from './auth'
 
 const TOKEN_KEY = 'fluentpath_token'
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
@@ -70,7 +72,14 @@ function buildUrl(path: string, query?: RequestOptions['query']): string {
 }
 
 async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
-  const { method = 'GET', body, query, formData } = opts
+  // Default method: if a body/formData is present and the caller didn't
+  // name a method, POST. The previous default was GET — which the browser
+  // rejects synchronously with "Request with GET/HEAD method cannot have
+  // body" when paired with any BodyInit. This regressed createRecording and
+  // uploadAudio (both pass only { formData }); login/register/etc. were
+  // fine because they pass method:'POST' explicitly.
+  const { body, query, formData } = opts
+  const method = opts.method ?? (body !== undefined || formData ? 'POST' : 'GET')
   const headers: Record<string, string> = {}
   const token = readToken()
   if (token) headers['Authorization'] = `Bearer ${token}`
@@ -98,6 +107,17 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   }
 
   if (!res.ok) {
+    // Stale/expired/orphaned token: wipe auth so the next render cycle
+    // reroutes the user to onboarding. Guarded on (a) being in the browser
+    // (server-rendered requests should never touch the store) and (b) us
+    // actually holding a token — a 401 on a login-failure call must not
+    // clobber state for an already-logged-in user who is e.g. retrying.
+    if (res.status === 401 && typeof window !== 'undefined') {
+      const current = useAuthStore.getState().token
+      if (current) {
+        useAuthStore.getState().clearAuth()
+      }
+    }
     const message =
       (parsed && typeof parsed === 'object' && 'detail' in parsed && typeof (parsed as { detail: unknown }).detail === 'string'
         ? (parsed as { detail: string }).detail
@@ -115,6 +135,15 @@ interface RawUser {
   email: string
   full_name: string | null
   is_admin?: boolean
+  // Onboarding fields — only present on /api/auth/me and /api/users/onboarding
+  // responses (serialize_user on the backend). /api/auth/login and
+  // /api/auth/register return the stripped-down shape without them.
+  target_level?: string | null
+  exam_profile?: string | null
+  exam_date?: string | null
+  goal?: string | null
+  current_level?: string | null
+  interface_language?: string | null
 }
 
 function mapUser(raw: RawUser): User {
@@ -123,6 +152,12 @@ function mapUser(raw: RawUser): User {
     email: raw.email,
     fullName: raw.full_name,
     isAdmin: !!raw.is_admin,
+    targetLevel: raw.target_level ?? null,
+    examProfile: raw.exam_profile ?? null,
+    examDate: raw.exam_date ?? null,
+    goal: raw.goal ?? null,
+    currentLevel: raw.current_level ?? null,
+    interfaceLanguage: raw.interface_language ?? null,
   }
 }
 
@@ -231,34 +266,41 @@ interface RawRecording {
   duration_seconds: number | null
   status: Recording['status']
   created_at: string
-  feedback?: RawFeedback
+  // GET /api/recordings/{id} returns the structured analysis under `diagnostic`.
+  // There's also a legacy `feedback` key in the response carrying
+  // {overall_score, analysis, recommendations} — that's the old shape and
+  // we intentionally ignore it.
+  diagnostic?: RawDiagnosticBlock | null
 }
 
-interface RawFeedback {
-  note_globale: number
-  score_le_fond: number
-  score_les_moules_des_idees: number
-  score_les_moules: number
-  score_les_reflexes_anglais: number
-  score_prononciation: number
-  analyse_le_fond?: string | null
-  analyse_les_moules_des_idees?: string | null
-  analyse_les_moules?: string | null
-  analyse_les_reflexes_anglais?: string | null
-  analyse_prononciation?: string | null
-  goulet_couche: CoucheKey
-  goulet_nom: string
-  goulet_explication: string
-  ce_qui_marche: string | null
-  ordonnance: OrdonnanceStep[] | null
-  cefr_level: string | null
-  clb_level: string | null
+// Backend shape for the `diagnostic` block as emitted by the recordings
+// router (mirrors what analysis.py writes into the Feedback row, but
+// restructured as JSON for the API).
+interface RawDiagnosticBlock {
+  note_globale?: number
+  la_carte?: Partial<Record<CoucheKey, number>>
+  le_goulet?: {
+    couche: number | string
+    nom: string
+    explication: string
+  }
+  ce_qui_marche?: string
+  // NOT an array — the backend emits a wrapper object with an `exercices`
+  // array inside (see RawOrdonnanceBlock). Typed as unknown at the block
+  // level so the dedicated mapOrdonnance() guard owns the shape check.
+  ordonnance?: unknown
+  cefr_level?: string | null
+  clb_level?: string | null
   feedback_grid?: {
     tache_2?: {
       pyramide?: RawMoule
       rebond?: RawMoule
       ciblage?: RawMoule
     }
+    // The grid also carries {what_works, what_doesnt_work, english_habits,
+    // structure_quality, tache_3} objects with title_fr/content_fr — not
+    // consumed here yet, but keeping the type open so they pass through.
+    [k: string]: unknown
   } | null
 }
 
@@ -267,6 +309,44 @@ interface RawMoule {
   detected?: boolean
   examples?: string[]
   notes?: string | null
+}
+
+// Backend `ordonnance` block (app/services/analysis.py::SYSTEM_PROMPT_ORDONNANCE).
+// Empty recordings serialize as {} (not [] — see recordings.py:645), so the
+// wrapper object is optional at every level.
+interface RawOrdonnanceExercise {
+  numero?: number
+  type?: string
+  consigne?: string
+  modele?: string
+  phrase?: string
+  options?: string[]
+  reponse?: number
+  explication?: string
+}
+interface RawOrdonnanceBlock {
+  couche_ciblee?: number
+  nom_couche?: string
+  exercices?: RawOrdonnanceExercise[]
+}
+
+// Normalize the backend's wrapper-object-with-exercices-array into the flat
+// OrdonnanceStep[] the UI expects. Returns [] whenever the shape is missing
+// or unrecognizable (empty {}, null, pre-F-032 rows with different keys,
+// demo-mode fallbacks).
+function mapOrdonnance(raw: unknown): OrdonnanceStep[] {
+  if (!raw || typeof raw !== 'object') return []
+  const block = raw as RawOrdonnanceBlock
+  const exercises = Array.isArray(block.exercices) ? block.exercices : []
+  return exercises.map((ex, i) => ({
+    priority: typeof ex.numero === 'number' ? ex.numero : i + 1,
+    // `consigne` is already localized to the user's ui_language per the
+    // analysis prompt; `type` is the short category fallback ("préposition",
+    // "conjugaison", ...). Both can be absent on malformed rows.
+    action: ex.consigne ?? ex.type ?? `Exercise ${i + 1}`,
+    pattern: ex.type,
+    example: ex.modele ?? ex.phrase,
+  }))
 }
 
 function mapRecording(raw: RawRecording): Recording {
@@ -292,29 +372,67 @@ const COUCHE_LABELS: Record<CoucheKey, string> = {
   prononciation: 'Prononciation',
 }
 
+// The backend packs French + English into one string with "|||" as the
+// separator (e.g. "Aucune production.|||No production."). Default to the
+// English side; callers that want the French copy can split themselves.
+// TODO(Phase 4): thread the user's interface_language through so the right
+// side is picked automatically.
+function pickLocalized(s: string | null | undefined): string | null {
+  if (!s) return null
+  const parts = s.split('|||')
+  return parts.length > 1 ? parts[1].trim() : parts[0].trim()
+}
+
 // Exposed so tests / future tickets can reuse the mapper without a round-trip.
-export function mapFeedbackToDiagnostic(recordingId: number, fb: RawFeedback): Diagnostic {
-  const couches: Couche[] = [
-    { key: 'le_fond', label: COUCHE_LABELS.le_fond, score: fb.score_le_fond, analyse: fb.analyse_le_fond ?? null },
-    { key: 'les_moules_des_idees', label: COUCHE_LABELS.les_moules_des_idees, score: fb.score_les_moules_des_idees, analyse: fb.analyse_les_moules_des_idees ?? null },
-    { key: 'les_moules', label: COUCHE_LABELS.les_moules, score: fb.score_les_moules, analyse: fb.analyse_les_moules ?? null },
-    { key: 'les_reflexes_anglais', label: COUCHE_LABELS.les_reflexes_anglais, score: fb.score_les_reflexes_anglais, analyse: fb.analyse_les_reflexes_anglais ?? null },
-    { key: 'prononciation', label: COUCHE_LABELS.prononciation, score: fb.score_prononciation, analyse: fb.analyse_prononciation ?? null },
+export function mapDiagnosticBlock(
+  recordingId: number,
+  d: RawDiagnosticBlock,
+): Diagnostic {
+  const carte = d.la_carte ?? {}
+  // Only surface couches the backend actually returned a score for. Today
+  // analysis.py emits 4 (prononciation is absent); keeping this dynamic so
+  // the UI automatically reflects whatever couches future versions emit.
+  const allKeys: CoucheKey[] = [
+    'le_fond',
+    'les_moules_des_idees',
+    'les_moules',
+    'les_reflexes_anglais',
+    'prononciation',
   ]
+  const couches: Couche[] = allKeys
+    .filter((k) => carte[k] != null)
+    .map((k) => ({
+      key: k,
+      label: COUCHE_LABELS[k],
+      score: carte[k] ?? 0,
+      // analyse_par_couche is not in the new `diagnostic` shape; use the
+      // bilingual "ce_qui_marche" as a shared narrative instead (for now).
+      analyse: null,
+    }))
+
+  const gouletNomRaw = d.le_goulet?.nom ?? ''
+  // `le_goulet.couche` is a numeric index in the API (1..4); pair with the
+  // `nom` string to resolve the actual CoucheKey. If nom doesn't match a
+  // known key we fall back to le_fond (defensive; shouldn't happen).
+  const gouletKey: CoucheKey = allKeys.includes(gouletNomRaw as CoucheKey)
+    ? (gouletNomRaw as CoucheKey)
+    : 'le_fond'
+
   const goulet: Goulet = {
-    couche: fb.goulet_couche,
-    nom: fb.goulet_nom,
-    explication: fb.goulet_explication,
+    couche: gouletKey,
+    nom: COUCHE_LABELS[gouletKey] ?? gouletNomRaw,
+    explication: pickLocalized(d.le_goulet?.explication) ?? '',
   }
+
   return {
     recordingId,
-    noteGlobale: fb.note_globale,
+    noteGlobale: d.note_globale ?? 0,
     couches,
     goulet,
-    ceQuiMarche: fb.ce_qui_marche,
-    ordonnance: fb.ordonnance ?? [],
-    cefrLevel: fb.cefr_level,
-    clbLevel: fb.clb_level,
+    ceQuiMarche: pickLocalized(d.ce_qui_marche),
+    ordonnance: mapOrdonnance(d.ordonnance),
+    cefrLevel: d.cefr_level ?? null,
+    clbLevel: d.clb_level ?? null,
   }
 }
 
@@ -324,8 +442,11 @@ const MOULE_LABELS: Record<'pyramide' | 'rebond' | 'ciblage', string> = {
   ciblage: 'Ciblage',
 }
 
-export function mapFeedbackToMoules(recordingId: number, fb: RawFeedback): MoulesBreakdown {
-  const grid = fb.feedback_grid?.tache_2 ?? {}
+export function mapDiagnosticBlockToMoules(
+  recordingId: number,
+  d: RawDiagnosticBlock,
+): MoulesBreakdown {
+  const grid = d.feedback_grid?.tache_2 ?? {}
   const keys: Array<'pyramide' | 'rebond' | 'ciblage'> = ['pyramide', 'rebond', 'ciblage']
   const moules: Moule[] = keys.map((key) => {
     const raw = grid[key] ?? {}
@@ -339,6 +460,53 @@ export function mapFeedbackToMoules(recordingId: number, fb: RawFeedback): Moule
     }
   })
   return { recordingId, moules }
+}
+
+// ── Onboarding shape bridge ──────────────────────────────────────────────────
+
+// TCF goals on the frontend are coarse motivations; the backend's exam_profile
+// is the specific exam track. This mapping reflects the descriptors shown on
+// onboarding step 2 (TCFGoalSelect). Tune here if the product pivots the
+// association.
+const GOAL_TO_EXAM_PROFILE: Record<TCFGoal, string> = {
+  immigration: 'tcf_canada',
+  studies: 'delf',
+  general: 'tcf_general',
+}
+
+interface BackendOnboardingPayload {
+  target_level: string | undefined
+  exam_profile: string | undefined
+  exam_date: string | null
+  goal: string | undefined
+  current_level: string | undefined
+  interface_language: string | undefined
+}
+
+// Exported so the signup flow / tests can invoke the mapper without a network
+// round-trip and so future callers (e.g. a profile-edit screen) share one
+// source of truth for the shape conversion.
+export function mapOnboardingToBackend(
+  data: Partial<OnboardingData>,
+): BackendOnboardingPayload {
+  // The store's ExamDate is a tagged union:
+  //   { type: 'quick', label } → user picked a bucket, no concrete date
+  //   { type: 'date',  value } → value is "YYYY-MM" from <input type="month">
+  // Backend Pydantic expects YYYY-MM-DD or null; pad with "-01" for month-only.
+  let examDate: string | null = null
+  const d = data.examDate
+  if (d && d.type === 'date' && d.value) {
+    examDate = /^\d{4}-\d{2}-\d{2}$/.test(d.value) ? d.value : `${d.value}-01`
+  }
+
+  return {
+    target_level: data.targetScore,
+    exam_profile: data.goal ? GOAL_TO_EXAM_PROFILE[data.goal] : undefined,
+    exam_date: examDate,
+    goal: data.goal,
+    current_level: data.currentLevel,
+    interface_language: data.uiLanguage,
+  }
 }
 
 // ── Domain methods ───────────────────────────────────────────────────────────
@@ -380,19 +548,16 @@ export const api = {
       return mapUser(raw)
     },
 
-    // Backend onboarding-persistence endpoint is not yet implemented (see F-060
-    // gap in the backend inventory). Stubbed here to the intended path so
-    // wiring the UI in the next ticket is one backend landing away from green.
+    // Backend schema (app/routers/users.py::OnboardingData):
+    //   target_level, exam_profile, exam_date (YYYY-MM-DD | null),
+    //   goal, current_level, interface_language.
+    // Frontend store uses a different shape (targetScore, tagged-union
+    // examDate, uiLanguage, no exam_profile). mapOnboardingToBackend bridges
+    // the two so onboarding screens and the store can stay as-is.
     async completeOnboarding(data: OnboardingData): Promise<User> {
       const raw = await request<RawUser>('/api/users/onboarding', {
         method: 'POST',
-        body: {
-          ui_language: data.uiLanguage,
-          goal: data.goal,
-          current_level: data.currentLevel,
-          target_score: data.targetScore,
-          exam_date: data.examDate,
-        },
+        body: mapOnboardingToBackend(data),
       })
       return mapUser(raw)
     },
@@ -519,15 +684,27 @@ export const api = {
     // the optional audioBlob is expected once the user hits submit. Calling
     // without a blob returns a rejected promise — intentional, to surface the
     // shape mismatch early.
+    //
+    // tacheMode accepts either a digit (1|2|3) or the full backend string
+    // ('tache_1'|'tache_2'|'tache_3'). Bare digits are normalized to the
+    // `tache_N` form — the backend rejects anything else with a 400. Defaults
+    // to 'tache_3' so existing T3-only callers don't need to change.
     async createRecording(
       topicId: number,
       audioBlob: Blob,
-      opts: { targetLevel?: string; uiLanguage?: string; examProfile?: string } = {},
+      opts: {
+        tacheMode?: 1 | 2 | 3 | 'tache_1' | 'tache_2' | 'tache_3'
+        targetLevel?: string
+        uiLanguage?: string
+        examProfile?: string
+      } = {},
     ): Promise<Recording> {
+      const rawMode = opts.tacheMode ?? 'tache_3'
+      const mode = typeof rawMode === 'number' ? `tache_${rawMode}` : rawMode
       const fd = new FormData()
       fd.append('audio', audioBlob, 'recording.webm')
       fd.append('topic_id', String(topicId))
-      fd.append('tache_mode', 'tache_3')
+      fd.append('tache_mode', mode)
       if (opts.targetLevel) fd.append('target_level', opts.targetLevel)
       if (opts.uiLanguage) fd.append('ui_language', opts.uiLanguage)
       if (opts.examProfile) fd.append('exam_profile', opts.examProfile)
@@ -536,36 +713,35 @@ export const api = {
     },
 
     // Fetches the recording tied to a session (Conversation.recording_id for
-    // Tâche 1/2; recording id directly for Tâche 3) and maps its feedback
-    // into the 4-couche + goulet + ordonnance shape the UI renders.
+    // Tâche 1/2; recording id directly for Tâche 3) and maps its `diagnostic`
+    // block into the 4-couche + goulet + ordonnance shape the UI renders.
+    // Note: the backend also returns a legacy `feedback` object with a
+    // trimmed {overall_score, analysis, recommendations} shape — we don't
+    // use it; all structured data lives under `diagnostic`.
     async getDiagnostic(recordingId: number): Promise<Diagnostic> {
-      const raw = await request<RawRecording & { feedback?: RawFeedback }>(
-        `/api/recordings/${recordingId}`,
-      )
-      if (!raw.feedback) {
+      const raw = await request<RawRecording>(`/api/recordings/${recordingId}`)
+      if (!raw.diagnostic) {
         throw new ApiError(
           409,
-          'Recording has no feedback yet — analysis may still be running.',
+          'Recording has no diagnostic yet — analysis may still be running.',
           raw,
         )
       }
-      return mapFeedbackToDiagnostic(raw.id, raw.feedback)
+      return mapDiagnosticBlock(raw.id, raw.diagnostic)
     },
 
-    // Cherry-picks feedback_grid.tache_2 from the recording's feedback.
+    // Cherry-picks feedback_grid.tache_2 from the recording's diagnostic.
     // Only meaningful for Tâche 2 sessions; returns zeroed moules otherwise.
     async getMoules(recordingId: number): Promise<MoulesBreakdown> {
-      const raw = await request<RawRecording & { feedback?: RawFeedback }>(
-        `/api/recordings/${recordingId}`,
-      )
-      if (!raw.feedback) {
+      const raw = await request<RawRecording>(`/api/recordings/${recordingId}`)
+      if (!raw.diagnostic) {
         throw new ApiError(
           409,
-          'Recording has no feedback yet — analysis may still be running.',
+          'Recording has no diagnostic yet — analysis may still be running.',
           raw,
         )
       }
-      return mapFeedbackToMoules(raw.id, raw.feedback)
+      return mapDiagnosticBlockToMoules(raw.id, raw.diagnostic)
     },
   },
 }

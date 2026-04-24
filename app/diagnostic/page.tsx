@@ -1,11 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import CouchesDiagnostic from '@/components/diagnostic/CouchesDiagnostic'
 import GouletCard from '@/components/diagnostic/GouletCard'
 import OrdonnanceExerciseCard from '@/components/diagnostic/OrdonnanceExerciseCard'
 import CorrectedLine, { Correction } from '@/components/diagnostic/CorrectedLine'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import { api, ApiError } from '@/lib/api'
+import type { Couche, Diagnostic } from '@/lib/types'
 
 // ─── design tokens ────────────────────────────────────────────────────────────
 const INK          = '#1A1A1A'
@@ -13,13 +17,14 @@ const INK_SOFT     = '#1A1A1AB3'
 const INK_MUTED    = '#1A1A1A66'
 const SAGE         = '#D4E4D0'
 const BUTTER       = '#FFF0C2'
+const PEACH        = '#FFD8C2'
 const BG           = '#FAFAF7'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 
-// ─── transcript data ──────────────────────────────────────────────────────────
+// ─── mock transcript (shown when no ?session= param — for design-review) ─────
 type Segment = { text?: string; correction?: Correction }
 
-const LINES: { segments: Segment[]; coachingNote: string }[] = [
+const MOCK_LINES: { segments: Segment[]; coachingNote: string }[] = [
   {
     segments: [
       { text: 'Bonjour, je voudrais partir ' },
@@ -49,14 +54,35 @@ const LINES: { segments: Segment[]; coachingNote: string }[] = [
   },
 ]
 
-// ─── helper: CEFR from score ─────────────────────────────────────────────────
-function cefrBand(score: number): string {
-  if (score <= 20) return 'A1'
-  if (score <= 35) return 'A2'
-  if (score <= 55) return 'B1'
-  if (score <= 75) return 'B2'
-  if (score <= 90) return 'C1'
+// ─── helpers ─────────────────────────────────────────────────────────────────
+function cefrBand(score0to100: number): string {
+  if (score0to100 <= 20) return 'A1'
+  if (score0to100 <= 35) return 'A2'
+  if (score0to100 <= 55) return 'B1'
+  if (score0to100 <= 75) return 'B2'
+  if (score0to100 <= 90) return 'C1'
   return 'C2'
+}
+
+// Backend scores for each couche come in at whatever scale analysis.py
+// happens to emit today — the Diagnostic type notes "0-10 typically" but
+// the UI bars treat scores as percentages. Rescale defensively: anything
+// ≤10 is assumed 0-10 and scaled; anything larger is passed through.
+function toPercent(rawScore: number): number {
+  if (!Number.isFinite(rawScore)) return 0
+  if (rawScore <= 10) return Math.round(rawScore * 10)
+  return Math.round(rawScore)
+}
+
+// Map the shaped Diagnostic into the CoucheRow shape CouchesDiagnostic expects.
+// Sorted worst-first so the bottleneck is at the top of the chart.
+function couchesToRows(couches: Couche[]): { name: string; score: number; cefr: string }[] {
+  return couches
+    .map((c) => {
+      const pct = toPercent(c.score)
+      return { name: c.label, score: pct, cefr: cefrBand(pct) }
+    })
+    .sort((a, b) => a.score - b.score)
 }
 
 // ─── sub-components ──────────────────────────────────────────────────────────
@@ -122,17 +148,189 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
   )
 }
 
-// ─── page ─────────────────────────────────────────────────────────────────────
-export default function DiagnosticPage() {
+function LoaderScreen() {
+  return (
+    <div
+      style={{ minHeight: '100dvh', backgroundColor: PEACH }}
+      aria-label="Loading diagnostic"
+    />
+  )
+}
+
+function ErrorScreen({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div
+      style={{
+        minHeight: '100dvh',
+        backgroundColor: BG,
+        fontFamily: DISPLAY_FONT,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '0 24px',
+        gap: 16,
+      }}
+      role="alert"
+    >
+      <p style={{ fontWeight: 700, fontSize: 18, color: INK, margin: 0, textAlign: 'center' }}>
+        Couldn&rsquo;t load your diagnostic.
+      </p>
+      <p style={{ fontWeight: 500, fontSize: 14, color: INK_MUTED, margin: 0, textAlign: 'center' }}>
+        {message}
+      </p>
+      <button
+        type="button"
+        onClick={onRetry}
+        style={{
+          fontFamily: DISPLAY_FONT,
+          fontWeight: 700,
+          fontSize: 15,
+          color: '#FFFFFF',
+          backgroundColor: INK,
+          border: 'none',
+          borderRadius: 14,
+          padding: '10px 22px',
+          cursor: 'pointer',
+          marginTop: 4,
+        }}
+      >
+        Try again
+      </button>
+    </div>
+  )
+}
+
+// ─── inner content ───────────────────────────────────────────────────────────
+
+function DiagnosticInner() {
+  const searchParams = useSearchParams()
+  const sessionParam = searchParams.get('session')
+  const sessionId = sessionParam != null ? Number.parseInt(sessionParam, 10) : null
+  const hasSession = sessionId != null && Number.isFinite(sessionId)
+
+  const [diagnostic, setDiagnostic] = useState<Diagnostic | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(hasSession)
+  const [retryKey, setRetryKey] = useState(0)
+
   const [sessionOpen, setSessionOpen] = useState(false)
   const [transcriptTab, setTranscriptTab] = useState<'resume' | 'complet'>('resume')
 
-  const tcfScore = 428
-  const tcfBand  = 'C1'
-  // C1 band = 400–499, position within band
-  const bandMin  = 400
-  const bandMax  = 499
-  const bandFill = Math.min(1, Math.max(0, (tcfScore - bandMin) / (bandMax - bandMin)))
+  const fetchDiagnostic = useCallback(async () => {
+    if (!hasSession || sessionId == null) return
+    setIsLoading(true)
+    setLoadError(null)
+    try {
+      const result = await api.sessions.getDiagnostic(sessionId)
+      setDiagnostic(result)
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setLoadError(err.message || "The server couldn't find that recording.")
+      } else {
+        setLoadError("We couldn't reach the server. Check your connection.")
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }, [hasSession, sessionId])
+
+  useEffect(() => {
+    void fetchDiagnostic()
+  }, [fetchDiagnostic, retryKey])
+
+  // ── loading / error gates when a session is requested ─────────────────────
+  if (hasSession && isLoading && !diagnostic) {
+    return <LoaderScreen />
+  }
+  if (hasSession && loadError && !diagnostic) {
+    return (
+      <ErrorScreen
+        message={loadError}
+        onRetry={() => setRetryKey((k) => k + 1)}
+      />
+    )
+  }
+
+  // ── compute display values — real when diagnostic present, mock otherwise ─
+  //
+  // The existing layout is the source of truth for the mock values; the fields
+  // the Diagnostic shape doesn't (yet) provide (TCF 0-699 score, WPM, flagged
+  // counts, corrected lines) stay on the mocks with a TODO so the design
+  // review path still works at /diagnostic with no query param.
+  const realMode = diagnostic != null
+
+  const tcfBand = realMode ? diagnostic.cefrLevel ?? 'B2' : 'C1'
+  // TODO(Phase 4): derive the /699 TCF score from backend once a CEFR→TCF
+  // table exists server-side. For now we surface noteGlobale (/20) as the
+  // numeric anchor in real mode; mock mode shows the canonical 428/699.
+  const tcfScoreLabel = realMode
+    ? `${Math.round((diagnostic.noteGlobale ?? 0))}/20`
+    : '428 / 699'
+  const tcfTargetLine = realMode
+    ? diagnostic.ceQuiMarche ?? 'Diagnostic ready.'
+    : 'Within target band for TCF Canada (CLB 9+)'
+
+  // Couches radar rows
+  const coucheRows = realMode ? couchesToRows(diagnostic.couches) : undefined
+
+  // Goulet card values
+  let gouletLayer = 'Les Réflexes Anglais'
+  let gouletScore = 45
+  let gouletBody =
+    "You're translating English structures directly into French. This is the lowest of your four layers (45/100, A2 band) and the single biggest thing holding your TCF score back. Fix this layer and your overall score jumps the most."
+  if (realMode) {
+    gouletLayer = diagnostic.goulet.nom || gouletLayer
+    const gouletCouche = diagnostic.couches.find(
+      (c) => c.key === diagnostic.goulet.couche,
+    )
+    if (gouletCouche) gouletScore = toPercent(gouletCouche.score)
+    gouletBody = diagnostic.goulet.explication || gouletBody
+  }
+
+  // Ordonnance exercises
+  const mockOrdonnance = [
+    {
+      number: '01',
+      title: 'Préposition swap drill',
+      description:
+        "20 sentences where English speakers reach for the wrong preposition. Spot the trap, pick the French one.",
+      duration: '10 min',
+    },
+    {
+      number: '02',
+      title: 'Word order rebuild',
+      description:
+        '10 English sentences. Rebuild each as a native French speaker would — not as a direct translation.',
+      duration: '12 min',
+    },
+    {
+      number: '03',
+      title: 'False friend gauntlet',
+      description:
+        '15 cognates that look identical in both languages but mean different things. Choose the right French sense.',
+      duration: '8 min',
+    },
+  ]
+  // Belt + braces: the mapper normalizes the backend object-wrapper into
+  // OrdonnanceStep[], but if a future backend shape change breaks that
+  // invariant we'd rather render fewer cards than crash the whole page.
+  const ordonnanceCards = realMode
+    ? (diagnostic.ordonnance ?? []).slice(0, 3).map((step, i) => ({
+        number: String(i + 1).padStart(2, '0'),
+        title: step.action || step.pattern || `Exercise ${i + 1}`,
+        description: step.example || step.pattern || '',
+        duration: '10 min', // duration not in Diagnostic shape yet
+      }))
+    : mockOrdonnance
+  // If backend gave 0-2 ordonnance steps in real mode, top up with mocks so
+  // the section still shows three cards (UX invariant).
+  while (realMode && ordonnanceCards.length < 3) {
+    ordonnanceCards.push(mockOrdonnance[ordonnanceCards.length])
+  }
+
+  // TCF score bar fill: only meaningful for the mock number; hide in real mode.
+  const bandFill = 0.28 // mock 428 within C1 band 400-499 ≈ 28%
 
   return (
     <div
@@ -142,7 +340,6 @@ export default function DiagnosticPage() {
         fontFamily: DISPLAY_FONT,
       }}
     >
-      {/* ── max-width wrapper ── */}
       <div
         style={{
           maxWidth: 440,
@@ -150,7 +347,6 @@ export default function DiagnosticPage() {
           paddingBottom: 120,
         }}
       >
-
         {/* ══ HEADER ══════════════════════════════════════════════════════════ */}
         <div
           style={{
@@ -164,7 +360,6 @@ export default function DiagnosticPage() {
             justifyContent: 'space-between',
           }}
         >
-          {/* Back arrow */}
           <Link
             href="/speaking"
             aria-label="Back to speaking"
@@ -191,7 +386,6 @@ export default function DiagnosticPage() {
             </svg>
           </Link>
 
-          {/* Title */}
           <div style={{ textAlign: 'center' }}>
             <p
               style={{
@@ -213,11 +407,12 @@ export default function DiagnosticPage() {
                 color: INK_MUTED,
               }}
             >
-              Tâche 2 · Agence de voyages · 8 min
+              {realMode
+                ? `Recording #${diagnostic.recordingId}`
+                : 'Tâche 2 · Agence de voyages · 8 min'}
             </p>
           </div>
 
-          {/* Share icon */}
           <button
             aria-label="Share"
             style={{
@@ -243,7 +438,6 @@ export default function DiagnosticPage() {
           </button>
         </div>
 
-        {/* ── page body ── */}
         <div
           style={{
             padding: '0 16px',
@@ -252,12 +446,12 @@ export default function DiagnosticPage() {
             gap: 12,
           }}
         >
-
           {/* ══ SECTION 1 — TCF SCORE HERO ══════════════════════════════════ */}
           <SectionCard bg="white">
-            <SectionLabel>Estimated TCF Score</SectionLabel>
+            <SectionLabel>
+              {realMode ? 'Overall band' : 'Estimated TCF Score'}
+            </SectionLabel>
 
-            {/* Score hero */}
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
               <span
                 style={{
@@ -279,11 +473,10 @@ export default function DiagnosticPage() {
                   paddingBottom: 6,
                 }}
               >
-                {tcfScore} / 699
+                {tcfScoreLabel}
               </span>
             </div>
 
-            {/* Target line */}
             <p
               style={{
                 margin: 0,
@@ -293,44 +486,46 @@ export default function DiagnosticPage() {
                 color: INK_SOFT,
               }}
             >
-              Within target band for TCF Canada (CLB 9+)
+              {tcfTargetLine}
             </p>
 
-            {/* Progress bar */}
-            <div>
-              <div
-                style={{
-                  height: 6,
-                  backgroundColor: '#1A1A1A12',
-                  borderRadius: 100,
-                  overflow: 'hidden',
-                }}
-              >
+            {/* Progress bar — only in mock mode where the /699 anchor is known */}
+            {!realMode && (
+              <div>
                 <div
                   style={{
-                    height: '100%',
-                    width: `${bandFill * 100}%`,
-                    backgroundColor: INK,
+                    height: 6,
+                    backgroundColor: '#1A1A1A12',
                     borderRadius: 100,
-                    transition: 'width 0.6s ease',
+                    overflow: 'hidden',
                   }}
-                />
+                >
+                  <div
+                    style={{
+                      height: '100%',
+                      width: `${bandFill * 100}%`,
+                      backgroundColor: INK,
+                      borderRadius: 100,
+                      transition: 'width 0.6s ease',
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginTop: 4,
+                  }}
+                >
+                  <span style={{ fontFamily: DISPLAY_FONT, fontWeight: 500, fontSize: 10, color: INK_MUTED }}>
+                    C1 band start
+                  </span>
+                  <span style={{ fontFamily: DISPLAY_FONT, fontWeight: 500, fontSize: 10, color: INK_MUTED }}>
+                    C2
+                  </span>
+                </div>
               </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginTop: 4,
-                }}
-              >
-                <span style={{ fontFamily: DISPLAY_FONT, fontWeight: 500, fontSize: 10, color: INK_MUTED }}>
-                  C1 band start
-                </span>
-                <span style={{ fontFamily: DISPLAY_FONT, fontWeight: 500, fontSize: 10, color: INK_MUTED }}>
-                  C2
-                </span>
-              </div>
-            </div>
+            )}
           </SectionCard>
 
           {/* ══ SECTION 2 — RADAR ═══════════════════════════════════════════ */}
@@ -338,22 +533,24 @@ export default function DiagnosticPage() {
             <SectionLabel>La Méthode en Couches</SectionLabel>
             <SectionHeading>Where you stand on each layer</SectionHeading>
 
-            <CouchesDiagnostic />
+            <CouchesDiagnostic rows={coucheRows} />
           </SectionCard>
 
           {/* ══ SECTION 3 — LE GOULET ═══════════════════════════════════════ */}
           <GouletCard
-            layer="Les Réflexes Anglais"
-            score={45}
-            band={cefrBand(45)}
+            layer={gouletLayer}
+            score={gouletScore}
+            band={cefrBand(gouletScore)}
             estimatedGain={35}
-            body="You're translating English structures directly into French. This is the lowest of your four layers (45/100, A2 band) and the single biggest thing holding your TCF score back. Fix this layer and your overall score jumps the most."
+            body={gouletBody}
           />
 
           {/* ══ SECTION 4 — L'ORDONNANCE ════════════════════════════════════ */}
           <SectionCard bg={BUTTER}>
             <SectionLabel>{"L'Ordonnance · Your Prescription"}</SectionLabel>
-            <SectionHeading>Three exercises to fix this</SectionHeading>
+            <SectionHeading>
+              {realMode ? 'Your next exercises' : 'Three exercises to fix this'}
+            </SectionHeading>
             <p
               style={{
                 margin: 0,
@@ -363,32 +560,26 @@ export default function DiagnosticPage() {
                 color: INK_MUTED,
               }}
             >
-              Targeted at Les Réflexes Anglais. Built for English speakers.
+              {realMode
+                ? `Targeted at ${gouletLayer}.`
+                : 'Targeted at Les Réflexes Anglais. Built for English speakers.'}
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <OrdonnanceExerciseCard
-                number="01"
-                title="Préposition swap drill"
-                description="20 sentences where English speakers reach for the wrong preposition. Spot the trap, pick the French one."
-                duration="10 min"
-              />
-              <OrdonnanceExerciseCard
-                number="02"
-                title="Word order rebuild"
-                description="10 English sentences. Rebuild each as a native French speaker would — not as a direct translation."
-                duration="12 min"
-              />
-              <OrdonnanceExerciseCard
-                number="03"
-                title="False friend gauntlet"
-                description="15 cognates that look identical in both languages but mean different things. Choose the right French sense."
-                duration="8 min"
-              />
+              {ordonnanceCards.map((ex) => (
+                <OrdonnanceExerciseCard
+                  key={ex.number}
+                  number={ex.number}
+                  title={ex.title}
+                  description={ex.description}
+                  duration={ex.duration}
+                />
+              ))}
             </div>
           </SectionCard>
 
-          {/* ══ SECTION 5 — SESSION DETAILS (collapsible) ═══════════════════ */}
+          {/* ══ SECTION 5 — SESSION DETAILS (still mocked — WPM/pron% aren't
+                 in the shared Diagnostic shape yet; follow-up ticket) ═══════ */}
           <SectionCard bg="white" style={{ gap: 0, padding: 0, overflow: 'hidden' }}>
             <button
               onClick={() => setSessionOpen((v) => !v)}
@@ -492,9 +683,11 @@ export default function DiagnosticPage() {
             )}
           </SectionCard>
 
-          {/* ══ SECTION 6 — CORRECTED TRANSCRIPTION ═════════════════════════ */}
+          {/* ══ SECTION 6 — CORRECTED TRANSCRIPTION (still mocked — the
+                 Diagnostic shape doesn't carry segment-level corrections;
+                 wiring /recordings/{id} transcript/corrections into the
+                 CorrectedLine segments shape is its own ticket) ═══════════ */}
           <SectionCard bg="white">
-            {/* Tab toggle */}
             <div
               style={{
                 display: 'flex',
@@ -532,7 +725,6 @@ export default function DiagnosticPage() {
               })}
             </div>
 
-            {/* Lines */}
             <div
               style={{
                 display: 'flex',
@@ -540,7 +732,7 @@ export default function DiagnosticPage() {
                 gap: transcriptTab === 'complet' ? 20 : 14,
               }}
             >
-              {LINES.map((line, i) => (
+              {MOCK_LINES.map((line, i) => (
                 <CorrectedLine
                   key={i}
                   segments={line.segments}
@@ -560,7 +752,6 @@ export default function DiagnosticPage() {
               padding: '8px 0 24px',
             }}
           >
-            {/* Primary */}
             <Link
               href="/speaking"
               style={{
@@ -580,7 +771,6 @@ export default function DiagnosticPage() {
               Practice again
             </Link>
 
-            {/* Secondary */}
             <Link
               href="/raccourci"
               style={{
@@ -598,9 +788,19 @@ export default function DiagnosticPage() {
               Back to Le Raccourci
             </Link>
           </div>
-
         </div>
       </div>
     </div>
+  )
+}
+
+// ─── outer wrapper: ProtectedRoute + Suspense (for useSearchParams) ──────────
+export default function DiagnosticPage() {
+  return (
+    <ProtectedRoute>
+      <Suspense fallback={<LoaderScreen />}>
+        <DiagnosticInner />
+      </Suspense>
+    </ProtectedRoute>
   )
 }
