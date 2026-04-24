@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-24
+**Last updated:** 2026-04-24 (F-062 ship)
 **Sprint window:** April 21 – May 4, 2026
 
 ---
@@ -92,11 +92,42 @@ F-061.3 ✅ Ordonnance shape normalization
   - `lib/api.ts`: new `RawOrdonnanceExercise` / `RawOrdonnanceBlock` types + a dedicated `mapOrdonnance(raw: unknown)` guard that returns `[]` for any unrecognized shape and key-maps present exercises (`numero→priority`, `consigne→action` with `type` fallback, `type→pattern`, `modele ?? phrase→example`). `RawDiagnosticBlock.ordonnance` retyped to `unknown` so the guard owns the shape check.
   - `app/diagnostic/page.tsx:316`: belt-and-braces `(diagnostic.ordonnance ?? []).slice(0, 3)` — if a future backend shape change breaks the mapper invariant, the page renders fewer cards instead of crashing. Mock-card padding (tops up to 3) still kicks in when backend returns fewer exercises.
 
+F-062 ✅ Tâche 2 real recording (multi-turn role-play conversation)
+  - `components/speaking/Tache2Session.tsx` — full rewrite against a phase state machine: `briefing → user-idle → user-recording → user-transcribing → reviewing → examiner-speaking → finalizing` (plus `error` recovery). Fixed 6-turn client-side cap (`TARGET_USER_TURNS`); backend hard cap is 12 so the client's cap always wins and we explicitly call finalize.
+  - Reuses F-061 primitives unchanged: `useAudioRecorder` (60s per-turn cap via effect on `durationMs`, same pattern as T3's 180s but with a different threshold) and `VuMeter` (stream-driven AnalyserNode). No fork.
+  - PTT flow — hold to record, release to stop. Idempotency guards (`stoppingRef`, `finalizingRef`) prevent the 60s cap effect racing a user tap, and prevent double-finalize on error-retry.
+  - Per-turn upload: `api.sessions.uploadConversationTurn(conversationId, audioBlob)` — new method on the API surface (renamed from `uploadAudio` with enriched response shape: `autoEnded`, `wrapUpHint`, `examinerTurnNumber` added).
+  - Examiner playback: simple `HTMLAudioElement` with autoplay attempt. On `NotAllowedError` (autoplay blocked on first load) shows a "Tap to hear the reply" ghost button; subsequent turns play inline once the audio context is user-unlocked. Text-only fallback when backend returns `examiner_turn_audio_url: null` (TTS unavailable).
+  - Muted toggle respected on the NEXT examiner turn, not mid-sentence — intentional so toggling mute doesn't cut off the current line.
+  - Per-session review-suppression: `reviewSuppressed` is ephemeral component state (NOT localStorage per spec). Default false; checkbox in the turn-review sheet flips it for remaining turns in the same session.
+  - Turn-review sheet: simplified from spec — backend emits `feedback_grid` only at `/end` (see discrepancy note below), so the sheet shows the user's transcribed line with a "Confirmer" CTA and the suppress checkbox, **not** the Pyramide/Rebond/Ciblage moule breakdown. Full moule breakdown still appears on `/diagnostic` after finalize, via the existing mapper chain.
+  - Finalize: `api.sessions.finalizeConversation(conversationId)` — new method hitting `POST /api/conversations/{id}/end`. Semantically identical to the spec's `/finalize` (runs 4-couche analysis across all candidate turns, returns recording_id, idempotent on completed conversations). Routes to `/diagnostic?session=<recording_id>` on success.
+  - Error surface: mirrors F-061.2 pattern — `ApiError` → "{status}: {message}", `TypeError` → network error, microphone permission errors → recorder's own copy. Retry button re-enters the right phase based on state (briefing if /start failed, user-idle if mid-conversation, finalize if /end failed).
+  - Scenario briefs: client-side literals for the three unlocked scenarios (`agence-voyages`, `ami-demenage`, `bibliotheque`); fallback brief for any other slug so direct URL edits don't crash (backend still rejects unknown `scenario_code` with 404 on `/start`). Picker wiring to `GET /api/conversations/scenarios` is deferred to F-061.1.
+  - API surface additions (`lib/api.ts` + `lib/types.ts`): `ConversationStart`, `ConversationTurnResult`, `ConversationFinalizeResult` types; `createConversation` now takes an options bag (`scenarioCode`, `topicId`, `targetLevel`, `uiLanguage`, `examProfile`) and returns the richer `ConversationStart` shape with opening-examiner fields (always null for T2) and normalized turn caps.
+  - Spec discrepancies documented for the follow-up ticket (not blocking ship):
+      · Spec assumed `/turn` response carried `feedback_grid`; backend only emits feedback at `/end`. Per-turn moule coaching isn't available — sheet shows transcript confirmation instead.
+      · Spec named the final endpoint `/finalize`; backend has `/end` with identical semantics. Frontend method name kept as `finalizeConversation`; HTTP endpoint is `/end`.
+      · T2 `/start` returns `examiner_turn_text: null` (candidate opens). Spec's `examiner-speaking` phase after briefing is skipped for T2 — we go straight to `user-idle`. The phase still exists for T1 reuse in F-063.
+  - Verification: `tsc --noEmit` clean except the pre-existing TargetScoreSelect.tsx:98 known issue.
+
+F-062.1 ✅ Scenario slug↔backend code mapping + dev sanity check
+  - Bug: browser test hit "Start conversation" on /speaking/tache-2/agence-voyages and got `404: Unknown or inactive scenario_code 'agence-voyages'`. Frontend was sending URL slugs; backend's `tache2_scenarios.code` column uses underscored + three entirely different spellings (picker and seeder drifted during F-049 seeding):
+      · `agence-voyages` → `agence_voyages` (hyphen→underscore)
+      · `ami-demenage` → `ami_demenagement` (different word form)
+      · `bibliotheque` → `bibliotheque` (exact)
+      · `collegue-quebecois` → `nouveau_collegue_quebecois` (prefix)
+      · `agence-immobiliere` → `agence_immobiliere_canada` (suffix)
+  - Fix: added a `backendCode` field to each `Scenario` / `ScenarioBrief` literal — one in `Tache2Picker.tsx`, one in `Tache2Session.tsx`. `createConversation` now sends `brief.backendCode` instead of the URL slug. URL slugs stay hyphen-cased (no breaking changes). Fallback for unknown slugs sends the slug itself; backend returns a clean 404 surfaced via the error overlay.
+  - Dev sanity check (Tache2Picker): on mount in `NODE_ENV === 'development'`, fires `api.sessions.listTache2Scenarios()` once and `console.warn`s any unlocked SCENARIOS entry whose `backendCode` isn't in the backend response. Locked entries are skipped because `/scenarios` filters by the raccourci gate (F-053) — a "missing" warning for a gated row would be a false positive. Errors are swallowed silently.
+  - New API method: `api.sessions.listTache2Scenarios()` — GET /api/conversations/scenarios, returns trimmed `{scenarios: [{id, code, difficulty}], aboveA2}`. Reused by the sanity check; eventually consumed by F-061.1 picker wiring as the source-of-truth replacement for the client literal.
+  - TODO(F-061.1) comment on both sides points at the long-term fix: have the picker consume `/scenarios` directly, eliminating the drift problem by construction.
+
 ---
 
 ## In progress
 
-_(none — F-061 closed end-to-end. F-061.1 opens next if picker/slug work is prioritized, else F-062.)_
+_(none — F-062 + F-062.1 closed. F-063 (T1) and F-061.1 (picker) both open.)_
 
 ---
 
@@ -113,14 +144,6 @@ _(none — F-061 closed end-to-end. F-061.1 opens next if picker/slug work is pr
 **F-062** 📋 Tâche 2 real recording (multi-turn conversation)
 
 These complete the MVP loop: user can do a real TCF session, get real analysis, see real feedback.
-
-**F-062** 📋 Tâche 2 real recording (multi-turn conversation)
-- Reuse useAudioRecorder + VuMeter primitives from F-061
-- Wire Tache2Session.tsx: PTT mode, 60s per turn cap
-- POST /api/conversations + /api/conversations/{id}/turns per turn
-- After 3 turns: fetch conversation, cherry-pick feedback_grid.tache_2 for TranscriptReviewPanel
-- Route to /diagnostic?session=<recordingId> on completion
-- Depends on: F-061
 
 **F-063** 📋 Tâche 1 real recording (AI examiner conversation)
 - Reuse useAudioRecorder + VuMeter primitives

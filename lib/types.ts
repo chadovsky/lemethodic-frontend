@@ -136,6 +136,44 @@ export interface Conversation {
   completedAt: string | null
 }
 
+// Return shape of api.sessions.createConversation (POST /conversations/start).
+// T1 populates examiner fields with an opening turn; T2 returns them null
+// because the candidate speaks first.
+export interface ConversationStart {
+  conversationId: string
+  tacheMode: TacheMode
+  conversationStatus: Conversation['status']
+  examinerTurnText: string | null
+  examinerTurnAudioUrl: string | null
+  examinerTurnNumber: number | null
+  maxCandidateTurnsHard: number | null
+  maxCandidateTurnsHint: number | null
+}
+
+// Return shape of api.sessions.uploadConversationTurn (POST /conversations/{id}/turn).
+// `autoEnded` flips when the backend-side hard cap is hit — for clients
+// enforcing a tighter cap (F-062's 6-turn T2 loop) this stays false and the
+// client calls finalizeConversation itself.
+export interface ConversationTurnResult {
+  candidateTranscript: string
+  examinerTurnText: string | null
+  examinerTurnAudioUrl: string | null
+  examinerTurnNumber: number | null
+  conversationStatus: Conversation['status']
+  recordingId: number | null
+  autoEnded: boolean
+  wrapUpHint: boolean
+}
+
+// Return shape of api.sessions.finalizeConversation (POST /conversations/{id}/end).
+// underMinTurns flags T1 sessions ended before the minimum turn count — the
+// UI can warn that results are directional.
+export interface ConversationFinalizeResult {
+  conversationStatus: Conversation['status']
+  recordingId: number | null
+  underMinTurns: boolean
+}
+
 export interface Recording {
   id: number
   tacheMode: TacheMode | 'writing' | 'legacy'

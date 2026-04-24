@@ -30,7 +30,9 @@
       "Read(//c/Users/pc/Downloads/tcf-oral-tool/**)",
       "Bash(git log *)",
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(python -c \"import sqlite3; c=sqlite3.connect\\('tcf_oral.db'\\).cursor\\(\\); print\\('TABLES:'\\); [print\\('  ', r[0]\\) for r in c.execute\\(\\\\\"SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '%scenario%'\\\\\"\\)]; print\\('\\\\\\\\nROWS:'\\); [print\\(r\\) for r in c.execute\\('SELECT id, code, is_active, difficulty FROM tache2_scenarios'\\)]\")",
+      "Bash(./node_modules/.bin/tsc *)"
     ]
   }
 }

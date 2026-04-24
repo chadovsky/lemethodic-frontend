@@ -7,7 +7,10 @@
 import type {
   ApiErrorShape,
   Conversation,
+  ConversationFinalizeResult,
+  ConversationStart,
   ConversationTurn,
+  ConversationTurnResult,
   Couche,
   CoucheKey,
   Diagnostic,
@@ -240,6 +243,22 @@ interface RawConversation {
   turns: RawConversationTurn[]
   started_at: string
   completed_at: string | null
+}
+
+// Backend /start response. Distinct from RawConversation because /start
+// returns only the initial state, not the full turn history. T1 carries an
+// opening examiner turn; T2 returns null in those slots (candidate opens).
+interface RawConversationStart {
+  conversation_id: string
+  tache_mode: TacheMode
+  conversation_status: Conversation['status']
+  examiner_turn_text: string | null
+  examiner_turn_audio_url: string | null
+  turn_number: number | null
+  // T1 uses one name, T2 another — normalized in the mapper.
+  max_candidate_turns?: number
+  max_candidate_turns_hard?: number
+  max_candidate_turns_hint?: number
 }
 
 function mapConversation(raw: RawConversation): Conversation {
@@ -632,15 +651,46 @@ export const api = {
 
   sessions: {
     // Tâche 1/2 — starts a multi-turn conversation.
-    async createConversation(tacheMode: TacheMode, scenarioId?: string): Promise<Conversation> {
-      const raw = await request<RawConversation>('/api/conversations/start', {
-        method: 'POST',
+    //
+    // Backend /start returns different shapes for T1 vs T2:
+    //   - T1: includes an opening examiner turn (examiner_turn_text/_audio_url/_number)
+    //   - T2: candidate speaks first, so those fields are all null; the
+    //         scenario object is included instead
+    // Both include the conversation id, status, mode, and turn caps.
+    async createConversation(
+      tacheMode: TacheMode,
+      opts: {
+        scenarioCode?: string
+        topicId?: number
+        targetLevel?: string
+        uiLanguage?: string
+        examProfile?: string
+      } = {},
+    ): Promise<ConversationStart> {
+      const raw = await request<RawConversationStart>('/api/conversations/start', {
         body: {
           tache_mode: tacheMode,
-          ...(scenarioId ? { scenario_code: scenarioId } : {}),
+          ...(opts.scenarioCode ? { scenario_code: opts.scenarioCode } : {}),
+          ...(opts.topicId ? { topic_id: opts.topicId } : {}),
+          ...(opts.targetLevel ? { target_level: opts.targetLevel } : {}),
+          ...(opts.uiLanguage ? { ui_language: opts.uiLanguage } : {}),
+          ...(opts.examProfile ? { exam_profile: opts.examProfile } : {}),
         },
       })
-      return mapConversation(raw)
+      return {
+        conversationId: raw.conversation_id,
+        tacheMode: raw.tache_mode,
+        conversationStatus: raw.conversation_status,
+        examinerTurnText: raw.examiner_turn_text ?? null,
+        examinerTurnAudioUrl: raw.examiner_turn_audio_url ?? null,
+        examinerTurnNumber: raw.turn_number ?? null,
+        // T1 uses max_candidate_turns; T2 uses max_candidate_turns_hard. The
+        // client normalizes to a single "hard cap" number so callers don't
+        // have to fork on mode. Hint is T2-only.
+        maxCandidateTurnsHard:
+          raw.max_candidate_turns_hard ?? raw.max_candidate_turns ?? null,
+        maxCandidateTurnsHint: raw.max_candidate_turns_hint ?? null,
+      }
     },
 
     async getConversation(id: string): Promise<Conversation> {
@@ -648,35 +698,86 @@ export const api = {
       return mapConversation(raw)
     },
 
-    // Posts a candidate turn to an existing conversation. turnIndex is
-    // informational — the backend numbers turns itself.
-    async uploadAudio(
+    // Lists Tâche 2 scenarios the current user is gated into. Backend
+    // filters by the raccourci gate (F-053): below-A2 users only get A2_B1
+    // rows. Used by the F-062.1 dev sanity check in Tache2Picker to detect
+    // slug/code drift between the client-side SCENARIOS literal and the
+    // seeded DB; the picker itself will eventually consume this endpoint
+    // as its source of truth (F-061.1).
+    async listTache2Scenarios(): Promise<{
+      scenarios: Array<{ id: number; code: string; difficulty: string }>
+      aboveA2: boolean
+    }> {
+      const raw = await request<{
+        scenarios: Array<{
+          id: number
+          code: string
+          difficulty?: string
+        }>
+        gates: { above_a2: boolean }
+      }>('/api/conversations/scenarios')
+      return {
+        scenarios: raw.scenarios.map((s) => ({
+          id: s.id,
+          code: s.code,
+          difficulty: s.difficulty ?? 'A2_B1',
+        })),
+        aboveA2: raw.gates.above_a2,
+      }
+    },
+
+    // Posts a candidate turn. Multipart F-048 path: server runs STT and
+    // returns the transcript + the next examiner turn. When the backend's
+    // hard cap is hit (T1: 4, T2: 12) it auto-runs analysis and sets
+    // recordingId — clients that enforce a tighter client-side cap (like
+    // F-062's 6-turn T2 loop) never see that because they call finalize()
+    // themselves before the backend would auto-end.
+    async uploadConversationTurn(
       sessionId: string,
       audioBlob: Blob,
-      turnIndex?: number,
-    ): Promise<{
-      candidateTranscript: string
-      examinerTurnText: string | null
-      examinerTurnAudioUrl: string | null
-      conversationStatus: Conversation['status']
-      recordingId: number | null
-    }> {
+    ): Promise<ConversationTurnResult> {
       const fd = new FormData()
       fd.append('audio', audioBlob, 'turn.webm')
-      if (turnIndex !== undefined) fd.append('turn_index', String(turnIndex))
       const raw = await request<{
         candidate_transcript: string
         examiner_turn_text: string | null
         examiner_turn_audio_url: string | null
+        examiner_turn_number: number | null
         conversation_status: Conversation['status']
         recording_id: number | null
+        auto_ended: boolean
+        wrap_up_hint: boolean
       }>(`/api/conversations/${sessionId}/turn`, { formData: fd })
       return {
         candidateTranscript: raw.candidate_transcript,
         examinerTurnText: raw.examiner_turn_text,
         examinerTurnAudioUrl: raw.examiner_turn_audio_url,
+        examinerTurnNumber: raw.examiner_turn_number,
         conversationStatus: raw.conversation_status,
         recordingId: raw.recording_id,
+        autoEnded: raw.auto_ended,
+        wrapUpHint: raw.wrap_up_hint,
+      }
+    },
+
+    // Manually end a conversation — runs the 4-couche analysis over all
+    // candidate turns and links the resulting Recording row for /diagnostic
+    // routing. Idempotent on completed conversations (returns the same
+    // recording_id). Named `finalize` on the frontend for API-surface
+    // consistency; backend endpoint is `/end` (semantically identical).
+    async finalizeConversation(sessionId: string): Promise<ConversationFinalizeResult> {
+      const raw = await request<{
+        conversation_status: Conversation['status']
+        recording_id: number | null
+        under_min_turns: boolean
+      }>(`/api/conversations/${sessionId}/end`, {
+        method: 'POST',
+        body: {},
+      })
+      return {
+        conversationStatus: raw.conversation_status,
+        recordingId: raw.recording_id,
+        underMinTurns: raw.under_min_turns,
       }
     },
 

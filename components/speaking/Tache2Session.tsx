@@ -1,37 +1,160 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+// Tâche 2 — role-play conversation session (F-062).
+//
+// State machine:
+//   briefing → user-idle → user-recording → user-transcribing
+//              ↓             ↑
+//              reviewing ────┘ (loops up to TARGET_USER_TURNS)
+//              ↓
+//              examiner-speaking → user-idle (next turn)
+//                                  ↓
+//                                  finalizing → routes to /diagnostic
+//   Any phase → error → recovery
+//
+// Backend contract:
+//   POST /conversations/start       (T2: examiner_turn_* all null, candidate opens)
+//   POST /conversations/{id}/turn   (multipart audio; returns transcript + next examiner turn)
+//   POST /conversations/{id}/end    (runs 4-couche analysis, returns recording_id)
+//
+// Primitives: useAudioRecorder + VuMeter come from F-061 untouched. The
+// 60s cap is enforced here via an effect on recorder.durationMs — same
+// pattern as Tache3Session's 180s cap but with a different threshold.
+//
+// Per-turn review: the backend emits feedback_grid only at /end (not per
+// /turn), so the review sheet here is transcript-confirmation only — no
+// moule-level coaching. Full Pyramide/Rebond/Ciblage breakdown surfaces
+// on the /diagnostic page after finalize. See F-068 if per-turn moule
+// feedback gets added to /turn later.
+
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronLeft, Volume2, VolumeX, ChevronDown, ChevronUp } from 'lucide-react'
 import ChatBubble from './ChatBubble'
 import RecordButton, { RecordingState } from './RecordButton'
 import VuMeter from './VuMeter'
-import TranscriptReviewPanel from './TranscriptReviewPanel'
+import { useAudioRecorder } from '@/hooks/useAudioRecorder'
+import { api, ApiError } from '@/lib/api'
+import { useAuthStore } from '@/lib/auth'
 
 const INK          = '#1A1A1A'
 const INK_SOFT     = '#1A1A1AB3'
 const INK_MUTED    = '#1A1A1A66'
 const SAGE         = '#D4E4D0'
+const PEACH        = '#FFD8C2'
+const BUTTER       = '#FFF0C2'
 const BG           = '#FAFAF7'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 
-type Turn = { side: 'examiner' | 'user'; text: string }
+const TARGET_USER_TURNS = 6
+const TURN_CAP_MS       = 60_000
 
-const INITIAL_TURNS: Turn[] = [
-  { side: 'examiner', text: 'Bonjour, comment puis-je vous aider\u00a0?' },
-  { side: 'user',     text: 'Bonjour. Je voudrais partir en vacances dans un pays francophone.' },
-  { side: 'examiner', text: 'Très bien. Avez-vous une période en tête\u00a0?' },
-]
+type Phase =
+  | 'briefing'
+  | 'user-idle'
+  | 'user-recording'
+  | 'user-transcribing'
+  | 'reviewing'
+  | 'examiner-speaking'
+  | 'finalizing'
+  | 'error'
 
-const INFO_TARGETS = [
-  'Destination options',
-  'Price range',
-  'Duration of stay',
-  'Type of accommodation',
-  'Included activities',
-  'Weather forecast',
-  'Visa requirements',
-]
+type BubbleEntry = {
+  side: 'examiner' | 'user'
+  text: string
+  /** Examiner audio URL for this bubble, if any. */
+  audioUrl?: string | null
+}
+
+interface ScenarioBrief {
+  /** The backend's scenario_code column value. URL slugs and backend codes
+   *  drifted during seeding (hyphen vs underscore, plus three entirely
+   *  different spellings — "ami-demenage" vs "ami_demenagement", etc.), so
+   *  this field is the source of truth for what /start accepts. */
+  backendCode: string
+  title: string
+  roleBody: string
+  infoTargets: string[]
+  bg: string
+  counterpartLabel: string
+  register: string
+}
+
+// Scenario briefs keyed by URL slug. `backendCode` is the value sent to
+// POST /api/conversations/start; it does NOT match the URL slug in three of
+// the five seeded scenarios.
+//
+// TODO(F-061.1): replace this literal with a live fetch of
+// GET /api/conversations/scenarios so there's one source of truth for both
+// the picker and this session. The sanity check in Tache2Picker currently
+// flags drift; moving to a live fetch eliminates the drift entirely.
+const SCENARIO_BRIEFS: Record<string, ScenarioBrief> = {
+  'agence-voyages': {
+    backendCode: 'agence_voyages',
+    title: "L'agence de voyages",
+    roleBody:
+      'You want to plan a vacation to a French-speaking country. Ask the agent everything you need to choose the perfect destination.',
+    infoTargets: [
+      'Destination options',
+      'Price range',
+      'Duration of stay',
+      'Type of accommodation',
+      'Included activities',
+      'Weather forecast',
+      'Visa requirements',
+    ],
+    bg: SAGE,
+    counterpartLabel: 'travel agent',
+    register: 'Formel',
+  },
+  'ami-demenage': {
+    backendCode: 'ami_demenagement',
+    title: "L'ami qui déménage",
+    roleBody:
+      'Your friend is moving to another city. Ask the questions a good friend would ask.',
+    infoTargets: [
+      'Where they are moving',
+      'When they leave',
+      'Why they are leaving',
+      'New job or studies',
+      'New living situation',
+      'When you can visit',
+    ],
+    bg: PEACH,
+    counterpartLabel: 'your friend',
+    register: 'Informel',
+  },
+  'bibliotheque': {
+    backendCode: 'bibliotheque',
+    title: 'La bibliothèque',
+    roleBody:
+      'You need a book at the library and want to know the rules. Ask the librarian.',
+    infoTargets: [
+      'How to borrow a book',
+      'Loan duration',
+      'Late fees',
+      'Renewing a loan',
+      'Quiet-room hours',
+      'Membership cost',
+    ],
+    bg: BUTTER,
+    counterpartLabel: 'the librarian',
+    register: 'Semi-formel',
+  },
+}
+
+// Fallback brief used when a scenario slug isn't in the map (e.g. direct
+// URL edit). Keeps the session functional instead of crashing; backendCode
+// falls back to the slug itself — the backend will reject it with a 404
+// and the error overlay will surface the detail.
+const FALLBACK_BRIEF: Omit<ScenarioBrief, 'backendCode'> = {
+  title: 'Role-play',
+  roleBody: 'Ask questions to gather the information you need.',
+  infoTargets: [],
+  bg: SAGE,
+  counterpartLabel: 'your counterpart',
+  register: 'Formel',
+}
 
 interface Tache2SessionProps {
   scenario?: string
@@ -39,57 +162,364 @@ interface Tache2SessionProps {
 
 export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2SessionProps) {
   const router = useRouter()
-  const [muted, setMuted]                   = useState(false)
-  const [briefExpanded, setBriefExpanded]   = useState(true)
-  const [briefDismissed, setBriefDismissed] = useState(false)
-  const [recordingState, setRecordingState] = useState<RecordingState>('recording')
-  const [pttTimer, setPttTimer]             = useState(8) // design review: show 0:08
-  const [showTranscript, setShowTranscript] = useState(false)
-  const [turns, setTurns]                   = useState<Turn[]>(INITIAL_TURNS)
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const user = useAuthStore((s) => s.user)
+  // Unknown slug → fallback brief, with the slug itself as the backendCode.
+  // /start will 404 and the error overlay will surface the detail — better
+  // UX than silently substituting a valid-but-wrong scenario.
+  const brief: ScenarioBrief = SCENARIO_BRIEFS[scenario] ?? {
+    ...FALLBACK_BRIEF,
+    backendCode: scenario,
+  }
 
-  // Auto-scroll to bottom
+  // ── State ────────────────────────────────────────────────────────────────
+  const [phase, setPhase] = useState<Phase>('briefing')
+  const [error, setError] = useState<string | null>(null)
+
+  const [conversationId, setConversationId] = useState<string | null>(null)
+  const [bubbles, setBubbles] = useState<BubbleEntry[]>([])
+  const [userTurnCount, setUserTurnCount] = useState(0)
+  const [pendingTranscript, setPendingTranscript] = useState<string | null>(null)
+  const [pendingExaminerBubble, setPendingExaminerBubble] = useState<BubbleEntry | null>(null)
+  const [reviewSuppressed, setReviewSuppressed] = useState(false)
+  const [muted, setMuted] = useState(false)
+  const [briefExpanded, setBriefExpanded] = useState(false)
+  const [autoplayBlocked, setAutoplayBlocked] = useState(false)
+
+  const recorder = useAudioRecorder()
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const audioElRef = useRef<HTMLAudioElement | null>(null)
+  // Guards finalize + stopRecording against double-triggering from the 60s
+  // cap effect racing a user tap.
+  const stoppingRef = useRef(false)
+  const finalizingRef = useRef(false)
+  // Latest user-turn count — used by the examiner-audio-ended callback so it
+  // doesn't close over a stale count when the effect fires.
+  const userTurnCountRef = useRef(0)
+  useEffect(() => {
+    userTurnCountRef.current = userTurnCount
+  }, [userTurnCount])
+
+  // Auto-scroll on new bubble.
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [turns])
+  }, [bubbles, phase])
 
-  function handlePTTStart() {
-    setRecordingState('recording')
-  }
+  // Cleanup: stop any playing examiner audio on unmount.
+  useEffect(() => {
+    return () => {
+      const a = audioElRef.current
+      if (a) {
+        a.pause()
+        a.src = ''
+        audioElRef.current = null
+      }
+    }
+  }, [])
 
-  function handlePTTEnd() {
-    setRecordingState('processing')
-    // Short delay then show transcript review
-    setTimeout(() => {
-      setRecordingState('awaiting_review')
-      setShowTranscript(true)
-    }, 800)
-  }
+  // ── Backend calls ────────────────────────────────────────────────────────
 
-  function handleConfirmTranscript() {
-    setShowTranscript(false)
-    setTurns((prev) => [
-      ...prev,
-      {
-        side: 'user',
-        text: 'Oui, je pensais partir en juillet ou août. Quelles destinations me recommandez-vous\u00a0?',
-      },
-    ])
-    setRecordingState('idle')
-  }
+  const startConversation = useCallback(async () => {
+    setError(null)
+    try {
+      const start = await api.sessions.createConversation('tache_2', {
+        scenarioCode: brief.backendCode,
+        targetLevel: user?.targetLevel ?? 'B2',
+        uiLanguage: user?.interfaceLanguage ?? 'en',
+        examProfile: user?.examProfile ?? 'tcf_canada',
+      })
+      setConversationId(start.conversationId)
+      // T2 has no opening examiner turn. If a future backend change adds
+      // one, surface it here so the rest of the flow doesn't need to fork.
+      if (start.examinerTurnText) {
+        setBubbles([
+          {
+            side: 'examiner',
+            text: start.examinerTurnText,
+            audioUrl: start.examinerTurnAudioUrl,
+          },
+        ])
+        setPendingExaminerBubble(null)
+        setPhase('examiner-speaking')
+      } else {
+        setPhase('user-idle')
+      }
+    } catch (err) {
+      handleApiError(err, 'Could not start the conversation.')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [brief.backendCode, user])
 
-  function handleStartConversation() {
-    setBriefExpanded(false)
-    setBriefDismissed(true)
-  }
+  const handleApiError = useCallback((err: unknown, genericFallback: string) => {
+    setPhase('error')
+    if (err instanceof ApiError) {
+      setError(err.message ? `${err.status}: ${err.message}` : `${genericFallback} (${err.status}).`)
+    } else if (err instanceof TypeError) {
+      setError("Couldn't reach the server. Retry?")
+    } else if (
+      recorder.status === 'error' &&
+      (recorder.error?.toLowerCase().includes('permission') ?? false)
+    ) {
+      setError(recorder.error)
+    } else {
+      setError(genericFallback)
+    }
+  }, [recorder.status, recorder.error])
 
-  function handleEndConversation() {
-    router.push('/speaking/feedback/placeholder')
-  }
+  // ── Recording controls ───────────────────────────────────────────────────
 
-  const userTurnCount = turns.filter((t) => t.side === 'user').length
+  const handlePTTStart = useCallback(async () => {
+    if (phase !== 'user-idle') return
+    setError(null)
+    stoppingRef.current = false
+    await recorder.startRecording()
+    // status transitions observed via the effect below.
+  }, [phase, recorder])
+
+  // When the recorder reports 'recording' and we're still idle, advance.
+  useEffect(() => {
+    if (recorder.status === 'recording' && phase === 'user-idle') {
+      setPhase('user-recording')
+    } else if (recorder.status === 'error' && phase !== 'error') {
+      handleApiError(
+        new Error(recorder.error ?? 'Microphone error.'),
+        recorder.error ?? 'Microphone error.',
+      )
+    }
+  }, [recorder.status, recorder.error, phase, handleApiError])
+
+  const uploadTurn = useCallback(
+    async (blob: Blob) => {
+      if (!conversationId) {
+        handleApiError(new Error('Missing conversation id.'), 'Session state lost. Retry?')
+        return
+      }
+      setPhase('user-transcribing')
+      try {
+        const result = await api.sessions.uploadConversationTurn(conversationId, blob)
+
+        // Commit candidate bubble immediately so the user sees their line.
+        const nextCount = userTurnCountRef.current + 1
+        setBubbles((prev) => [
+          ...prev,
+          { side: 'user', text: result.candidateTranscript || '…' },
+        ])
+        setUserTurnCount(nextCount)
+        setPendingTranscript(result.candidateTranscript)
+
+        // Stash the examiner reply — it plays after review (or immediately
+        // if review is suppressed).
+        if (result.examinerTurnText) {
+          setPendingExaminerBubble({
+            side: 'examiner',
+            text: result.examinerTurnText,
+            audioUrl: result.examinerTurnAudioUrl,
+          })
+        } else {
+          setPendingExaminerBubble(null)
+        }
+
+        // Branch: review or skip?
+        if (reviewSuppressed) {
+          proceedAfterCommit(nextCount, {
+            side: 'examiner',
+            text: result.examinerTurnText ?? '',
+            audioUrl: result.examinerTurnAudioUrl,
+          }, result.examinerTurnText != null)
+        } else {
+          setPhase('reviewing')
+        }
+      } catch (err) {
+        handleApiError(err, 'Upload failed. Retry?')
+      }
+    },
+    // proceedAfterCommit referenced below — useCallback chain allows it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [conversationId, reviewSuppressed, handleApiError],
+  )
+
+  const finishRecording = useCallback(async () => {
+    if (stoppingRef.current) return
+    stoppingRef.current = true
+    try {
+      const blob = await recorder.stopRecording()
+      await uploadTurn(blob)
+    } catch {
+      handleApiError(new Error('Could not stop the recording cleanly.'), 'Could not stop the recording cleanly.')
+    }
+  }, [recorder, uploadTurn, handleApiError])
+
+  // 60s hard cap during recording.
+  useEffect(() => {
+    if (recorder.status === 'recording' && recorder.durationMs >= TURN_CAP_MS) {
+      void finishRecording()
+    }
+  }, [recorder.status, recorder.durationMs, finishRecording])
+
+  // ── Examiner playback + turn progression ─────────────────────────────────
+
+  const finalize = useCallback(async () => {
+    if (finalizingRef.current) return
+    finalizingRef.current = true
+    setPhase('finalizing')
+    try {
+      if (!conversationId) {
+        throw new Error('Missing conversation id.')
+      }
+      const result = await api.sessions.finalizeConversation(conversationId)
+      if (result.recordingId == null) {
+        throw new Error('Analysis returned no recording id.')
+      }
+      router.push(`/diagnostic?session=${result.recordingId}`)
+    } catch (err) {
+      finalizingRef.current = false
+      handleApiError(err, 'Could not finalize the session. Retry?')
+    }
+  }, [conversationId, router, handleApiError])
+
+  // Central "user turn committed → what next" router. Called from both
+  // the review-confirm path and the review-suppressed path.
+  const proceedAfterCommit = useCallback(
+    (
+      committedCount: number,
+      examinerBubble: BubbleEntry,
+      hasExaminerReply: boolean,
+    ) => {
+      if (hasExaminerReply) {
+        setBubbles((prev) => [...prev, examinerBubble])
+        setPhase('examiner-speaking')
+      } else if (committedCount >= TARGET_USER_TURNS) {
+        // No examiner reply AND we've hit target — straight to finalize.
+        void finalize()
+      } else {
+        // No examiner reply but more turns to go (unexpected for T2, but
+        // defensive): go back to user-idle so the candidate can continue.
+        setPhase('user-idle')
+      }
+      stoppingRef.current = false
+    },
+    [finalize],
+  )
+
+  // Examiner audio playback driver. Runs whenever we enter examiner-speaking
+  // and there's a bubble with audio to play.
+  useEffect(() => {
+    if (phase !== 'examiner-speaking') return
+    const last = bubbles[bubbles.length - 1]
+    if (!last || last.side !== 'examiner') return
+
+    setAutoplayBlocked(false)
+
+    const onDone = () => {
+      // If we've hit TARGET_USER_TURNS user turns, this was the examiner
+      // reply to the 6th turn — finalize. Otherwise back to user-idle.
+      if (userTurnCountRef.current >= TARGET_USER_TURNS) {
+        void finalize()
+      } else {
+        setPhase('user-idle')
+      }
+    }
+
+    if (!last.audioUrl || muted) {
+      // No audio (backend TTS unavailable, or user muted) — skip the
+      // playback step. onDone fires synchronously.
+      onDone()
+      return
+    }
+
+    const audio = new Audio(last.audioUrl)
+    audioElRef.current = audio
+    audio.onended = onDone
+    audio.onerror = onDone
+    audio.play().catch(() => {
+      // Autoplay blocked — expose a manual Listen button. onDone fires
+      // once the user taps Listen and audio plays through.
+      setAutoplayBlocked(true)
+    })
+
+    return () => {
+      audio.onended = null
+      audio.onerror = null
+      audio.pause()
+      if (audioElRef.current === audio) audioElRef.current = null
+    }
+    // bubbles ref triggers this; muted too (so toggling mute mid-session
+    // is respected on the NEXT examiner turn, not the current one — that's
+    // intentional, don't cut someone off mid-sentence).
+  }, [phase, bubbles, muted, finalize])
+
+  const handleListenTap = useCallback(() => {
+    const a = audioElRef.current
+    if (a) {
+      a.play().then(() => setAutoplayBlocked(false)).catch(() => setAutoplayBlocked(true))
+    } else {
+      // Audio element gone (shouldn't happen) — advance anyway.
+      setAutoplayBlocked(false)
+      if (userTurnCountRef.current >= TARGET_USER_TURNS) {
+        void finalize()
+      } else {
+        setPhase('user-idle')
+      }
+    }
+  }, [finalize])
+
+  // ── Review flow ──────────────────────────────────────────────────────────
+
+  const confirmReview = useCallback(() => {
+    const examiner = pendingExaminerBubble
+    setPendingExaminerBubble(null)
+    setPendingTranscript(null)
+    proceedAfterCommit(
+      userTurnCountRef.current,
+      examiner ?? { side: 'examiner', text: '' },
+      examiner != null,
+    )
+  }, [pendingExaminerBubble, proceedAfterCommit])
+
+  // ── Error recovery ───────────────────────────────────────────────────────
+
+  const retryFromError = useCallback(() => {
+    finalizingRef.current = false
+    stoppingRef.current = false
+    setError(null)
+    if (!conversationId) {
+      // Error happened before /start succeeded — retry from briefing.
+      setPhase('briefing')
+      return
+    }
+    if (userTurnCount >= TARGET_USER_TURNS) {
+      // Hit the finalize step and failed — retry finalize.
+      void finalize()
+    } else {
+      // Mid-conversation error — let the user re-record the last turn.
+      setPhase('user-idle')
+    }
+  }, [conversationId, userTurnCount, finalize])
+
+  // ── Derived values ───────────────────────────────────────────────────────
+
+  const recordButtonState: RecordingState =
+    phase === 'user-recording'
+      ? 'recording'
+      : phase === 'user-transcribing'
+        ? 'processing'
+        : phase === 'reviewing'
+          ? 'awaiting_review'
+          : 'idle'
+
+  const secondsLeftInTurn = Math.max(
+    0,
+    Math.ceil((TURN_CAP_MS - recorder.durationMs) / 1000),
+  )
+
+  const turnDisplay = `Turn ${Math.min(userTurnCount + 1, TARGET_USER_TURNS)} of ${TARGET_USER_TURNS}`
+
+  const showFinalizingOverlay = phase === 'finalizing'
+  const showReviewSheet = phase === 'reviewing'
+  const showErrorOverlay = phase === 'error'
+
+  // ── Render ───────────────────────────────────────────────────────────────
 
   return (
     <div
@@ -101,293 +531,667 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
         flexDirection: 'column',
       }}
     >
-      <div style={{ maxWidth: 440, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', flex: 1 }}>
-
-        {/* Top bar */}
-        <header
-          style={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 40,
-            backgroundColor: BG,
-            borderBottom: '1px solid #1A1A1A0A',
-            padding: '10px 12px 10px',
-            minHeight: 80,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            gap: 2,
-            flexShrink: 0,
+      <div
+        style={{
+          maxWidth: 440,
+          margin: '0 auto',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+        }}
+      >
+        <Header
+          title={brief.title}
+          counterpartLabel={brief.counterpartLabel}
+          register={brief.register}
+          muted={muted}
+          onToggleMute={() => setMuted((m) => !m)}
+          onExit={() => {
+            if (confirm('End this session?')) {
+              recorder.reset()
+              router.push('/speaking/tache-2')
+            }
           }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <button
-              onClick={() => {
-                if (confirm('End this session?')) router.push('/speaking/tache-2')
-              }}
-              aria-label="Go back"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: INK, display: 'flex' }}
-            >
-              <ChevronLeft size={24} strokeWidth={2} />
-            </button>
-            <div style={{ textAlign: 'center', flex: 1 }}>
-              <p style={{ fontFamily: DISPLAY_FONT, fontWeight: 600, fontSize: 11, color: INK_MUTED, margin: '0 0 2px', letterSpacing: '0.04em' }}>
-                T&acirc;che 2 &middot; Role-play
-              </p>
-              <p style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, fontSize: 17, color: INK, margin: 0 }}>
-                L&apos;agence de voyages
-              </p>
-            </div>
-            <button
-              onClick={() => setMuted((m) => !m)}
-              aria-label={muted ? 'Unmute voice' : 'Mute voice'}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: INK_MUTED, display: 'flex' }}
-            >
-              {muted ? <VolumeX size={20} strokeWidth={1.75} /> : <Volume2 size={20} strokeWidth={1.75} />}
-            </button>
-          </div>
-          <p style={{ fontFamily: DISPLAY_FONT, fontWeight: 500, fontSize: 12, color: INK_MUTED, textAlign: 'center', margin: 0 }}>
-            You&apos;re talking to: travel agent &middot; Register: Formel
-          </p>
-        </header>
+          turnDisplay={phase === 'briefing' ? null : turnDisplay}
+        />
 
-        {/* Brief panel */}
-        {!briefDismissed ? (
-          <div
-            style={{
-              margin: '12px 20px 0',
-              backgroundColor: SAGE,
-              borderRadius: 20,
-              overflow: 'hidden',
-              flexShrink: 0,
-            }}
-          >
-            <div style={{ padding: '16px 18px' }}>
-              <p
-                style={{
-                  fontFamily: DISPLAY_FONT,
-                  fontWeight: 700,
-                  fontSize: 10,
-                  letterSpacing: '0.10em',
-                  textTransform: 'uppercase',
-                  color: INK_MUTED,
-                  margin: '0 0 6px',
-                }}
-              >
-                Your role
-              </p>
-              <p style={{ fontWeight: 500, fontSize: 14, lineHeight: '21px', color: INK, margin: '0 0 12px' }}>
-                You want to plan a vacation to a French-speaking country. Ask the agent everything you need to choose the perfect destination.
-              </p>
-              <p
-                style={{
-                  fontFamily: DISPLAY_FONT,
-                  fontWeight: 700,
-                  fontSize: 10,
-                  letterSpacing: '0.10em',
-                  textTransform: 'uppercase',
-                  color: INK_MUTED,
-                  margin: '0 0 6px',
-                }}
-              >
-                Info to gather:
-              </p>
-              <ul style={{ margin: '0 0 16px', paddingLeft: 18 }}>
-                {INFO_TARGETS.map((t) => (
-                  <li key={t} style={{ fontWeight: 500, fontSize: 13, lineHeight: '21px', color: INK_SOFT }}>{t}</li>
-                ))}
-              </ul>
-              <button
-                onClick={handleStartConversation}
-                style={{
-                  width: '100%',
-                  height: 48,
-                  borderRadius: 14,
-                  backgroundColor: INK,
-                  color: '#FFFFFF',
-                  fontFamily: DISPLAY_FONT,
-                  fontWeight: 700,
-                  fontSize: 15,
-                  border: 'none',
-                  cursor: 'pointer',
-                  outline: 'none',
-                }}
-              >
-                Start conversation
-              </button>
-            </div>
-          </div>
+        {phase === 'briefing' ? (
+          <BriefingPanel
+            brief={brief}
+            onStart={startConversation}
+          />
         ) : (
-          /* Collapsed brief chip */
-          <div style={{ margin: '8px 20px 0', flexShrink: 0 }}>
-            <button
-              onClick={() => setBriefExpanded((e) => !e)}
-              style={{
-                background: SAGE,
-                border: 'none',
-                borderRadius: 100,
-                padding: '6px 14px',
-                fontFamily: DISPLAY_FONT,
-                fontWeight: 600,
-                fontSize: 12,
-                color: INK_SOFT,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-              }}
-            >
-              View your role
-              {briefExpanded ? <ChevronUp size={12} strokeWidth={2} /> : <ChevronDown size={12} strokeWidth={2} />}
-            </button>
-          </div>
-        )}
-
-        {/* Scrollable conversation — FIX 3: extra bottom padding during recording so last bubble stays visible */}
-        <div
-          ref={scrollRef}
-          style={{
-            flex: 1,
-            overflowY: 'auto',
-            padding: '16px 20px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 16,
-            paddingBottom: recordingState === 'recording' ? 340 : 220,
-            transition: 'padding-bottom 0.2s ease',
-          }}
-        >
-          {turns.map((turn, i) => (
-            <ChatBubble
-              key={i}
-              side={turn.side}
-              senderLabel={turn.side === 'examiner' ? "L'agent de voyages" : 'Vous'}
-              text={turn.text}
-              showAudio={turn.side === 'examiner'}
-              bubbleColor={SAGE}
+          <>
+            <BriefChip
+              brief={brief}
+              expanded={briefExpanded}
+              onToggle={() => setBriefExpanded((v) => !v)}
             />
-          ))}
 
-          {/* Wrap-up hint after 8 user turns */}
-          {userTurnCount >= 8 && (
             <div
+              ref={scrollRef}
               style={{
+                flex: 1,
+                overflowY: 'auto',
+                padding: '16px 20px',
                 display: 'flex',
-                justifyContent: 'center',
+                flexDirection: 'column',
+                gap: 16,
+                paddingBottom: phase === 'user-recording' ? 340 : 220,
+                transition: 'padding-bottom 0.2s ease',
               }}
             >
-              <button
-                onClick={handleEndConversation}
-                style={{
-                  backgroundColor: SAGE,
-                  border: 'none',
-                  borderRadius: 100,
-                  padding: '8px 16px',
-                  fontFamily: DISPLAY_FONT,
-                  fontWeight: 600,
-                  fontSize: 13,
-                  color: INK_SOFT,
-                  cursor: 'pointer',
-                }}
-              >
-                You&apos;ve gathered a lot of information. End conversation?
-              </button>
-            </div>
-          )}
-        </div>
+              {bubbles.map((b, i) => (
+                <ChatBubble
+                  key={i}
+                  side={b.side}
+                  senderLabel={b.side === 'examiner' ? brief.counterpartLabel : 'Vous'}
+                  text={b.text}
+                  showAudio={b.side === 'examiner' && !!b.audioUrl}
+                  bubbleColor={brief.bg}
+                />
+              ))}
 
-        {/* Fixed PTT recording area */}
-        <div
+              {autoplayBlocked && phase === 'examiner-speaking' && (
+                <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                  <button
+                    onClick={handleListenTap}
+                    style={ghostButtonStyle}
+                    aria-label="Play examiner audio"
+                  >
+                    Tap to hear the reply
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <BottomBar
+              phase={phase}
+              recordButtonState={recordButtonState}
+              recorderStream={recorder.stream}
+              secondsLeftInTurn={secondsLeftInTurn}
+              idleColor={brief.bg}
+              onPTTStart={handlePTTStart}
+              onPTTEnd={finishRecording}
+            />
+          </>
+        )}
+      </div>
+
+      {showReviewSheet && (
+        <TurnReviewSheet
+          transcript={pendingTranscript ?? ''}
+          onConfirm={confirmReview}
+          suppressed={reviewSuppressed}
+          onToggleSuppress={setReviewSuppressed}
+          bg={brief.bg}
+        />
+      )}
+
+      {showFinalizingOverlay && <FinalizingOverlay />}
+
+      {showErrorOverlay && (
+        <ErrorOverlay
+          message={error ?? 'Something went wrong.'}
+          onRetry={retryFromError}
+        />
+      )}
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Sub-components — inline since they're only used here.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const ghostButtonStyle: React.CSSProperties = {
+  background: 'transparent',
+  border: `1.5px solid ${INK_MUTED}`,
+  borderRadius: 100,
+  padding: '8px 16px',
+  fontFamily: DISPLAY_FONT,
+  fontWeight: 600,
+  fontSize: 13,
+  color: INK_SOFT,
+  cursor: 'pointer',
+  outline: 'none',
+}
+
+function Header({
+  title,
+  counterpartLabel,
+  register,
+  muted,
+  onToggleMute,
+  onExit,
+  turnDisplay,
+}: {
+  title: string
+  counterpartLabel: string
+  register: string
+  muted: boolean
+  onToggleMute: () => void
+  onExit: () => void
+  turnDisplay: string | null
+}) {
+  return (
+    <header
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 40,
+        backgroundColor: BG,
+        borderBottom: '1px solid #1A1A1A0A',
+        padding: '10px 12px 10px',
+        minHeight: 80,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        gap: 2,
+        flexShrink: 0,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <button
+          onClick={onExit}
+          aria-label="Go back"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: INK, display: 'flex' }}
+        >
+          <ChevronLeft size={24} strokeWidth={2} />
+        </button>
+        <div style={{ textAlign: 'center', flex: 1 }}>
+          <p style={{ fontFamily: DISPLAY_FONT, fontWeight: 600, fontSize: 11, color: INK_MUTED, margin: '0 0 2px', letterSpacing: '0.04em' }}>
+            T&acirc;che 2 &middot; Role-play
+          </p>
+          <p style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, fontSize: 17, color: INK, margin: 0 }}>
+            {title}
+          </p>
+        </div>
+        <button
+          onClick={onToggleMute}
+          aria-label={muted ? 'Unmute voice' : 'Mute voice'}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: INK_MUTED, display: 'flex' }}
+        >
+          {muted ? <VolumeX size={20} strokeWidth={1.75} /> : <Volume2 size={20} strokeWidth={1.75} />}
+        </button>
+      </div>
+      <p style={{ fontFamily: DISPLAY_FONT, fontWeight: 500, fontSize: 12, color: INK_MUTED, textAlign: 'center', margin: 0 }}>
+        You&apos;re talking to: {counterpartLabel} &middot; Register: {register}
+        {turnDisplay ? <> &middot; {turnDisplay}</> : null}
+      </p>
+    </header>
+  )
+}
+
+function BriefingPanel({ brief, onStart }: { brief: ScenarioBrief; onStart: () => void }) {
+  return (
+    <div
+      style={{
+        margin: '12px 20px 0',
+        backgroundColor: brief.bg,
+        borderRadius: 20,
+        overflow: 'hidden',
+      }}
+    >
+      <div style={{ padding: '16px 18px' }}>
+        <p
           style={{
-            position: 'fixed',
-            bottom: 0,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '100%',
-            maxWidth: 440,
-            backgroundColor: '#FFFFFF',
-            borderTop: '1px solid #1A1A1A14',
-            padding: '20px 24px 20px',
-            zIndex: 30,
+            fontFamily: DISPLAY_FONT,
+            fontWeight: 700,
+            fontSize: 10,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase',
+            color: INK_MUTED,
+            margin: '0 0 6px',
           }}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-
-            {/* Timer when recording */}
-            {recordingState === 'recording' && (
-              <p
-                style={{
-                  fontFamily: DISPLAY_FONT,
-                  fontWeight: 800,
-                  fontSize: 22,
-                  color: INK,
-                  margin: 0,
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                0:{String(pttTimer).padStart(2, '0')}
-              </p>
-            )}
-
-            <RecordButton
-              mode="ptt"
-              recordingState={recordingState}
-              idleColor={SAGE}
-              onPTTStart={handlePTTStart}
-              onPTTEnd={handlePTTEnd}
-            />
-
-            {recordingState === 'recording' && <VuMeter active color={INK} />}
-
+          Your role
+        </p>
+        <p style={{ fontWeight: 500, fontSize: 14, lineHeight: '21px', color: INK, margin: '0 0 12px' }}>
+          {brief.roleBody}
+        </p>
+        {brief.infoTargets.length > 0 && (
+          <>
             <p
               style={{
                 fontFamily: DISPLAY_FONT,
                 fontWeight: 700,
-                fontSize: 14,
-                color: INK,
-                margin: 0,
-                textAlign: 'center',
+                fontSize: 10,
+                letterSpacing: '0.10em',
+                textTransform: 'uppercase',
+                color: INK_MUTED,
+                margin: '0 0 6px',
               }}
             >
-              {recordingState === 'idle'      ? 'Hold to talk' :
-               recordingState === 'recording' ? 'Recording… release to stop' :
-               recordingState === 'processing' ? 'Processing…' :
-               'Reviewing\u2026'}
+              Info to gather:
             </p>
+            <ul style={{ margin: '0 0 16px', paddingLeft: 18 }}>
+              {brief.infoTargets.map((t) => (
+                <li key={t} style={{ fontWeight: 500, fontSize: 13, lineHeight: '21px', color: INK_SOFT }}>{t}</li>
+              ))}
+            </ul>
+          </>
+        )}
+        <button
+          onClick={onStart}
+          style={{
+            width: '100%',
+            height: 48,
+            borderRadius: 14,
+            backgroundColor: INK,
+            color: '#FFFFFF',
+            fontFamily: DISPLAY_FONT,
+            fontWeight: 700,
+            fontSize: 15,
+            border: 'none',
+            cursor: 'pointer',
+            outline: 'none',
+          }}
+        >
+          Start conversation
+        </button>
+      </div>
+    </div>
+  )
+}
 
-            {recordingState === 'idle' && (
-              <p style={{ fontFamily: DISPLAY_FONT, fontWeight: 500, fontSize: 12, color: INK_MUTED, margin: 0, textAlign: 'center' }}>
-                Press and hold the button to speak
-              </p>
-            )}
-          </div>
+function BriefChip({
+  brief,
+  expanded,
+  onToggle,
+}: {
+  brief: ScenarioBrief
+  expanded: boolean
+  onToggle: () => void
+}) {
+  return (
+    <div style={{ margin: '8px 20px 0', flexShrink: 0 }}>
+      <button
+        onClick={onToggle}
+        style={{
+          background: brief.bg,
+          border: 'none',
+          borderRadius: 100,
+          padding: '6px 14px',
+          fontFamily: DISPLAY_FONT,
+          fontWeight: 600,
+          fontSize: 12,
+          color: INK_SOFT,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+        }}
+      >
+        View your role
+        {expanded ? <ChevronUp size={12} strokeWidth={2} /> : <ChevronDown size={12} strokeWidth={2} />}
+      </button>
+      {expanded && (
+        <div
+          style={{
+            marginTop: 8,
+            padding: '12px 14px',
+            backgroundColor: brief.bg,
+            borderRadius: 14,
+          }}
+        >
+          <p style={{ fontWeight: 500, fontSize: 13, lineHeight: '19px', color: INK, margin: 0 }}>
+            {brief.roleBody}
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
-            <button
-              onClick={handleEndConversation}
+function BottomBar({
+  phase,
+  recordButtonState,
+  recorderStream,
+  secondsLeftInTurn,
+  idleColor,
+  onPTTStart,
+  onPTTEnd,
+}: {
+  phase: Phase
+  recordButtonState: RecordingState
+  recorderStream: MediaStream | null
+  secondsLeftInTurn: number
+  idleColor: string
+  onPTTStart: () => void
+  onPTTEnd: () => void
+}) {
+  const helper =
+    phase === 'user-idle' ? 'Hold to talk' :
+    phase === 'user-recording' ? 'Recording… release to stop' :
+    phase === 'user-transcribing' ? 'Transcribing…' :
+    phase === 'reviewing' ? 'Reviewing your turn…' :
+    phase === 'examiner-speaking' ? 'Listen to the reply…' :
+    'Waiting…'
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        bottom: 0,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '100%',
+        maxWidth: 440,
+        backgroundColor: '#FFFFFF',
+        borderTop: '1px solid #1A1A1A14',
+        padding: '20px 24px 20px',
+        zIndex: 30,
+      }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+        {phase === 'user-recording' && (
+          <p
+            style={{
+              fontFamily: DISPLAY_FONT,
+              fontWeight: 800,
+              fontSize: 22,
+              color: INK,
+              margin: 0,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            0:{String(secondsLeftInTurn).padStart(2, '0')}
+          </p>
+        )}
+
+        <RecordButton
+          mode="ptt"
+          recordingState={recordButtonState}
+          idleColor={idleColor}
+          onPTTStart={phase === 'user-idle' ? onPTTStart : undefined}
+          onPTTEnd={phase === 'user-recording' ? onPTTEnd : undefined}
+        />
+
+        {phase === 'user-recording' && (
+          <VuMeter stream={recorderStream} color={INK} />
+        )}
+
+        <p
+          style={{
+            fontFamily: DISPLAY_FONT,
+            fontWeight: 700,
+            fontSize: 14,
+            color: INK,
+            margin: 0,
+            textAlign: 'center',
+          }}
+        >
+          {helper}
+        </p>
+
+        {phase === 'user-idle' && (
+          <p style={{ fontFamily: DISPLAY_FONT, fontWeight: 500, fontSize: 12, color: INK_MUTED, margin: 0, textAlign: 'center' }}>
+            Press and hold the button to speak
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function TurnReviewSheet({
+  transcript,
+  onConfirm,
+  suppressed,
+  onToggleSuppress,
+  bg,
+}: {
+  transcript: string
+  onConfirm: () => void
+  suppressed: boolean
+  onToggleSuppress: (v: boolean) => void
+  bg: string
+}) {
+  return (
+    <>
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(0,0,0,0.28)',
+          zIndex: 60,
+        }}
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Review your turn"
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '100%',
+          maxWidth: 440,
+          backgroundColor: '#FAFAF7',
+          borderTopLeftRadius: 28,
+          borderTopRightRadius: 28,
+          zIndex: 70,
+          boxShadow: '0 -8px 40px rgba(0,0,0,0.12)',
+          maxHeight: '90dvh',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <div style={{ overflowY: 'auto', flex: 1, padding: '20px 20px 0' }}>
+          <div
+            aria-hidden="true"
+            style={{
+              width: 36,
+              height: 4,
+              borderRadius: 2,
+              backgroundColor: INK_MUTED,
+              margin: '0 auto 20px',
+            }}
+          />
+          <p
+            style={{
+              fontFamily: DISPLAY_FONT,
+              fontWeight: 700,
+              fontSize: 10,
+              letterSpacing: '0.10em',
+              textTransform: 'uppercase',
+              color: INK_MUTED,
+              margin: '0 0 8px',
+            }}
+          >
+            Your turn
+          </p>
+          <p
+            style={{
+              fontFamily: DISPLAY_FONT,
+              fontWeight: 600,
+              fontSize: 17,
+              color: INK,
+              margin: '0 0 12px',
+              lineHeight: 1.35,
+            }}
+          >
+            Does this capture what you said?
+          </p>
+          <div
+            style={{
+              backgroundColor: bg,
+              borderRadius: 18,
+              padding: '16px 18px',
+              marginBottom: 20,
+            }}
+          >
+            <p
               style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
+                fontFamily: DISPLAY_FONT,
+                fontWeight: 500,
+                fontSize: 15,
+                lineHeight: '23px',
+                color: INK,
+                margin: 0,
+              }}
+            >
+              {transcript || '—'}
+            </p>
+          </div>
+          <p
+            style={{
+              fontFamily: DISPLAY_FONT,
+              fontWeight: 500,
+              fontSize: 12,
+              color: INK_MUTED,
+              lineHeight: '18px',
+              margin: 0,
+            }}
+          >
+            Full Pyramide / Rebond / Ciblage breakdown appears on your diagnostic after all {TARGET_USER_TURNS} turns.
+          </p>
+          <div style={{ height: 20 }} />
+        </div>
+        <div
+          style={{
+            padding: '16px 20px 32px',
+            borderTop: '1px solid #1A1A1A0A',
+            backgroundColor: '#FAFAF7',
+            flexShrink: 0,
+          }}
+        >
+          <button
+            onClick={onConfirm}
+            style={{
+              width: '100%',
+              height: 52,
+              borderRadius: 16,
+              border: 'none',
+              backgroundColor: INK,
+              fontFamily: DISPLAY_FONT,
+              fontWeight: 700,
+              fontSize: 15,
+              color: '#FFFFFF',
+              cursor: 'pointer',
+              outline: 'none',
+              marginBottom: 14,
+            }}
+          >
+            Confirmer
+          </button>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={suppressed}
+              onChange={(e) => onToggleSuppress(e.target.checked)}
+              style={{ width: 16, height: 16, accentColor: INK, cursor: 'pointer', flexShrink: 0 }}
+            />
+            <span
+              style={{
                 fontFamily: DISPLAY_FONT,
                 fontWeight: 500,
                 fontSize: 13,
-                color: INK_MUTED,
-                padding: 0,
+                color: INK_SOFT,
               }}
             >
-              End conversation
-            </button>
-          </div>
+              Ne plus afficher cette revue
+            </span>
+          </label>
         </div>
-
       </div>
+    </>
+  )
+}
 
-      {/* Transcript review panel */}
-      <TranscriptReviewPanel
-        visible={showTranscript}
-        onConfirm={handleConfirmTranscript}
+function FinalizingOverlay() {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(250, 250, 247, 0.96)',
+        zIndex: 80,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 16,
+        fontFamily: DISPLAY_FONT,
+      }}
+    >
+      <div
+        aria-hidden="true"
+        style={{
+          width: 44,
+          height: 44,
+          border: `3px solid ${INK}22`,
+          borderTopColor: INK,
+          borderRadius: '50%',
+          animation: 'spin 0.9s linear infinite',
+        }}
       />
+      <p style={{ fontWeight: 700, fontSize: 18, color: INK, margin: 0 }}>
+        Analyzing your conversation…
+      </p>
+      <p style={{ fontWeight: 500, fontSize: 13, color: INK_MUTED, margin: 0, textAlign: 'center', maxWidth: 300 }}>
+        Running the 4-couche analysis across all {TARGET_USER_TURNS} of your turns.
+      </p>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  )
+}
+
+function ErrorOverlay({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div
+      role="alert"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(250, 250, 247, 0.96)',
+        zIndex: 80,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 16,
+        padding: '0 24px',
+        fontFamily: DISPLAY_FONT,
+      }}
+    >
+      <p style={{ fontWeight: 700, fontSize: 18, color: INK, margin: 0, textAlign: 'center' }}>
+        Something went wrong
+      </p>
+      <p style={{ fontWeight: 500, fontSize: 14, color: INK_SOFT, margin: 0, textAlign: 'center', maxWidth: 320 }}>
+        {message}
+      </p>
+      <button
+        onClick={onRetry}
+        style={{
+          marginTop: 4,
+          fontFamily: DISPLAY_FONT,
+          fontWeight: 700,
+          fontSize: 15,
+          color: '#FFFFFF',
+          backgroundColor: INK,
+          border: 'none',
+          borderRadius: 14,
+          padding: '12px 24px',
+          cursor: 'pointer',
+        }}
+      >
+        Try again
+      </button>
     </div>
   )
 }

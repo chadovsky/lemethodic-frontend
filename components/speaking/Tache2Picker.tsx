@@ -1,9 +1,11 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ChevronLeft, Lock } from 'lucide-react'
 import BottomNav from '@/components/home/BottomNav'
+import { api } from '@/lib/api'
 
 const INK          = '#1A1A1A'
 const INK_SOFT     = '#1A1A1AB3'
@@ -17,7 +19,13 @@ const BG           = '#FAFAF7'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 
 interface Scenario {
+  /** URL slug — hyphen-cased, used in the /speaking/tache-2/<code> route. */
   code: string
+  /** Backend scenario_code (tache2_scenarios.code column). Diverges from
+   *  the URL slug for three of five rows due to historical seeding drift.
+   *  The F-062.1 sanity check below validates this mapping at mount in
+   *  dev builds. */
+  backendCode: string
   title: string
   bg: string
   difficulty: string
@@ -30,6 +38,7 @@ interface Scenario {
 const SCENARIOS: Scenario[] = [
   {
     code: 'agence-voyages',
+    backendCode: 'agence_voyages',
     title: "L'agence de voyages",
     bg: SAGE,
     difficulty: 'A2-B1',
@@ -38,6 +47,7 @@ const SCENARIOS: Scenario[] = [
   },
   {
     code: 'ami-demenage',
+    backendCode: 'ami_demenagement',
     title: "L'ami qui d\u00e9m\u00e9nage",
     bg: PEACH,
     difficulty: 'A2-B1',
@@ -46,6 +56,7 @@ const SCENARIOS: Scenario[] = [
   },
   {
     code: 'bibliotheque',
+    backendCode: 'bibliotheque',
     title: 'La biblioth\u00e8que',
     bg: BUTTER,
     difficulty: 'A2-B1',
@@ -54,6 +65,7 @@ const SCENARIOS: Scenario[] = [
   },
   {
     code: 'collegue-quebecois',
+    backendCode: 'nouveau_collegue_quebecois',
     title: 'Le nouveau coll\u00e8gue qu\u00e9b\u00e9cois',
     bg: LAVENDER,
     difficulty: 'B1-B2',
@@ -64,6 +76,7 @@ const SCENARIOS: Scenario[] = [
   },
   {
     code: 'agence-immobiliere',
+    backendCode: 'agence_immobiliere_canada',
     title: "L'agence immobili\u00e8re au Canada",
     bg: SKY,
     difficulty: 'B1-B2',
@@ -82,6 +95,48 @@ const REGISTER_COLORS: Record<string, string> = {
 
 export default function Tache2Picker() {
   const router = useRouter()
+
+  // F-062.1 sanity check (dev builds only): verify every unlocked SCENARIOS
+  // entry's backendCode actually exists + is active in the DB. Runs once on
+  // mount. Purely diagnostic — errors are swallowed, no user-facing surface.
+  //
+  // Skips `locked: true` entries because backend /scenarios filters by the
+  // raccourci gate (F-053); for below-A2 users those rows won't be in the
+  // response even though they exist in the DB. A "missing" warning for a
+  // gated row would be a false positive.
+  //
+  // TODO(F-061.1): replace SCENARIOS with the live /scenarios response so
+  // drift becomes impossible by construction; this check can then be
+  // deleted.
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'development') return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const resp = await api.sessions.listTache2Scenarios()
+        if (cancelled) return
+        const backendCodes = new Set(resp.scenarios.map((s) => s.code))
+        const checkable = SCENARIOS.filter((s) => !s.locked)
+        const missing = checkable.filter((s) => !backendCodes.has(s.backendCode))
+        if (missing.length > 0) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            '[F-062.1] Tache2 scenario drift — the following picker entries reference backend codes that are missing or inactive:',
+            missing.map((s) => ({ slug: s.code, backendCode: s.backendCode })),
+            '\nActive backend codes returned:',
+            Array.from(backendCodes),
+          )
+        }
+      } catch {
+        // Network / auth / endpoint unavailable — dev diagnostic only, stay
+        // silent. Worst case the backendCode map ships drifted and the
+        // first user click surfaces a 404 via the error overlay.
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <div style={{ minHeight: '100dvh', backgroundColor: BG, fontFamily: DISPLAY_FONT }}>
