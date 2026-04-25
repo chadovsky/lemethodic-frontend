@@ -4,12 +4,19 @@ import { Suspense, useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import CouchesDiagnostic from '@/components/diagnostic/CouchesDiagnostic'
-import GouletCard from '@/components/diagnostic/GouletCard'
-import OrdonnanceExerciseCard from '@/components/diagnostic/OrdonnanceExerciseCard'
+// F-080c: GouletCard removed from the page render; component file kept
+// (cleanup follow-up filed as F-080c.x). Replaced by DetectedModuleCard +
+// SecondaryModulesList + EmptyDetectionFallback in the new DETECTED
+// REFLEXES section. L'ORDONNANCE is repurposed to render the primary
+// module's content_refs when present.
+import DetectedModuleCard from '@/components/diagnostic/DetectedModuleCard'
+import SecondaryModulesList from '@/components/diagnostic/SecondaryModulesList'
+import EmptyDetectionFallback from '@/components/diagnostic/EmptyDetectionFallback'
+import InlineContentRef from '@/components/diagnostic/InlineContentRef'
 import CorrectedLine, { Correction } from '@/components/diagnostic/CorrectedLine'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import { api, ApiError } from '@/lib/api'
-import type { Couche, Diagnostic } from '@/lib/types'
+import type { Couche, DetectedModulesResponse, Diagnostic } from '@/lib/types'
 
 // ─── design tokens ────────────────────────────────────────────────────────────
 const INK          = '#1A1A1A'
@@ -148,6 +155,36 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
   )
 }
 
+// F-080c — DETECTED REFLEXES section. Composes the primary module
+// card, the collapsed secondary list, and the empty fallback. Kept
+// inline to mirror the existing section helpers (SectionCard /
+// SectionLabel / SectionHeading) — no separate file needed.
+function DetectedReflexesSection({
+  primaryModule,
+  primaryDetection,
+  secondaryModules,
+  detections,
+}: {
+  primaryModule: DetectedModulesResponse['primary_module']
+  primaryDetection: DetectedModulesResponse['detections'][number] | null
+  secondaryModules: DetectedModulesResponse['secondary_modules']
+  detections: DetectedModulesResponse['detections']
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <SectionLabel>Detected reflexes</SectionLabel>
+      {primaryModule ? (
+        <DetectedModuleCard module={primaryModule} detection={primaryDetection} />
+      ) : (
+        <EmptyDetectionFallback />
+      )}
+      {secondaryModules.length > 0 ? (
+        <SecondaryModulesList modules={secondaryModules} detections={detections} />
+      ) : null}
+    </div>
+  )
+}
+
 function LoaderScreen() {
   return (
     <div
@@ -210,6 +247,12 @@ function DiagnosticInner() {
   const hasSession = sessionId != null && Number.isFinite(sessionId)
 
   const [diagnostic, setDiagnostic] = useState<Diagnostic | null>(null)
+  // F-080c: detected-modules response. null = not yet fetched (initial /
+  // retry); empty-shape object = backend confirmed no detections (renders
+  // EmptyDetectionFallback). Failure to fetch this is non-fatal — the
+  // diagnostic page degrades to the empty fallback rather than blocking
+  // the whole render on a secondary endpoint.
+  const [modulesResp, setModulesResp] = useState<DetectedModulesResponse | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(hasSession)
   const [retryKey, setRetryKey] = useState(0)
@@ -222,8 +265,24 @@ function DiagnosticInner() {
     setIsLoading(true)
     setLoadError(null)
     try {
-      const result = await api.sessions.getDiagnostic(sessionId)
-      setDiagnostic(result)
+      // F-080c: parallel fetches. The diagnostic call is the load-blocker
+      // (its failure renders the error screen); the modules call is
+      // non-blocking — its failure logs and falls back to the empty
+      // detection state, which is also a valid product state.
+      const [diagResult, modulesResult] = await Promise.all([
+        api.sessions.getDiagnostic(sessionId),
+        api.sessions.getDetectedModules(sessionId).catch((err) => {
+          // eslint-disable-next-line no-console
+          console.warn('F-080c: getDetectedModules failed; rendering empty fallback.', err)
+          return {
+            primary_module: null,
+            secondary_modules: [],
+            detections: [],
+          } as DetectedModulesResponse
+        }),
+      ])
+      setDiagnostic(diagResult)
+      setModulesResp(modulesResult)
     } catch (err) {
       if (err instanceof ApiError) {
         setLoadError(err.message || "The server couldn't find that recording.")
@@ -274,60 +333,25 @@ function DiagnosticInner() {
   // Couches radar rows
   const coucheRows = realMode ? couchesToRows(diagnostic.couches) : undefined
 
-  // Goulet card values
-  let gouletLayer = 'Les Réflexes Anglais'
-  let gouletScore = 45
-  let gouletBody =
-    "You're translating English structures directly into French. This is the lowest of your four layers (45/100, A2 band) and the single biggest thing holding your TCF score back. Fix this layer and your overall score jumps the most."
-  if (realMode) {
-    gouletLayer = diagnostic.goulet.nom || gouletLayer
-    const gouletCouche = diagnostic.couches.find(
-      (c) => c.key === diagnostic.goulet.couche,
-    )
-    if (gouletCouche) gouletScore = toPercent(gouletCouche.score)
-    gouletBody = diagnostic.goulet.explication || gouletBody
-  }
-
-  // Ordonnance exercises
-  const mockOrdonnance = [
-    {
-      number: '01',
-      title: 'Préposition swap drill',
-      description:
-        "20 sentences where English speakers reach for the wrong preposition. Spot the trap, pick the French one.",
-      duration: '10 min',
-    },
-    {
-      number: '02',
-      title: 'Word order rebuild',
-      description:
-        '10 English sentences. Rebuild each as a native French speaker would — not as a direct translation.',
-      duration: '12 min',
-    },
-    {
-      number: '03',
-      title: 'False friend gauntlet',
-      description:
-        '15 cognates that look identical in both languages but mean different things. Choose the right French sense.',
-      duration: '8 min',
-    },
-  ]
-  // Belt + braces: the mapper normalizes the backend object-wrapper into
-  // OrdonnanceStep[], but if a future backend shape change breaks that
-  // invariant we'd rather render fewer cards than crash the whole page.
-  const ordonnanceCards = realMode
-    ? (diagnostic.ordonnance ?? []).slice(0, 3).map((step, i) => ({
-        number: String(i + 1).padStart(2, '0'),
-        title: step.action || step.pattern || `Exercise ${i + 1}`,
-        description: step.example || step.pattern || '',
-        duration: '10 min', // duration not in Diagnostic shape yet
-      }))
-    : mockOrdonnance
-  // If backend gave 0-2 ordonnance steps in real mode, top up with mocks so
-  // the section still shows three cards (UX invariant).
-  while (realMode && ordonnanceCards.length < 3) {
-    ordonnanceCards.push(mockOrdonnance[ordonnanceCards.length])
-  }
+  // F-080c: detected modules + ordonnance source. The Diagnostic.goulet
+  // and Diagnostic.ordonnance fields from the legacy /diagnostic block
+  // are no longer surfaced — Le Goulet was removed from visible UI in
+  // F-080c, and the mock "ordonnance exercises" are replaced by the
+  // primary module's content_refs (when present). The design-review
+  // path (no `?session=`) lands on the empty fallback, same as a real
+  // session that detected nothing — keeps mock surface area small.
+  const primaryModule = modulesResp?.primary_module ?? null
+  const secondaryModules = modulesResp?.secondary_modules ?? []
+  const detections = modulesResp?.detections ?? []
+  const primaryDetection = detections.find((d) => d.is_primary) ?? null
+  // Render L'ORDONNANCE only when the primary module ships at least one
+  // content_ref. Module 2 (to_get_reflex) has empty content_refs by
+  // design — for those, the in-card examples ARE the teaching surface.
+  const ordonnanceRefs = primaryModule
+    ? [...primaryModule.content_refs].sort(
+        (a, b) => (a.display_order ?? 0) - (b.display_order ?? 0),
+      )
+    : []
 
   // TCF score bar fill: only meaningful for the mock number; hide in real mode.
   const bandFill = 0.28 // mock 428 within C1 band 400-499 ≈ 28%
@@ -528,55 +552,43 @@ function DiagnosticInner() {
             )}
           </SectionCard>
 
-          {/* ══ SECTION 2 — RADAR ═══════════════════════════════════════════ */}
+          {/* ══ SECTION 2 — LA MÉTHODE EN COUCHES (now secondary context) ══ */}
           <SectionCard bg={SAGE}>
             <SectionLabel>La Méthode en Couches</SectionLabel>
-            <SectionHeading>Where you stand on each layer</SectionHeading>
+            <SectionHeading>Your CEFR-tracking baseline</SectionHeading>
 
             <CouchesDiagnostic rows={coucheRows} />
           </SectionCard>
 
-          {/* ══ SECTION 3 — LE GOULET ═══════════════════════════════════════ */}
-          <GouletCard
-            layer={gouletLayer}
-            score={gouletScore}
-            band={cefrBand(gouletScore)}
-            estimatedGain={35}
-            body={gouletBody}
+          {/* ══ SECTION 3 — DETECTED REFLEXES (F-080c, replaces Le Goulet) ══ */}
+          <DetectedReflexesSection
+            primaryModule={primaryModule}
+            primaryDetection={primaryDetection}
+            secondaryModules={secondaryModules}
+            detections={detections}
           />
 
-          {/* ══ SECTION 4 — L'ORDONNANCE ════════════════════════════════════ */}
-          <SectionCard bg={BUTTER}>
-            <SectionLabel>{"L'Ordonnance · Your Prescription"}</SectionLabel>
-            <SectionHeading>
-              {realMode ? 'Your next exercises' : 'Three exercises to fix this'}
-            </SectionHeading>
-            <p
-              style={{
-                margin: 0,
-                fontFamily: DISPLAY_FONT,
-                fontWeight: 500,
-                fontSize: 13,
-                color: INK_MUTED,
-              }}
-            >
-              {realMode
-                ? `Targeted at ${gouletLayer}.`
-                : 'Targeted at Les Réflexes Anglais. Built for English speakers.'}
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {ordonnanceCards.map((ex) => (
-                <OrdonnanceExerciseCard
-                  key={ex.number}
-                  number={ex.number}
-                  title={ex.title}
-                  description={ex.description}
-                  duration={ex.duration}
-                />
-              ))}
-            </div>
-          </SectionCard>
+          {/* ══ SECTION 4 — L'ORDONNANCE (only when primary has content_refs) */}
+          {primaryModule && ordonnanceRefs.length > 0 ? (
+            <SectionCard bg={BUTTER}>
+              <SectionLabel>{"L'Ordonnance · Learn this"}</SectionLabel>
+              <SectionHeading>How to fix this in your next session</SectionHeading>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 12,
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: 16,
+                  padding: '16px 18px',
+                }}
+              >
+                {ordonnanceRefs.map((ref, i) => (
+                  <InlineContentRef key={i} ref_={ref} />
+                ))}
+              </div>
+            </SectionCard>
+          ) : null}
 
           {/* ══ SECTION 5 — SESSION DETAILS (still mocked — WPM/pron% aren't
                  in the shared Diagnostic shape yet; follow-up ticket) ═══════ */}

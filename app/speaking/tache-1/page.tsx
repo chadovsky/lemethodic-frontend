@@ -1,10 +1,8 @@
-import Tache1Session from '@/components/speaking/Tache1Session'
-import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import { redirect } from 'next/navigation'
 
+// Tâche 1 has no picker — the landing card links directly to
+// /speaking/tache-1/interview. This redirect exists only for anyone who
+// navigates to the bare /speaking/tache-1 URL by hand.
 export default function Tache1Page() {
-  return (
-    <ProtectedRoute>
-      <Tache1Session />
-    </ProtectedRoute>
-  )
+  redirect('/speaking/tache-1/interview')
 }

@@ -2,8 +2,9 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-24 (F-062 ship)
+**Last updated:** 2026-04-25 (F-080c ship)
 **Sprint window:** April 21 – May 4, 2026
+**Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
 ---
 
@@ -134,7 +135,7 @@ F-062.2 ✅ PTT pointer capture + minimum-hold guard
 
 ## In progress
 
-_(none — F-062 + F-062.1 + F-062.2 closed. F-063 (T1), F-061.1 (picker), F-062.3 (T2 re-record) open.)_
+F-080 is the active spine. F-080a + F-080b + F-080c shipped 2026-04-25. Next: F-080d (cross-session intelligence + Raccourci routing — recurring-modules endpoint, Raccourci tab rewrite with "Recommended for you" callout, /learn/[module_id] route). Other queued tickets (F-061.1 T3 picker, F-064 lesson detail + quiz, launch-prep F-071–F-079) remain deferred behind F-080.
 
 ---
 
@@ -173,20 +174,39 @@ F-062.3 ✅ Tâche 2 re-record current turn — "Refaire cette prise"
   - Final verification (Recording #25): DB soft-flag cascade confirmed on a 7-candidate-row conversation where 1 row was re-recorded — `conversation_turns` had (candidate 0, examiner 1, candidate 2 superseded, examiner 3 superseded via cascade, candidate 4, examiner 5, ...) with 6 active candidate turns total. `/end` analysis built the combined transcript from active rows only. Diagnostic page rendered real 4-couche scores matching conversation content (Le Goulet explanation cited "says 'I'm going to Marrakech' but explains neither preferences, needs, budget" — content from the kept turns, not the discarded retake).
   - `tsc --noEmit` clean on ship (only the pre-existing TargetScoreSelect.tsx:98 known error). Migration ran cleanly on dev SQLite.
 
+F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end — 4-turn personal-interview flow with randomized opening prompts from DB, per-turn upload + review sheet (Confirmer / Refaire cette prise), hybrid briefing-then-examiner-opens, final /end routing to /diagnostic with 4-couche analysis on combined active-turn audio.
+  - Backend (tcf-oral-tool):
+      · New model `Tache1Opening` in `app/models/models.py` — columns: `id`, `opening_prompt_fr` (NOT NULL), `opening_prompt_en`, `opening_prompt_es`, `is_active`, `created_at`. EN/ES columns mirror the Tâche 2 scenario table's multi-language pattern; examiner TTS only reads the FR column (kept for future bilingual-subtitle display).
+      · Migration `scripts/add_tache1_openings.py` — idempotent CREATE TABLE IF NOT EXISTS + partial index `ix_tache1_openings_active` on (is_active). Repo-convention direct-sqlite3 pattern, same as `scripts/add_turn_supersede_columns.py` from F-062.3. Note: because `init_db.py` uses `Base.metadata.create_all()` the table auto-materializes when the backend imports the model — the explicit migration script is still shipped for fresh-DB bootstrapping and clarity.
+      · Seeder `scripts/seed_tache1_openings.py` — 8 prompts with FR/EN/ES translations (idempotent upsert by `opening_prompt_fr`). Ran cleanly on dev DB: 8 rows inserted, all is_active=1.
+      · `app/routers/conversations.py`: imported `Tache1Opening` + `random_opening as t1_random_opening_fallback` from the persona module; new helper `_pick_random_tache1_opening(db)` that `ORDER BY func.random() LIMIT 1` on active rows. `_append_examiner_turn` now branches on `conv.tache_mode == "tache_1" and next_number == 0` to use the DB pick; fallback to the in-code tuple if the table is empty or the query raises (defensive — a fresh DB without the migration shouldn't 500 a T1 session). All other examiner-turn flow unchanged — subsequent T1 turns still go through `generate_examiner_turn_t1(conv)` with Claude Sonnet.
+      · `analyze_tache_1` already existed (F-048) — no changes needed. It uses `_active_turns()` so F-062.3's soft-flag cascade applies automatically on /end; `candidate_turn_number` already shipped in `/turn` response for Refaire.
+      · No changes to `/supersede`, `/end`, or TTS. T1 and T2 share the same endpoints and analysis persistence pipeline.
+  - Frontend (fluentpath-frontend):
+      · `components/speaking/Tache1Session.tsx` — full rewrite as a near-clone of Tache2Session. Phase state machine: `briefing → examiner-speaking (opening) → user-idle → user-recording → user-transcribing → reviewing → supersede-in-flight | examiner-speaking (reply) → user-idle (loop) → finalizing`. Reuses F-061/F-062 primitives unchanged: `useAudioRecorder`, `VuMeter`, `RecordButton` (PTT mode with pointer capture from F-062.2), `TurnReviewSheet` (inlined — Confirmer + Refaire cette prise + "Ne plus afficher" checkbox).
+      · T1-specific adjustments from T2: `TARGET_USER_TURNS = 4` (vs 6); `TURN_CAP_MS = 30_000` (vs 60_000 — T1 turns are short exchanges); hybrid briefing card with hardcoded prose (no scenario object / picker) → single "Start interview" CTA → /start returns `examinerTurnText` populated → phase lands in `examiner-speaking` before the user's first PTT (contrast with T2 which lands in `user-idle` because the candidate opens there); single `PEACH` bubble color for examiner bubbles (T1 has no per-scenario palette); turn indicator hidden during briefing AND during the opening examiner turn (shown once `userTurnCount > 0` or non-opening phase) so users aren't distracted by "Turn 1 of 4" while the examiner is still speaking.
+      · `MIN_HOLD_MS = 200` slip-finger guard mirrored from T2.
+      · Muted toggle + autoplay-blocked "Tap to hear the question" ghost button mirrored from T2 (copy adjusted: "question" vs "reply" since T1 is a Q&A).
+      · Error overlay with secondary "Keep this take" escape for supersede failures — identical to F-062.3 pattern.
+      · Deferred-commit via `proceedAfterCommit` / `userTurnCountRef`: `userTurnCount` increments on Confirmer (not on upload), so the "Turn X of 4" indicator correctly stays on the current turn through a re-record cycle.
+      · Per-session `reviewSuppressed` ephemeral state (not localStorage) — same pattern as T2.
+      · No API surface changes in `lib/api.ts` or `lib/types.ts` — `createConversation('tache_1', opts)` already worked (TacheMode type included 'tache_1'; `scenarioCode` was already optional; mapper normalizes `max_candidate_turns` (T1) vs `max_candidate_turns_hard` (T2) into `maxCandidateTurnsHard`). `supersedeTurn` / `uploadConversationTurn` / `finalizeConversation` unchanged.
+  - Routing:
+      · `app/speaking/tache-1/[topic]/page.tsx` — new dynamic route; renders `Tache1Session` inside `ProtectedRoute`. Slug is informational only (session doesn't branch on it).
+      · `app/speaking/tache-1/page.tsx` — now redirects to `/speaking/tache-1/interview` (Next.js `redirect()`) for anyone who navigates to the bare URL by hand.
+      · `components/speaking/SpeakingLanding.tsx` — Tâche 1 card `href` updated from `/speaking/tache-1` to `/speaking/tache-1/interview`.
+  - Verification: `pnpm tsc --noEmit` clean except the pre-existing TargetScoreSelect.tsx:98 known issue. Migration ran idempotently (table auto-created on backend boot); seeder inserted 8 rows; 5 samples of `_pick_random_tache1_opening(db)` returned 4 unique prompts (expected distribution).
+  - Deliberate deviations from spec:
+      · `analyze_tache_1` already existed from F-048 — no new analyzer, no rubric-weight adjustments made in this ticket. T2/T3 weighting lives in `app/services/scoring_profiles.py::compute_weighted_note_globale` which already has a `tache_1` branch. If rubric calibration surfaces issues during F-079 (calibration with real students), revisit in a separate follow-up — not in scope for F-063.
+      · Opening-prompt EN/ES columns seeded but not surfaced in UI yet. Examiner bubble renders only FR since that's the spoken language. Kept for parity with Tache2Scenario shape and future bilingual-subtitle display.
+
 ## Queued — follow-ups
 
-_(none — F-062.3 closed; T2 loop is now re-record-capable.)_
+_(none — F-063 closed; T1 full loop shipped, mirrors T2 behavior.)_
 
 ---
 
 ## Queued — core product wiring (continued)
-
-**F-063** 📋 Tâche 1 real recording (AI examiner conversation)
-- Reuse useAudioRecorder + VuMeter primitives
-- Wire Tache1Session.tsx with examiner turn playback (TTS audio)
-- POST /api/conversations with tache_mode=1
-- Handle 4-turn examiner-user-examiner-user flow
-- Depends on: F-061, F-062
 
 **F-064** 📋 Lesson detail + quiz real data
 - `app/raccourci/lesson/[id]/page.tsx` fetches GET /api/raccourci/lessons/{id}
@@ -239,7 +259,112 @@ _(none — F-062.3 closed; T2 loop is now re-record-capable.)_
 
 ---
 
+## Queued — Module Library + Intelligence Layer (F-080)
+
+**F-080** 📋 Sprint pivot (2026-04-25). Replace generic Claude-API feedback with a named library of L1-interference remediation modules; every speaking session tagged with detected modules; cross-session accumulation drives Raccourci routing. Architectural cornerstone: new `remediation_modules` table (coexists with existing `raccourci_lessons` via optional `raccourci_lesson_id` FK); every Tâche analysis outputs `detected_modules: [ids]`. Split into 4 phased sub-tickets with verification gates between each. Total budget ~3.5 engineering days + parallel module authoring by Chadi. See `F-080-SPEC.md` (to be added) for the full ticket text; summary per phase below.
+
+**F-080a** ✅ Backend scaffolding — modules table + seed loader (shipped 2026-04-25, commit `4f48ae1` in tcf-oral-tool; first commit after git init)
+- Migration `scripts/add_remediation_modules.py` (idempotent sqlite3 pattern from F-062.3) — creates `remediation_modules` + `session_detected_modules` with CHECK constraints on `category` and `severity`, partial active-row indexes.
+- SQLAlchemy `RemediationModule` + `SessionDetectedModule` in `app/models/models.py` with JSON-blob TEXT fields for `detection_criteria`, `examples`, `content_refs`, `drill_ids`, `prerequisite_module_ids`.
+- Pydantic schemas in new `app/schemas/modules.py` (ContentRef, ExampleEntry, DetectionCriteria, RemediationModule, DetectedModule).
+- Seed loader `scripts/seed_remediation_modules.py` reading `*.json` from a modules folder (Windows path TBD — spec says `/mnt/user-data/uploads/modules/` which is Linux; finalize before implementation).
+- CRUD endpoints in new `app/routers/modules.py` — `GET /api/modules`, `GET /api/modules/{id}`, `GET /api/modules?category=X`. No auth restrictions V1.
+- Gate: migration idempotent, 2 authored modules seed and re-seed cleanly, schema CHECK rejects invalid category/severity.
+
+**F-080.x** 📋 Module 1 (`nuance_reflex`) detection_criteria refinement — request-vs-make distinction for T2
+- Surfaced during F-080b Path A regression analysis. The `nuance_reflex` `contextual_triggers` list says "T2 role-plays asking the candidate to recommend or weigh options," but doesn't distinguish between a candidate **MAKING** a recommendation (canonical trigger) vs **REQUESTING** one (e.g. asking a travel agent for advice — the candidate stating "Je préfère la plage" is preference-as-input-to-service, not opinion-defending). The current criteria treat both identically; Claude reads them inconsistently across runs.
+- Possible refinement: split the T2 contextual_trigger into "candidate making a recommendation/weighing options for someone else" vs "candidate stating preferences as input to a service request" — only the first is a canonical nuance_reflex context.
+- Not blocking F-080b. Surface during content-authoring review; Chadi to decide whether the criteria need rewording or whether the borderline case should be left out-of-scope.
+
+**F-080b** ✅ Claude API integration — detect modules per session (shipped 2026-04-25 in tcf-oral-tool; Path A v2 fix-up shipped same day after gerondif_confusion smoke test)
+- New `app/services/module_library.py` — three responsibilities: `fetch_active_modules_for_prompt(db)` renders the active library as a compact text block (~600 tokens for 2 modules; see F-080 deferred Q on prompt-size scaling), `fetch_valid_module_ids(db)` returns the set used for hallucination rejection, `persist_detected_modules(recording_id, detected_modules, primary_module_id, db)` is the single source of truth for writing detection rows. Single helper called from BOTH finalize paths.
+- New `app/services/module_detector.py` — `detect_modules(transcript, tache_mode, db)` makes one Claude Sonnet call against a system prompt that injects the rendered library + per-Tâche category-priority instructions (T1: discourse_structure / register_mismatch / vocab_calque; T2: register_mismatch / vocab_calque / grammar_interference; T3: discourse_structure / verb_aspect / word_order). Weighting is prompt INSTRUCTION not hard filter — modules from non-priority categories still surface when criteria match. Empty `detected_modules` is an explicitly valid result (the prompt instructs Claude to return empty when nothing fits — false detections degrade student trust more than missed ones).
+- `analyze_tache_1`, `analyze_tache_2`, `analyze_tache_3` each call `detect_modules` after the existing 4-couche analysis (same layered pattern as Yarden in T2 and argumentation in T3); the result is merged into the analyzer's output dict as `detected_modules` + `primary_module`. New optional `db` kwarg threaded through; when absent (legacy crossover path), analyzers default to empty detection.
+- Persistence wired in BOTH finalize paths per spec amendment (T3 doesn't go through `/end`):
+    · `app/routers/conversations.py::_run_conversation_analysis_and_persist` — T1 + T2 sessions, immediately after `db.refresh(rec)` for the new Recording row
+    · `app/routers/recordings.py::_run_analysis_and_persist` — T3 (and any legacy upload path), after `db.refresh(feedback)`
+  Both call sites wrap `persist_detected_modules` in a defensive try/except so a detection failure can never crash session finalize. The helper itself never raises.
+- Hallucination protection: `persist_detected_modules` fetches valid module ids before insert and skips any detection whose `module_id` isn't in the active library, logging at WARNING with the rejected ids and the active set for debugging. Malformed detection entries (missing module_id, non-dict, non-numeric confidence) are similarly logged + skipped without crashing.
+- Verification gates (all green):
+    · imports clean across analyzers + routers (54 routes, no circular imports)
+    · prompt block renders correctly for the 2 seeded modules (3111 chars, all detection_criteria fields populated)
+    · demo-mode (no `ANTHROPIC_API_KEY`) returns `{detected_modules: [], primary_module: null}` — no fake detections
+    · live Claude T2 prompt with "Je prefere la plage. C'est mieux pour se reposer." → detects `nuance_reflex` (confidence 0.72), supporting_quote verbatim from transcript
+    · live Claude T1 prompt with "j'ai eu une biere", "j'ai ete a la maison", "j'ai eu ce poste" → detects `to_get_reflex` 3× (confidences 0.82–0.88), each with verbatim supporting_quote
+    · live Claude T3 prompt with a clean 3-beat argumentative monologue ("Il est vrai que… Cependant… C'est pour cette raison que…") → empty detection, primary null. Critical negative-test pass: no false positive on a well-structured response.
+    · hallucination test against persistence helper: mixed valid + 2 hallucinated + 4 malformed entries → only the 2 valid rows inserted, exactly 1 marked is_primary, non-numeric confidence preserved as NULL, all rejections logged at WARNING.
+- Deferred to later iterations (per F-080 spec): confidence threshold filtering (storing all detections for now, threshold tuning postponed until we have data); per-Tâche category subsetting in the injected library (revisit at 25+ modules); admin UI for module CRUD (F-080.1 if/when authoring scales).
+- Shipped on the master branch in tcf-oral-tool — second commit on the repo (after F-080a's initial commit `4f48ae1`).
+
+  **Path A v2 (post-ship fix, same day):** smoke test of seeded Module 3 (`gerondif_confusion`, the first conditional-detection module) revealed F-080b's prompt only handled surface-visible modules cleanly. The detector was suppressing conditional detections to <0.4 (below the emit floor) because their criteria are by-design semantically ambiguous. Three fixes:
+    1. **Detection prompt: two-class structure.** `_DETECTION_SYSTEM` now distinguishes Class 1 (surface-visible: keywords ARE the mistake; old behavior preserved with 0.85+ for unmistakable, 0.55–0.75 for suggested) and Class 2 (conditional: keywords are inspection triggers only, identified by markers like "wrongness depends on semantic context" / "inspection trigger only" / "see grammatical_signals" embedded in the keywords_wrong list). Conditional modules use a 4-step process — surface match → semantic intent eval → verify mismatch → emit at 0.55–0.75 — and the 0.4 floor explicitly does NOT apply to them.
+    2. **Module ordering: alphabetical-by-id.** `fetch_active_modules_for_prompt` switched from severity-DESC to alphabetical, removing the anchoring bias that made high-severity modules dominate even when subtler conditional ones were the better match. Random ordering was tried first but introduced run-to-run variance; alphabetical is deterministic and category/severity-neutral.
+    3. **Parser robustness + prompt cleanup.** Added `_extract_first_json_object()` — balanced `{...}` walker tolerant of leading prose preambles ("Looking at the transcript: …" before the JSON). Also fixed doubled-brace artifact in the OUTPUT FORMAT example (holdover from `.format()`-style template; my code uses `.replace()`) — Claude was occasionally mirroring the literal `{{...}}` back, producing unparseable output.
+  **Verification gates after Path A v2 (all green, intentional non-borderline test cases):**
+    · R1 nuance_reflex on T3 unambiguous flat stance ("Les réseaux sociaux sont négatifs…") → detected @ 0.87 (≥0.7 floor)
+    · R2 to_get_reflex on T1 avoir-misuse → 3 detections @ 0.88, 0.82, 0.75 (multi-hit verbatim quotes)
+    · R3a gerondif_confusion SHORT (2-sentence Module 3 example #4) → 0.65 (squarely in 0.55–0.75 conditional band)
+    · R3b gerondif_confusion LONG (6-sentence T3 monologue with same misuse buried) → 0.65, confirming short-context starvation is NOT a separate factor
+    · R4 clean argumentative monologue (negative test) → empty, no false positives
+    · R5 hallucination test → 2 valid rows inserted, 1 is_primary, hallucinated/malformed all rejected with WARNING logs
+    · Variance: 5x repeats of R3a → identical outcome (1 unique result across 5 runs) under deterministic alphabetical ordering
+  **Test redesign noted:** the original F-080b ship test for nuance_reflex used the T2 plage transcript ("Je préfère la plage…"), which turned out to be a borderline case (T2 role-play where candidate REQUESTS rather than MAKES a recommendation). That borderline behavior is filed as F-080.x for Module 1 criteria review. Replacement regression test uses the unambiguous T3 flat-opinion case.
+- Inject active-module library (id + name + detection_criteria only — keep prompt compact) into each of `tache_1.py`, `tache_2.py`, `tache_3.py` analysis prompts.
+- Per-Tâche category weighting in prompt instructions (not hard filters): T1 favors discourse_structure + register_mismatch + vocab_calque; T2 favors register_mismatch + vocab_calque + grammar_interference; T3 favors discourse_structure + verb_aspect + word_order.
+- Analysis output schema gains `detected_modules: [{module_id, confidence, supporting_quote}]` + `primary_module: string`.
+- On `/end`, extract and insert one `session_detected_modules` row per detected module; set `is_primary=1` on the matching row. Empty detection logs a warning but does not fail finalize.
+- Gate: T2 session persists 1-3 detection rows with exactly one `is_primary=1`; supporting_quote matches real candidate utterance; T1 session preferentially detects the weighted categories.
+
+**F-080c.x** 📋 Full Le Goulet cleanup (deferred from F-080c per the F-080c.(3a) decision)
+- F-080c removed `<GouletCard />` from `app/diagnostic/page.tsx` and stripped the goulet derivation block, but left in place: `components/diagnostic/GouletCard.tsx` (the component file), `Goulet` interface in `lib/types.ts`, `goulet` field on the `Diagnostic` type, the `goulet`/`gouletKey` mapping in `lib/api.ts::mapDiagnosticBlock`, and the backend `le_goulet` block in `_format_recording`. None of these affect the visible UI today; they're carried forward defensively in case other consumers reference them.
+- Cleanup once nothing else reads goulet: delete `components/diagnostic/GouletCard.tsx`, drop `Goulet` + `goulet` field from frontend types and the api mapper, and stop writing `goulet_*` columns in `Feedback` (or keep them as legacy noise; either is fine).
+- Not blocking. File now to keep tech debt visible.
+
+**F-080c** ✅ Frontend — module-driven diagnostic page (shipped 2026-04-25)
+- Backend: new endpoint `GET /api/recordings/{id}/detected-modules` in `app/routers/recordings.py`. Owner check via existing recording.user_id pattern. Joins `session_detected_modules` with `remediation_modules`, hydrates the JSON-blob columns (detection_criteria / examples / content_refs / drill_ids / prerequisite_module_ids) into structured shape. Returns `{primary_module, secondary_modules, detections}`; 404 on unknown/foreign recording_id, 401 on missing token. Module-data only — couche scores stay on `getDiagnostic` (avoids duplication; new endpoint stays focused). Smoke-tested with seeded detections, empty case, 404, 401 — all green. Detection rows that reference a deleted module are logged at WARNING and dropped from the response rather than 500 (defensive — F-080b's persist_detected_modules already enforces FK validity at write time).
+- Frontend deps: `pnpm add react-markdown` (10.1.0). Used by InlineContentRef for rendering `inline_markdown` content_refs.
+- New hook `lib/hooks/useInterfaceLanguage.ts` — returns `'en' | 'fr' | 'es'` from `useAuthStore.user.interfaceLanguage` with `'en'` fallback. Consumed by every F-080c component for FR/EN field selection. ES users fall back to EN content (V1 module authoring ships FR + EN only).
+- New types in `lib/types.ts`: `ModuleCategory`, `ContentRefType`, `ModuleExampleEntry`, `ModuleContentRef`, `ModuleDetectionCriteria`, `RemediationModule`, `SessionDetection`, `DetectedModulesResponse`. Deliberately keeps the backend's snake_case field names (no camelCase mapper) — modules are read-only authored content that flows through unchanged, distinct from User/Recording mappers that bridge frontend-store-shape to backend.
+- New api method `api.sessions.getDetectedModules(recordingId)` — returns `DetectedModulesResponse` verbatim from the new endpoint.
+- Five new diagnostic components in `components/diagnostic/`:
+    · `DetectedModuleCard.tsx` — primary module rendering: category badge (1-of-8 pastel palette mirroring `globals.css`), severity dot scale (1-5), module name, L1-interference description, supporting quote in italics ("From your session: …"), expandable "See examples" button. Confidence is NEVER surfaced — F-080c locked UX decision. Confidence is logged for debugging only via the network tab.
+    · `SecondaryModulesList.tsx` — collapsed "Also detected · N" section. Expanded reveals per-module rows that themselves expand into description + supporting quote + examples. Per-module row picks the first non-primary detection for the supporting quote (T1 to_get_reflex emits multiple detection rows for the same module_id; we surface only one in the secondary view).
+    · `ModuleExamples.tsx` — wrong/right/explanation triplets. Wrong line in red strikethrough; right line in green; explanation in `Why:` block. Reused by both the primary card's expand and the secondary rows' expand.
+    · `InlineContentRef.tsx` — `react-markdown` rendering of `inline_markdown` refs (h1/h2/h3, **strong**, *em*, ul/ol/li, hr, code) styled to the FluentPath display tokens. `document` / `audio` / `external_link` types render placeholder cards ("Coming soon" — F-081 ships audio drills, F-082 ships interactive drills, document hosting deferred until authored content needs it).
+    · `EmptyDetectionFallback.tsx` — "No specific reflexes detected this session. Keep practicing." Bilingual FR/EN copy; ES falls back to EN.
+- Diagnostic page rewrite (`app/diagnostic/page.tsx`):
+    · Parallel fetch via `Promise.all([getDiagnostic, getDetectedModules])`. The diagnostic call is the load-blocker; `getDetectedModules` failure is non-fatal — falls back to the empty-fallback state (which is also a valid product state).
+    · Section 2 LA MÉTHODE EN COUCHES: header copy changed to "Your CEFR-tracking baseline" — bars stay, position is now secondary context.
+    · Section 3 LE GOULET removed from JSX. Replaced by inline `DetectedReflexesSection` (composes `DetectedModuleCard` + `SecondaryModulesList` + `EmptyDetectionFallback`).
+    · Section 4 L'ORDONNANCE conditionally rendered only when `primary_module` exists AND has at least one `content_refs` entry. Module 2 (`to_get_reflex`) ships empty content_refs by design — for those, examples in the primary card ARE the teaching surface; L'ORDONNANCE section disappears entirely. Otherwise renders the primary module's content_refs sorted by `display_order`, each via `InlineContentRef`.
+    · Mock-mode (no `?session=` param, design-review path) lands on the empty fallback in DETECTED REFLEXES with L'ORDONNANCE skipped — keeps mock surface area small and matches a real product state.
+    · Sections 5/6 (Session details, Corrected transcription) untouched — still mocked, out of scope for F-080c.
+- Verification: `pnpm tsc --noEmit` clean except the pre-existing `TargetScoreSelect.tsx:98` known issue; backend endpoint smoke-tested via `TestClient` (200 with detections, 200 with empty, 404, 401); routes count incremented from 54 → 55.
+- Le Goulet cleanup deferred to F-080c.x (component file, type field, api mapper, backend column writes all left in place — F-080c only removed the visible UI surface per (3a) decision in the implementation discussion).
+- F-080c locked UX decisions held: secondary modules collapsed by default, no confidence threshold, confidence never surfaced in UI, Le Goulet removed from visible UI.
+_(F-080c shipped detail captured above; legacy queue text was here.)_
+
+**F-080d** 📋 Cross-session intelligence + Raccourci routing
+- New endpoint `GET /api/me/recurring-modules` — returns modules the user has hit 3+ times across their last 5 sessions, with `detection_count`, `last_detected_at`, `sessions_with_detection`.
+- New endpoint `GET /api/modules/{id}/learn` — module with resolved content_refs (V1 only handles inline_markdown; S3/file-path resolution deferred).
+- Rewrite `app/raccourci/page.tsx`: prepend "Recommended for you" callout listing recurring modules (non-dismissable); 16 canonical lessons stay in place but lessons whose `raccourci_lesson_id` matches a recurring module get a "Your gap" badge.
+- New route `app/learn/[module_id]/page.tsx` — full module content page: localized description, all examples, all content_refs rendered, "I practiced this" engagement button.
+- Optional stats view (module history this month, top unaddressed recurring) — may split to F-080e if F-080d runs long.
+- Gate: after 5 varied sessions, recurring endpoint returns modules with count >= 3; Raccourci tab surfaces them; /learn/[id] renders full content.
+
+**F-080 deferred architectural questions (flagged in spec; revisit when relevant):**
+- Prompt-size scaling once library passes ~25 modules — inject category-subset per Tâche rather than full library.
+- Early false-positive detections — add confidence threshold (persist only >= 0.7) in a 2nd iteration of F-080b.
+- Module deprecation workflow — schema has `active: false` but no operational path defined.
+- Module authoring pipeline — V1 is JSON files + reseed; V2 admin-UI is deferred (would be F-080.1).
+
+**F-080 unblocks** (out-of-sprint follow-ups): F-081 audio content refs (native-speaker drills), F-082 interactive drill implementation, F-063.1 T1 audio autoplay investigation, F-063.3 T1 review-sheet timing UX, F-061.1 T3 topic picker (lower priority once module-driven feedback lands).
+
+---
+
 ## Queued — launch prep (F-071 to F-079)
+
+**Pushed behind F-080 per 2026-04-25 pivot.** Still on the sprint board but re-prioritized after the intelligence layer ships.
 
 Previously called "F-060 launch prep" umbrella. Split into discrete tickets here.
 

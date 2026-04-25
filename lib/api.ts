@@ -14,6 +14,7 @@ import type {
   ConversationTurnResult,
   Couche,
   CoucheKey,
+  DetectedModulesResponse,
   Diagnostic,
   Goulet,
   Lesson,
@@ -864,6 +865,22 @@ export const api = {
         )
       }
       return mapDiagnosticBlock(raw.id, raw.diagnostic)
+    },
+
+    // F-080c — fetch the modules detected on this recording, hydrated
+    // with full module content for the diagnostic page. Returned shape
+    // mirrors the backend response verbatim (snake_case field names);
+    // the diagnostic components consume it directly without camelCase
+    // mapping. See lib/types.DetectedModulesResponse for the shape.
+    //
+    // Empty state: when no modules were detected, the backend returns
+    // primary_module: null + empty arrays; the diagnostic page renders
+    // EmptyDetectionFallback in that case. 404 only fires when the
+    // recording_id doesn't exist or doesn't belong to the user.
+    async getDetectedModules(recordingId: number): Promise<DetectedModulesResponse> {
+      return request<DetectedModulesResponse>(
+        `/api/recordings/${recordingId}/detected-modules`,
+      )
     },
 
     // Cherry-picks feedback_grid.tache_2 from the recording's diagnostic.

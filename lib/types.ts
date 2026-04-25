@@ -257,6 +257,93 @@ export interface MoulesBreakdown {
   moules: Moule[]
 }
 
+// ── F-080 Module library (remediation modules + per-session detections) ─────
+
+export type ModuleCategory =
+  | 'vocab_calque'
+  | 'grammar_interference'
+  | 'discourse_structure'
+  | 'pronunciation'
+  | 'register_mismatch'
+  | 'word_order'
+  | 'verb_aspect'
+  | 'other'
+
+export type ContentRefType = 'inline_markdown' | 'document' | 'audio' | 'external_link'
+
+// One example pair from a module's `examples` array. Fields per the F-080a
+// pydantic schema; FR + EN explanations are always populated, ES deferred.
+export interface ModuleExampleEntry {
+  context: string
+  wrong_utterance: string
+  corrected_utterance: string
+  explanation_fr: string
+  explanation_en: string
+}
+
+// One content_ref. Conditional fields per `type`:
+//   inline_markdown → content_fr/content_en populated
+//   document        → locator + description populated
+//   audio           → url + duration_seconds (+ optional description)
+//   external_link   → url + description
+export interface ModuleContentRef {
+  type: ContentRefType
+  display_order: number
+  content_fr?: string | null
+  content_en?: string | null
+  locator?: string | null
+  description?: string | null
+  url?: string | null
+  duration_seconds?: number | null
+}
+
+export interface ModuleDetectionCriteria {
+  keywords_wrong: string[]
+  grammatical_signals: string[]
+  contextual_triggers: string[]
+}
+
+// Hydrated remediation module — matches the backend pydantic schema field
+// names verbatim (snake_case) since the GET /detected-modules endpoint
+// returns the pydantic dump shape directly. We don't run a camelCase
+// mapper on this surface; the F-080c diagnostic components index by the
+// authored field names. This is a deliberate divergence from the
+// User/Recording mappers — those bridge frontend-store-shape to backend
+// shape, whereas modules are read-only authored content that flows
+// through unchanged.
+export interface RemediationModule {
+  id: string
+  name_fr: string
+  name_en: string
+  category: ModuleCategory
+  severity: number
+  active: boolean
+  L1_interference_description_fr: string
+  L1_interference_description_en: string
+  detection_criteria: ModuleDetectionCriteria
+  examples: ModuleExampleEntry[]
+  content_refs: ModuleContentRef[]
+  drill_ids: number[]
+  prerequisite_module_ids: string[]
+  raccourci_lesson_id: number | null
+}
+
+// One row from session_detected_modules joined with the module id. The
+// confidence_score is informational/debug-only — the diagnostic page
+// MUST NOT surface it to the user (F-080c locked UX decision).
+export interface SessionDetection {
+  module_id: string
+  confidence_score: number | null
+  supporting_quote: string | null
+  is_primary: boolean
+}
+
+export interface DetectedModulesResponse {
+  primary_module: RemediationModule | null
+  secondary_modules: RemediationModule[]
+  detections: SessionDetection[]
+}
+
 // ── API error ────────────────────────────────────────────────────────────────
 
 export interface ApiErrorShape {

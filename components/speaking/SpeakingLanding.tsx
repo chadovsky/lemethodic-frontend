@@ -33,7 +33,7 @@ const CARDS: TacheCard[] = [
     metaClock: '5–8 min',
     metaMode: 'Conversation',
     MetaIcon: MessageCircle,
-    href: '/speaking/tache-1',
+    href: '/speaking/tache-1/interview',
   },
   {
     number: 2,
