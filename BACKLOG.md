@@ -491,6 +491,17 @@ Previously called "F-060 launch prep" umbrella. Split into discrete tickets here
 
 ## Deferred — post-launch (Week 3+)
 
+**F-093** ⏸ Streaming transcription via WebSocket STT
+- Replace Whisper API batch transcription with streaming provider (Deepgram, OpenAI Realtime API, or Groq Whisper streaming).
+- Backend: WebSocket endpoint for audio streaming, partial-result forwarding, reconnection handling.
+- Frontend: real-time transcript rendering during recording, interim vs final states.
+- Migration: existing recordings stay batch; new recordings stream.
+- Estimate: 3-5 days. Priority: High post-launch. Filed 2026-04-27 from observed Gemini Live UX.
+
+**F-093.1** ⏸ Progressive transcription UI (no backend change)
+- Frontend-only illusion of streaming using existing batch backend. Show waveform of captured audio, animated "Transcribing..." text, then word-by-word stagger animation when transcript arrives.
+- ~2 hours work. Optional pre-launch in QA window May 2-3 if real-streaming feel is desired before F-093 ships. Filed 2026-04-27.
+
 ⏸ **Stripe integration** — deferred per explicit decision. Backend first, revenue later.
 ⏸ **Test-drive recording before paywall** — post-launch A/B test for conversion optimization
 ⏸ **Writing module (Expression Écrite)** — full TCF coverage beyond Expression Orale
