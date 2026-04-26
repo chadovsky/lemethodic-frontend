@@ -276,14 +276,14 @@ function DiagnosticInner() {
 
   // F-080d: state for the LearnModuleSheet picker (linked-module path
   // from the "Learn this" button). Orphan modules tap straight through
-  // to /learn/[id]; the sheet only opens when raccourci_lesson_id is
+  // to /learn/[id]; the sheet only opens when ecole_lesson_id is
   // non-null.
   const [pickerModule, setPickerModule] = useState<RemediationModule | null>(null)
   const [lessonsCache, setLessonsCache] = useState<Lesson[] | null>(null)
 
   const handleLearnTap = useCallback(
     (m: RemediationModule) => {
-      if (m.raccourci_lesson_id != null) {
+      if (m.ecole_lesson_id != null) {
         setPickerModule(m)
         // Lazy-fetch lessons once so the sheet's primary CTA shows the
         // real lesson title rather than the bare lesson number.
@@ -303,8 +303,8 @@ function DiagnosticInner() {
   )
 
   const pickerLessonTitle =
-    pickerModule != null && pickerModule.raccourci_lesson_id != null && lessonsCache
-      ? lessonsCache.find((l) => l.lessonNumber === pickerModule.raccourci_lesson_id)?.title
+    pickerModule != null && pickerModule.ecole_lesson_id != null && lessonsCache
+      ? lessonsCache.find((l) => l.lessonNumber === pickerModule.ecole_lesson_id)?.title
       : undefined
 
   const fetchDiagnostic = useCallback(async () => {
@@ -832,7 +832,7 @@ function DiagnosticInner() {
             </Link>
 
             <Link
-              href="/raccourci"
+              href="/ecole"
               style={{
                 display: 'block',
                 textAlign: 'center',
@@ -845,7 +845,7 @@ function DiagnosticInner() {
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
-              Back to Le Raccourci
+              Back to L'École
             </Link>
           </div>
         </div>

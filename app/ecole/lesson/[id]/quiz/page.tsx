@@ -34,7 +34,7 @@ export default async function QuizPage({ params }: Props) {
           }}
         >
           <Link
-            href={`/raccourci/lesson/${id}`}
+            href={`/ecole/lesson/${id}`}
             aria-label="Back to lesson"
             style={{
               display: 'flex',

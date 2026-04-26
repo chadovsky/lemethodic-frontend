@@ -17,7 +17,7 @@ interface Tab {
 }
 
 const TABS: Tab[] = [
-  { href: '/',          label: 'Raccourci', Icon: Home         },
+  { href: '/',          label: 'École', Icon: Home         },
   { href: '/speaking',  label: 'Speaking',  Icon: Mic          },
   { href: '/writing',   label: 'Writing',   Icon: PenLine      },
   { href: '/progress',  label: 'Progress',  Icon: BarChart2    },
@@ -54,10 +54,10 @@ export default function BottomNav() {
         }}
       >
         {TABS.map(({ href, label, Icon }) => {
-          // treat /raccourci/lesson/* as also "home" active
+          // treat /ecole/lesson/* as also "home" active
           const isActive =
             href === '/'
-              ? pathname === '/' || pathname.startsWith('/raccourci')
+              ? pathname === '/' || pathname.startsWith('/ecole')
               : pathname === href || pathname.startsWith(href + '/')
 
           return (

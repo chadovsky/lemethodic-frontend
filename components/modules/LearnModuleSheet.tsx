@@ -1,13 +1,13 @@
 'use client'
 
 // F-080d — shared bottom-sheet picker for LINKED modules (modules whose
-// raccourci_lesson_id is non-null). Two destinations:
-//   - Primary CTA: structured Raccourci lesson at /raccourci/{lesson_id}
+// ecole_lesson_id is non-null). Two destinations:
+//   - Primary CTA: structured École lesson at /ecole/{lesson_id}
 //   - Secondary CTA: standalone module reading at /learn/{module_id}
 //
 // Used by HomeScreen "Recommended for you" cards (F2) and the diagnostic
 // page DetectedModuleCard "Learn this" button (F3). Orphan modules
-// (raccourci_lesson_id === null) bypass this sheet entirely and route
+// (ecole_lesson_id === null) bypass this sheet entirely and route
 // straight to /learn/[id]; the linked-vs-orphan branching lives at the
 // call site so this component can stay focused on the "user picks" flow.
 //
@@ -37,7 +37,7 @@ interface ShortModule {
   id: string
   name_en: string
   name_fr: string
-  raccourci_lesson_id: number | null
+  ecole_lesson_id: number | null
 }
 
 interface Props {
@@ -57,29 +57,29 @@ export default function LearnModuleSheet({ module: m, lessonTitle, onClose }: Pr
   // this sheet at all (caller bug if they are), but stay defensive.
   useEffect(() => {
     if (resolvedTitle != null) return
-    if (m.raccourci_lesson_id == null) return
+    if (m.ecole_lesson_id == null) return
     let cancelled = false
     api.lessons
       .list()
       .then((lessons) => {
         if (cancelled) return
-        const match = lessons.find((l) => l.lessonNumber === m.raccourci_lesson_id)
-        setResolvedTitle(match?.title ?? `Lesson ${m.raccourci_lesson_id}`)
+        const match = lessons.find((l) => l.lessonNumber === m.ecole_lesson_id)
+        setResolvedTitle(match?.title ?? `Lesson ${m.ecole_lesson_id}`)
       })
       .catch(() => {
         if (cancelled) return
         // On fetch failure, fall back to the bare lesson number — the
         // route still works; only the displayed title is degraded.
-        setResolvedTitle(`Lesson ${m.raccourci_lesson_id}`)
+        setResolvedTitle(`Lesson ${m.ecole_lesson_id}`)
       })
     return () => {
       cancelled = true
     }
-  }, [m.raccourci_lesson_id, resolvedTitle])
+  }, [m.ecole_lesson_id, resolvedTitle])
 
   const goLesson = () => {
-    if (m.raccourci_lesson_id == null) return
-    router.push(`/raccourci/lesson/${m.raccourci_lesson_id}`)
+    if (m.ecole_lesson_id == null) return
+    router.push(`/ecole/lesson/${m.ecole_lesson_id}`)
   }
 
   const goLearn = () => {
@@ -99,9 +99,9 @@ export default function LearnModuleSheet({ module: m, lessonTitle, onClose }: Pr
   // shows the lesson number immediately, swaps in the title when
   // available. Avoids a flash of "Loading…" on the primary button.
   const primaryLabel =
-    resolvedTitle && m.raccourci_lesson_id != null
-      ? `Lesson ${m.raccourci_lesson_id}: ${resolvedTitle}`
-      : `Lesson ${m.raccourci_lesson_id}`
+    resolvedTitle && m.ecole_lesson_id != null
+      ? `Lesson ${m.ecole_lesson_id}: ${resolvedTitle}`
+      : `Lesson ${m.ecole_lesson_id}`
 
   return (
     <>

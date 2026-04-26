@@ -30,7 +30,7 @@ The root route (`app/page.tsx`) renders `components/onboarding/OnboardingFlow.ts
 3. `CurrentLevelSelect` — self-assessed CEFR band (`A1_A2` | `A2_B1` | `B1_B2` | `B2_plus`)
 4. `TargetScoreSelect` — depends on the chosen goal
 5. `ExamDateSelect` — either a real `YYYY-MM` date or a "quick" label
-6. `RaccourciReveal` — summary screen; its continue CTA `router.push('/paywall')`
+6. `EcoleReveal` — summary screen; its continue CTA `router.push('/paywall')`
 
 Each step component is self-contained and calls `onContinue(value)` + optional `onBack()` props. Step 6's types (`CurrentLevel`, `TargetScore`, `ExamDate`) are re-exported from their step files — `OnboardingFlow` imports types from each step.
 
@@ -42,7 +42,7 @@ When adding a step, update all three: (a) the component file, (b) `OnboardingSta
 
 - **Color/font constants** — `INK`, `INK_SOFT`, `INK_MUTED`, `PAPER`, `CTA_DISABLED`, `DISPLAY_FONT`. These are re-used outside onboarding too (e.g. `components/Paywall.tsx` imports from this file).
 - **`ProgressDots`**, **`OnboardingCard`**, **`CheckIcon`**, **`CTAButton`**, **`BackButton`** — the reusable pieces every step is assembled from.
-- **`OnboardingScreen`** — layout wrapper that takes a pastel `bg`, illustration, headline, descriptor, CTA state, and cards as children. Most but not all steps use it; `RaccourciReveal` and `LanguageSelect` render their own layout while still using the primitives above.
+- **`OnboardingScreen`** — layout wrapper that takes a pastel `bg`, illustration, headline, descriptor, CTA state, and cards as children. Most but not all steps use it; `EcoleReveal` and `LanguageSelect` render their own layout while still using the primitives above.
 
 Prefer using these primitives over hand-rolling new buttons/cards — the press-animation and selection states (`scale(0.96)` → `scale(1.01)`) are implemented inline with pointer handlers, not via Tailwind classes.
 
@@ -60,7 +60,7 @@ Geist/Geist Mono are loaded via `next/font/google` in `app/layout.tsx` but the r
 
 ### Other routes
 
-- `/paywall` — `components/Paywall.tsx`, a long client component using Recharts (`RadarChart`) plus an expandable comparison table. Imports design tokens from the onboarding primitives. This is the final step of the onboarding funnel — the step-6 `RaccourciReveal` CTA pushes here.
+- `/paywall` — `components/Paywall.tsx`, a long client component using Recharts (`RadarChart`) plus an expandable comparison table. Imports design tokens from the onboarding primitives. This is the final step of the onboarding funnel — the step-6 `EcoleReveal` CTA pushes here.
 
 ### Build config gotchas
 

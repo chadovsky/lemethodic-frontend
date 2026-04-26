@@ -18,18 +18,18 @@ interface Milestone {
 const MILESTONES: Milestone[] = [
   { label: 'Fondations',          range: 'Lessons 1–4',   minLesson: 1,  maxLesson: 4  },
   { label: 'Mécaniques',          range: 'Lessons 5–10',  minLesson: 5,  maxLesson: 10 },
-  { label: 'Raccourci Complet',   range: 'Lessons 11–16', minLesson: 11, maxLesson: 16 },
+  { label: 'École Complet',   range: 'Lessons 11–16', minLesson: 11, maxLesson: 16 },
 ]
 
-interface RaccourciProgressProps {
+interface EcoleProgressProps {
   completedCount: number   // 0–16
   totalCount: number       // 16
 }
 
-export default function RaccourciProgress({
+export default function EcoleProgress({
   completedCount,
   totalCount,
-}: RaccourciProgressProps) {
+}: EcoleProgressProps) {
   const pct = Math.round((completedCount / totalCount) * 100)
 
   return (
@@ -47,7 +47,7 @@ export default function RaccourciProgress({
           marginBottom: 6,
         }}
       >
-        Le Raccourci
+        L'École
       </p>
 
       {/* Subtitle */}

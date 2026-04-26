@@ -54,7 +54,7 @@ export default function LoginPage() {
   }, [])
   useEffect(() => {
     if (hydrated && token) {
-      router.replace('/raccourci')
+      router.replace('/ecole')
     }
   }, [hydrated, token, router])
 
@@ -72,7 +72,7 @@ export default function LoginPage() {
     try {
       const { token, user } = await api.auth.login(email.trim(), password)
       useAuthStore.getState().setAuth(token, user)
-      router.push('/raccourci')
+      router.push('/ecole')
     } catch (err) {
       if (err instanceof ApiError) {
         setError(mapApiError(err))
@@ -156,7 +156,7 @@ export default function LoginPage() {
             marginTop: 6,
           }}
         >
-          Sign in to continue your Raccourci.
+          Sign in to continue your École.
         </p>
 
         {/* Email */}

@@ -608,15 +608,15 @@ export const api = {
 
   lessons: {
     async list(): Promise<Lesson[]> {
-      const raw = await request<{ lessons: RawLesson[] }>('/api/raccourci/lessons')
+      const raw = await request<{ lessons: RawLesson[] }>('/api/ecole/lessons')
       return raw.lessons.map(mapLesson)
     },
 
     async get(id: number): Promise<LessonDetail> {
       const [lessonRaw, quizRaw] = await Promise.all([
-        request<RawLesson>(`/api/raccourci/lessons/${id}`),
+        request<RawLesson>(`/api/ecole/lessons/${id}`),
         request<{ questions: RawQuizQuestion[]; pass_threshold: number }>(
-          `/api/raccourci/lessons/${id}/quiz`,
+          `/api/ecole/lessons/${id}/quiz`,
         ),
       ])
       return {
@@ -646,7 +646,7 @@ export const api = {
         }>
         status: Lesson['status']
         next_unlocked?: number
-      }>(`/api/raccourci/lessons/${id}/quiz/submit`, {
+      }>(`/api/ecole/lessons/${id}/quiz/submit`, {
         method: 'POST',
         body: {
           answers: quizAnswers.map((a) => ({
@@ -723,7 +723,7 @@ export const api = {
     },
 
     // Lists Tâche 2 scenarios the current user is gated into. Backend
-    // filters by the raccourci gate (F-053): below-A2 users only get A2_B1
+    // filters by the ecole gate (F-053): below-A2 users only get A2_B1
     // rows. Used by the F-062.1 dev sanity check in Tache2Picker to detect
     // slug/code drift between the client-side SCENARIOS literal and the
     // seeded DB; the picker itself will eventually consume this endpoint

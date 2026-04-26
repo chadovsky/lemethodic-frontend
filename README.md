@@ -46,7 +46,7 @@ If you see `CORS error` / `No 'Access-Control-Allow-Origin'` in the browser cons
 
 ## Deferred features
 
-- **Test-drive recording screen** (free diagnostic before paywall) — deferred to post-launch Phase 2 for conversion-optimization A/B testing. The `/test-drive` route has been removed; the onboarding funnel now routes step 6 (`RaccourciReveal`) directly to `/paywall`.
+- **Test-drive recording screen** (free diagnostic before paywall) — deferred to post-launch Phase 2 for conversion-optimization A/B testing. The `/test-drive` route has been removed; the onboarding funnel now routes step 6 (`EcoleReveal`) directly to `/paywall`.
 
 ## Learn More
 

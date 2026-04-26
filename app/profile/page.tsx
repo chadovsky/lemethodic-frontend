@@ -332,7 +332,7 @@ export default function ProfilePage() {
               >
                 {[
                   { value: 'Day 7', sub: 'Current streak', icon: '🔥' },
-                  { value: '4/16',  sub: 'Raccourci',       icon: null },
+                  { value: '4/16',  sub: 'École',       icon: null },
                   { value: '47',    sub: 'Days to TCF',     icon: null },
                 ].map(({ value, sub, icon }, i) => (
                   <div

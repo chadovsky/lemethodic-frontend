@@ -1,15 +1,15 @@
 'use client'
 
 // Root route. Auth-aware:
-//   - authenticated + token verified → replace to /raccourci
+//   - authenticated + token verified → replace to /ecole
 //   - authenticated but token is stale → useVerifyAuth clears it, we render
-//     onboarding on the next tick (no detour through /raccourci)
+//     onboarding on the next tick (no detour through /ecole)
 //   - unauthenticated → render the onboarding flow
 //
 // Everything downstream (protected routes) uses <ProtectedRoute>; this page
 // is the inverse — the one place where an unauthenticated user is the
 // expected audience. We still run useVerifyAuth here so a stale localStorage
-// token gets cleared without bouncing through /raccourci first.
+// token gets cleared without bouncing through /ecole first.
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -33,7 +33,7 @@ export default function Home() {
 
   useEffect(() => {
     if (hydrated && token && verified) {
-      router.replace('/raccourci')
+      router.replace('/ecole')
     }
   }, [hydrated, token, verified, router])
 

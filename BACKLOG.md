@@ -2,9 +2,11 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-26 (F-080d ship — F-080 epic complete)
+**Last updated:** 2026-04-27 (F-086 ship — Le Raccourci → L'École rename)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
+
+> **Note (F-086, 2026-04-27):** Le Raccourci was renamed to L'École. Historical entries below — anything marked ✅ shipped before today — are preserved verbatim with their original "Le Raccourci" / `raccourci_*` references. Forward-looking queued and deferred entries have been rewritten to use the new names. The DB migration (`scripts/rename_raccourci_to_ecole.py`) ran cleanly: `raccourci_lessons` → `ecole_lessons`, `raccourci_quiz_questions` → `ecole_quiz_questions`, `user_raccourci_progress` → `user_ecole_progress`, `remediation_modules.raccourci_lesson_id` → `ecole_lesson_id`. F-087 will replace lesson row contents wholesale and truncate user progress.
 
 ---
 
@@ -133,11 +135,49 @@ F-062.2 ✅ PTT pointer capture + minimum-hold guard
 
 ---
 
+## Shipped — Week 2 (April 27)
+
+F-086 ✅ Le Raccourci → L'École rename. Atomic phase-1 of the F-086→F-089 pack.
+
+**Backend (tcf-oral-tool):**
+- `scripts/rename_raccourci_to_ecole.py` — idempotent SQLite migration. Renamed three tables (`raccourci_lessons` → `ecole_lessons`, `raccourci_quiz_questions` → `ecole_quiz_questions`, `user_raccourci_progress` → `user_ecole_progress`) and one column (`remediation_modules.raccourci_lesson_id` → `ecole_lesson_id`). Row counts preserved exactly: 16 lessons, 80 quiz questions, 80 progress rows. SQLite 3.50.4 auto-rewrites FK references on `ALTER TABLE RENAME`; foreign-key enforcement disabled during the migration window as belt-and-braces. Indexes keep their original `raccourci_*` names — internal sqlite_master metadata, not surfaced anywhere user-or-grep-facing.
+- Discovery: an early run hit a Windows console encoding crash on the `→` character mid-loop, leaving one table renamed and two not. Migration script's idempotency check now tolerates per-table half-state and resumes from any partial state. Future runs (e.g. on prod first-deploy) re-run cleanly. ASCII `->` replaced the offending arrow in print statements.
+- Backend code rename via one-shot `_f086_refactor.py` (deleted post-ship): 184 raccourci/Raccourci occurrences across 14 .py files replaced. ORM classes (`RaccourciLesson` → `EcoleLesson`, `RaccourciQuizQuestion` → `EcoleQuizQuestion`, `UserRaccourciProgress` → `UserEcoleProgress`), `__tablename__` strings, FK targets (`raccourci_lessons.id` → `ecole_lessons.id`), relationship names, the entire `app/services/raccourci_gating.py` (now `ecole_gating.py`), the entire `app/routers/raccourci.py` (now `ecole.py`) including `APIRouter(prefix="/api/ecole")`, three scripts (`seed_ecole_lessons.py`, `seed_ecole_quiz_placeholders.py`, `add_ecole_tables.py`), `app/schemas/modules.py::raccourci_lesson_id` field, and incidental references in `conversations.py`, `recordings.py`, `users.py`, `modules.py`, `main.py`. Substitution order: most-specific identifier first so e.g. `raccourci_lesson_id` was replaced before bare `raccourci_lessons` could eat it.
+- 3 module JSONs (`nuance_reflex.json`, `to_get_reflex.json`, `gerondif_confusion.json`) had `raccourci_lesson_id` keys renamed to `ecole_lesson_id`. Reseeded via `python -m scripts.seed_remediation_modules`: 0 inserted, 3 updated. Post-reseed verify: `gerondif_confusion.ecole_lesson_id = 16` (lesson-16 link preserved across rename), other two NULL.
+
+**Frontend (fluentpath-frontend):**
+- One-shot `_f086_refactor.mjs` (deleted post-ship): 95 occurrences across 21 .ts/.tsx files. Component identifiers (`RaccourciProgress` → `EcoleProgress`, `RaccourciReveal` → `EcoleReveal`), field name on response shapes (`raccourci_lesson_id` → `ecole_lesson_id` on `RemediationModule`, `RecurringModule`, `ModuleWithContext`, `LearnModuleSheet`'s ShortModule), API path strings (`/api/raccourci` → `/api/ecole`), frontend route paths (`/raccourci/lesson` → `/ecole/lesson`), illustration asset paths, user-facing copy (`Le Raccourci` → `L'École`).
+- Files moved: `components/home/RaccourciProgress.tsx` → `EcoleProgress.tsx`, `components/onboarding/RaccourciReveal.tsx` → `EcoleReveal.tsx`, `public/illustration-raccourci.{jpg,png}` → `illustration-ecole.{jpg,png}`. Directory `app/raccourci/` → `app/ecole/` blocked by Windows file lock (Next.js `.next` cache held handles); worked around with file-by-file moves + cascading `rmdir`. Stale `.next/` cache nuked at the end so the next dev start rebuilds with the new paths.
+- Two regressions caught and fixed: the `Le Raccourci → L'École` substitution introduced **unescaped apostrophes** inside single-quoted JS strings (in `LearnModulePage.tsx`, `Paywall.tsx`, `Tache2Picker.tsx` — 7 broken literals total) — fixed by swapping to double quotes. Also produced a **broken JS identifier** `backToÉcole` (Unicode-valid but ugly) — renamed to `backToEcole` (ASCII).
+- `RaccourciReveal` onboarding component renamed to `EcoleReveal` per atomicity rule (overrides earlier "scoped rename" interpretation). The component reveals the path to fluency — that path is now L'École.
+
+**Strategic docs:**
+- `fluentpath-frontend/CLAUDE.md`: 3 `RaccourciReveal` references updated to `EcoleReveal`.
+- `fluentpath-frontend/README.md` + `public/illustrations/README.md`: `RaccourciReveal` references updated.
+- `BACKLOG.md`: header note added at top documenting the rename. Shipped (✅) entries preserved verbatim (F-053, F-056, F-062.x details, F-080d details). Queued/deferred entries with raccourci references rewritten in place (F-064, F-066, F-069, "Mock Exam mode" deferred). The "in progress" header text updated to reflect post-F-086 reality and forward-link F-087 → F-089.
+- `tcf-oral-tool/CLAUDE.md`: zero raccourci hits to start with — untouched.
+- `HANDOVER.md`, `PROMOVA-PATTERNS.md`, `DECISIONS.md` — none existed in either repo. `HANDOVER.md` and `PROMOVA-PATTERNS.md` skipped silently per the per-prompt rule. `DECISIONS.md` awaiting Chadi's entry text (commit ships without it; gate 9 is satisfied because the file simply doesn't exist yet — when it does, the rename note will be its first entry).
+
+**Verification gates (all 9 green):**
+1. `GET /api/ecole/lessons` → 200 with 16 lessons. ✅
+2. `GET /api/raccourci/lessons` → 404. ✅
+3. DB: `ecole_lessons` exists, `raccourci_lessons` does not. ✅
+4. `SELECT ecole_lesson_id FROM remediation_modules WHERE id='gerondif_confusion'` → 16. ✅
+5. `app/ecole/page.tsx`, `app/ecole/lesson/[id]/page.tsx`, `app/ecole/lesson/[id]/quiz/page.tsx` exist. ✅
+6. `app/raccourci/` directory does not exist. ✅
+7. HomeScreen daily-action CTA href: `/ecole/lesson/${nextLesson.lessonNumber}`. ✅
+8. `/learn` page footer copy: `"Back to L'École"` / `"Retour à L'École"`. ✅
+9. `grep -ri "raccourci" tcf-oral-tool/ fluentpath-frontend/` returns ZERO active code references. Allowed survivors only: (a) the migration script `rename_raccourci_to_ecole.py` itself, (b) `.claude/settings.local.json` (gitignored local agent state), (c) `node_modules/typescript/.../fr/diagnosticMessages.generated.json` (TypeScript's French translation of "shorthand property" — completely unrelated to FluentPath), (d) BACKLOG.md historical entries below the header note (per Chadi's preserve-shipped-verbatim rule).
+
+`pnpm tsc --noEmit` clean except the pre-existing `TargetScoreSelect.tsx:98` known issue.
+
+---
+
 ## In progress
 
 **F-080 epic CLOSED 2026-04-26.** F-080a + F-080b + F-080c shipped 2026-04-25; F-080d shipped 2026-04-26. The intelligence layer is end-to-end live: detection → persistence → diagnostic surface → cross-session recurrence → Raccourci routing.
 
-Next per F-086 sprint plan: rename pack (Le Raccourci → L'École, raccourci_lesson_id retained, etc.). Other queued tickets (F-061.1 T3 picker, F-064 lesson detail + quiz, launch-prep F-071–F-079, F-080.x detection-sensitivity refinement) remain deferred.
+F-086 (Le Raccourci → L'École rename) shipped 2026-04-27 in this commit. Next per the F-086→F-089 pack: F-087 (16 → 27 lesson curriculum, two phases), then F-088 (Couches → TCF criteria relabel), then F-089 (lesson card sublines). Other queued tickets (F-061.1 T3 picker, F-064 lesson detail + quiz, launch-prep F-071–F-079, F-080.x detection-sensitivity refinement, F-080c.x Le Goulet cleanup, F-080d.x recordings(user_id) perf, F-080d.y public-glossary path) remain deferred.
 
 ---
 
@@ -211,8 +251,8 @@ _(none — F-063 closed; T1 full loop shipped, mirrors T2 behavior.)_
 ## Queued — core product wiring (continued)
 
 **F-064** 📋 Lesson detail + quiz real data
-- `app/raccourci/lesson/[id]/page.tsx` fetches GET /api/raccourci/lessons/{id}
-- Quiz component submits to POST /api/raccourci/lessons/{id}/complete
+- `app/ecole/lesson/[id]/page.tsx` fetches GET /api/ecole/lessons/{id}
+- Quiz component submits to POST /api/ecole/lessons/{id}/complete
 - Lesson completion updates user progress state
 - HomeScreen lesson list re-renders with updated completion state
 
@@ -229,7 +269,7 @@ _(none — F-063 closed; T1 full loop shipped, mirrors T2 behavior.)_
 **F-066** 📋 Daily action card B — smart practice recommendation
 - Currently hardcoded to "Tâche 2 · Agence de voyages"
 - Replace with endpoint that returns recommended practice based on user's bottleneck couche
-- Backend: new endpoint GET /api/raccourci/recommended-practice
+- Backend: new endpoint GET /api/ecole/recommended-practice
 - Frontend: HomeScreen fetches and renders recommendation
 - May be deferred to post-launch if bottleneck detection requires session history
 
@@ -248,10 +288,10 @@ _(none — F-063 closed; T1 full loop shipped, mirrors T2 behavior.)_
 - No backend change needed (exam_profile column already accepts 'tef')
 
 **F-069** 📋 French lesson titles in backend seeder
-- Update seed_topics.py or raccourci seeder
+- Update seed_topics.py or ecole seeder
 - Lesson titles must be French ("Conjugaison" not "Conjugation", "Prépositions" not "Prepositions")
 - Lesson short_descriptions stay in interface language (English for EN users)
-- Reseed the raccourci_lessons table on dev DB before launch
+- Reseed the ecole_lessons table on dev DB before launch
 
 **F-070** 📋 CEFR → TCF /699 score mapping
 - Backend analysis engine must emit tcfScore (0-699) alongside noteGlobale (0-20) and cefrBand
@@ -455,7 +495,7 @@ Previously called "F-060 launch prep" umbrella. Split into discrete tickets here
 ⏸ **Test-drive recording before paywall** — post-launch A/B test for conversion optimization
 ⏸ **Writing module (Expression Écrite)** — full TCF coverage beyond Expression Orale
 ⏸ **Exam Simulation mode** — distinct from Learning Mode (current default)
-⏸ **Mock Exam mode** — separate scoring mode recommended after completing Le Raccourci
+⏸ **Mock Exam mode** — separate scoring mode recommended after completing L'École
 ⏸ **Mobile PWA install prompt + service worker** — Phase 1 is responsive web
 ⏸ **Cross-session pattern detection** — locked behind 3-session minimum
 ⏸ **PDF export of diagnostic** — not required for launch

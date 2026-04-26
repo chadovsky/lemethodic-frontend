@@ -7,7 +7,7 @@ import TCFGoalSelect, { type TCFGoal } from './TCFGoalSelect'
 import CurrentLevelSelect, { type CurrentLevel } from './CurrentLevelSelect'
 import TargetScoreSelect, { type TargetScore } from './TargetScoreSelect'
 import ExamDateSelect, { type ExamDate } from './ExamDateSelect'
-import RaccourciReveal from './RaccourciReveal'
+import EcoleReveal from './EcoleReveal'
 import { useOnboardingStore } from '@/lib/onboarding'
 
 interface OnboardingState {
@@ -108,10 +108,10 @@ export default function OnboardingFlow() {
     )
   }
 
-  // Step 6 — Raccourci reveal
+  // Step 6 — École reveal
   if (step === 6) {
     return (
-      <RaccourciReveal
+      <EcoleReveal
         currentLevel={state.currentLevel ?? 'A2_B1'}
         targetScore={state.targetScore ?? ''}
         examDate={state.examDate ?? { type: 'quick', label: 'No exam scheduled' }}

@@ -133,7 +133,7 @@ export default function LessonListItem({ number, title, descriptor, status }: Le
 
   return (
     <Link
-      href={`/raccourci/lesson/${number}`}
+      href={`/ecole/lesson/${number}`}
       style={{ display: 'block', textDecoration: 'none' }}
     >
       {inner}

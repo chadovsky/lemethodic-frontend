@@ -72,7 +72,7 @@ const SCENARIOS: Scenario[] = [
     register: 'Informel',
     descriptor: 'A new colleague from Quebec joined the team. Get to know them.',
     locked: true,
-    lockedReason: 'Complete Le Raccourci to unlock',
+    lockedReason: "Complete L'École to unlock",
   },
   {
     code: 'agence-immobiliere',
@@ -83,7 +83,7 @@ const SCENARIOS: Scenario[] = [
     register: 'Formel',
     descriptor: "You're moving to Canada and looking for an apartment. Get all the info you need.",
     locked: true,
-    lockedReason: 'Complete Le Raccourci to unlock',
+    lockedReason: "Complete L'École to unlock",
   },
 ]
 
@@ -101,7 +101,7 @@ export default function Tache2Picker() {
   // mount. Purely diagnostic — errors are swallowed, no user-facing surface.
   //
   // Skips `locked: true` entries because backend /scenarios filters by the
-  // raccourci gate (F-053); for below-A2 users those rows won't be in the
+  // ecole gate (F-053); for below-A2 users those rows won't be in the
   // response even though they exist in the DB. A "missing" warning for a
   // gated row would be a false positive.
   //

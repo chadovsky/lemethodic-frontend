@@ -109,7 +109,7 @@ export default function ExamDateSelect({ onContinue, onBack }: ExamDateSelectPro
             maxWidth: 320,
           }}
         >
-          We will pace Le Raccourci to get you there.
+          We will pace L'École to get you there.
         </p>
 
         {/* Quick options */}

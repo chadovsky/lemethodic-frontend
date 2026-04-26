@@ -1,7 +1,7 @@
 import HomeScreen from '@/components/home/HomeScreen'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
-export default function RaccourciPage() {
+export default function ÉcolePage() {
   return (
     <ProtectedRoute>
       <HomeScreen />

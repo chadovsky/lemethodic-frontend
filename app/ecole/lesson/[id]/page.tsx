@@ -112,7 +112,7 @@ export default async function LessonPage({ params }: Props) {
               marginBottom: 32,
             }}
           >
-            15 min · Le Raccourci
+            15 min · L'École
           </p>
 
           {/* Illustration placeholder */}
@@ -175,7 +175,7 @@ export default async function LessonPage({ params }: Props) {
           {/* CTA */}
           <div style={{ marginTop: 40 }}>
             <Link
-              href={`/raccourci/lesson/${id}/quiz`}
+              href={`/ecole/lesson/${id}/quiz`}
               style={{
                 display: 'block',
                 width: '100%',

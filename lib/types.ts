@@ -45,7 +45,7 @@ export interface User {
   interfaceLanguage?: string | null
 }
 
-// ── Lessons (Le Raccourci) ───────────────────────────────────────────────────
+// ── Lessons (L'École) ───────────────────────────────────────────────────
 
 export type LessonStatus = 'locked' | 'unlocked' | 'in_progress' | 'completed'
 
@@ -325,7 +325,7 @@ export interface RemediationModule {
   content_refs: ModuleContentRef[]
   drill_ids: number[]
   prerequisite_module_ids: string[]
-  raccourci_lesson_id: number | null
+  ecole_lesson_id: number | null
 }
 
 // One row from session_detected_modules joined with the module id. The
@@ -371,7 +371,7 @@ export interface RecurringModule {
   name_fr: string
   category: ModuleCategory
   severity: number
-  raccourci_lesson_id: number | null
+  ecole_lesson_id: number | null
   recurrence_count: number
   first_detected_at: string
   last_detected_at: string

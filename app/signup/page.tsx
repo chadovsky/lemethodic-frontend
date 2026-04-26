@@ -89,7 +89,7 @@ function SignupInner() {
   }, [])
   useEffect(() => {
     if (hydrated && token) {
-      router.replace('/raccourci')
+      router.replace('/ecole')
     }
   }, [hydrated, token, router])
 
@@ -127,11 +127,11 @@ function SignupInner() {
           useOnboardingStore.getState().reset()
         } catch (flushErr) {
           // eslint-disable-next-line no-console
-          console.error('Onboarding flush failed — routing to /raccourci anyway', flushErr)
+          console.error('Onboarding flush failed — routing to /ecole anyway', flushErr)
         }
       }
 
-      router.push('/raccourci')
+      router.push('/ecole')
     } catch (err) {
       if (err instanceof ApiError) {
         setError(mapRegisterError(err))

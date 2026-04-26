@@ -6,7 +6,7 @@ import type { CurrentLevel } from './CurrentLevelSelect'
 import type { TargetScore } from './TargetScoreSelect'
 import type { ExamDate } from './ExamDateSelect'
 
-interface RaccourciRevealProps {
+interface EcoleRevealProps {
   currentLevel: CurrentLevel
   targetScore: TargetScore
   examDate: ExamDate
@@ -34,12 +34,12 @@ const VALUE_LINES = [
   'Anchored to your TCF — every lesson explains why it matters for the exam',
 ]
 
-export default function RaccourciReveal({
+export default function EcoleReveal({
   currentLevel,
   targetScore,
   examDate,
   onContinue,
-}: RaccourciRevealProps) {
+}: EcoleRevealProps) {
   return (
     <div
       className="min-h-screen w-full flex flex-col items-center"
@@ -75,7 +75,7 @@ export default function RaccourciReveal({
             color: INK,
           }}
         >
-          Meet Le Raccourci.
+          Meet L'École.
         </h1>
 
         {/* Subhead */}
@@ -200,7 +200,7 @@ export default function RaccourciReveal({
         <div className="flex-1" />
 
         {/* CTA */}
-        <CTAButton label="Start my Raccourci" enabled onClick={onContinue} />
+        <CTAButton label="Start my École" enabled onClick={onContinue} />
       </div>
     </div>
   )

@@ -69,7 +69,7 @@ const COPY = {
     severity: 'Sévérité',
     detectedSessions: (n: number) => `Détecté dans ${n} session${n > 1 ? 's' : ''}`,
     mostRecently: (rel: string) => `· le plus récemment ${rel}`,
-    backToRaccourci: 'Retour à Le Raccourci',
+    backToEcole: "Retour à L'École",
     closeAndReturn: 'Ou simplement fermer',
     goDeeperPrefix: 'Approfondir avec la leçon',
   },
@@ -77,7 +77,7 @@ const COPY = {
     severity: 'Severity',
     detectedSessions: (n: number) => `Detected in ${n} session${n > 1 ? 's' : ''}`,
     mostRecently: (rel: string) => `· most recently ${rel}`,
-    backToRaccourci: 'Back to Le Raccourci',
+    backToEcole: "Back to L'École",
     closeAndReturn: 'Or just close this',
     goDeeperPrefix: 'Go deeper in Lesson',
   },
@@ -110,8 +110,8 @@ export default function LearnModulePage({ moduleId }: Props) {
         api.lessons.list().catch(() => [] as Lesson[]),
       ])
       setModuleData(m)
-      if (m.raccourci_lesson_id != null) {
-        setLinkedLesson(lessons.find((l) => l.lessonNumber === m.raccourci_lesson_id) ?? null)
+      if (m.ecole_lesson_id != null) {
+        setLinkedLesson(lessons.find((l) => l.lessonNumber === m.ecole_lesson_id) ?? null)
       } else {
         setLinkedLesson(null)
       }
@@ -141,8 +141,8 @@ export default function LearnModulePage({ moduleId }: Props) {
       <ErrorScreen
         message={loadError}
         onRetry={() => setRetryKey((k) => k + 1)}
-        backLabel={copy.backToRaccourci}
-        onBack={() => router.push('/raccourci')}
+        backLabel={copy.backToEcole}
+        onBack={() => router.push('/ecole')}
       />
     )
   }
@@ -178,7 +178,7 @@ export default function LearnModulePage({ moduleId }: Props) {
     recurrencePill = `${copy.detectedSessions(ctx.recurrence_count)}${mostRecently}`
   }
 
-  const linkedLessonNumber = m.raccourci_lesson_id
+  const linkedLessonNumber = m.ecole_lesson_id
   const linkedLessonTitle = linkedLesson?.title
 
   return (
@@ -332,7 +332,7 @@ export default function LearnModulePage({ moduleId }: Props) {
               <>
                 <button
                   type="button"
-                  onClick={() => router.push(`/raccourci/lesson/${linkedLessonNumber}`)}
+                  onClick={() => router.push(`/ecole/lesson/${linkedLessonNumber}`)}
                   style={{
                     width: '100%',
                     minHeight: 56,
@@ -374,7 +374,7 @@ export default function LearnModulePage({ moduleId }: Props) {
             ) : (
               <button
                 type="button"
-                onClick={() => router.push('/raccourci')}
+                onClick={() => router.push('/ecole')}
                 style={{
                   width: '100%',
                   minHeight: 56,
@@ -389,7 +389,7 @@ export default function LearnModulePage({ moduleId }: Props) {
                   WebkitTapHighlightColor: 'transparent',
                 }}
               >
-                {copy.backToRaccourci}
+                {copy.backToEcole}
               </button>
             )}
           </div>

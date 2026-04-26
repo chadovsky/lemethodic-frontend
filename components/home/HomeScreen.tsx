@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Bell } from 'lucide-react'
 import DailyActionCard from './DailyActionCard'
-import RaccourciProgress from './RaccourciProgress'
+import EcoleProgress from './EcoleProgress'
 import LessonListItem, { type LessonStatus as ItemStatus } from './LessonListItem'
 import BottomNav from './BottomNav'
 import RecurringModuleCard from '@/components/modules/RecurringModuleCard'
@@ -139,7 +139,7 @@ export default function HomeScreen({
   // standalone /learn/[id] page.
   const handleRecurringTap = useCallback(
     (m: RecurringModule) => {
-      if (m.raccourci_lesson_id != null) {
+      if (m.ecole_lesson_id != null) {
         setPickerModule(m)
       } else {
         router.push(`/learn/${m.module_id}`)
@@ -151,8 +151,8 @@ export default function HomeScreen({
   // Pre-resolved lesson title for the picker (HomeScreen already has the
   // lessons list cached, save the sheet a roundtrip).
   const pickerLessonTitle =
-    pickerModule != null && pickerModule.raccourci_lesson_id != null && lessons
-      ? lessons.find((l) => l.lessonNumber === pickerModule.raccourci_lesson_id)?.title
+    pickerModule != null && pickerModule.ecole_lesson_id != null && lessons
+      ? lessons.find((l) => l.lessonNumber === pickerModule.ecole_lesson_id)?.title
       : undefined
 
   // ─── derived values ──────────────────────────────────────────────────────
@@ -234,7 +234,7 @@ export default function HomeScreen({
               margin: 0,
             }}
           >
-            Le Raccourci
+            L'École
           </h1>
 
           <button
@@ -380,7 +380,7 @@ export default function HomeScreen({
                   ]}
                   illustrationSrc="/illustration-level.jpg"
                   illustrationAlt="Lesson illustration"
-                  href={`/raccourci/lesson/${nextLesson.lessonNumber}`}
+                  href={`/ecole/lesson/${nextLesson.lessonNumber}`}
                 />
               ) : lessons === null && !fetchError ? (
                 <div
@@ -469,9 +469,9 @@ export default function HomeScreen({
             </section>
           )}
 
-          {/* ── Zone 2: Le Raccourci journey ──────────────────────── */}
-          <section aria-label="Le Raccourci journey" style={{ marginTop: 48 }}>
-            <RaccourciProgress
+          {/* ── Zone 2: L'École journey ──────────────────────── */}
+          <section aria-label="L'École journey" style={{ marginTop: 48 }}>
+            <EcoleProgress
               completedCount={effectiveCompleted}
               totalCount={TOTAL_LESSONS}
             />
@@ -558,7 +558,7 @@ export default function HomeScreen({
             id: pickerModule.module_id,
             name_en: pickerModule.name_en,
             name_fr: pickerModule.name_fr,
-            raccourci_lesson_id: pickerModule.raccourci_lesson_id,
+            ecole_lesson_id: pickerModule.ecole_lesson_id,
           }}
           lessonTitle={pickerLessonTitle}
           onClose={() => setPickerModule(null)}
