@@ -344,6 +344,44 @@ export interface DetectedModulesResponse {
   detections: SessionDetection[]
 }
 
+// F-080d — per-user detection history attached to a single module by the
+// augmented GET /api/modules/{module_id}. Null when the request is
+// unauthenticated OR the user has zero detections of this module
+// ("cold state" — page still renders as a glossary entry).
+export interface ModuleUserContext {
+  recurrence_count: number
+  first_detected_at: string
+  last_detected_at: string
+  detected_in_recordings: number[]
+}
+
+// Module + per-user context. Returned by GET /api/modules/{id}; consumed
+// by the /learn/[module_id] page.
+export interface ModuleWithContext extends RemediationModule {
+  user_context: ModuleUserContext | null
+}
+
+// Compact entry returned by GET /api/users/me/recurring_modules. Subset
+// of the full module — only the fields the home-tab "Recommended for
+// you" card needs to render. Authoritative content (description,
+// examples, content_refs) lives in the full module fetched on /learn/[id].
+export interface RecurringModule {
+  module_id: string
+  name_en: string
+  name_fr: string
+  category: ModuleCategory
+  severity: number
+  raccourci_lesson_id: number | null
+  recurrence_count: number
+  first_detected_at: string
+  last_detected_at: string
+  recording_ids: number[]
+}
+
+export interface RecurringModulesResponse {
+  recurring_modules: RecurringModule[]
+}
+
 // ── API error ────────────────────────────────────────────────────────────────
 
 export interface ApiErrorShape {

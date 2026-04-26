@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import CouchesDiagnostic from '@/components/diagnostic/CouchesDiagnostic'
 // F-080c: GouletCard removed from the page render; component file kept
 // (cleanup follow-up filed as F-080c.x). Replaced by DetectedModuleCard +
@@ -14,9 +14,16 @@ import SecondaryModulesList from '@/components/diagnostic/SecondaryModulesList'
 import EmptyDetectionFallback from '@/components/diagnostic/EmptyDetectionFallback'
 import InlineContentRef from '@/components/diagnostic/InlineContentRef'
 import CorrectedLine, { Correction } from '@/components/diagnostic/CorrectedLine'
+import LearnModuleSheet from '@/components/modules/LearnModuleSheet'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import { api, ApiError } from '@/lib/api'
-import type { Couche, DetectedModulesResponse, Diagnostic } from '@/lib/types'
+import type {
+  Couche,
+  DetectedModulesResponse,
+  Diagnostic,
+  Lesson,
+  RemediationModule,
+} from '@/lib/types'
 
 // ─── design tokens ────────────────────────────────────────────────────────────
 const INK          = '#1A1A1A'
@@ -164,17 +171,23 @@ function DetectedReflexesSection({
   primaryDetection,
   secondaryModules,
   detections,
+  onLearnTap,
 }: {
   primaryModule: DetectedModulesResponse['primary_module']
   primaryDetection: DetectedModulesResponse['detections'][number] | null
   secondaryModules: DetectedModulesResponse['secondary_modules']
   detections: DetectedModulesResponse['detections']
+  onLearnTap?: (m: RemediationModule) => void
 }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <SectionLabel>Detected reflexes</SectionLabel>
       {primaryModule ? (
-        <DetectedModuleCard module={primaryModule} detection={primaryDetection} />
+        <DetectedModuleCard
+          module={primaryModule}
+          detection={primaryDetection}
+          onLearnTap={onLearnTap}
+        />
       ) : (
         <EmptyDetectionFallback />
       )}
@@ -242,6 +255,7 @@ function ErrorScreen({ message, onRetry }: { message: string; onRetry: () => voi
 
 function DiagnosticInner() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const sessionParam = searchParams.get('session')
   const sessionId = sessionParam != null ? Number.parseInt(sessionParam, 10) : null
   const hasSession = sessionId != null && Number.isFinite(sessionId)
@@ -259,6 +273,39 @@ function DiagnosticInner() {
 
   const [sessionOpen, setSessionOpen] = useState(false)
   const [transcriptTab, setTranscriptTab] = useState<'resume' | 'complet'>('resume')
+
+  // F-080d: state for the LearnModuleSheet picker (linked-module path
+  // from the "Learn this" button). Orphan modules tap straight through
+  // to /learn/[id]; the sheet only opens when raccourci_lesson_id is
+  // non-null.
+  const [pickerModule, setPickerModule] = useState<RemediationModule | null>(null)
+  const [lessonsCache, setLessonsCache] = useState<Lesson[] | null>(null)
+
+  const handleLearnTap = useCallback(
+    (m: RemediationModule) => {
+      if (m.raccourci_lesson_id != null) {
+        setPickerModule(m)
+        // Lazy-fetch lessons once so the sheet's primary CTA shows the
+        // real lesson title rather than the bare lesson number.
+        if (lessonsCache == null) {
+          api.lessons
+            .list()
+            .then(setLessonsCache)
+            .catch(() => {
+              /* sheet falls back to "Lesson N" when title is missing */
+            })
+        }
+      } else {
+        router.push(`/learn/${m.id}`)
+      }
+    },
+    [lessonsCache, router],
+  )
+
+  const pickerLessonTitle =
+    pickerModule != null && pickerModule.raccourci_lesson_id != null && lessonsCache
+      ? lessonsCache.find((l) => l.lessonNumber === pickerModule.raccourci_lesson_id)?.title
+      : undefined
 
   const fetchDiagnostic = useCallback(async () => {
     if (!hasSession || sessionId == null) return
@@ -566,6 +613,7 @@ function DiagnosticInner() {
             primaryDetection={primaryDetection}
             secondaryModules={secondaryModules}
             detections={detections}
+            onLearnTap={handleLearnTap}
           />
 
           {/* ══ SECTION 4 — L'ORDONNANCE (only when primary has content_refs) */}
@@ -802,6 +850,14 @@ function DiagnosticInner() {
           </div>
         </div>
       </div>
+
+      {pickerModule && (
+        <LearnModuleSheet
+          module={pickerModule}
+          lessonTitle={pickerLessonTitle}
+          onClose={() => setPickerModule(null)}
+        />
+      )}
     </div>
   )
 }

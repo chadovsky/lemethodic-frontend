@@ -19,6 +19,7 @@ import type {
   Goulet,
   Lesson,
   LessonDetail,
+  ModuleWithContext,
   Moule,
   MoulesBreakdown,
   OnboardingData,
@@ -27,6 +28,7 @@ import type {
   QuizQuestion,
   QuizResult,
   Recording,
+  RecurringModulesResponse,
   TacheMode,
   TCFGoal,
   User,
@@ -581,6 +583,26 @@ export const api = {
         body: mapOnboardingToBackend(data),
       })
       return mapUser(raw)
+    },
+
+    // F-080d — modules detected in 3+ distinct recordings for the
+    // current user, sorted by severity DESC then recurrence_count DESC.
+    // Returns a snake_case payload verbatim from the backend (read-only
+    // surface; no camelCase mapper layer to avoid maintenance churn).
+    // Empty array on cold users (fewer than 3 recurring detections).
+    async getRecurringModules(): Promise<RecurringModulesResponse> {
+      return request<RecurringModulesResponse>('/api/users/me/recurring_modules')
+    },
+  },
+
+  modules: {
+    // F-080d — full module spec for the /learn/[module_id] page. The
+    // backend endpoint augments with optional auth: when a token is
+    // present and the user has detections of this module, `user_context`
+    // carries the per-user history; null otherwise (cold state). 404
+    // when module_id doesn't exist in the active library.
+    async get(moduleId: string): Promise<ModuleWithContext> {
+      return request<ModuleWithContext>(`/api/modules/${moduleId}`)
     },
   },
 

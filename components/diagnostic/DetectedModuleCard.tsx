@@ -62,21 +62,28 @@ const COPY = {
     seeExamples: 'Voir les exemples',
     hideExamples: 'Masquer les exemples',
     severity: 'Sévérité',
+    learnThis: 'En savoir plus',
   },
   en: {
     fromSession: 'From your session:',
     seeExamples: 'See examples',
     hideExamples: 'Hide examples',
     severity: 'Severity',
+    learnThis: 'Learn this',
   },
 } as const
 
 interface Props {
   module: RemediationModule
   detection: SessionDetection | null
+  /** F-080d — when provided, renders a "Learn this" button at the bottom
+   *  of the card. Caller routes per linked-vs-orphan rules (linked
+   *  module → LearnModuleSheet picker; orphan → /learn/[id] direct push).
+   *  Omit to keep the F-080c-shipped behavior with no Learn-this CTA. */
+  onLearnTap?: (m: RemediationModule) => void
 }
 
-export default function DetectedModuleCard({ module: m, detection }: Props) {
+export default function DetectedModuleCard({ module: m, detection, onLearnTap }: Props) {
   const lang = useInterfaceLanguage()
   const copy = lang === 'fr' ? COPY.fr : COPY.en
   const name = lang === 'fr' ? m.name_fr : m.name_en
@@ -182,33 +189,56 @@ export default function DetectedModuleCard({ module: m, detection }: Props) {
         </div>
       ) : null}
 
-      {/* See examples expand */}
-      {m.examples.length > 0 ? (
+      {/* See examples expand + F-080d Learn this CTA */}
+      {m.examples.length > 0 || onLearnTap ? (
         <>
-          <button
-            type="button"
-            onClick={() => setExamplesOpen((v) => !v)}
-            aria-expanded={examplesOpen}
-            style={{
-              alignSelf: 'flex-start',
-              fontFamily: DISPLAY_FONT,
-              fontWeight: 700,
-              fontSize: 13,
-              color: INK,
-              backgroundColor: '#FFFFFF',
-              border: 'none',
-              borderRadius: 100,
-              padding: '8px 14px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              WebkitTapHighlightColor: 'transparent',
-            }}
-          >
-            {examplesOpen ? copy.hideExamples : copy.seeExamples}
-            {examplesOpen ? <ChevronUp size={14} strokeWidth={2.25} /> : <ChevronDown size={14} strokeWidth={2.25} />}
-          </button>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {m.examples.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setExamplesOpen((v) => !v)}
+                aria-expanded={examplesOpen}
+                style={{
+                  fontFamily: DISPLAY_FONT,
+                  fontWeight: 700,
+                  fontSize: 13,
+                  color: INK,
+                  backgroundColor: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: 100,
+                  padding: '8px 14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  WebkitTapHighlightColor: 'transparent',
+                }}
+              >
+                {examplesOpen ? copy.hideExamples : copy.seeExamples}
+                {examplesOpen ? <ChevronUp size={14} strokeWidth={2.25} /> : <ChevronDown size={14} strokeWidth={2.25} />}
+              </button>
+            )}
+            {onLearnTap && (
+              <button
+                type="button"
+                onClick={() => onLearnTap(m)}
+                style={{
+                  fontFamily: DISPLAY_FONT,
+                  fontWeight: 700,
+                  fontSize: 13,
+                  color: '#FFFFFF',
+                  backgroundColor: INK,
+                  border: 'none',
+                  borderRadius: 100,
+                  padding: '8px 14px',
+                  cursor: 'pointer',
+                  WebkitTapHighlightColor: 'transparent',
+                }}
+              >
+                {copy.learnThis}
+              </button>
+            )}
+          </div>
           {examplesOpen ? <ModuleExamples examples={m.examples} /> : null}
         </>
       ) : null}

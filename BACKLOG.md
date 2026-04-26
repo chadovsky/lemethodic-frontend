@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-25 (F-080c ship)
+**Last updated:** 2026-04-26 (F-080d ship — F-080 epic complete)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -135,7 +135,9 @@ F-062.2 ✅ PTT pointer capture + minimum-hold guard
 
 ## In progress
 
-F-080 is the active spine. F-080a + F-080b + F-080c shipped 2026-04-25. Next: F-080d (cross-session intelligence + Raccourci routing — recurring-modules endpoint, Raccourci tab rewrite with "Recommended for you" callout, /learn/[module_id] route). Other queued tickets (F-061.1 T3 picker, F-064 lesson detail + quiz, launch-prep F-071–F-079) remain deferred behind F-080.
+**F-080 epic CLOSED 2026-04-26.** F-080a + F-080b + F-080c shipped 2026-04-25; F-080d shipped 2026-04-26. The intelligence layer is end-to-end live: detection → persistence → diagnostic surface → cross-session recurrence → Raccourci routing.
+
+Next per F-086 sprint plan: rename pack (Le Raccourci → L'École, raccourci_lesson_id retained, etc.). Other queued tickets (F-061.1 T3 picker, F-064 lesson detail + quiz, launch-prep F-071–F-079, F-080.x detection-sensitivity refinement) remain deferred.
 
 ---
 
@@ -315,6 +317,16 @@ _(none — F-063 closed; T1 full loop shipped, mirrors T2 behavior.)_
 - On `/end`, extract and insert one `session_detected_modules` row per detected module; set `is_primary=1` on the matching row. Empty detection logs a warning but does not fail finalize.
 - Gate: T2 session persists 1-3 detection rows with exactly one `is_primary=1`; supporting_quote matches real candidate utterance; T1 session preferentially detects the weighted categories.
 
+**F-080d.x** 📋 Perf — `recurring_modules` query index (deferred from F-080d B1)
+- The `GET /api/users/me/recurring_modules` query joins `session_detected_modules` (scanned via `idx_sdm_user_module` on `module_id`) with `recordings` (via PK) and filters on `recordings.user_id`. Today `recordings.user_id` is NOT indexed (only the PK `ix_recordings_id`). EXPLAIN QUERY PLAN at F-080d ship time shows SQLite uses the `module_id` index to drive the GROUP BY and resolves recordings via PK lookup — no full scan of recordings observed.
+- File now because: at first-1000-users scale, with ~25 recordings per user, the per-row recordings PK lookup is fast enough. If the query starts hot-pathing in production, add `CREATE INDEX idx_recordings_user_id ON recordings(user_id)` and re-run EXPLAIN.
+- Spec asked for a 3-column index `(user_id, module_id, session_id)` on `session_detected_modules`. That shape doesn't fit the actual schema (no user_id or session_id columns on that table — user comes from the recordings JOIN, "session" is the recording_id). Ignore the spec shape; the simpler `recordings(user_id)` single-column index is the right intervention if/when needed.
+
+**F-080d.y** 📋 Public-glossary path for `/learn/[module_id]` (post-launch)
+- F-080d Q4 locked to Option A: pre-launch all visitors to `/learn/[id]` authenticate via `ProtectedRoute`. Cold state = logged-in user who hasn't triggered the module.
+- Backend is already optional-auth ready (`get_current_user_optional` on `GET /api/modules/{id}`; `user_context: null` when no token). Frontend just wraps in `ProtectedRoute` per the existing pattern.
+- Post-launch SEO play: drop the `ProtectedRoute` wrapper, render the page as a public glossary entry. Backend unchanged. Surfaces module library to search engines as long-form authored content; bonus marketing surface.
+
 **F-080c.x** 📋 Full Le Goulet cleanup (deferred from F-080c per the F-080c.(3a) decision)
 - F-080c removed `<GouletCard />` from `app/diagnostic/page.tsx` and stripped the goulet derivation block, but left in place: `components/diagnostic/GouletCard.tsx` (the component file), `Goulet` interface in `lib/types.ts`, `goulet` field on the `Diagnostic` type, the `goulet`/`gouletKey` mapping in `lib/api.ts::mapDiagnosticBlock`, and the backend `le_goulet` block in `_format_recording`. None of these affect the visible UI today; they're carried forward defensively in case other consumers reference them.
 - Cleanup once nothing else reads goulet: delete `components/diagnostic/GouletCard.tsx`, drop `Goulet` + `goulet` field from frontend types and the api mapper, and stop writing `goulet_*` columns in `Feedback` (or keep them as legacy noise; either is fine).
@@ -344,13 +356,32 @@ _(none — F-063 closed; T1 full loop shipped, mirrors T2 behavior.)_
 - F-080c locked UX decisions held: secondary modules collapsed by default, no confidence threshold, confidence never surfaced in UI, Le Goulet removed from visible UI.
 _(F-080c shipped detail captured above; legacy queue text was here.)_
 
-**F-080d** 📋 Cross-session intelligence + Raccourci routing
-- New endpoint `GET /api/me/recurring-modules` — returns modules the user has hit 3+ times across their last 5 sessions, with `detection_count`, `last_detected_at`, `sessions_with_detection`.
-- New endpoint `GET /api/modules/{id}/learn` — module with resolved content_refs (V1 only handles inline_markdown; S3/file-path resolution deferred).
-- Rewrite `app/raccourci/page.tsx`: prepend "Recommended for you" callout listing recurring modules (non-dismissable); 16 canonical lessons stay in place but lessons whose `raccourci_lesson_id` matches a recurring module get a "Your gap" badge.
-- New route `app/learn/[module_id]/page.tsx` — full module content page: localized description, all examples, all content_refs rendered, "I practiced this" engagement button.
-- Optional stats view (module history this month, top unaddressed recurring) — may split to F-080e if F-080d runs long.
-- Gate: after 5 varied sessions, recurring endpoint returns modules with count >= 3; Raccourci tab surfaces them; /learn/[id] renders full content.
+**F-080d** ✅ Cross-session intelligence + Raccourci routing (shipped 2026-04-26 — closes the F-080 epic)
+
+Backend (commit `cbd1d8e` in tcf-oral-tool):
+- New endpoint `GET /api/users/me/recurring_modules` (in `app/routers/users.py`) — modules detected in 3+ distinct recordings for the authed user, sorted by severity DESC then recurrence_count DESC. Each entry: `module_id`, `name_en`, `name_fr`, `category`, `severity`, `raccourci_lesson_id`, `recurrence_count`, `first_detected_at`, `last_detected_at`, `recording_ids`. Empty array on cold users (status 200, not 404). Threshold constant `RECURRING_MODULE_RECORDING_THRESHOLD = 3`.
+- Schema-correction note: F-080d spec referenced `session_id` / `user_id` columns on `session_detected_modules` that don't exist. Actual schema has `recording_id` (FK to recordings, recordings owns user_id). Response field renamed from spec's `session_ids` → `recording_ids` so the API contract matches the data model. "Session" stays in user-facing copy only ("Detected in 5 of your sessions").
+- Augmented `GET /api/modules/{module_id}` (in `app/routers/modules.py`) — endpoint already existed from F-080a as public-read CRUD. Added optional auth via `get_current_user_optional`; when token is present and user has detections, attaches `user_context` block (`recurrence_count`, `first_detected_at`, `last_detected_at`, `detected_in_recordings`). Always present in response, null when no token / no detections / cold user. 404 unchanged.
+- Query plan: `SCAN sdm USING INDEX idx_sdm_user_module + SEARCH r USING INTEGER PRIMARY KEY` — no full scan of recordings even though `recordings.user_id` is unindexed. Fine for first-1000-users scale; tracked as F-080d.x.
+- Verification: 4 gates green + EXPLAIN QUERY PLAN clean (run from F-080d round 1 with snapshot/restore for the test user's pre-existing detections).
+
+Frontend (commit ahead of this BACKLOG.md update in fluentpath-frontend):
+- `lib/types.ts` adds `ModuleUserContext`, `ModuleWithContext`, `RecurringModule`, `RecurringModulesResponse`. Snake_case preserved (read-only authored content; no camelCase mapper layer).
+- `lib/api.ts` adds `api.users.getRecurringModules()` and a new `api.modules.get(moduleId)` namespace.
+- New shared `components/modules/LearnModuleSheet.tsx` — bottom-sheet picker for linked modules (raccourci_lesson_id non-null). Two CTAs: primary "Lesson N: {title}" → `/raccourci/lesson/{N}`, secondary "Just read about this pattern" → `/learn/{module_id}`. Backdrop tap + X close + body-scroll lock. Lesson title is auto-fetched via `api.lessons.list()` when caller doesn't pre-resolve.
+- New shared `components/modules/RecurringModuleCard.tsx` — compact card (name, category badge, severity dots, "Detected in N of your sessions") used in HomeScreen "Recommended for you" section. Whole card is the tap target.
+- `components/home/HomeScreen.tsx` — "Recommended for you" section inserted between Zone 1 (today's daily action card) and Zone 2 (Le Raccourci 16-lesson list). Hidden entirely (no banner, no header) when `recurring_modules.length === 0`. Picker state + portal lifted into HomeScreen; tap routing branches linked → sheet vs orphan → direct push.
+- New route `app/learn/[module_id]/page.tsx` + `components/learn/LearnModulePage.tsx` — wrapped in `ProtectedRoute` per Q4 Option A (cold state = authed user with no detections, NOT public visitor). Header (back chevron, name_en, category badge, severity dots), recurrence pill (suppressed when user_context null) using `date-fns.formatDistanceToNow` for "most recently 2 days ago" copy, FR/EN locale switching, long-form description, examples expanded by default (no toggle), conditional footer CTA (linked → "Go deeper in Lesson N: {title}" + secondary text "Or just close this"; orphan → "Back to Le Raccourci"). Loader/error screens with Retry. Reuses `ModuleExamples` from F-080c.
+- `components/diagnostic/DetectedModuleCard.tsx` — added "Learn this" button alongside the existing "See examples" expand. New optional `onLearnTap` prop; caller (DiagnosticInner) handles routing via the same shared LearnModuleSheet picker.
+- `app/diagnostic/page.tsx` — wired `handleLearnTap` callback through DetectedReflexesSection → DetectedModuleCard. Picker state + sheet portal lifted into DiagnosticInner. Lessons cache lazy-fetched on first picker open.
+- Type reconciliation: `RemediationModule.id` (canonical) vs `RecurringModule.module_id` (snake_case from backend response). LearnModuleSheet's internal `ShortModule` interface uses `id`; HomeScreen does the trivial `module_id → id` mapping at the picker call site so both consumers (diagnostic page + HomeScreen) feed the sheet a uniform shape.
+
+Verification: `tsc --noEmit` clean except the pre-existing `TargetScoreSelect.tsx:98` known issue. The 7 F4 gates require Chadi's manual session-recording (3 deliberate trigger sessions + linked-module retest with temporary `raccourci_lesson_id: 16` on `to_get_reflex.json`); code paths are wired, ready for browser smoke.
+
+Filed:
+- F-080d.x — perf follow-up for `recordings(user_id)` index if the recurring query hot-paths.
+- F-080d.y — public-glossary path for `/learn/[module_id]` (post-launch SEO play; backend optional-auth ready).
+- F-080d.z — verification harness rule: any test that mutates `session_detected_modules` MUST use try/finally with snapshot+restore. Adopted after the round-1 cleanup leak; documented in this ticket's commit message.
 
 **F-080 deferred architectural questions (flagged in spec; revisit when relevant):**
 - Prompt-size scaling once library passes ~25 modules — inject category-subset per Tâche rather than full library.

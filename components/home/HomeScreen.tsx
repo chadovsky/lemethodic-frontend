@@ -2,17 +2,21 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Bell } from 'lucide-react'
 import DailyActionCard from './DailyActionCard'
 import RaccourciProgress from './RaccourciProgress'
 import LessonListItem, { type LessonStatus as ItemStatus } from './LessonListItem'
 import BottomNav from './BottomNav'
+import RecurringModuleCard from '@/components/modules/RecurringModuleCard'
+import LearnModuleSheet from '@/components/modules/LearnModuleSheet'
 import { useAuthStore } from '@/lib/auth'
 import { api, ApiError } from '@/lib/api'
-import type { Lesson } from '@/lib/types'
+import type { Lesson, RecurringModule } from '@/lib/types'
 
 // ─── design tokens ───────────────────────────────────────────────────────────
 const INK         = '#1A1A1A'
+const INK_SOFT    = '#1A1A1AB3'
 const INK_MUTED   = '#1A1A1A66'
 const PEACH       = '#FFD8C2'
 const BUTTER      = '#FFF0C2'
@@ -88,7 +92,13 @@ export default function HomeScreen({
   const avatarInitial = (resolvedName || 'F').charAt(0).toUpperCase()
 
   // ─── fetch state ─────────────────────────────────────────────────────────
+  const router = useRouter()
   const [lessons, setLessons] = useState<Lesson[] | null>(null)
+  // F-080d — recurring modules for the "Recommended for you" section.
+  // Empty array = section hidden entirely (no banner, no header). Failure
+  // to fetch is non-fatal; section just stays hidden.
+  const [recurringModules, setRecurringModules] = useState<RecurringModule[]>([])
+  const [pickerModule, setPickerModule] = useState<RecurringModule | null>(null)
   const [fetchError, setFetchError] = useState<string | null>(null)
   const [retryKey, setRetryKey] = useState(0)
 
@@ -98,11 +108,15 @@ export default function HomeScreen({
       // Lessons drive progress + the "Today" card. /me is refreshed in the
       // background to pick up any backend updates (e.g. exam_date edited
       // elsewhere); its failure must not block lesson rendering.
-      const [lessonList, me] = await Promise.all([
+      // F-080d: recurring_modules added to the parallel fetch — its failure
+      // is non-fatal (section just stays hidden).
+      const [lessonList, me, recurring] = await Promise.all([
         api.lessons.list(),
         api.users.getMe().catch(() => null),
+        api.users.getRecurringModules().catch(() => ({ recurring_modules: [] })),
       ])
       setLessons(lessonList)
+      setRecurringModules(recurring.recurring_modules ?? [])
       if (me) {
         const token = useAuthStore.getState().token
         if (token) useAuthStore.getState().setAuth(token, me)
@@ -119,6 +133,27 @@ export default function HomeScreen({
   useEffect(() => {
     load()
   }, [load, retryKey])
+
+  // F-080d — tap routing for recurring module cards. Linked modules open
+  // the LearnModuleSheet picker; orphan modules route straight to the
+  // standalone /learn/[id] page.
+  const handleRecurringTap = useCallback(
+    (m: RecurringModule) => {
+      if (m.raccourci_lesson_id != null) {
+        setPickerModule(m)
+      } else {
+        router.push(`/learn/${m.module_id}`)
+      }
+    },
+    [router],
+  )
+
+  // Pre-resolved lesson title for the picker (HomeScreen already has the
+  // lessons list cached, save the sheet a roundtrip).
+  const pickerLessonTitle =
+    pickerModule != null && pickerModule.raccourci_lesson_id != null && lessons
+      ? lessons.find((l) => l.lessonNumber === pickerModule.raccourci_lesson_id)?.title
+      : undefined
 
   // ─── derived values ──────────────────────────────────────────────────────
   const fetchedCompleted = lessons?.filter((l) => l.status === 'completed').length ?? 0
@@ -390,6 +425,50 @@ export default function HomeScreen({
             </p>
           </section>
 
+          {/* ── F-080d: Recommended for you (between Zone 1 and Zone 2) ── */}
+          {recurringModules.length > 0 && (
+            <section
+              aria-label="Recommended for you"
+              style={{ marginTop: 40, display: 'flex', flexDirection: 'column', gap: 12 }}
+            >
+              <div>
+                <p
+                  style={{
+                    fontFamily: DISPLAY_FONT,
+                    fontWeight: 700,
+                    fontSize: 10,
+                    letterSpacing: '0.10em',
+                    textTransform: 'uppercase',
+                    color: INK_MUTED,
+                    margin: '0 0 6px',
+                  }}
+                >
+                  Recommended for you
+                </p>
+                <p
+                  style={{
+                    fontFamily: DISPLAY_FONT,
+                    fontWeight: 500,
+                    fontSize: 13,
+                    color: INK_SOFT,
+                    margin: 0,
+                  }}
+                >
+                  Based on patterns we&rsquo;ve seen across your sessions.
+                </p>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {recurringModules.map((m) => (
+                  <RecurringModuleCard
+                    key={m.module_id}
+                    module={m}
+                    onTap={() => handleRecurringTap(m)}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* ── Zone 2: Le Raccourci journey ──────────────────────── */}
           <section aria-label="Le Raccourci journey" style={{ marginTop: 48 }}>
             <RaccourciProgress
@@ -469,6 +548,22 @@ export default function HomeScreen({
       </div>
 
       <BottomNav />
+
+      {pickerModule && (
+        <LearnModuleSheet
+          // RecurringModule uses `module_id` (snake_case from the backend
+          // response); LearnModuleSheet expects the canonical `id` field
+          // (matches RemediationModule). Trivial bridge here.
+          module={{
+            id: pickerModule.module_id,
+            name_en: pickerModule.name_en,
+            name_fr: pickerModule.name_fr,
+            raccourci_lesson_id: pickerModule.raccourci_lesson_id,
+          }}
+          lessonTitle={pickerLessonTitle}
+          onClose={() => setPickerModule(null)}
+        />
+      )}
     </div>
   )
 }
