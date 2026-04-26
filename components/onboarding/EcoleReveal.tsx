@@ -89,7 +89,7 @@ export default function EcoleReveal({
             maxWidth: 360,
           }}
         >
-          The shortcut. 16 lessons. The exact grammar English speakers keep failing on. Finish it, and B2 is unblocked.
+          The shortcut. 27 lessons. The exact grammar English speakers keep failing on. Finish it, and B2 is unblocked.
         </p>
 
         {/* Value lines */}

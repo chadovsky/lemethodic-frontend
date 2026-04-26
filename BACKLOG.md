@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-27 (F-086 ship — Le Raccourci → L'École rename)
+**Last updated:** 2026-04-27 (F-087 ship — 27-lesson L'École curriculum)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -173,11 +173,48 @@ F-086 ✅ Le Raccourci → L'École rename. Atomic phase-1 of the F-086→F-089 
 
 ---
 
+F-087 ✅ 27-lesson L'École curriculum. Phase 2 of the F-086→F-089 pack.
+
+**Backend (tcf-oral-tool):**
+- New `scripts/seed_ecole_curriculum.py` — single-run migration + seeder. Adds `phase` (default 1) and `subline_en` (nullable) columns to `ecole_lessons` via idempotent `ALTER TABLE ADD COLUMN IF NOT EXISTS`-equivalent (PRAGMA-guarded). Wipes `user_ecole_progress` (80 stale rows from the pre-rename test users — 0 completions, 1 quiz attempt, no real investment per F-086 Q1.2 audit). Truncates `ecole_lessons` and inserts the locked 27 rows. Updates `remediation_modules.ecole_lesson_id` for `gerondif_confusion` from 16 → 22 (gérondif moved from old curriculum lesson 16 to new curriculum lesson 22, in Phase 2). Linear prerequisite chain (1→2→3→…→27).
+- Two minor fixes when saving Chadi's script: trimmed columns from the lesson INSERT that don't exist on `ecole_lessons` (status / quiz_attempts / completed_at / updated_at — those live on `user_ecole_progress`); replaced unicode arrows + check/cross marks in print statements with ASCII to avoid the same Windows console encoding crash that bit F-086.
+- Curriculum locked: Phase 1 Fondations (1-16) replaces the old curriculum's Conjugation / Articles / Prepositions / etc. with Articles définis et indéfinis (1) → Concordance des temps et hypothèse (16). Phase 2 Approfondissement (17-27) is brand new: Verbes pronominaux (17) → Faire causatif (18) → Mise en relief (19) → Tournures impersonnelles (20) → Comparatifs (21) → Gérondif (22) → Présentatifs (23) → Connecteurs logiques (24) → Marqueurs temporels (25) → Registre oral (26) → Nominalisation (27). Voix passive removed from sequence; demoted to module library as `voix_passive_calque` per spec note (separate authoring ticket, not part of F-087).
+- Each lesson row carries `subline_en` (deadpan English subline) authored at seed time. F-087 only stores them; F-089 surfaces them under the lesson title on cards.
+- Backend code updates: `EcoleLesson` model gains `phase` + `subline_en` columns; `_lesson_row_to_summary` and `_lesson_full_detail` in `app/routers/ecole.py` expose both fields in the API response. `phase` defaults to 1 in both serialization and ORM, so any pre-F-087 row that survives a future regression lands as Fondations. `subline_en` flows through nullable; F-089 surfaces it conditionally.
+
+**Frontend (fluentpath-frontend):**
+- `lib/types.ts::Lesson`: `phase: 1 | 2` (required, defaulted by mapper) + `sublineEn?: string | null` (optional). `lib/api.ts::mapLesson` defaults `phase` to 1 when the backend omits it (covers any rollback / replay against an older API), maps `subline_en → sublineEn`.
+- `components/home/HomeScreen.tsx`: `TOTAL_LESSONS` 16 → 27. Lesson list loop now renders all 27 rows with a Phase 2 divider injected at the boundary (when `prev.phase === 1 && current.phase === 2`). Divider component `<PhaseDivider />` (defined inline in HomeScreen since it's the only consumer): small-caps "PHASE 2 — APPROFONDISSEMENT" header + subline "11 lessons of polish, after the click." Keyed off row data, not hardcoded `lesson_number === 17`, so a future curriculum reshuffle just works.
+- `components/home/EcoleProgress.tsx`: 3 milestones rebalanced to the new curriculum:
+    · Fondations (Lessons 1–4) — unchanged
+    · Approfondissement (Lessons 5–16) — replaces "Mécaniques" + "Raccourci Complet" splits; earned at lesson 16 to mark the transition INTO Phase 2 Approfondissement
+    · L'École Complète (Lessons 17–27) — new, full-curriculum completion at lesson 27
+- `components/Paywall.tsx`: feature comparison table "1 of 16" → "1 of 27"; first VALUE_ROWS entry "L'École — 16 lessons unlocking B2 grammar" → "27 lessons".
+- `components/onboarding/EcoleReveal.tsx`: onboarding step 6 copy "16 lessons" → "27 lessons" (the rest of the EcoleReveal copy intentionally unchanged — the "shortcut" framing of the screen is now stale post-rename but is a separate copywriting concern, not a curriculum-count concern; flagged as F-087.x).
+- `components/modules/LearnModuleSheet.tsx`: stale "(16 lessons)" comment in the lesson-fetch caching note updated to "(27 lessons post-F-087)".
+- `app/ecole/page.tsx`: function name `ÉcolePage` → `EcolePage` (Unicode-acute identifier was a holdover from the F-086 substitution pass; cleaning to ASCII matches the same rule that produced `backToEcole` in F-086).
+
+**Verification gates (all 7 green):**
+1. `GET /api/ecole/lessons` → 27 lessons ordered by `lesson_number` ascending. ✅
+2. Response includes `phase: 1` for lessons 1-16, `phase: 2` for 17-27. ✅
+3. `SELECT COUNT(*) FROM ecole_lessons` → 27. ✅
+4. `SELECT ecole_lesson_id FROM remediation_modules WHERE id='gerondif_confusion'` → 22. ✅
+5. HomeScreen + `/ecole` render 27 lesson cards with the Phase 2 divider visible between #16 and #17 (visual gate — code path verified, browser verification deferred to Chadi's smoke).
+6. `gerondif_confusion` linked-module picker now routes to `/ecole/lesson/22` (LearnModuleSheet reads `m.ecole_lesson_id` which the API returns as 22 post-seed).
+7. Milestone badges render at lessons 4 (Fondations), 16 (Approfondissement), 27 (L'École Complète) with new copy.
+
+`pnpm tsc --noEmit` clean except the pre-existing `TargetScoreSelect.tsx:98` known issue.
+
+**Filed:**
+- **F-087.x** EcoleReveal copy refresh — the onboarding step 6 "The shortcut" framing is stale post-Le-Raccourci-→-L'École rename. Component renamed to EcoleReveal in F-086, lesson count updated to 27 in F-087, but the rhetorical lead-in still calls L'École "the shortcut." Chadi to revise the copy when ready (not blocking; F-087 was scoped to mechanical curriculum updates).
+
+---
+
 ## In progress
 
 **F-080 epic CLOSED 2026-04-26.** F-080a + F-080b + F-080c shipped 2026-04-25; F-080d shipped 2026-04-26. The intelligence layer is end-to-end live: detection → persistence → diagnostic surface → cross-session recurrence → Raccourci routing.
 
-F-086 (Le Raccourci → L'École rename) shipped 2026-04-27 in this commit. Next per the F-086→F-089 pack: F-087 (16 → 27 lesson curriculum, two phases), then F-088 (Couches → TCF criteria relabel), then F-089 (lesson card sublines). Other queued tickets (F-061.1 T3 picker, F-064 lesson detail + quiz, launch-prep F-071–F-079, F-080.x detection-sensitivity refinement, F-080c.x Le Goulet cleanup, F-080d.x recordings(user_id) perf, F-080d.y public-glossary path) remain deferred.
+F-086 + F-087 shipped 2026-04-27. Next per the F-086→F-089 pack: F-088 (Couches → TCF criteria relabel — frontend-heavy, no DB churn), then F-089 (lesson card sublines render — purely cosmetic, reads what F-087 already seeded). Other queued tickets (F-061.1 T3 picker, F-064 lesson detail + quiz, launch-prep F-071–F-079, F-080.x detection-sensitivity refinement, F-080c.x Le Goulet cleanup, F-080d.x recordings(user_id) perf, F-080d.y public-glossary path, F-087.x EcoleReveal copy refresh) remain deferred.
 
 ---
 

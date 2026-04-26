@@ -22,7 +22,7 @@ const RADAR_DATA = [
 ]
 
 const VALUE_ROWS: string[] = [
-  "L'École — 16 lessons unlocking B2 grammar",
+  "L'École — 27 lessons unlocking B2 grammar",
   "Unlimited Tâche 1, 2, 3 practice with AI examiner",
   "Mock Exam mode (recommended after L'École)",
 ]
@@ -35,7 +35,7 @@ const TRIAL_TIMELINE = [
 
 type CellVal = true | false | string
 const COMPARE_ROWS: { feature: string; free: CellVal; paid: CellVal }[] = [
-  { feature: "L'École lessons",     free: '1 of 16',  paid: true },
+  { feature: "L'École lessons",     free: '1 of 27',  paid: true },
   { feature: 'Tâche 1/2/3 practice',    free: '3/day',    paid: true },
   { feature: 'AI examiner feedback',     free: false,      paid: true },
   { feature: 'Mock Exam mode',           free: false,      paid: true },

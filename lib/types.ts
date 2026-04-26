@@ -62,6 +62,16 @@ export interface Lesson {
   completedAt: string | null
   estimatedDurationMinutes?: number
   prerequisiteLessonNumber?: number | null
+  // F-087 — phase 1 (Fondations, lessons 1-16) vs phase 2
+  // (Approfondissement, 17-27). Drives the visual separator on the home
+  // tab and /ecole list page. Defaults to 1 in the mapper if backend
+  // omits the field.
+  phase: 1 | 2
+  // F-087 (rendered by F-089) — deadpan English subline shown beneath
+  // the title on lesson cards. Always populated for the seeded 27;
+  // optional here only because the mapper hands through whatever the
+  // backend sends.
+  sublineEn?: string | null
 }
 
 export type QuizQuestionType =

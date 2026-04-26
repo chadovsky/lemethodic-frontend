@@ -181,6 +181,10 @@ interface RawLesson {
   completed_at: string | null
   estimated_duration_minutes?: number
   prerequisite_lesson_number?: number | null
+  // F-087 fields — present from the post-seed backend; defaulted in the
+  // mapper for any older response shape that survives in tests.
+  phase?: number
+  subline_en?: string | null
 }
 
 function mapLesson(raw: RawLesson): Lesson {
@@ -197,6 +201,11 @@ function mapLesson(raw: RawLesson): Lesson {
     completedAt: raw.completed_at,
     estimatedDurationMinutes: raw.estimated_duration_minutes,
     prerequisiteLessonNumber: raw.prerequisite_lesson_number,
+    // F-087: default to 1 (Fondations) on missing/unknown to keep
+    // legacy rows landing in the first phase. Anything other than the
+    // documented values 1 or 2 collapses to 1.
+    phase: raw.phase === 2 ? 2 : 1,
+    sublineEn: raw.subline_en ?? null,
   }
 }
 

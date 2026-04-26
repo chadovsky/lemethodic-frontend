@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Bell } from 'lucide-react'
@@ -25,7 +25,10 @@ const LAVENDER    = '#E0D4F0'
 const BG          = '#FAFAF7'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 
-const TOTAL_LESSONS = 16
+// F-087 — 27 lessons total: Phase 1 Fondations (1-16) + Phase 2
+// Approfondissement (17-27). Visual separator inserted between lesson
+// 16 and 17 in the rendering loop below.
+const TOTAL_LESSONS = 27
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -532,15 +535,28 @@ export default function HomeScreen({
                   />
                 ))
               ) : (
-                lessons.map((lesson) => (
-                  <LessonListItem
-                    key={lesson.id}
-                    number={lesson.lessonNumber}
-                    title={lesson.title}
-                    descriptor={lesson.shortDescription}
-                    status={toItemStatus(lesson.status)}
-                  />
-                ))
+                lessons.map((lesson, idx) => {
+                  const prev = idx > 0 ? lessons[idx - 1] : null
+                  // F-087 — render the Phase 1 → Phase 2 divider
+                  // exactly once, at the boundary where the previous
+                  // lesson is phase 1 and this one is phase 2. Keyed
+                  // off the row data rather than a hardcoded
+                  // lesson_number === 17 check so a future curriculum
+                  // shuffle just works.
+                  const showPhaseDivider =
+                    prev != null && prev.phase === 1 && lesson.phase === 2
+                  return (
+                    <Fragment key={lesson.id}>
+                      {showPhaseDivider && <PhaseDivider />}
+                      <LessonListItem
+                        number={lesson.lessonNumber}
+                        title={lesson.title}
+                        descriptor={lesson.shortDescription}
+                        status={toItemStatus(lesson.status)}
+                      />
+                    </Fragment>
+                  )
+                })
               )}
             </div>
           </section>
@@ -564,6 +580,49 @@ export default function HomeScreen({
           onClose={() => setPickerModule(null)}
         />
       )}
+    </div>
+  )
+}
+
+// F-087 — visual divider between Phase 1 (Fondations, lessons 1-16) and
+// Phase 2 (Approfondissement, lessons 17-27). Rendered inline inside the
+// lesson list when the loop crosses the phase boundary; HomeScreen is
+// the only consumer so it's defined here rather than as a shared file.
+function PhaseDivider() {
+  return (
+    <div
+      role="separator"
+      aria-label="Phase 2 — Approfondissement"
+      style={{
+        padding: '24px 16px 12px',
+        borderTop: '1px solid #1A1A1A14',
+        marginTop: 8,
+      }}
+    >
+      <p
+        style={{
+          margin: 0,
+          fontFamily: DISPLAY_FONT,
+          fontWeight: 700,
+          fontSize: 10,
+          letterSpacing: '0.10em',
+          textTransform: 'uppercase',
+          color: INK_MUTED,
+        }}
+      >
+        Phase 2 — Approfondissement
+      </p>
+      <p
+        style={{
+          margin: '4px 0 0',
+          fontFamily: DISPLAY_FONT,
+          fontWeight: 500,
+          fontSize: 12,
+          color: INK_SOFT,
+        }}
+      >
+        11 lessons of polish, after the click.
+      </p>
     </div>
   )
 }

@@ -15,15 +15,22 @@ interface Milestone {
   maxLesson: number
 }
 
+// F-087 — milestones rebalanced to the 27-lesson curriculum:
+//   - Fondations (1-4): unchanged
+//   - Approfondissement (5-16): celebrates ENTERING Phase 2 (the
+//     "Approfondissement" curriculum phase begins at lesson 17, so the
+//     badge earned at lesson 16 marks the transition)
+//   - L'École Complète (17-27): full-curriculum completion
+// Earlier "Mécaniques" + "Raccourci Complet" splits replaced.
 const MILESTONES: Milestone[] = [
   { label: 'Fondations',          range: 'Lessons 1–4',   minLesson: 1,  maxLesson: 4  },
-  { label: 'Mécaniques',          range: 'Lessons 5–10',  minLesson: 5,  maxLesson: 10 },
-  { label: 'École Complet',   range: 'Lessons 11–16', minLesson: 11, maxLesson: 16 },
+  { label: 'Approfondissement',   range: 'Lessons 5–16',  minLesson: 5,  maxLesson: 16 },
+  { label: "L'École Complète",    range: 'Lessons 17–27', minLesson: 17, maxLesson: 27 },
 ]
 
 interface EcoleProgressProps {
-  completedCount: number   // 0–16
-  totalCount: number       // 16
+  completedCount: number   // 0–27
+  totalCount: number       // 27 post-F-087 (was 16 pre-curriculum-expansion)
 }
 
 export default function EcoleProgress({

@@ -14,7 +14,7 @@
 // Lesson title: callers can pass `lessonTitle` directly (HomeScreen has
 // the lessons list cached and saves a roundtrip); when omitted, the
 // sheet fetches `api.lessons.list()` once on open and looks up by
-// lesson_number. Roundtrip is small (16 lessons) but the cached path is
+// lesson_number. Roundtrip is small (27 lessons post-F-087) but the cached path is
 // preferred when available.
 
 import { useEffect, useState } from 'react'
