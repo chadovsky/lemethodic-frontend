@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-27 (F-075a shipped — 10 MB cap on all 4 audio upload endpoints; F-075a.x filed for frontend guard; F-075b still queued)
+**Last updated:** 2026-04-27 (F-075b shipped — TTS auth wrap; F-075b.x filed with canonical pattern for future user-audio serving route)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -349,6 +349,48 @@ F-084 ✅ Diagnostic page progressive disclosure (v2 — replaces the original b
 - **F-084.x** ⏸ Restore session details into the F-084 disclosure when F-058 ships real WPM/pron%/flagged-count data. Section 5 was deleted in F-084 because mocked numbers erode trust the moment a user notices identical stats across recordings; once the underlying data lands, fold the section back in alongside the universal sidebars in Layer 5's expanded view.
 
 **Followups already in BACKLOG**: F-058 itself remains queued (currently the placeholder "Coming soon" Progress page; same data layer F-084.x will eventually need).
+
+---
+
+F-075b ✅ Auth on audio serving. Second half of F-075 (security hardening, carried from F-050).
+
+**Audit reshaped the scope.** The original F-075b spec assumed a user-audio serving route existed and lacked an ownership check. **It doesn't exist.** Audit found no `app.mount("/uploads", ...)`, no `FileResponse` returning recording audio anywhere; `_serialize_turn` (conversations.py:138) explicitly refuses to expose candidate audio_url with the comment "We deliberately do NOT expose candidate audio_url — those are raw filesystem paths to ./uploads and aren't web-servable." `_format_recording` doesn't include `audio_path` either. The frontend `<audio>` calls in `Tache1Session` / `Tache2Session` play back **examiner TTS** (`/tts_audio/<hash>.mp3`), not user recordings.
+
+The actual exposed surface was `/tts_audio/`, mounted as unauthenticated static files (`app.mount("/tts_audio", StaticFiles(...))` in main.py). Hashes are SHA-256 of `(text, voice, model)` — guessing is intractable — but anyone with a leaked URL (devtools network logs, captured frontend bundles) could refetch without auth.
+
+**Backend (tcf-oral-tool):**
+- `main.py` — replaced `app.mount("/tts_audio", StaticFiles(...))` with an authenticated `GET /tts_audio/{filename}` handler. Depends on `get_current_user`, which already accepts both the `access_token` cookie AND the `Authorization: Bearer` header. The cookie path is critical — browsers don't attach the Authorization header to `<audio>` element fetches but they do send cookies, so existing T1/T2 examiner playback continues to work without frontend changes.
+- Path traversal defense, two layers:
+  - Filename string filter rejects `/`, `\`, `..`, `\x00`, leading `.`.
+  - Post-resolution check via `Path.resolve().relative_to(cache_root)` confirms the resolved file actually lives inside the cache dir — catches symlink-based escapes and any future filename quirk the string filter doesn't anticipate.
+- Media type inferred from extension (`.mp3 → audio/mpeg`, plus wav/ogg/m4a/webm fallbacks; unknown → `application/octet-stream`). The TTS pipeline only emits .mp3 today; the table is forward-compat for a future provider that ships other formats.
+- Static `/static` mount unchanged (app/static — CSS/templates, not audio).
+
+**Frontend:** none. Cookie-auth path keeps the existing `<audio src="/tts_audio/...">` playback working without code changes.
+
+**Verification gates (revised; user-audio gates dropped since no such route exists):**
+1. ✅ `/tts_audio/<file>.mp3` unauthenticated → 401 (`{"detail":"Not authenticated"}`).
+2. ✅ Same path with `Authorization: Bearer <jwt>` → 200, body matches stub bytes, `content-type: audio/mpeg`.
+3. ✅ Same path with `access_token=<jwt>` cookie → 200 (the `<audio>` element path that keeps T1/T2 playback working).
+4. ✅ Path traversal blocked across 6 attempts:
+   - `../etc/passwd` → 404 (router doesn't match multi-segment paths)
+   - `..\windows\system32` → 400 (handler guard)
+   - `.hidden` → 400 (handler guard)
+   - `subdir/file.mp3` → 404 (router)
+   - `subdir\file.mp3` → 400 (handler)
+   - `with\x00null.mp3` → rejected at httpx URL parser before the request leaves the client (defense-in-depth at the client lib layer)
+5. ✅ Well-formed but missing filename → 404 (sanity).
+
+Harness `scripts/verify_f075b_tts_auth.py` drops a synthetic mp3 stub into the TTS cache, exercises all gates, and removes the stub via try/finally per F-080d.z rule #1. Real cache state is untouched.
+
+`python -c "import main"` smoke clean. Confirmed via `app.routes` inspection that the `/tts_audio` mount is gone and only the `/tts_audio/{filename}` route handler is registered.
+
+**Filed:**
+- **F-075b.x** 📋 — canonical pattern for the future user-audio serving route. **Spec preserved verbatim from Chadi's go-ahead message** so whoever wires playback first has the exact contract:
+
+  > When future tickets need to play user audio (F-081 audio drills, F-058 session details with playback, or any new playback consumer), add `GET /api/recordings/{id}/audio` with: (1) `get_current_user` dependency, (2) ownership check via `Recording.user_id == current_user.id`, (3) **404 (not 403)** on mismatch to avoid existence-leaking, (4) `FileResponse` with media type inferred from `audio_path`'s extension. Do NOT use `app.mount('/uploads', ...)` — that bypasses ownership entirely.
+
+  Rationale for the 404-not-403 choice: returning 403 leaks the existence of recordings owned by other users (an attacker could enumerate IDs and learn which exist). 404 is indistinguishable from a missing recording, preventing the enumeration leak.
 
 ---
 
@@ -730,11 +772,10 @@ Previously called "F-060 launch prep" umbrella. Split into discrete tickets here
 - Signup page parses 422 response body for validation detail
 - Shows specific message "Please use a valid email address (not .local, .test, or .example)" instead of generic "Could not create account"
 
-**F-075** 📋 Audio upload security hardening (carried from F-050) — split into F-075a (size cap) and F-075b (user_id auth on serving)
-**F-075a shipped 2026-04-27. F-075b queued.** F-075a entry below in "Shipped — Week 2 (April 27)".
-- Backend: server-side size cap on /api/audio/upload (5 MB hard limit) — **superseded by F-075a, which audited the surface, found 4 upload endpoints, and capped them all at 10 MB (~6× headroom over the largest legitimate file in the corpus).**
-- Backend: user_id on Recording model + auth check on /api/audio/{id} serve route — **F-075b. Still queued.**
-- Current state (re: serving): raw filesystem paths exposed as URLs with no ownership check.
+**F-075** 📋 Audio upload security hardening (carried from F-050) — split into F-075a (size cap) and F-075b (auth on audio serving)
+**F-075a + F-075b both shipped 2026-04-27.** Entries in "Shipped — Week 2 (April 27)" below.
+- Backend: server-side size cap on /api/audio/upload (5 MB hard limit) — **shipped as F-075a; audit found 4 upload endpoints, all capped at 10 MB.**
+- Backend: user_id on Recording model + auth check on /api/audio/{id} serve route — **shipped as F-075b, but reshaped: audit found NO existing user-audio serving route (the diagnostic page never plays back user recordings; `_serialize_turn` deliberately refuses to expose candidate audio_url). Actual fix wrapped the unauthenticated `/tts_audio/` static mount with an authenticated route handler. F-075b.x carries the canonical pattern for whoever wires user-audio playback first.**
 
 **F-076** 📋 Background tab timer drift fix (carried from F-050)
 - Frontend: PTT 60s cap in Tache2Session uses performance.now()+setInterval
