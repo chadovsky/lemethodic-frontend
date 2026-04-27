@@ -30,14 +30,22 @@ const GOALS: {
     icon: '/icons/flag-canada.png',
     iconAlt: 'Canadian flag',
     title: 'Canadian immigration',
-    descriptor: 'TCF / TEF Canada, CLB scoring',
+    // F-091.0 — V1 onboarding lock to TCF-only. TEF dropped from the
+    // descriptor (was "TCF / TEF Canada, CLB scoring") since the
+    // backend exam_profiles registry only ships TCF Canada today.
+    // F-091b will reintroduce TEF post-launch.
+    descriptor: 'TCF Canada, CLB scoring',
   },
   {
     id: 'studies',
     icon: '/icons/graduation-cap.png',
     iconAlt: 'Graduation cap',
     title: 'Studies in France',
-    descriptor: 'DELF, DALF, academic admissions',
+    // F-091.0 — was "DELF, DALF, academic admissions". DELF/DALF
+    // pulled per the V1 TCF-only lock; the studies path remains open
+    // because TCF is a legitimate target for academic admissions
+    // (TCF DAP for university entry).
+    descriptor: 'TCF for academic admissions',
   },
   {
     id: 'general',

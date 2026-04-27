@@ -508,10 +508,24 @@ export function mapDiagnosticBlockToMoules(
 // is the specific exam track. This mapping reflects the descriptors shown on
 // onboarding step 2 (TCFGoalSelect). Tune here if the product pivots the
 // association.
+//
+// F-091.0 — V1 onboarding lock to TCF-only. All three goals map to
+// 'tcf_canada' until the F-091 epic ships post-launch. The backend
+// exam_profiles registry only ships TCF Canada today; the previous
+// values 'delf' / 'tcf_general' were silently falling through to TCF
+// Canada via get_profile()'s default-fallback, so the mapping was
+// already a false-promise string in the DB. Locking it here makes
+// the persisted value match the actual analyzer behavior. F-091b
+// will restore goal-aware profile dispatch (with real DELF + TEF
+// implementations).
+//
+// The `goal` field on the user is unaffected — it still persists the
+// motivation ('immigration' / 'studies' / 'general'), which F-091b
+// will read to dispatch into the right exam profile post-launch.
 const GOAL_TO_EXAM_PROFILE: Record<TCFGoal, string> = {
   immigration: 'tcf_canada',
-  studies: 'delf',
-  general: 'tcf_general',
+  studies: 'tcf_canada',
+  general: 'tcf_canada',
 }
 
 interface BackendOnboardingPayload {

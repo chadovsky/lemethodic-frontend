@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-27 (F-083 backend rubric shipped; F-083.x biographical-extraction sub-ticket filed; F-084 dependency satisfied)
+**Last updated:** 2026-04-27 (F-091.0 V1 onboarding lock to TCF-only shipped — descriptors stripped + GOAL_TO_EXAM_PROFILE locked to tcf_canada)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -304,6 +304,38 @@ F-083 ✅ Per-Tâche pedagogical rubric (backend). Sprint feedback-rendering pac
 - **F-083.x** ⏸ Extract T1 biographical data to user profile. T1 transcripts contain origin/profession/family/hobbies. The diagnostic should extract structured fields and store them on `users` for personalized examples in later sessions. Out of F-083 scope; filed per anti-scope. Estimate: 1 day.
 
 `pnpm tsc --noEmit` clean (frontend untouched). Backend imports clean (`python -c "import main"` smoke).
+
+---
+
+F-091.0 ✅ V1 onboarding lock to TCF-only. Pre-launch ticket; May 4 launch ships TCF-honest.
+
+**Approach (a-prime) — adopted after Step 0 audit found the spec's two choices (hide selector / grey out cards) didn't fit the architecture.** No discrete exam-selector step exists in this codebase: step 2 is `TCFGoalSelect` which captures motivation (`immigration` / `studies` / `general`), and the exam profile is **derived** from goal via `mapOnboardingToBackend`. The goal step also gates step 4 (`TargetScoreSelect` branches on `state.goal` to choose between CLB / B1-C2 / "confident conversational"-style options) — removing it breaks the score-selection screen.
+
+(a-prime) keeps the goal selector visible (motivation persists for F-091b post-launch) and locks the false-promise leaks at two surface points:
+
+**Frontend (fluentpath-frontend) — single commit:**
+- `components/onboarding/TCFGoalSelect.tsx`:
+  - immigration descriptor: `"TCF / TEF Canada, CLB scoring"` → `"TCF Canada, CLB scoring"` (TEF dropped)
+  - studies descriptor: `"DELF, DALF, academic admissions"` → `"TCF for academic admissions"` (DELF/DALF dropped; TCF DAP for university entry is a real product fit)
+  - general descriptor: unchanged (was already exam-neutral)
+- `lib/api.ts::GOAL_TO_EXAM_PROFILE`:
+  - `immigration` → `'tcf_canada'` (unchanged; was real)
+  - `studies` → `'tcf_canada'` (was `'delf'` — false-promise string that silently fell through to TCF Canada server-side via `get_profile()`'s default fallback)
+  - `general` → `'tcf_canada'` (was `'tcf_general'` — same false-promise pattern)
+- F-091.0 ship comments added at both surface points so F-091b can find the unwind sites cleanly.
+
+**Backend:** none. The exam_profiles registry already has only `TCF_CANADA`; `get_profile()` already falls back to TCF for unknown ids. The behavior was already TCF-everywhere; F-091.0 makes the persisted strings match.
+
+**Verification gates (5):**
+1. ✅ New user signup walks through onboarding without seeing TEF/DELF/DALF — code path verified, two descriptor strings stripped (only F-091.0 ship comments retain the strings, not user-visible). Browser smoke deferred.
+2. ✅ Live signup test (`TestClient` against `/api/auth/register` + `/api/users/onboarding`) — registered user, fired the onboarding flush three times once per goal, all three persisted `exam_profile = 'tcf_canada'`. Test user cleaned up via try/finally per F-080d.z rule #1.
+3. ✅ Existing users unaffected — pre-flight DB audit: 12 users total, 9 NULL + 3 `'tcf_canada'`. Zero non-TCF rows to disturb.
+4. ✅ TCF analyzer dispatch fires correctly — no backend changes; the existing dispatch was already TCF-only via the registry default, and `users.exam_profile` for new signups now matches what the dispatch expects.
+5. ✅ Analytics N/A — no `analytics`/`track`/`posthog`/`mixpanel`/`gtag` calls anywhere under `components/onboarding/` or `lib/onboarding*`. Nothing to remove or constant-fire.
+
+`pnpm tsc --noEmit` clean except the pre-existing `TargetScoreSelect.tsx:98` known issue.
+
+**Unwind for F-091b** (post-launch): the two surface points carry F-091.0 ship comments. F-091b restores the goal-aware mapper (now with real `tef.py` + `delf.py` registered) and re-enables the original descriptors. No DB migration needed — `users.goal` is already persisted unchanged today.
 
 ---
 
@@ -648,18 +680,7 @@ Previously called "F-060 launch prep" umbrella. Split into discrete tickets here
 - Compare FluentPath predicted TCF score vs actual exam score
 - Tune analysis engine thresholds if gaps exceed ±50 points on /699 scale
 
-**F-091.0** 📋 V1 onboarding lock to TCF-only
-- **Pre-launch.** Until the F-091 epic ships post-launch, the onboarding flow must not surface non-TCF exam options. The May 4 launch ships TCF-only by decision (April 27, 2026); the launch product is honest about what it actually supports.
-- Two implementation choices, recommendation **(a)**:
-  - **(a)** *Recommended.* Hide the exam-selector step entirely if it currently exists. New users default to `exam_profile = 'tcf'`. Returning users with non-TCF profiles (none exist yet — sanity-check via `SELECT DISTINCT exam_profile FROM users` before locking) keep their value but the UI doesn't surface the choice.
-  - **(b)** Keep the step visible but show TCF as the only selectable card. Other exam cards (TEF, DELF, DALF) replaced by a single greyed-out non-tappable "More exams coming soon" tile.
-- Why (a): less UI surface, and no "coming soon" promise that needs a specific date attached. Confirm by checking current onboarding code before deciding — if the selector is already hidden behind a feature flag, just leave it off; if visible and selectable, hide it.
-- Verification gates:
-  1. New user signup → onboarding flow does not show non-TCF exam options.
-  2. `SELECT DISTINCT exam_profile FROM users` returns only `'tcf'` (or NULL for users created pre-feature).
-  3. Existing test users with `exam_profile = 'tcf'` are unaffected.
-  4. Onboarding analytics event for exam selection (if any) is either removed or fires with `'tcf'` as a constant.
-- Estimate: 1-2 hours. Single commit. Filed 2026-04-27 alongside the F-091 epic restructure.
+_(F-091.0 shipped 2026-04-27 — see entry under "Shipped — Week 2 (April 27)" above. Approach (a-prime) — descriptors stripped + mapper locked, goal step retained because it gates `TargetScoreSelect`. Note this entry is intentionally left as a forward-pointer; the original ticket scope is preserved verbatim in the shipped entry.)_
 
 ---
 
