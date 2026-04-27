@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-27 (F-084 v2 shipped — diagnostic page progressive disclosure with narrative hero + top-3 dimensions + "See full breakdown"; F-084.x filed for session-details restore when F-058 lands)
+**Last updated:** 2026-04-27 (F-075a shipped — 10 MB cap on all 4 audio upload endpoints; F-075a.x filed for frontend guard; F-075b still queued)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -352,6 +352,47 @@ F-084 ✅ Diagnostic page progressive disclosure (v2 — replaces the original b
 
 ---
 
+F-075a ✅ Server-side audio upload size cap. First half of F-075 (security hardening, carried from F-050); F-075b (user_id auth on /api/audio/{id} serving) remains queued.
+
+**Audit findings reshaped the design.** The spec assumed one upload endpoint (`/api/recordings/upload`); the codebase has **four** audio-receiving multipart routes:
+- `POST /api/recordings/upload` (T3 / legacy single-shot)
+- `POST /api/recordings/transcribe` (F-002 two-step; appears unused by current FE but still live)
+- `POST /api/conversations/{id}/turn` (T1 + T2 per-turn)
+- `POST /api/audio/upload` (F-050 audio→URL+transcript helper)
+
+A path-prefix middleware (`/api/recordings/*`) would have left two of four wide open. Adopted **content-type filter** instead — middleware matches any `POST` with `Content-Type: multipart/form-data` regardless of path, defending current routes and any future audio endpoint added without updating an allowlist.
+
+**Cap chosen:** 10 MB. Real-world corpus check (30 audio files on disk): max 1.68 MB, p50 184 KB. 10 MB gives ~6× headroom over the largest legitimate file. Override via `MAX_AUDIO_UPLOAD_BYTES` env if testing needs a different ceiling.
+
+**Backend (tcf-oral-tool):**
+- `app/config.py` — new `MAX_AUDIO_UPLOAD_BYTES` constant (default `10 * 1024 * 1024`, env-overridable). Documented at the call site as a 6× headroom decision with a note not to exceed 20 MB without a real reason.
+- `main.py` — Layer A middleware `enforce_multipart_upload_cap`: matches `POST` + `Content-Type: multipart/form-data`, reads `Content-Length`, returns `413 {"detail": "Audio file exceeds maximum allowed size of 10 MB"}` when exceeded. Malformed Content-Length values fall through to Layer B (the route's authoritative gate) rather than 400 here.
+- Layer B route-level checks added on all four routes:
+  - `app/routers/recordings.py` — module-level `_enforce_audio_size_cap(content)` helper, called after each `await audio.read()` in both `/upload` and `/transcribe`.
+  - `app/routers/audio.py` — inline `len(content) > cap` check after `await audio.read()` in `/upload`.
+  - `app/routers/conversations.py` — same inline check inside `append_turn` for the `audio` branch.
+- All four sites raise `HTTPException(status_code=413, detail=…)` so the frontend gets a consistent error regardless of which layer caught it.
+
+**Verification harness `scripts/verify_f075a_size_cap.py` (3 passes, 5 routes):**
+- **Pass 1** Layer A — POST `/api/recordings/upload` with an 11 MB body → middleware returns 413. ✅
+- **Pass 2** Layer B — all four routes with an 11 MB body → 413 from each. ✅
+  - `/api/recordings/upload` ✅
+  - `/api/recordings/transcribe` ✅
+  - `/api/audio/upload` ✅
+  - `/api/conversations/{id}/turn` (started a real conversation, posted over-cap audio) ✅
+- **Pass 3** regression — 256 KB legitimate body → status 500 from STT failing on synthetic bytes (NOT 413; the size check let it through, which is the gate). ✅
+- Cleanup per F-080d.z rule #1 — snapshot `Recording.id` max + full `Conversation.id` set pre-run, delete any rows added during the run in a `try/finally`. Confirmed: 1 recording + 1 conversation deleted on each run, existing rows untouched.
+
+`python -c "import main"` smoke clean.
+
+**Frontend:** none (per spec — F-075a is backend-only).
+
+**Filed:**
+- **F-075a.x** ⏸ Frontend client-side audio size guard. Pre-flight check on the recording blob size before triggering upload, with a clear "Recording too long; please record a shorter session" message. Falls back to handling the server's 413 response. Out of F-075a scope (which was server-side enforcement only). Estimate: 1-2h.
+- **F-075b** 📋 user_id auth on `/api/audio/{id}` serving — the second half of the original F-075. Still queued; same launch-prep window as F-076 (background-tab timer drift).
+
+---
+
 F-091.0 ✅ V1 onboarding lock to TCF-only. Pre-launch ticket; May 4 launch ships TCF-honest.
 
 **Approach (a-prime) — adopted after Step 0 audit found the spec's two choices (hide selector / grey out cards) didn't fit the architecture.** No discrete exam-selector step exists in this codebase: step 2 is `TCFGoalSelect` which captures motivation (`immigration` / `studies` / `general`), and the exam profile is **derived** from goal via `mapOnboardingToBackend`. The goal step also gates step 4 (`TargetScoreSelect` branches on `state.goal` to choose between CLB / B1-C2 / "confident conversational"-style options) — removing it breaks the score-selection screen.
@@ -689,10 +730,11 @@ Previously called "F-060 launch prep" umbrella. Split into discrete tickets here
 - Signup page parses 422 response body for validation detail
 - Shows specific message "Please use a valid email address (not .local, .test, or .example)" instead of generic "Could not create account"
 
-**F-075** 📋 Audio upload security hardening (carried from F-050)
-- Backend: server-side size cap on /api/audio/upload (5 MB hard limit)
-- Backend: user_id on Recording model + auth check on /api/audio/{id} serve route
-- Current state: raw filesystem paths exposed as URLs with no ownership check
+**F-075** 📋 Audio upload security hardening (carried from F-050) — split into F-075a (size cap) and F-075b (user_id auth on serving)
+**F-075a shipped 2026-04-27. F-075b queued.** F-075a entry below in "Shipped — Week 2 (April 27)".
+- Backend: server-side size cap on /api/audio/upload (5 MB hard limit) — **superseded by F-075a, which audited the surface, found 4 upload endpoints, and capped them all at 10 MB (~6× headroom over the largest legitimate file in the corpus).**
+- Backend: user_id on Recording model + auth check on /api/audio/{id} serve route — **F-075b. Still queued.**
+- Current state (re: serving): raw filesystem paths exposed as URLs with no ownership check.
 
 **F-076** 📋 Background tab timer drift fix (carried from F-050)
 - Frontend: PTT 60s cap in Tache2Session uses performance.now()+setInterval
