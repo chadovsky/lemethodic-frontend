@@ -18,12 +18,15 @@ import LearnModuleSheet from '@/components/modules/LearnModuleSheet'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import { api, ApiError } from '@/lib/api'
 import { useInterfaceLanguage, type InterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
+import { dimensionLabel, sidebarLabel } from '@/lib/rubric/dimensionLabels'
 import type {
   Couche,
   DetectedModulesResponse,
   Diagnostic,
   Lesson,
   RemediationModule,
+  TacheRubric,
+  TacheRubricDimension,
 } from '@/lib/types'
 
 // ─── design tokens ────────────────────────────────────────────────────────────
@@ -117,6 +120,57 @@ const TCF_SECTION_COPY: Record<InterfaceLanguage, { eyebrow: string; heading: st
   en: { eyebrow: 'TCF Evaluation',     heading: 'Your CEFR-tracking baseline' },
   fr: { eyebrow: 'Évaluation TCF',     heading: 'Your CEFR-tracking baseline' },
   es: { eyebrow: 'Evaluación TCF',     heading: 'Your CEFR-tracking baseline' },
+}
+
+// F-084 — pick top 3 rubric dimensions: 1 strength + 2 weaknesses.
+// Tie-break is deterministic — preserve the rubric's canonical order
+// (the index in the dimensions array, which matches the prompt's
+// emit order).
+//
+// Strength = highest score; if multiple dimensions tie at the top,
+// pick the one earliest in the canonical order.
+// Weaknesses = the two lowest scores from the REMAINING dimensions
+// (after the strength is removed). Same tie-break rule.
+//
+// Returns { top3, remaining } so Layer 3 can render the visible 3 and
+// Layer 5 can render whatever didn't fit (T1+T2: 2 remaining; T3: 3).
+function pickTop3Dimensions(dims: TacheRubricDimension[]): {
+  top3: TacheRubricDimension[]
+  remaining: TacheRubricDimension[]
+} {
+  if (dims.length === 0) return { top3: [], remaining: [] }
+  const indexed = dims.map((d, i) => ({ d, i }))
+  // Strength: highest score, then lowest index for tie-break.
+  const strength = [...indexed].sort((a, b) => {
+    if (b.d.score !== a.d.score) return b.d.score - a.d.score
+    return a.i - b.i
+  })[0]
+  const remainingAfterStrength = indexed.filter((x) => x.i !== strength.i)
+  // Weaknesses: lowest score, then lowest index for tie-break.
+  const weakSorted = [...remainingAfterStrength].sort((a, b) => {
+    if (a.d.score !== b.d.score) return a.d.score - b.d.score
+    return a.i - b.i
+  })
+  const weaknesses = weakSorted.slice(0, 2)
+  const visibleIndices = new Set([strength.i, ...weaknesses.map((w) => w.i)])
+  // Restore canonical order in the visible row so the page reads in a
+  // stable order regardless of which 3 dims got picked.
+  const top3 = indexed
+    .filter((x) => visibleIndices.has(x.i))
+    .map((x) => x.d)
+  const remaining = indexed
+    .filter((x) => !visibleIndices.has(x.i))
+    .map((x) => x.d)
+  return { top3, remaining }
+}
+
+// F-084 — semantic color tinting for the score badge. Subtle, no
+// alarm bells; mid scores stay neutral. 0-1 = warning tint, 2-3 =
+// neutral, 4-5 = success tint.
+function dimensionScoreTint(score: number): { bg: string; fg: string } {
+  if (score <= 1) return { bg: '#F5D6D6', fg: '#8A2A2A' } // soft blush
+  if (score >= 4) return { bg: '#D4E4D0', fg: '#2D5A38' } // soft sage
+  return { bg: '#1A1A1A0F', fg: '#1A1A1A' }                // neutral
 }
 
 // ─── sub-components ──────────────────────────────────────────────────────────
@@ -292,8 +346,13 @@ function DiagnosticInner() {
   const [isLoading, setIsLoading] = useState<boolean>(hasSession)
   const [retryKey, setRetryKey] = useState(0)
 
-  const [sessionOpen, setSessionOpen] = useState(false)
+  // F-084 — Section 5 (mocked WPM/pron%) removed; sessionOpen state
+  // dropped alongside it. See F-084.x in BACKLOG for restoring real
+  // session details once the underlying data lands.
   const [transcriptTab, setTranscriptTab] = useState<'resume' | 'complet'>('resume')
+  // F-084 — progressive disclosure for Layer 5. Local state only; no
+  // persistence, no URL param. Page reload resets to collapsed (gate 7).
+  const [breakdownOpen, setBreakdownOpen] = useState(false)
 
   // F-080d: state for the LearnModuleSheet picker (linked-module path
   // from the "Learn this" button). Orphan modules tap straight through
@@ -403,6 +462,24 @@ function DiagnosticInner() {
   // Couches radar rows
   const coucheRows = realMode ? couchesToRows(diagnostic.couches, lang) : undefined
   const tcfCopy = TCF_SECTION_COPY[lang] ?? TCF_SECTION_COPY.en
+
+  // F-084 — pedagogical-rubric data and progressive-disclosure derivations.
+  const tacheRubric: TacheRubric | null = realMode ? diagnostic.tacheRubric : null
+  const rubricDims = tacheRubric?.dimensions ?? []
+  const { top3: top3Dimensions, remaining: remainingDimensions } =
+    pickTop3Dimensions(rubricDims)
+  const retryRec = tacheRubric?.retryRecommendation
+  const showRetryCallout = !!retryRec?.shouldRetry
+  // Hero narrative — single sentence above the score. Falls back to a
+  // CEFR-band heading for legacy recordings (gate 4).
+  const tacheNumber = tacheRubric?.tacheMode === 'tache_1' ? 1
+    : tacheRubric?.tacheMode === 'tache_2' ? 2
+    : tacheRubric?.tacheMode === 'tache_3' ? 3
+    : null
+  const narrativeFallback = tacheNumber != null
+    ? `${tcfBand} on Tâche ${tacheNumber}`
+    : `${tcfBand}`
+  const narrativeText = realMode ? (diagnostic.narrativeSummary ?? narrativeFallback) : narrativeFallback
 
   // F-080c: detected modules + ordonnance source. The Diagnostic.goulet
   // and Diagnostic.ordonnance fields from the legacy /diagnostic block
@@ -541,6 +618,24 @@ function DiagnosticInner() {
             gap: 12,
           }}
         >
+          {/* ══ LAYER 1 — F-084 NARRATIVE HERO ══════════════════════════════
+                Single deadpan sentence above the score. Falls back to
+                "{cefr_band} on Tâche {n}" for legacy recordings where
+                narrative_summary is null. NOT a heading element — it's
+                content, not a section header. ══════════════════════════ */}
+          <p
+            style={{
+              margin: '0 4px 4px',
+              fontFamily: DISPLAY_FONT,
+              fontWeight: 500,
+              fontSize: 18,
+              lineHeight: 1.45,
+              color: INK,
+            }}
+          >
+            {narrativeText}
+          </p>
+
           {/* ══ SECTION 1 — TCF SCORE HERO ══════════════════════════════════ */}
           <SectionCard bg="white">
             <SectionLabel>
@@ -633,42 +728,125 @@ function DiagnosticInner() {
             <CouchesDiagnostic rows={coucheRows} />
           </SectionCard>
 
-          {/* ══ SECTION 3 — DETECTED REFLEXES (F-080c, replaces Le Goulet) ══ */}
-          <DetectedReflexesSection
-            primaryModule={primaryModule}
-            primaryDetection={primaryDetection}
-            secondaryModules={secondaryModules}
-            detections={detections}
-            onLearnTap={handleLearnTap}
-          />
+          {/* ══ LAYER 3 — TOP 3 RUBRIC DIMENSIONS (F-084) ════════════════════
+                1 strength + 2 weaknesses; deterministic tie-break by
+                canonical rubric order. Skipped entirely when the
+                rubric is null (legacy recording) or has no dimensions. */}
+          {top3Dimensions.length > 0 && (
+            <SectionCard bg="white">
+              {top3Dimensions.map((dim) => {
+                const tint = dimensionScoreTint(dim.score)
+                return (
+                  <div
+                    key={dim.key}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                      paddingBottom: 12,
+                      borderBottom: '1px solid #1A1A1A0A',
+                    }}
+                  >
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontFamily: DISPLAY_FONT,
+                          fontWeight: 700,
+                          fontSize: 14,
+                          color: INK,
+                          marginBottom: 2,
+                        }}
+                      >
+                        {dimensionLabel(dim.key)}
+                      </p>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontFamily: DISPLAY_FONT,
+                          fontWeight: 500,
+                          fontSize: 13,
+                          lineHeight: 1.45,
+                          color: INK_SOFT,
+                        }}
+                      >
+                        {(dim.prose ?? '').length > 120
+                          ? `${dim.prose.slice(0, 117).trim()}…`
+                          : dim.prose}
+                      </p>
+                    </div>
+                    <span
+                      style={{
+                        flexShrink: 0,
+                        fontFamily: DISPLAY_FONT,
+                        fontWeight: 700,
+                        fontSize: 13,
+                        backgroundColor: tint.bg,
+                        color: tint.fg,
+                        padding: '4px 10px',
+                        borderRadius: 999,
+                      }}
+                      aria-label={`Score: ${dim.score} out of 5`}
+                    >
+                      {dim.score}/5
+                    </span>
+                  </div>
+                )
+              })}
+            </SectionCard>
+          )}
 
-          {/* ══ SECTION 4 — L'ORDONNANCE (only when primary has content_refs) */}
-          {primaryModule && ordonnanceRefs.length > 0 ? (
-            <SectionCard bg={BUTTER}>
-              <SectionLabel>{"L'Ordonnance · Learn this"}</SectionLabel>
-              <SectionHeading>How to fix this in your next session</SectionHeading>
-              <div
+          {/* ══ LAYER 4 — RETRY CALLOUT (F-084, conditional) ═════════════════
+                Renders only when the rubric's deterministic-or-LLM
+                threshold check decided a retry is worth doing. */}
+          {showRetryCallout && retryRec && (
+            <SectionCard bg={PEACH}>
+              <SectionLabel>Worth another try</SectionLabel>
+              <p
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 12,
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: 16,
-                  padding: '16px 18px',
+                  margin: 0,
+                  fontFamily: DISPLAY_FONT,
+                  fontWeight: 500,
+                  fontSize: 14,
+                  lineHeight: 1.5,
+                  color: INK,
                 }}
               >
-                {ordonnanceRefs.map((ref, i) => (
-                  <InlineContentRef key={i} ref_={ref} />
-                ))}
-              </div>
+                {retryRec.reason}
+              </p>
+              {tacheNumber != null && (
+                <Link
+                  href={`/speaking/tache-${tacheNumber}`}
+                  style={{
+                    alignSelf: 'flex-start',
+                    fontFamily: DISPLAY_FONT,
+                    fontWeight: 700,
+                    fontSize: 14,
+                    color: '#FFFFFF',
+                    backgroundColor: INK,
+                    padding: '10px 18px',
+                    borderRadius: 12,
+                    textDecoration: 'none',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
+                >
+                  Record again
+                </Link>
+              )}
             </SectionCard>
-          ) : null}
+          )}
 
-          {/* ══ SECTION 5 — SESSION DETAILS (still mocked — WPM/pron% aren't
-                 in the shared Diagnostic shape yet; follow-up ticket) ═══════ */}
+          {/* ══ LAYER 5 — "See full breakdown" disclosure (F-084) ═════════════
+                Single button at the bottom. Click expands inline (no
+                modal). Contains: remaining dimensions, universal
+                sidebars, full retry reasoning, plus the existing
+                detected-modules + L'Ordonnance + corrected-transcript
+                sections (moved from their previous always-visible
+                positions). Section 5 (mocked WPM/pron%) intentionally
+                removed — see F-084.x. ════════════════════════════════ */}
           <SectionCard bg="white" style={{ gap: 0, padding: 0, overflow: 'hidden' }}>
             <button
-              onClick={() => setSessionOpen((v) => !v)}
+              onClick={() => setBreakdownOpen((v) => !v)}
               style={{
                 width: '100%',
                 padding: '18px 20px',
@@ -680,7 +858,7 @@ function DiagnosticInner() {
                 cursor: 'pointer',
                 WebkitTapHighlightColor: 'transparent',
               }}
-              aria-expanded={sessionOpen}
+              aria-expanded={breakdownOpen}
             >
               <span
                 style={{
@@ -690,7 +868,7 @@ function DiagnosticInner() {
                   color: INK,
                 }}
               >
-                Session details
+                See full breakdown
               </span>
               <svg
                 width="16"
@@ -699,7 +877,7 @@ function DiagnosticInner() {
                 fill="none"
                 aria-hidden="true"
                 style={{
-                  transform: sessionOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transform: breakdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
                   transition: 'transform 0.2s',
                   flexShrink: 0,
                 }}
@@ -713,121 +891,252 @@ function DiagnosticInner() {
                 />
               </svg>
             </button>
+          </SectionCard>
 
-            {sessionOpen && (
-              <div
-                style={{
-                  borderTop: '1px solid #1A1A1A0A',
-                  padding: '16px 20px 20px',
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr 1fr',
-                  gap: 12,
-                }}
-              >
-                {[
-                  { value: '112 WPM',      sub: 'Native: 130–160' },
-                  { value: '87%',          sub: 'Pronunciation' },
-                  { value: '6 flagged',    sub: 'L1 interference' },
-                ].map(({ value, sub }) => (
-                  <div
-                    key={sub}
+          {breakdownOpen && (
+            <>
+              {/* Remaining rubric dimensions (those not shown in Layer 3). */}
+              {remainingDimensions.length > 0 && (
+                <SectionCard bg="white">
+                  <SectionLabel>Other dimensions</SectionLabel>
+                  {remainingDimensions.map((dim) => {
+                    const tint = dimensionScoreTint(dim.score)
+                    return (
+                      <div
+                        key={dim.key}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: 12,
+                          paddingBottom: 12,
+                          borderBottom: '1px solid #1A1A1A0A',
+                        }}
+                      >
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p
+                            style={{
+                              margin: 0,
+                              fontFamily: DISPLAY_FONT,
+                              fontWeight: 700,
+                              fontSize: 14,
+                              color: INK,
+                              marginBottom: 2,
+                            }}
+                          >
+                            {dimensionLabel(dim.key)}
+                          </p>
+                          <p
+                            style={{
+                              margin: 0,
+                              fontFamily: DISPLAY_FONT,
+                              fontWeight: 500,
+                              fontSize: 13,
+                              lineHeight: 1.45,
+                              color: INK_SOFT,
+                            }}
+                          >
+                            {dim.prose}
+                          </p>
+                        </div>
+                        <span
+                          style={{
+                            flexShrink: 0,
+                            fontFamily: DISPLAY_FONT,
+                            fontWeight: 700,
+                            fontSize: 13,
+                            backgroundColor: tint.bg,
+                            color: tint.fg,
+                            padding: '4px 10px',
+                            borderRadius: 999,
+                          }}
+                        >
+                          {dim.score}/5
+                        </span>
+                      </div>
+                    )
+                  })}
+                </SectionCard>
+              )}
+
+              {/* Universal sidebars: conjugation / grammar_structure /
+                  sentence_construction. Reads from rubric.universalSidebars. */}
+              {tacheRubric && (
+                <SectionCard bg="white">
+                  <SectionLabel>Technical KPIs</SectionLabel>
+                  {(['conjugation', 'grammar_structure', 'sentence_construction'] as const).map((sbKey) => {
+                    const sb = tacheRubric.universalSidebars[sbKey]
+                    const tint = dimensionScoreTint(sb.score)
+                    return (
+                      <div
+                        key={sbKey}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 4,
+                          paddingBottom: 12,
+                          borderBottom: '1px solid #1A1A1A0A',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                          <span
+                            style={{
+                              fontFamily: DISPLAY_FONT,
+                              fontWeight: 700,
+                              fontSize: 14,
+                              color: INK,
+                            }}
+                          >
+                            {sidebarLabel(sbKey)}
+                          </span>
+                          <span
+                            style={{
+                              flexShrink: 0,
+                              fontFamily: DISPLAY_FONT,
+                              fontWeight: 700,
+                              fontSize: 13,
+                              backgroundColor: tint.bg,
+                              color: tint.fg,
+                              padding: '4px 10px',
+                              borderRadius: 999,
+                            }}
+                          >
+                            {sb.score}/5
+                          </span>
+                        </div>
+                        {sb.examples.length > 0 && (
+                          <ul
+                            style={{
+                              margin: '4px 0 0',
+                              paddingLeft: 18,
+                              fontFamily: DISPLAY_FONT,
+                              fontWeight: 500,
+                              fontSize: 13,
+                              lineHeight: 1.45,
+                              color: INK_SOFT,
+                            }}
+                          >
+                            {sb.examples.map((ex, i) => (
+                              <li key={i} style={{ marginBottom: 2 }}>{ex}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    )
+                  })}
+                </SectionCard>
+              )}
+
+              {/* Full retry reasoning (always shown inside the disclosure
+                  even when Layer 4 already surfaced the reason). */}
+              {retryRec && retryRec.reason && (
+                <SectionCard bg="white">
+                  <SectionLabel>Retry reasoning</SectionLabel>
+                  <p
                     style={{
-                      backgroundColor: BG,
-                      borderRadius: 14,
-                      padding: '12px 10px',
+                      margin: 0,
+                      fontFamily: DISPLAY_FONT,
+                      fontWeight: 500,
+                      fontSize: 14,
+                      lineHeight: 1.5,
+                      color: INK,
+                    }}
+                  >
+                    {retryRec.shouldRetry
+                      ? retryRec.reason
+                      : `No retry recommended. ${tacheRubric?.nextActionSuggestion ?? ''}`.trim()}
+                  </p>
+                </SectionCard>
+              )}
+
+              {/* ── SECTION 3 (moved into disclosure) — DETECTED REFLEXES ── */}
+              <DetectedReflexesSection
+                primaryModule={primaryModule}
+                primaryDetection={primaryDetection}
+                secondaryModules={secondaryModules}
+                detections={detections}
+                onLearnTap={handleLearnTap}
+              />
+
+              {/* ── SECTION 4 (moved into disclosure) — L'ORDONNANCE ────── */}
+              {primaryModule && ordonnanceRefs.length > 0 ? (
+                <SectionCard bg={BUTTER}>
+                  <SectionLabel>{"L'Ordonnance · Learn this"}</SectionLabel>
+                  <SectionHeading>How to fix this in your next session</SectionHeading>
+                  <div
+                    style={{
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: 4,
-                      alignItems: 'center',
-                      textAlign: 'center',
+                      gap: 12,
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: 16,
+                      padding: '16px 18px',
                     }}
                   >
-                    <span
-                      style={{
-                        fontFamily: DISPLAY_FONT,
-                        fontWeight: 800,
-                        fontSize: 17,
-                        color: INK,
-                      }}
-                    >
-                      {value}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: DISPLAY_FONT,
-                        fontWeight: 500,
-                        fontSize: 10,
-                        color: INK_MUTED,
-                        lineHeight: '14px',
-                      }}
-                    >
-                      {sub}
-                    </span>
+                    {ordonnanceRefs.map((ref, i) => (
+                      <InlineContentRef key={i} ref_={ref} />
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
-          </SectionCard>
+                </SectionCard>
+              ) : null}
 
-          {/* ══ SECTION 6 — CORRECTED TRANSCRIPTION (still mocked — the
-                 Diagnostic shape doesn't carry segment-level corrections;
-                 wiring /recordings/{id} transcript/corrections into the
-                 CorrectedLine segments shape is its own ticket) ═══════════ */}
-          <SectionCard bg="white">
-            <div
-              style={{
-                display: 'flex',
-                backgroundColor: BG,
-                borderRadius: 100,
-                padding: 4,
-                gap: 2,
-              }}
-            >
-              {(['resume', 'complet'] as const).map((tab) => {
-                const active = transcriptTab === tab
-                return (
-                  <button
-                    key={tab}
-                    onClick={() => setTranscriptTab(tab)}
-                    style={{
-                      flex: 1,
-                      fontFamily: DISPLAY_FONT,
-                      fontWeight: active ? 700 : 500,
-                      fontSize: 13,
-                      color: active ? INK : INK_MUTED,
-                      backgroundColor: active ? 'white' : 'transparent',
-                      border: 'none',
-                      borderRadius: 100,
-                      padding: '8px 0',
-                      cursor: 'pointer',
-                      boxShadow: active ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
-                      transition: 'all 0.15s',
-                      WebkitTapHighlightColor: 'transparent',
-                    }}
-                  >
-                    {tab === 'resume' ? 'Le Résumé' : 'Le Diagnostic complet'}
-                  </button>
-                )
-              })}
-            </div>
+              {/* ── SECTION 6 (moved into disclosure) — CORRECTED TRANSCRIPTION ── */}
+              <SectionCard bg="white">
+                <div
+                  style={{
+                    display: 'flex',
+                    backgroundColor: BG,
+                    borderRadius: 100,
+                    padding: 4,
+                    gap: 2,
+                  }}
+                >
+                  {(['resume', 'complet'] as const).map((tab) => {
+                    const active = transcriptTab === tab
+                    return (
+                      <button
+                        key={tab}
+                        onClick={() => setTranscriptTab(tab)}
+                        style={{
+                          flex: 1,
+                          fontFamily: DISPLAY_FONT,
+                          fontWeight: active ? 700 : 500,
+                          fontSize: 13,
+                          color: active ? INK : INK_MUTED,
+                          backgroundColor: active ? 'white' : 'transparent',
+                          border: 'none',
+                          borderRadius: 100,
+                          padding: '8px 0',
+                          cursor: 'pointer',
+                          boxShadow: active ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+                          transition: 'all 0.15s',
+                          WebkitTapHighlightColor: 'transparent',
+                        }}
+                      >
+                        {tab === 'resume' ? 'Le Résumé' : 'Le Diagnostic complet'}
+                      </button>
+                    )
+                  })}
+                </div>
 
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: transcriptTab === 'complet' ? 20 : 14,
-              }}
-            >
-              {MOCK_LINES.map((line, i) => (
-                <CorrectedLine
-                  key={i}
-                  segments={line.segments}
-                  coachingNote={line.coachingNote}
-                  showCoaching={transcriptTab === 'complet'}
-                />
-              ))}
-            </div>
-          </SectionCard>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: transcriptTab === 'complet' ? 20 : 14,
+                  }}
+                >
+                  {MOCK_LINES.map((line, i) => (
+                    <CorrectedLine
+                      key={i}
+                      segments={line.segments}
+                      coachingNote={line.coachingNote}
+                      showCoaching={transcriptTab === 'complet'}
+                    />
+                  ))}
+                </div>
+              </SectionCard>
+            </>
+          )}
 
           {/* ══ BOTTOM ACTIONS ══════════════════════════════════════════════ */}
           <div

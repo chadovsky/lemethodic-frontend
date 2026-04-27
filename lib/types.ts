@@ -257,6 +257,38 @@ export interface OrdonnanceStep {
   example?: string
 }
 
+// F-083 — per-Tâche pedagogical rubric. Distinct from F-088's couches
+// (those are TCF-evaluation criteria scored on the legacy /5 scale);
+// the rubric here is the F-083 deadpan-tutor-voice layer.
+export interface TacheRubricDimension {
+  key: string
+  score: number   // 0-5
+  prose: string
+}
+
+export interface UniversalSidebar {
+  score: number   // 0-5
+  examples: string[]
+}
+
+export interface RetryRecommendation {
+  shouldRetry: boolean
+  reason: string
+}
+
+export interface TacheRubric {
+  tacheMode: 'tache_1' | 'tache_2' | 'tache_3'
+  summaryProse: string
+  dimensions: TacheRubricDimension[]
+  universalSidebars: {
+    conjugation: UniversalSidebar
+    grammar_structure: UniversalSidebar
+    sentence_construction: UniversalSidebar
+  }
+  retryRecommendation: RetryRecommendation
+  nextActionSuggestion: string
+}
+
 export interface Diagnostic {
   recordingId: number
   noteGlobale: number
@@ -266,6 +298,13 @@ export interface Diagnostic {
   ordonnance: OrdonnanceStep[]
   cefrLevel: string | null
   clbLevel: string | null
+  // F-084 — single-sentence diagnostic hero ("B1+, headed to B2.
+  // Connectors are holding you back."). null for legacy recordings
+  // and rubric fallbacks; frontend falls back to a CEFR-band default.
+  narrativeSummary: string | null
+  // F-083/F-084 — per-Tâche pedagogical rubric block. null for
+  // legacy recordings.
+  tacheRubric: TacheRubric | null
 }
 
 // ── Moules (Tâche 2 breakdown: Pyramide / Rebond / Ciblage) ──────────────────

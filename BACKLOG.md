@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-27 (F-091.0 V1 onboarding lock to TCF-only shipped — descriptors stripped + GOAL_TO_EXAM_PROFILE locked to tcf_canada)
+**Last updated:** 2026-04-27 (F-084 v2 shipped — diagnostic page progressive disclosure with narrative hero + top-3 dimensions + "See full breakdown"; F-084.x filed for session-details restore when F-058 lands)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -307,6 +307,51 @@ F-083 ✅ Per-Tâche pedagogical rubric (backend). Sprint feedback-rendering pac
 
 ---
 
+F-084 ✅ Diagnostic page progressive disclosure (v2 — replaces the original basic/detailed toggle design). Two-commit ship: backend extends the F-083 rubric prompt with `narrative_summary`; frontend rebuilds the diagnostic page around 5 layers.
+
+**Audit C decision: A1 (extend F-083 prompt) over A2 (separate Claude call).** The F-083 prompts are large but structurally compartmentalized — scoring (sec. 3) and threshold (sec. 4) are isolated from the JSON OUTPUT block (sec. 5). Adding a `narrative_summary` field to the JSON schema doesn't touch the scoring instructions, and the LLM has all the right context already in scope. A2 would have meant 50% more tokens per analysis to re-derive context. F-083 verification harness re-ran 6/6 + 4/4 + 3/3 green post-change → byte-identical scoring confirmed (gate 2).
+
+**Backend (tcf-oral-tool):**
+- `app/services/tache_rubric.py` — three rubric prompts (T1/T2/T3) gain a `NARRATIVE SUMMARY` instruction block + a `narrative_summary` field in their JSON OUTPUT schemas. Spec format preserved verbatim ("{CEFR band}, headed to {next band}. {What's holding them back, in plain words}." with the three example sentences). Dimension scoring + threshold sections byte-identical to F-083 ship.
+- `_coerce_rubric` adds a `narrative_summary` field to the canonical shape (240-char trim cap; LLM occasionally drifts to 2 sentences and the cap protects the hero slot from rendering a wall of text). `_rubric_fallback` returns empty string for legacy/no-key paths.
+- `Feedback.narrative_summary` (TEXT NULLABLE) added via `scripts/add_narrative_summary_column.py`. Idempotent PRAGMA-guarded `ALTER TABLE` matching the F-083 / F-062.3 / F-080a pattern. Ran cleanly on dev DB.
+- Persistence (both `recordings.py::_run_analysis_and_persist` and `conversations.py::_run_conversation_analysis_and_persist`) extracts `analysis["tache_rubric"]["narrative_summary"]` into the dedicated column. Empty-string fallbacks collapse to `None` for consistent legacy/empty behavior.
+- Serialization: `_format_recording` exposes `diagnostic.narrative_summary` at the top level alongside `diagnostic.tache_rubric`. Nullable.
+- `scripts/verify_f083_rubric.py` extended to assert `narrative_summary` shape on live Claude runs. Live runs produced the correct deadpan-tutor format on all three Tâches:
+  - T1: *"A2+, foundation work needed. Vocabulary range and content depth are holding you back."*
+  - T2: *"A2+, foundation work needed. Scripted delivery is holding you back from real interaction."*
+  - T3: *"B2, ready to push for C1. Solid structure and connectors; need richer examples for thematic depth."*
+
+**Frontend (fluentpath-frontend):**
+- `lib/types.ts` adds `TacheRubricDimension`, `UniversalSidebar`, `RetryRecommendation`, `TacheRubric` types. `Diagnostic` gains `narrativeSummary: string | null` + `tacheRubric: TacheRubric | null`.
+- `lib/api.ts` adds `RawTacheRubric` and pass-through in `mapDiagnosticBlock` (snake_case → camelCase, defensive on every nested field). Empty narrative strings collapse to null at the mapper boundary so the diagnostic page has a single "absent" check.
+- New `lib/rubric/dimensionLabels.ts` — hardcoded French labels for all 16 rubric dimension keys (T1: 5, T2: 5, T3: 6) plus the 3 sidebar keys. Labels stay French in both UI languages per the F-088 Étendue/Cohérence/Correction/Aisance precedent. `dimensionLabel()` and `sidebarLabel()` helpers fall back to a prettified snake_case key if a future backend dimension surfaces without a mapping.
+- `app/diagnostic/page.tsx` rebuilt around 5 layers:
+  - **Layer 1** — narrative hero. Single sentence above Section 1, 18px / weight 500 / `INK`. NOT a heading element. Falls back to `"{cefr_band} on Tâche {n}"` for legacy recordings (gate 4).
+  - **Layer 2** — Sections 1 + 2 unchanged (TCF score hero + couches diagnostic from F-088).
+  - **Layer 3** — top 3 dimensions card. Selection is deterministic: 1 strength (highest score, canonical-order tie-break) + 2 weaknesses (lowest scores from the remaining set, same tie-break). Visible row sorts by canonical order so the page reads stably regardless of which 3 got picked. Score badges use subtle semantic tinting: `0-1 = soft blush`, `2-3 = neutral`, `4-5 = soft sage`. Prose truncated at 120 chars with ellipsis.
+  - **Layer 4** — conditional retry callout. Renders only when `retryRecommendation.shouldRetry === true`. Peach card with `"Worth another try"` eyebrow + reason + "Record again" CTA → `/speaking/tache-{n}`.
+  - **Layer 5** — `"See full breakdown"` disclosure. `useState` toggle, no persistence (gate 7). Expanded contents in order: remaining 2-3 dimensions, universal sidebars (conjugation / grammar_structure / sentence_construction with score + examples), full retry reasoning (always shown inside disclosure even when Layer 4 already showed the reason — surface for the no-retry case which uses `nextActionSuggestion` as fallback), then the moved-from-default-render Sections 3 (detected modules) + 4 (L'Ordonnance) + 6 (corrected transcript).
+- **Section 5 (mocked WPM / pronon% / flagged-count) deleted entirely.** Mocked stats erode trust once a user notices identical numbers across recordings — see F-084.x for the restore plan when F-058 ships real session-details data. Both the Section 5 markup and the now-unused `sessionOpen` useState dropped.
+
+**Verification gates (7):**
+1. ✅ Migration idempotent — `scripts/add_narrative_summary_column.py` ran cleanly on a DB that already had F-083's `tache_rubric_data` column.
+2. ✅ F-083 byte-identical scoring — `python -m scripts.verify_f083_rubric` re-ran post-prompt-change: Pass 1 6/6 (threshold logic), Pass 2 4/4 (coercion), Pass 3 3/3 (live shape) — same outcome shape as before F-084.
+3. ✅ Live Claude `narrative_summary` populated — verified via Pass 3 (above) on all three Tâches in the deadpan tutor format.
+4. ✅ Legacy recording falls back — `TestClient` GET on recording 33 (T1, pre-F-083): `narrative_summary: None` (key present, value null), `tache_rubric: None`. Frontend's mapper collapses both to null and renders `"${tcfBand} on Tâche 1"` heading.
+5. ⚠️ Layer rendering — `tsc --noEmit` clean (only pre-existing `TargetScoreSelect.tsx:98`); dev server returns 200 on `/diagnostic` and `/diagnostic?session=33`. Visual smoke (narrative hero → score → top-3 → retry → disclosure-collapsed) deferred to Chadi.
+6. ⚠️ Disclosure expand interaction — code path verified (single `breakdownOpen` useState, conditional render of remaining dims + sidebars + reasoning + Section 3 + Section 4 + Section 6); browser smoke deferred.
+7. ✅ No persistence — `useState(false)` for `breakdownOpen`, no localStorage, no URL param, no profile field. Page reload resets to collapsed.
+
+`pnpm tsc --noEmit` clean except the pre-existing `TargetScoreSelect.tsx:98` known issue.
+
+**Filed (sub-ticket):**
+- **F-084.x** ⏸ Restore session details into the F-084 disclosure when F-058 ships real WPM/pron%/flagged-count data. Section 5 was deleted in F-084 because mocked numbers erode trust the moment a user notices identical stats across recordings; once the underlying data lands, fold the section back in alongside the universal sidebars in Layer 5's expanded view.
+
+**Followups already in BACKLOG**: F-058 itself remains queued (currently the placeholder "Coming soon" Progress page; same data layer F-084.x will eventually need).
+
+---
+
 F-091.0 ✅ V1 onboarding lock to TCF-only. Pre-launch ticket; May 4 launch ships TCF-honest.
 
 **Approach (a-prime) — adopted after Step 0 audit found the spec's two choices (hide selector / grey out cards) didn't fit the architecture.** No discrete exam-selector step exists in this codebase: step 2 is `TCFGoalSelect` which captures motivation (`immigration` / `studies` / `general`), and the exam profile is **derived** from goal via `mapOnboardingToBackend`. The goal step also gates step 4 (`TargetScoreSelect` branches on `state.goal` to choose between CLB / B1-C2 / "confident conversational"-style options) — removing it breaks the score-selection screen.
@@ -479,15 +524,7 @@ F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end 
 
 ---
 
-## Queued — feedback rendering (F-084)
-
-**F-084** 📋 Basic vs detailed feedback rendering modes
-- Two rendering modes per diagnostic, toggled on the diagnostic page:
-  - **Basic** — high-level summary, top 1-2 detected modules, encouragement copy, single-line couche summary. For new users / quick reviews / low-confidence sessions.
-  - **Detailed** — full module list (primary + all secondaries expanded), every example shown, every couche scored with its analysis prose. For users who want the full receipts.
-- Currently only one rendering mode exists (the detailed view). Need to (a) extract a "basic mode" component pass over each diagnostic section, (b) add a toggle to the page header, (c) persist the user's preferred default on the User row (basic-by-default for new signups; detailed-by-default for users with 5+ recordings).
-- **F-083 dependency satisfied** — the per-Tâche pedagogical rubric ships its data layer in commit (next). F-084 is the frontend that surfaces `summary_prose` / `tache_specific_dimensions[]` / `universal_sidebars` / `retry_recommendation` from the new `diagnostic.tache_rubric` block.
-- Estimate: 4-6h. Filed 2026-04-27.
+_(F-084 v2 shipped 2026-04-27 as a progressive-disclosure pattern, not the original basic/detailed toggle. See "Shipped — Week 2 (April 27)" below for the full entry. Original spec preserved here for diff-history; the v2 spec replaces the toggle/preference-field design with a single page that uses progressive disclosure for everyone — narrative hero + top-3 dimensions visible by default, "See full breakdown" disclosure for depth.)_
 
 ---
 

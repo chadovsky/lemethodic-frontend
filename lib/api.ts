@@ -319,6 +319,33 @@ interface RawCouche {
   score: number
 }
 
+// F-083/F-084 raw shape — the backend's `diagnostic.tache_rubric` JSON
+// block. Field names mirror the LLM output schema in
+// app/services/tache_rubric.py exactly; the mapper below converts
+// snake_case → camelCase at the API boundary.
+interface RawTacheRubricDimension {
+  key: string
+  score: number
+  prose: string
+}
+interface RawUniversalSidebar {
+  score: number
+  examples: string[]
+}
+interface RawTacheRubric {
+  tache_mode: 'tache_1' | 'tache_2' | 'tache_3'
+  summary_prose: string
+  tache_specific_dimensions: RawTacheRubricDimension[]
+  universal_sidebars: {
+    conjugation: RawUniversalSidebar
+    grammar_structure: RawUniversalSidebar
+    sentence_construction: RawUniversalSidebar
+  }
+  retry_recommendation: { should_retry: boolean; reason: string }
+  next_action_suggestion: string
+  narrative_summary?: string
+}
+
 interface RawDiagnosticBlock {
   note_globale?: number
   couches?: RawCouche[]
@@ -327,6 +354,12 @@ interface RawDiagnosticBlock {
     nom: string
     explication: string
   }
+  // F-084 — top-level narrative summary (also nested inside
+  // tache_rubric.narrative_summary; the top-level one is the
+  // canonical surface and is what the dedicated DB column carries).
+  narrative_summary?: string | null
+  // F-083 — per-Tâche pedagogical rubric. null for legacy recordings.
+  tache_rubric?: RawTacheRubric | null
   ce_qui_marche?: string
   // NOT an array — the backend emits a wrapper object with an `exercices`
   // array inside (see RawOrdonnanceBlock). Typed as unknown at the block
@@ -464,6 +497,36 @@ export function mapDiagnosticBlock(
     explication: pickLocalized(d.le_goulet?.explication) ?? '',
   }
 
+  // F-083/F-084 — pass the rubric through with snake_case → camelCase
+  // mapping. Defensive on every nested field so a partial-shape
+  // backend response degrades to a usable rubric instead of crashing.
+  let tacheRubric: import('./types').TacheRubric | null = null
+  if (d.tache_rubric && typeof d.tache_rubric === 'object') {
+    const r = d.tache_rubric
+    const dims = Array.isArray(r.tache_specific_dimensions) ? r.tache_specific_dimensions : []
+    const sb = (r.universal_sidebars ?? {}) as RawTacheRubric['universal_sidebars']
+    const blank = { score: 0, examples: [] as string[] }
+    tacheRubric = {
+      tacheMode: r.tache_mode,
+      summaryProse: r.summary_prose ?? '',
+      dimensions: dims.map((dim) => ({
+        key: String(dim.key ?? ''),
+        score: typeof dim.score === 'number' ? dim.score : 0,
+        prose: dim.prose ?? '',
+      })),
+      universalSidebars: {
+        conjugation: sb.conjugation ?? blank,
+        grammar_structure: sb.grammar_structure ?? blank,
+        sentence_construction: sb.sentence_construction ?? blank,
+      },
+      retryRecommendation: {
+        shouldRetry: !!r.retry_recommendation?.should_retry,
+        reason: r.retry_recommendation?.reason ?? '',
+      },
+      nextActionSuggestion: r.next_action_suggestion ?? '',
+    }
+  }
+
   return {
     recordingId,
     noteGlobale: d.note_globale ?? 0,
@@ -473,6 +536,11 @@ export function mapDiagnosticBlock(
     ordonnance: mapOrdonnance(d.ordonnance),
     cefrLevel: d.cefr_level ?? null,
     clbLevel: d.clb_level ?? null,
+    // F-084 — top-level narrative summary. Empty string from the
+    // backend rubric fallback collapses to null so the frontend has a
+    // single "absent" check.
+    narrativeSummary: d.narrative_summary && d.narrative_summary.trim() ? d.narrative_summary : null,
+    tacheRubric,
   }
 }
 
