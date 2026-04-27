@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-27 (F-087 ship — 27-lesson L'École curriculum)
+**Last updated:** 2026-04-27 (backlog reconciliation — F-101/F-102/F-103 filed, F-080d.z rule #3 adopted)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -525,6 +525,7 @@ Filed:
 - F-080d.z — verification harness rules:
   1. Any test that mutates `session_detected_modules` (or any other shared table) MUST use try/finally with snapshot+restore. Adopted after the F-080d round-1 cleanup leak.
   2. List/grid/index rendering gates MUST also click through to a detail page reached from the list and confirm content matches the data layer. Adopted F-089 after F-087 verification gate 5 ("HomeScreen + /ecole render 27 cards") shipped clean while `/ecole/lesson/[id]` was a hardcoded stub map covering only the old 16-lesson curriculum — list rendering passed; detail flow was broken for lessons 17-27 from F-087 onward. Bundled the fix into F-089 since that's the first ticket that actually read the detail page.
+  3. Every ticket spec must include an explicit grep-audit step against the actual codebase before implementation begins. Adopted 2026-04-27 after multiple tickets this sprint had spec drift between described state and codebase reality: F-087 referenced fields that didn't exist on the model, F-089 assumed `/ecole/lesson/[id]` rendered real data when it was a hardcoded stub, F-088 named an endpoint (`/api/diagnostic/{session_id}`) that doesn't exist in this codebase and missed the legacy admin template as a second consumer of `la_carte`. The grep-audit catches drift at write-time when the cost of revising the spec is hours, not at implementation-time when the cost is scope creep + commit-message archaeology.
 
 **F-080 deferred architectural questions (flagged in spec; revisit when relevant):**
 - Prompt-size scaling once library passes ~25 modules — inject category-subset per Tâche rather than full library.
@@ -604,6 +605,24 @@ Previously called "F-060 launch prep" umbrella. Split into discrete tickets here
 **F-093.1** ⏸ Progressive transcription UI (no backend change)
 - Frontend-only illusion of streaming using existing batch backend. Show waveform of captured audio, animated "Transcribing..." text, then word-by-word stagger animation when transcript arrives.
 - ~2 hours work. Optional pre-launch in QA window May 2-3 if real-streaming feel is desired before F-093 ships. Filed 2026-04-27.
+
+**F-101** ⏸ Master diagnostic — speaking + writing fusion (post-launch)
+- Combined view across Expression Orale (already shipped) and Expression Écrite (F-085). Detected modules from both modalities surface in one place. The product differentiator: a student sees the same English habit appearing in their speaking AND their writing — the cross-modal pattern is the key claim against generalist apps.
+- Depends on F-085 shipping first (writing pipeline must produce module detections before they can fuse with the speaking ones).
+- Estimate: 2-3 days. Filed 2026-04-27 from sprint reconciliation.
+
+**F-102** ⏸ Student-level dashboard (post-launch)
+- Longitudinal view of the student's progress across all sessions, all modalities, all time. Surfaces trends ("nuance_reflex fixed in week 2"), stuck patterns ("to_get_reflex still recurring after 8 sessions"), gives the student a Sunday-morning view of how they're doing. Bigger surface than per-session feedback — the home/École/diagnostic triad covers "what to do next"; F-102 covers "where am I going."
+- Depends on F-101 (the data model needs both modalities feeding the dashboard so trends are honest about the full surface, not just the speaking half).
+- Estimate: 3-4 days. Filed 2026-04-27 from sprint reconciliation.
+
+**F-103** 📋/⏸ Level-aware routing (sprint OR post-launch — Chadi to decide)
+- Onboarding captures user level (A1/A2/B1/B2/C1) but the app currently ignores it once the user lands on the home tab. Three places where level should bite:
+  - (a) **Lesson list start point** — A1 starts at lesson 1; B2 might start at 16 (skip Phase 1 fundamentals if calibration confirms mastery); C1 at Phase 2 outright.
+  - (b) **Diagnostic rubric calibration** — what counts as "good" depends on level. A B1 producing fragments still scores higher than a C1 producing fragments because the bar is different.
+  - (c) **"Recommended for you" module filtering** — surface modules appropriate to the student's level, not high-severity advanced patterns when fundamentals are still missing.
+- Status undecided: sprint candidate (depends on whether the launch product can honestly handle a B2 user without it; if yes, post-launch). Chadi to flag before next planning pass.
+- Estimate: 2 days. Filed 2026-04-27 from sprint reconciliation.
 
 ⏸ **Stripe integration** — deferred per explicit decision. Backend first, revenue later.
 ⏸ **Test-drive recording before paywall** — post-launch A/B test for conversion optimization
