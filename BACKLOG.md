@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-27 (F-075b shipped — TTS auth wrap; F-075b.x filed with canonical pattern for future user-audio serving route)
+**Last updated:** 2026-04-27 (F-076 shipped — CountdownTimer wall-clock rewrite + controlled-mode flag; pre-launch security trio F-075a/b + F-076 all shipped, DO deploy is next)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -349,6 +349,37 @@ F-084 ✅ Diagnostic page progressive disclosure (v2 — replaces the original b
 - **F-084.x** ⏸ Restore session details into the F-084 disclosure when F-058 ships real WPM/pron%/flagged-count data. Section 5 was deleted in F-084 because mocked numbers erode trust the moment a user notices identical stats across recordings; once the underlying data lands, fold the section back in alongside the universal sidebars in Layer 5's expanded view.
 
 **Followups already in BACKLOG**: F-058 itself remains queued (currently the placeholder "Coming soon" Progress page; same data layer F-084.x will eventually need).
+
+---
+
+F-076 ✅ Background tab timer drift fix. Last of the three pre-launch security tickets.
+
+**Audit reshaped scope, again.** Spec assumed counter-pattern timers (`setInterval(() => seconds + 1)`) across T1/T2/T3 record screens. Reality: T1/T2/T3 already use wall-clock math via `useAudioRecorder.durationMs` (Date.now()-based, fixed in F-061 — the file header explicitly notes the F-050 throttle bug). Auto-stop in all three sessions reads `recorder.durationMs >= CAP_MS` directly; the cap fires correctly under throttling, just visually lagged.
+
+The ONE real counter-pattern bug was in `components/speaking/CountdownTimer.tsx` (T3 prep mode's 2-minute prep timer). Old code: `setInterval(() => onTick(remaining - 1), 1000)` — decrement-by-1-each-second pattern. Backgrounded → throttled → drift. Single owned-mode caller: T3 prep. The other CountdownTimer caller (T3 recording) is parent-controlled from `recorder.durationMs` and was working accidentally because the no-op `onTick={() => {}}` masked the racing internal interval.
+
+**Frontend (fluentpath-frontend) — single commit:**
+- `components/speaking/CountdownTimer.tsx` rewritten:
+  - Owned mode (default, `controlled=false`): wall-clock math via `Date.now()`. `startTimeRef` captured on mount; tick polls every 250ms (~4Hz when foregrounded; arbitrary firing rate under throttle, doesn't matter — `Date.now() - startTime` is correct whenever the tick fires); `onTick(remaining)` pushed each tick; `onComplete()` fires when wall-clock elapsed ≥ totalSeconds; `completedRef` guard prevents double-fire on the cleanup race.
+  - Controlled mode (new `controlled?: boolean` prop): effect early-returns; component is purely visual. Renders the parent-driven `remaining` prop verbatim.
+  - `visibilitychange` listener forces an immediate tick on tab refocus — closes the gap between "throttled tick fires" and "user sees current value" for the few ms the next setInterval slot might take.
+  - Callbacks (`onTick`, `onComplete`) captured via refs that sync each render — effect doesn't restart on callback identity change.
+  - Effect deps `[controlled, totalSeconds]` only — runs ONCE per mount, not on every tick (the pre-F-076 design re-ran the effect on every `remaining` change, which is why the timer felt slightly off in foreground too).
+- `components/speaking/Tache3Session.tsx`: T3 recording mode usage now passes `controlled` explicitly. The pre-F-076 `onTick={() => {}}` smell is replaced by an explicit "parent owns timing" declaration; CountdownTimer's internal interval no longer races there.
+
+**Backend:** none. F-076 was always purely frontend.
+
+**Verification gates (5; manual gates 2-5 deferred to Chadi's browser smoke):**
+1. ✅ Audit findings reported, including the audit-vs-spec mismatch (T1/T2/T3 already wall-clock via useAudioRecorder; only CountdownTimer was broken).
+2-5. ⚠️ Browser-smoke gates deferred to Chadi:
+   - 30s background → prep timer reads ~30s elapsed correctly (covered by Date.now() math)
+   - Full 2-min background → prep auto-completes on refocus (covered by visibilitychange listener firing tick + onComplete on the catch-up tick)
+   - T3 recording controlled mode → CountdownTimer renders parent-driven `remaining` without running its own interval (effect early-returns when `controlled=true`)
+   - Foreground baseline → identical behavior to current production (1Hz visual updates since `displaySecs = remaining` is floored seconds; ring transition + label unchanged)
+
+  Code path traced for each gate. Dev server returns 200 on `/speaking/tache-3/environnement` post-change. `pnpm tsc --noEmit` clean except the pre-existing `TargetScoreSelect.tsx:98` known issue.
+
+**Pre-launch security trio complete:** F-075a (upload size cap) + F-075b (TTS auth wrap) + F-076 (timer drift fix) all shipped 2026-04-27. **Next: DigitalOcean App Platform deploy. Launch May 4.**
 
 ---
 
@@ -777,7 +808,9 @@ Previously called "F-060 launch prep" umbrella. Split into discrete tickets here
 - Backend: server-side size cap on /api/audio/upload (5 MB hard limit) — **shipped as F-075a; audit found 4 upload endpoints, all capped at 10 MB.**
 - Backend: user_id on Recording model + auth check on /api/audio/{id} serve route — **shipped as F-075b, but reshaped: audit found NO existing user-audio serving route (the diagnostic page never plays back user recordings; `_serialize_turn` deliberately refuses to expose candidate audio_url). Actual fix wrapped the unauthenticated `/tts_audio/` static mount with an authenticated route handler. F-075b.x carries the canonical pattern for whoever wires user-audio playback first.**
 
-**F-076** 📋 Background tab timer drift fix (carried from F-050)
+_(F-076 shipped 2026-04-27 — see entry under "Shipped — Week 2 (April 27)" above. The audit found the bug was localized to `CountdownTimer.tsx` (T3 prep mode); `useAudioRecorder` was already wall-clock via `Date.now()` per F-061. The original ticket text below is preserved verbatim for diff-history; the actual fix scope was narrower than the ticket assumed.)_
+
+**F-076 (original spec, superseded by ship)** 📋 Background tab timer drift fix (carried from F-050)
 - Frontend: PTT 60s cap in Tache2Session uses performance.now()+setInterval
 - Chrome throttles setInterval in hidden tabs, timer drifts
 - Fix: use Date.now() deltas (already pattern in useAudioRecorder)

@@ -414,9 +414,14 @@ export default function Tache3Session({ topicSlug }: Tache3SessionProps) {
               <CountdownTimer
                 totalSeconds={RECORD_SECS}
                 remaining={recordingRemainingSecs}
-                // Driven externally from recorder.durationMs — onTick noop
-                // keeps the component happy. onComplete is redundant with
-                // the 3-min useEffect watcher above.
+                // F-076 — controlled mode: parent owns timing. The
+                // recordingRemainingSecs value is computed from
+                // recorder.durationMs, which is already wall-clock-
+                // correct via Date.now() (see useAudioRecorder.ts).
+                // onTick / onComplete here are no-ops because the
+                // parent's 3-min useEffect watcher on durationMs is
+                // the actual auto-stop trigger.
+                controlled
                 onTick={() => {}}
                 onComplete={() => {}}
                 size={140}
