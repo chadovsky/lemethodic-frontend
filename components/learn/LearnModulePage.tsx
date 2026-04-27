@@ -180,6 +180,7 @@ export default function LearnModulePage({ moduleId }: Props) {
 
   const linkedLessonNumber = m.ecole_lesson_id
   const linkedLessonTitle = linkedLesson?.title
+  const linkedLessonSubline = linkedLesson?.sublineEn ?? null
 
   return (
     <div style={{ minHeight: '100dvh', backgroundColor: BG, fontFamily: DISPLAY_FONT }}>
@@ -345,12 +346,20 @@ export default function LearnModulePage({ moduleId }: Props) {
                     fontSize: 15,
                     cursor: 'pointer',
                     padding: '14px 18px',
+                    textAlign: 'left',
                     WebkitTapHighlightColor: 'transparent',
                   }}
                 >
-                  {linkedLessonTitle
-                    ? `${copy.goDeeperPrefix} ${linkedLessonNumber}: ${linkedLessonTitle}`
-                    : `${copy.goDeeperPrefix} ${linkedLessonNumber}`}
+                  <span style={{ display: 'block' }}>
+                    {linkedLessonTitle
+                      ? `${copy.goDeeperPrefix} ${linkedLessonNumber}: ${linkedLessonTitle}`
+                      : `${copy.goDeeperPrefix} ${linkedLessonNumber}`}
+                  </span>
+                  {linkedLessonSubline && (
+                    <span style={{ display: 'block', marginTop: 4, fontSize: 13, fontWeight: 500, opacity: 0.7, lineHeight: 1.5 }}>
+                      {linkedLessonSubline}
+                    </span>
+                  )}
                 </button>
                 <button
                   type="button"

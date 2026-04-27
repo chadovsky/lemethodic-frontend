@@ -151,12 +151,14 @@ export default function HomeScreen({
     [router],
   )
 
-  // Pre-resolved lesson title for the picker (HomeScreen already has the
-  // lessons list cached, save the sheet a roundtrip).
-  const pickerLessonTitle =
+  // Pre-resolved lesson title + subline for the picker (HomeScreen
+  // already has the lessons list cached, save the sheet a roundtrip).
+  const pickerLesson =
     pickerModule != null && pickerModule.ecole_lesson_id != null && lessons
-      ? lessons.find((l) => l.lessonNumber === pickerModule.ecole_lesson_id)?.title
+      ? lessons.find((l) => l.lessonNumber === pickerModule.ecole_lesson_id)
       : undefined
+  const pickerLessonTitle = pickerLesson?.title
+  const pickerLessonSubline = pickerLesson?.sublineEn ?? undefined
 
   // ─── derived values ──────────────────────────────────────────────────────
   const fetchedCompleted = lessons?.filter((l) => l.status === 'completed').length ?? 0
@@ -373,6 +375,7 @@ export default function HomeScreen({
                   background={BUTTER}
                   label={`Lesson ${nextLesson.lessonNumber} of ${TOTAL_LESSONS}`}
                   title={nextLesson.title}
+                  subline={nextLesson.sublineEn ?? undefined}
                   descriptor={nextLesson.shortDescription}
                   meta={[
                     {
@@ -551,6 +554,7 @@ export default function HomeScreen({
                       <LessonListItem
                         number={lesson.lessonNumber}
                         title={lesson.title}
+                        subline={lesson.sublineEn ?? undefined}
                         descriptor={lesson.shortDescription}
                         status={toItemStatus(lesson.status)}
                       />
@@ -577,6 +581,7 @@ export default function HomeScreen({
             ecole_lesson_id: pickerModule.ecole_lesson_id,
           }}
           lessonTitle={pickerLessonTitle}
+          lessonSubline={pickerLessonSubline}
           onClose={() => setPickerModule(null)}
         />
       )}

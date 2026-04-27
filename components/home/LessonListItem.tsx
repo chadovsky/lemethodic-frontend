@@ -15,6 +15,9 @@ export type LessonStatus = 'complete' | 'in-progress' | 'locked'
 export interface LessonListItemProps {
   number: number
   title: string
+  // F-089 — deadpan one-liner from EcoleLesson.sublineEn. Rendered
+  // between title and descriptor when present.
+  subline?: string
   descriptor: string
   status: LessonStatus
 }
@@ -69,7 +72,7 @@ function StatusIcon({ status }: { status: LessonStatus }) {
   return <Lock size={16} strokeWidth={1.75} color={INK_MUTED} />
 }
 
-export default function LessonListItem({ number, title, descriptor, status }: LessonListItemProps) {
+export default function LessonListItem({ number, title, subline, descriptor, status }: LessonListItemProps) {
   const isLocked = status === 'locked'
 
   const inner = (
@@ -103,6 +106,24 @@ export default function LessonListItem({ number, title, descriptor, status }: Le
         >
           {title}
         </p>
+        {subline && (
+          <p
+            style={{
+              fontFamily: DISPLAY_FONT,
+              fontWeight: 500,
+              fontSize: 13,
+              color: INK_MUTED,
+              margin: 0,
+              lineHeight: '19px',
+              marginTop: 2,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {subline}
+          </p>
+        )}
         <p
           style={{
             fontFamily: DISPLAY_FONT,

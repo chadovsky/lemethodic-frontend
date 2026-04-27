@@ -302,10 +302,12 @@ function DiagnosticInner() {
     [lessonsCache, router],
   )
 
-  const pickerLessonTitle =
+  const pickerLesson =
     pickerModule != null && pickerModule.ecole_lesson_id != null && lessonsCache
-      ? lessonsCache.find((l) => l.lessonNumber === pickerModule.ecole_lesson_id)?.title
+      ? lessonsCache.find((l) => l.lessonNumber === pickerModule.ecole_lesson_id)
       : undefined
+  const pickerLessonTitle = pickerLesson?.title
+  const pickerLessonSubline = pickerLesson?.sublineEn ?? undefined
 
   const fetchDiagnostic = useCallback(async () => {
     if (!hasSession || sessionId == null) return
@@ -855,6 +857,7 @@ function DiagnosticInner() {
         <LearnModuleSheet
           module={pickerModule}
           lessonTitle={pickerLessonTitle}
+          lessonSubline={pickerLessonSubline}
           onClose={() => setPickerModule(null)}
         />
       )}

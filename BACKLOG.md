@@ -210,11 +210,39 @@ F-087 ✅ 27-lesson L'École curriculum. Phase 2 of the F-086→F-089 pack.
 
 ---
 
+F-089 ✅ Lesson card subline rendering. Final phase of the F-086→F-089 pack.
+
+**Backend (tcf-oral-tool):**
+- No changes. F-087 had already exposed `subline_en` on both `_lesson_row_to_summary` and `_lesson_full_detail` in `app/routers/ecole.py`; the model column was added in the same seed. B1 verification confirmed the API was already shipping the field on all 27 lessons.
+
+**Frontend (fluentpath-frontend):**
+- `lib/types.ts::Lesson.sublineEn` and `lib/api.ts::mapLesson` were both wired in F-087 — F-089 only adds rendering.
+- `components/home/DailyActionCard.tsx`: optional `subline?: string` prop. Rendered between title and descriptor at 14px / weight 500 / `INK_MUTED` / line-height 1.5, no italic. Title bottom margin tightens from 8 → 4 when a subline is present so the visual stack stays balanced.
+- `components/home/LessonListItem.tsx`: same `subline?: string` prop, rendered as a third single-line ellipsised row at 13px between title (15px) and descriptor (12px). Subline conditional — locked rows still get it (they get `EcoleLesson.sublineEn` regardless of progress).
+- `components/home/HomeScreen.tsx`: passes `subline={nextLesson.sublineEn ?? undefined}` to the "Today's session" `DailyActionCard`, and `subline={lesson.sublineEn ?? undefined}` to each `LessonListItem` in the L'École list. Picker pre-resolution now caches both title and subline (`pickerLessonTitle`, `pickerLessonSubline`) and forwards both to `LearnModuleSheet`.
+- `components/modules/LearnModuleSheet.tsx`: new `lessonSubline?: string | null` prop (parallel to `lessonTitle`). Same caching pattern — caller can pass it to skip the roundtrip; otherwise the on-open `api.lessons.list()` fetch fills it in. Subline is rendered as a third line inside the primary "Structured lesson" CTA below the existing eyebrow + lesson label, at 13px / weight 500 / opacity 0.7 against the dark button background.
+- `app/diagnostic/page.tsx`: same picker pre-resolution change as HomeScreen — `pickerLessonSubline` derived from `lessonsCache` and forwarded to the `LearnModuleSheet` invocation.
+- `components/learn/LearnModulePage.tsx`: "Go deeper to Lesson N: {title}" primary CTA on `/learn/[module_id]` now renders the linked lesson's subline below the title line in the same dark-button-on-light-bg style as the picker. Same surface as the picker primary CTA — added to scope after a `lesson.title` audit (the original `title_en|title_fr` grep missed this because the title arrives via the normalized `Lesson` shape).
+- `app/ecole/lesson/[id]/page.tsx` rewritten — split into a thin server shell that awaits route params and a new `LessonDetailClient.tsx` that fetches `api.lessons.list()`, filters by `lesson_number`, and renders real title + subline + description from the data layer. Replaces the pre-F-089 hardcoded `LESSON_TITLES` stub map (which only covered the old 16-lesson curriculum, with lessons 17–27 falling through to "Lesson N"). Subline appears between the h1 title and the existing duration eyebrow, at 16px / weight 500 / `INK_MUTED` / line-height 1.5. This was an F-087 verification miss (gate 5 confirmed the list rendered 27 cards but never clicked into a detail page); bundled into F-089 since gate 6 cannot pass without real data wiring. See `F-080d.z` rule #2.
+
+**Verification gates (7):**
+1. `SELECT COUNT(*) FROM ecole_lessons WHERE subline_en IS NULL` → 0. ✅
+2. `GET /api/ecole/lessons` returns `subline_en` populated on all 27 lesson objects. ✅ (curl with minted JWT — `count: 27`, `with_subline: 27`).
+3-7. UI rendering gates — code paths verified end-to-end, `tsc --noEmit` clean (only pre-existing `TargetScoreSelect.tsx:98` issue). Browser smoke deferred to Chadi: "Today's session" card, home/`/ecole` list (all 27 + Phase 2 divider), `/ecole/lesson/1` showing "Coffee can't stand alone here. It needs an article. Don't ask why.", and `LearnModuleSheet` picker showing lesson 22's "Three traps wearing the same '-ing.' We disarm them one by one." in the primary CTA.
+
+**Filed:**
+- **F-089.x** quiz page (`app/ecole/lesson/[id]/quiz/`) is still stub — hardcoded preposition questions regardless of route param. Out of F-089 scope (subline rendering only); flagged as a follow-up since the detail page rewrite makes the contrast more visible.
+- **F-080d.z rule #2** added (see below) — list rendering verification gates must also click through to a detail page reached from the list.
+
+`pnpm tsc --noEmit` clean except the pre-existing `TargetScoreSelect.tsx:98` known issue.
+
+---
+
 ## In progress
 
 **F-080 epic CLOSED 2026-04-26.** F-080a + F-080b + F-080c shipped 2026-04-25; F-080d shipped 2026-04-26. The intelligence layer is end-to-end live: detection → persistence → diagnostic surface → cross-session recurrence → Raccourci routing.
 
-F-086 + F-087 shipped 2026-04-27. Next per the F-086→F-089 pack: F-088 (Couches → TCF criteria relabel — frontend-heavy, no DB churn), then F-089 (lesson card sublines render — purely cosmetic, reads what F-087 already seeded). Other queued tickets (F-061.1 T3 picker, F-064 lesson detail + quiz, launch-prep F-071–F-079, F-080.x detection-sensitivity refinement, F-080c.x Le Goulet cleanup, F-080d.x recordings(user_id) perf, F-080d.y public-glossary path, F-087.x EcoleReveal copy refresh) remain deferred.
+F-086 + F-087 + F-089 shipped 2026-04-27. F-088 (Couches → TCF criteria relabel — frontend-heavy, no DB churn) is the only outstanding ticket from the F-086→F-089 rename pack. Other queued tickets (F-061.1 T3 picker, F-064 lesson detail + quiz / F-089.x quiz stub, launch-prep F-071–F-079, F-080.x detection-sensitivity refinement, F-080c.x Le Goulet cleanup, F-080d.x recordings(user_id) perf, F-080d.y public-glossary path, F-087.x EcoleReveal copy refresh) remain deferred.
 
 ---
 
@@ -458,7 +486,9 @@ Verification: `tsc --noEmit` clean except the pre-existing `TargetScoreSelect.ts
 Filed:
 - F-080d.x — perf follow-up for `recordings(user_id)` index if the recurring query hot-paths.
 - F-080d.y — public-glossary path for `/learn/[module_id]` (post-launch SEO play; backend optional-auth ready).
-- F-080d.z — verification harness rule: any test that mutates `session_detected_modules` MUST use try/finally with snapshot+restore. Adopted after the round-1 cleanup leak; documented in this ticket's commit message.
+- F-080d.z — verification harness rules:
+  1. Any test that mutates `session_detected_modules` (or any other shared table) MUST use try/finally with snapshot+restore. Adopted after the F-080d round-1 cleanup leak.
+  2. List/grid/index rendering gates MUST also click through to a detail page reached from the list and confirm content matches the data layer. Adopted F-089 after F-087 verification gate 5 ("HomeScreen + /ecole render 27 cards") shipped clean while `/ecole/lesson/[id]` was a hardcoded stub map covering only the old 16-lesson curriculum — list rendering passed; detail flow was broken for lessons 17-27 from F-087 onward. Bundled the fix into F-089 since that's the first ticket that actually read the detail page.
 
 **F-080 deferred architectural questions (flagged in spec; revisit when relevant):**
 - Prompt-size scaling once library passes ~25 modules — inject category-subset per Tâche rather than full library.

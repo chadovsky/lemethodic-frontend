@@ -18,6 +18,9 @@ interface DailyActionCardProps {
   background: string   // pastel hex
   label: string        // e.g. "LESSON 5 OF 16"
   title: string
+  // F-089 — deadpan one-liner from EcoleLesson.sublineEn. Rendered
+  // between title and descriptor when present.
+  subline?: string
   descriptor: string
   meta: MetaItem[]
   illustrationSrc: string
@@ -37,6 +40,7 @@ export default function DailyActionCard({
   background,
   label,
   title,
+  subline,
   descriptor,
   meta,
   illustrationSrc,
@@ -126,12 +130,30 @@ export default function DailyActionCard({
           lineHeight: '26px',
           color: INK,
           margin: 0,
-          marginBottom: 8,
+          marginBottom: subline ? 4 : 8,
           paddingRight: 72,
         }}
       >
         {title}
       </h3>
+
+      {/* Subline (F-089) */}
+      {subline && (
+        <p
+          style={{
+            fontFamily: DISPLAY_FONT,
+            fontWeight: 500,
+            fontSize: 14,
+            lineHeight: 1.5,
+            color: INK_MUTED,
+            margin: 0,
+            marginBottom: 8,
+            paddingRight: 72,
+          }}
+        >
+          {subline}
+        </p>
+      )}
 
       {/* Descriptor */}
       <p

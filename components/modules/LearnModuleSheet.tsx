@@ -16,6 +16,11 @@
 // sheet fetches `api.lessons.list()` once on open and looks up by
 // lesson_number. Roundtrip is small (27 lessons post-F-087) but the cached path is
 // preferred when available.
+//
+// F-089: `lessonSubline` (deadpan one-liner from EcoleLesson.sublineEn)
+// is rendered below the title in the primary CTA. Same caching pattern
+// as `lessonTitle` — callers with the lessons list cached pass it
+// directly; otherwise the sheet's fetch fills it in.
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -45,16 +50,23 @@ interface Props {
   /** Pre-fetched lesson title to avoid a roundtrip. When omitted, the
    *  sheet fetches lessons on open. */
   lessonTitle?: string
+  /** F-089 — pre-fetched lesson subline (deadpan one-liner). Rendered
+   *  below the title in the primary CTA. Same caching pattern as
+   *  `lessonTitle`; filled by the sheet's fetch when callers omit it. */
+  lessonSubline?: string | null
   onClose: () => void
 }
 
-export default function LearnModuleSheet({ module: m, lessonTitle, onClose }: Props) {
+export default function LearnModuleSheet({ module: m, lessonTitle, lessonSubline, onClose }: Props) {
   const router = useRouter()
   const [resolvedTitle, setResolvedTitle] = useState<string | null>(lessonTitle ?? null)
+  const [resolvedSubline, setResolvedSubline] = useState<string | null>(lessonSubline ?? null)
 
-  // Fetch lesson title only when caller didn't provide one and the
-  // module is actually linked. Orphan modules shouldn't be shown via
-  // this sheet at all (caller bug if they are), but stay defensive.
+  // Fetch lesson title + subline only when caller didn't provide a title
+  // and the module is actually linked. Orphan modules shouldn't be
+  // shown via this sheet at all (caller bug if they are), but stay
+  // defensive. Subline degrades silently when missing — the CTA still
+  // renders title + lesson number.
   useEffect(() => {
     if (resolvedTitle != null) return
     if (m.ecole_lesson_id == null) return
@@ -65,6 +77,7 @@ export default function LearnModuleSheet({ module: m, lessonTitle, onClose }: Pr
         if (cancelled) return
         const match = lessons.find((l) => l.lessonNumber === m.ecole_lesson_id)
         setResolvedTitle(match?.title ?? `Lesson ${m.ecole_lesson_id}`)
+        setResolvedSubline(match?.sublineEn ?? null)
       })
       .catch(() => {
         if (cancelled) return
@@ -242,6 +255,11 @@ export default function LearnModuleSheet({ module: m, lessonTitle, onClose }: Pr
               Structured lesson
             </span>
             <span style={{ display: 'block', marginTop: 2 }}>{primaryLabel}</span>
+            {resolvedSubline && (
+              <span style={{ display: 'block', marginTop: 4, fontSize: 13, fontWeight: 500, opacity: 0.7, lineHeight: 1.5 }}>
+                {resolvedSubline}
+              </span>
+            )}
           </button>
 
           <button
