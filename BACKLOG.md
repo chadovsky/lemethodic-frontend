@@ -238,11 +238,47 @@ F-089 ✅ Lesson card subline rendering. Final phase of the F-086→F-089 pack.
 
 ---
 
+F-088 ✅ Couches → TCF criteria relabel. Closes the F-086→F-089 pack.
+
+**Spec correction (commit + ticket history accuracy):** the F-088 spec referred to a `/api/diagnostic/{session_id}` endpoint; this codebase doesn't have one. The diagnostic block is served under `GET /api/recordings/{id}` with `result["diagnostic"] = {...}`. Frontend: `lib/api.ts:890` + `mapDiagnosticBlock()`. The implementation targets `/api/recordings/{id}` (and the `/history` companion that uses the same shape).
+
+**Backend (tcf-oral-tool):**
+- New `app/services/couche_labels.py` — single source for the 4-couche TCF mapping (`le_fond → Étendue`, `les_moules_des_idees → Cohérence`, `les_moules → Correction`, `les_reflexes_anglais → Aisance`). Exposes `couches_array(scores)` returning `[{internal_key, display_label_en, display_label_fr, score}]` in the canonical order. EN/FR labels are intentionally identical today (TCF criteria use the same French words across language tracks) but kept as distinct keys for forward compatibility.
+- `app/routers/recordings.py` — hard cut: replaced the `la_carte` dict in both `/api/recordings/history` (line ~594) and `GET /api/recordings/{id}` (line ~791 in `_format_recording`) with the new `couches` array. No transition period, no dual-shape support.
+- `app/templates/index.html` — the legacy admin/demo dashboard's `displayResults()` migrated alongside the API change. Reads `d.couches` (array), constructs an internal `carte` dict from `internal_key` → `score`, and the rest of the rendering pipeline (which calls `coucheLabel(internal_key)`) is untouched. Admin keeps showing internal pedagogical names per F-088 F5 (internal naming preserved on internal tools).
+- Untouched: `analytics.py` (`latest_carte`, `points[].le_fond`, `couche_trends`) — the FluentPath frontend doesn't consume `/api/analytics/*`; only the legacy admin template does. Out of F-088 scope.
+- Untouched: `analysis.py` LLM contract (the LLM still emits `la_carte` in the analysis JSON; the relabel is a serialization-boundary concern, not an internal-data concern). Same for `Feedback` model column names.
+
+**Frontend (fluentpath-frontend):**
+- `lib/types.ts::Couche` — `label: string` replaced by `displayLabelEn: string` + `displayLabelFr: string`. `CoucheKey` narrowed from 5 keys to 4 (prononciation removed; the F-088 array doesn't carry it and the historical defensive 5th key was never emitted in production).
+- `lib/types.ts::Goulet` — `nom` + new `nomFr` string carrying the bottleneck's TCF display labels (pre-resolved by the mapper so the diagnostic page can pick by interface language without rewalking the array).
+- `lib/api.ts::mapDiagnosticBlock` — reads from `d.couches` array, drops the local `COUCHE_LABELS` dict (labels now come from backend per request). Goulet resolution looks up the matching couche in the array to pre-fill `displayLabelEn` + `displayLabelFr` on the Goulet shape.
+- `app/diagnostic/page.tsx` — `couchesToRows()` takes an `InterfaceLanguage` and picks `displayLabelFr` for `lang === 'fr'`, `displayLabelEn` otherwise. New `TCF_SECTION_COPY` map gives the eyebrow text in EN/FR/ES (`TCF Evaluation` / `Évaluation TCF` / `Evaluación TCF`). Section heading "Your CEFR-tracking baseline" preserved per spec. Component imports `useInterfaceLanguage()`.
+- `components/diagnostic/CouchesDiagnostic.tsx::DEFAULT_ROWS` — demo-mode mock data labels updated from internal names (Le Fond / Les Moules / …) to TCF criteria so demo mode matches a real session's bar names. Bottleneck callout already generic ("Your bottleneck is the top row") — no couche-specific text to update.
+
+**DECISIONS.md:** entry appended to `tcf-oral-tool/DECISIONS.md` under `April 27, 2026 — Couches → TCF criteria relabel (F-088)`. Documents the relabel, the Réflexes Anglais ≠ Aisance honesty flag, and the F-090 backend refactor as the proper post-launch fix.
+
+**Verification gates (7):**
+1. Backend: `curl /api/recordings/{id}` returns `couches` array with `display_label_en` + `display_label_fr` populated for all 4 couches. ✅ (verified live: `Étendue`, `Cohérence`, `Correction`, `Aisance`)
+2. Backend: `internal_key` field present on each couche. ✅ (live verified)
+3. Frontend: diagnostic page header — code path verified (eyebrow reads from `tcfCopy.eyebrow`, switches on UI lang). Browser smoke deferred.
+4. Frontend: 4 score bars labeled Étendue · Cohérence · Correction · Aisance. Code path verified (mapper reads `display_label_*` per couche; `couchesToRows` picks by lang). Browser smoke deferred.
+5. Frontend: bottleneck callout uses new labels — copy is generic ("Your bottleneck is the top row. Fix it first.") so the relabel is automatic via the bar at the top.
+6. Progress tab radar chart — **N/A**: `app/progress/page.tsx` is currently a "Coming soon (F-058)" placeholder. No radar to relabel.
+7. About page methodology preservation — **N/A**: no About page exists in the FluentPath frontend. The methodology framing is preserved by virtue of not having a page to alter.
+
+`pnpm tsc --noEmit` clean except the pre-existing `TargetScoreSelect.tsx:98` known issue.
+
+**Filed:**
+- F-090 (post-launch) — proper backend refactor with a true Aisance dimension based on F-038 fluency layer signals. Replaces "Réflexes Anglais → Aisance" relabel with a faithful measure.
+
+---
+
 ## In progress
 
 **F-080 epic CLOSED 2026-04-26.** F-080a + F-080b + F-080c shipped 2026-04-25; F-080d shipped 2026-04-26. The intelligence layer is end-to-end live: detection → persistence → diagnostic surface → cross-session recurrence → Raccourci routing.
 
-F-086 + F-087 + F-089 shipped 2026-04-27. F-088 (Couches → TCF criteria relabel — frontend-heavy, no DB churn) is the only outstanding ticket from the F-086→F-089 rename pack. Other queued tickets (F-061.1 T3 picker, F-064 lesson detail + quiz / F-089.x quiz stub, launch-prep F-071–F-079, F-080.x detection-sensitivity refinement, F-080c.x Le Goulet cleanup, F-080d.x recordings(user_id) perf, F-080d.y public-glossary path, F-087.x EcoleReveal copy refresh) remain deferred.
+F-086 + F-087 + F-088 + F-089 shipped 2026-04-27. The F-086→F-089 rename pack is closed. Next per the roadmap: F-091 multi-exam routing. Other queued tickets (F-061.1 T3 picker, F-064 lesson detail + quiz / F-089.x quiz stub, launch-prep F-071–F-079, F-080.x detection-sensitivity refinement, F-080c.x Le Goulet cleanup, F-080d.x recordings(user_id) perf, F-080d.y public-glossary path, F-087.x EcoleReveal copy refresh, F-090 backend Aisance refactor) remain deferred.
 
 ---
 

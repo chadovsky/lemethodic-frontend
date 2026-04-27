@@ -308,9 +308,20 @@ interface RawRecording {
 // Backend shape for the `diagnostic` block as emitted by the recordings
 // router (mirrors what analysis.py writes into the Feedback row, but
 // restructured as JSON for the API).
+// F-088 — `la_carte` (internal-key dict) replaced by `couches` (array
+// of {internal_key, display_label_en, display_label_fr, score}). Hard
+// cut: backend no longer emits `la_carte`. See
+// app/services/couche_labels.py for the canonical mapping.
+interface RawCouche {
+  internal_key: CoucheKey
+  display_label_en: string
+  display_label_fr: string
+  score: number
+}
+
 interface RawDiagnosticBlock {
   note_globale?: number
-  la_carte?: Partial<Record<CoucheKey, number>>
+  couches?: RawCouche[]
   le_goulet?: {
     couche: number | string
     nom: string
@@ -396,14 +407,6 @@ function mapRecording(raw: RawRecording): Recording {
   }
 }
 
-const COUCHE_LABELS: Record<CoucheKey, string> = {
-  le_fond: 'Le fond',
-  les_moules_des_idees: 'Les moules des idées',
-  les_moules: 'Les moules',
-  les_reflexes_anglais: 'Les réflexes anglais',
-  prononciation: 'Prononciation',
-}
-
 // The backend packs French + English into one string with "|||" as the
 // separator (e.g. "Aucune production.|||No production."). Default to the
 // English side; callers that want the French copy can split themselves.
@@ -415,44 +418,49 @@ function pickLocalized(s: string | null | undefined): string | null {
   return parts.length > 1 ? parts[1].trim() : parts[0].trim()
 }
 
+const KNOWN_COUCHE_KEYS: ReadonlySet<CoucheKey> = new Set<CoucheKey>([
+  'le_fond',
+  'les_moules_des_idees',
+  'les_moules',
+  'les_reflexes_anglais',
+])
+
 // Exposed so tests / future tickets can reuse the mapper without a round-trip.
 export function mapDiagnosticBlock(
   recordingId: number,
   d: RawDiagnosticBlock,
 ): Diagnostic {
-  const carte = d.la_carte ?? {}
-  // Only surface couches the backend actually returned a score for. Today
-  // analysis.py emits 4 (prononciation is absent); keeping this dynamic so
-  // the UI automatically reflects whatever couches future versions emit.
-  const allKeys: CoucheKey[] = [
-    'le_fond',
-    'les_moules_des_idees',
-    'les_moules',
-    'les_reflexes_anglais',
-    'prononciation',
-  ]
-  const couches: Couche[] = allKeys
-    .filter((k) => carte[k] != null)
-    .map((k) => ({
-      key: k,
-      label: COUCHE_LABELS[k],
-      score: carte[k] ?? 0,
+  // F-088 — read the `couches` array directly. Backend always emits
+  // all 4 TCF couches in canonical order; defensive filter is here in
+  // case a legacy row ever lands without the field populated.
+  const couches: Couche[] = (d.couches ?? [])
+    .filter((c) => c && KNOWN_COUCHE_KEYS.has(c.internal_key as CoucheKey))
+    .map((c) => ({
+      key: c.internal_key as CoucheKey,
+      displayLabelEn: c.display_label_en,
+      displayLabelFr: c.display_label_fr,
+      score: c.score ?? 0,
       // analyse_par_couche is not in the new `diagnostic` shape; use the
       // bilingual "ce_qui_marche" as a shared narrative instead (for now).
       analyse: null,
     }))
 
+  // `le_goulet.nom` is a CoucheKey string from analysis.py
+  // (e.g. "les_reflexes_anglais"). Look up the matching couche so the
+  // bottleneck callout can render the same TCF display label as the bars.
   const gouletNomRaw = d.le_goulet?.nom ?? ''
-  // `le_goulet.couche` is a numeric index in the API (1..4); pair with the
-  // `nom` string to resolve the actual CoucheKey. If nom doesn't match a
-  // known key we fall back to le_fond (defensive; shouldn't happen).
-  const gouletKey: CoucheKey = allKeys.includes(gouletNomRaw as CoucheKey)
+  const gouletKey: CoucheKey = KNOWN_COUCHE_KEYS.has(gouletNomRaw as CoucheKey)
     ? (gouletNomRaw as CoucheKey)
     : 'le_fond'
+  const gouletCouche = couches.find((c) => c.key === gouletKey)
 
   const goulet: Goulet = {
     couche: gouletKey,
-    nom: COUCHE_LABELS[gouletKey] ?? gouletNomRaw,
+    // F-088 — pre-resolve both display labels for the goulet so the
+    // diagnostic page can pick by interface language without rewalking
+    // the couches array.
+    nom: gouletCouche?.displayLabelEn ?? gouletNomRaw,
+    nomFr: gouletCouche?.displayLabelFr ?? gouletNomRaw,
     explication: pickLocalized(d.le_goulet?.explication) ?? '',
   }
 

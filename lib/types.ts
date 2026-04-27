@@ -216,18 +216,37 @@ export interface Recording {
 
 // ── Diagnostic (frontend-facing view over Feedback.feedback_grid) ────────────
 
-export type CoucheKey = 'le_fond' | 'les_moules_des_idees' | 'les_moules' | 'les_reflexes_anglais' | 'prononciation'
+// F-088 — internal pedagogical keys (backend dimensions, scoring, and
+// the LLM analysis contract still use these). The TCF display labels
+// come from the backend per couche on each request — see
+// `displayLabelEn` / `displayLabelFr` below.
+//
+// Prononciation was historically a 5th defensive key; the F-088
+// `couches` response only carries the 4 official TCF criteria, so the
+// type was narrowed to match.
+export type CoucheKey = 'le_fond' | 'les_moules_des_idees' | 'les_moules' | 'les_reflexes_anglais'
 
 export interface Couche {
   key: CoucheKey
-  label: string
+  // F-088 — display labels authored on the backend
+  // (`app/services/couche_labels.py`). Frontend picks one based on
+  // `useInterfaceLanguage()`. EN/FR are intentionally identical today
+  // (TCF uses the same French words across language tracks); both
+  // fields exist anyway so a future market-specific divergence
+  // doesn't need a schema change.
+  displayLabelEn: string
+  displayLabelFr: string
   score: number // 0-10 typically
   analyse: string | null
 }
 
 export interface Goulet {
   couche: CoucheKey
-  nom: string
+  // F-088 — display labels for the bottleneck callout. EN/FR are
+  // identical today (TCF uses the same French words) but kept split
+  // for symmetry with Couche.displayLabel*.
+  nom: string   // EN (= "Aisance", "Étendue", …)
+  nomFr: string // FR (= same as `nom` today; here for forward compat)
   explication: string
 }
 

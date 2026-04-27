@@ -17,6 +17,7 @@ import CorrectedLine, { Correction } from '@/components/diagnostic/CorrectedLine
 import LearnModuleSheet from '@/components/modules/LearnModuleSheet'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import { api, ApiError } from '@/lib/api'
+import { useInterfaceLanguage, type InterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 import type {
   Couche,
   DetectedModulesResponse,
@@ -90,13 +91,32 @@ function toPercent(rawScore: number): number {
 
 // Map the shaped Diagnostic into the CoucheRow shape CouchesDiagnostic expects.
 // Sorted worst-first so the bottleneck is at the top of the chart.
-function couchesToRows(couches: Couche[]): { name: string; score: number; cefr: string }[] {
+//
+// F-088 — `name` reads from the F-088 backend display labels. EN/FR
+// are identical today (TCF criteria use the same French words across
+// language tracks); the parameter is here for forward compatibility
+// with a possible market-specific divergence.
+function couchesToRows(
+  couches: Couche[],
+  lang: InterfaceLanguage,
+): { name: string; score: number; cefr: string }[] {
   return couches
     .map((c) => {
       const pct = toPercent(c.score)
-      return { name: c.label, score: pct, cefr: cefrBand(pct) }
+      const name = lang === 'fr' ? c.displayLabelFr : c.displayLabelEn
+      return { name, score: pct, cefr: cefrBand(pct) }
     })
     .sort((a, b) => a.score - b.score)
+}
+
+// F-088 — section header copy keyed by interface language. Replaces
+// "LA MÉTHODE EN COUCHES" / "Your CEFR-tracking baseline" pair. ES
+// users get the Spanish localization; everything else falls back to
+// EN.
+const TCF_SECTION_COPY: Record<InterfaceLanguage, { eyebrow: string; heading: string }> = {
+  en: { eyebrow: 'TCF Evaluation',     heading: 'Your CEFR-tracking baseline' },
+  fr: { eyebrow: 'Évaluation TCF',     heading: 'Your CEFR-tracking baseline' },
+  es: { eyebrow: 'Evaluación TCF',     heading: 'Your CEFR-tracking baseline' },
 }
 
 // ─── sub-components ──────────────────────────────────────────────────────────
@@ -256,6 +276,7 @@ function ErrorScreen({ message, onRetry }: { message: string; onRetry: () => voi
 function DiagnosticInner() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const lang = useInterfaceLanguage()
   const sessionParam = searchParams.get('session')
   const sessionId = sessionParam != null ? Number.parseInt(sessionParam, 10) : null
   const hasSession = sessionId != null && Number.isFinite(sessionId)
@@ -380,7 +401,8 @@ function DiagnosticInner() {
     : 'Within target band for TCF Canada (CLB 9+)'
 
   // Couches radar rows
-  const coucheRows = realMode ? couchesToRows(diagnostic.couches) : undefined
+  const coucheRows = realMode ? couchesToRows(diagnostic.couches, lang) : undefined
+  const tcfCopy = TCF_SECTION_COPY[lang] ?? TCF_SECTION_COPY.en
 
   // F-080c: detected modules + ordonnance source. The Diagnostic.goulet
   // and Diagnostic.ordonnance fields from the legacy /diagnostic block
@@ -601,10 +623,12 @@ function DiagnosticInner() {
             )}
           </SectionCard>
 
-          {/* ══ SECTION 2 — LA MÉTHODE EN COUCHES (now secondary context) ══ */}
+          {/* ══ SECTION 2 — TCF Evaluation (F-088 relabel of "La Méthode en
+                Couches"; backend dimensions / scoring unchanged, label layer
+                only) ════════════════════════════════════════════════════ */}
           <SectionCard bg={SAGE}>
-            <SectionLabel>La Méthode en Couches</SectionLabel>
-            <SectionHeading>Your CEFR-tracking baseline</SectionHeading>
+            <SectionLabel>{tcfCopy.eyebrow}</SectionLabel>
+            <SectionHeading>{tcfCopy.heading}</SectionHeading>
 
             <CouchesDiagnostic rows={coucheRows} />
           </SectionCard>

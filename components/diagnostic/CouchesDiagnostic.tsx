@@ -19,11 +19,14 @@ interface Props {
 }
 
 // ─── default mock data — sorted ascending (worst first) ──────────────────────
+// F-088 — labels now match the TCF criteria the backend exposes via
+// `display_label_*`. Demo mode (no real diagnostic) falls back to
+// these so the visual matches a real session's bar names.
 const DEFAULT_ROWS: CoucheRow[] = [
-  { name: 'Les Réflexes Anglais', score: 45, cefr: 'A2' },
-  { name: 'Les Moules des Idées', score: 62, cefr: 'B2' },
-  { name: 'Les Moules',           score: 71, cefr: 'B2' },
-  { name: 'Le Fond',              score: 78, cefr: 'C1' },
+  { name: 'Aisance',    score: 45, cefr: 'A2' },
+  { name: 'Cohérence',  score: 62, cefr: 'B2' },
+  { name: 'Correction', score: 71, cefr: 'B2' },
+  { name: 'Étendue',    score: 78, cefr: 'C1' },
 ]
 
 // ─── target band constants ────────────────────────────────────────────────────
