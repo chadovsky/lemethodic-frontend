@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-27 (F-091 epic restructured with F-091a/b/c; F-068 + F-070 superseded; F-091.0 V1 onboarding lock filed in launch prep)
+**Last updated:** 2026-04-27 (F-083 backend rubric shipped; F-083.x biographical-extraction sub-ticket filed; F-084 dependency satisfied)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -274,6 +274,39 @@ F-088 ✅ Couches → TCF criteria relabel. Closes the F-086→F-089 pack.
 
 ---
 
+F-083 ✅ Per-Tâche pedagogical rubric (backend). Sprint feedback-rendering pack, phase 1.
+
+**Architecture:** additive layer alongside the existing prompts (chosen over strict replacement after a Step 0 audit found the existing `SYSTEM_PROMPT_DIAGNOSTIC` is consumed by F-088 / F-080c / scoring_profiles — replacing it would have collapsed yesterday's F-088 ship). Three prompt categories per recording: (1) generic 4-couche diagnostic (`analysis.py::SYSTEM_PROMPT_DIAGNOSTIC`, unchanged); (2) Tâche specialty prompts (T2 Yarden Pyramide/Rebond/Ciblage from F-049, T3 argumentation from F-051, both unchanged); (3) **new** per-Tâche pedagogical rubric (F-083). Two Claude calls per recording instead of one, run in parallel via `asyncio.gather` so total latency is `max()` not `sum()`.
+
+**Backend (tcf-oral-tool):**
+- New `app/services/tache_rubric.py` — three deadpan-English rubric prompts (`_RUBRIC_SYSTEM_T1` / `_T2` / `_T3`), one entry point `apply_tache_rubric(tache_mode, transcript, context)`, defensive `_coerce_rubric` + `_rubric_fallback`, and a deterministic `_enforce_threshold` that recomputes the retry recommendation from dimension scores so a noisy LLM response can't ship "should_retry: false" when the scores say otherwise. LLM-flagged retries (where the deterministic check disagrees in the "no retry" direction) are preserved with a `LLM-flagged: …` prefix so a subtle LLM signal isn't lost.
+- Per-Tâche dimensions (canonical order, mirrored in the prompts):
+  - **T1 (5):** premiere_impression, presentation_de_soi, lexique_identite, aisance_hesitations, prononciation
+  - **T2 (5):** formation_questions, registre_approprie, actes_de_parole, reactivite, structuration_interactionnelle
+  - **T3 (6):** position_claire, argumentation_structuree, connecteurs_logiques, developpement_thematique, defense_calme, aisance_sous_pression
+- Universal sidebars (3, all Tâches): conjugation, grammar_structure, sentence_construction. Each carries a 0-5 score + 1-2 specific examples cited from transcript.
+- Retry threshold logic: any dimension < 2/5 OR overall average < 2.5/5 fires retry. T2 also fires when `formation_questions` < 2.5/5 (foundation-skill failure). T3 also fires when `argumentation_structuree` < 2/5 (T3 without structure is just talking).
+- `app/services/tache_1.py`, `tache_2.py`, `tache_3.py` — each `analyze_tache_*` now runs `apply_tache_rubric` in parallel with `analyze_transcript` via `asyncio.gather`. Result merged at `result["tache_rubric"]`. Existing T2 Yarden / T3 argumentation calls stay sequential after the gather.
+- Schema: new `Feedback.tache_rubric_data` TEXT column (nullable). Migration `scripts/add_tache_rubric_data_column.py` — idempotent PRAGMA-guarded `ALTER TABLE`, repo-convention sqlite3 direct migration matching the F-062.3 / F-063 / F-080a pattern.
+- Persistence: `app/routers/recordings.py::_run_analysis_and_persist` and `app/routers/conversations.py::_run_conversation_analysis_and_persist` both write `tache_rubric_data=json.dumps(analysis["tache_rubric"])` when present (defensive — leaves NULL when the rubric call fell back).
+- Serialization: `_format_recording` exposes `diagnostic.tache_rubric` (or `null` for legacy / failed-rubric rows).
+
+**Frontend:** none. F-084 is the rendering ticket.
+
+**Verification gates (5/5 green via `scripts/verify_f083_rubric.py`):**
+1. ✅ Step 0 grep audit: located the generic prompt at `app/services/analysis.py::SYSTEM_PROMPT_DIAGNOSTIC` (line 264-410). New module added alongside, not replacing.
+2. ✅ Live Claude T1 call: 5 dimensions populated, all sidebars present, retry recommendation fires.
+3. ✅ T2: 5 dimensions; T3: 6 dimensions. Both with universal_sidebars (conjugation / grammar_structure / sentence_construction) populated.
+4. ✅ universal_sidebars present on all three Tâches in live runs.
+5. ✅ Threshold logic deterministic test: 6/6 cases (T1 strong/weak, T2 strong/foundation-fail, T3 strong/no-structure) fire as expected. Coercion robustness: 4/4 cases (empty payload, garbage types, LLM-flag preservation, score clamp). Live Claude retry flag fires correctly per-Tâche.
+
+**Filed (sub-ticket):**
+- **F-083.x** ⏸ Extract T1 biographical data to user profile. T1 transcripts contain origin/profession/family/hobbies. The diagnostic should extract structured fields and store them on `users` for personalized examples in later sessions. Out of F-083 scope; filed per anti-scope. Estimate: 1 day.
+
+`pnpm tsc --noEmit` clean (frontend untouched). Backend imports clean (`python -c "import main"` smoke).
+
+---
+
 ## In progress
 
 **F-080 epic CLOSED 2026-04-26.** F-080a + F-080b + F-080c shipped 2026-04-25; F-080d shipped 2026-04-26. The intelligence layer is end-to-end live: detection → persistence → diagnostic surface → cross-session recurrence → Raccourci routing.
@@ -414,25 +447,15 @@ F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end 
 
 ---
 
-## Queued — feedback rendering (F-083, F-084)
-
-**F-083** 📋 Per-Tâche pedagogical rubric
-- Different feedback prose per Tâche based on what each task actually tests:
-  - **T1** — emphasizes self-presentation fluidity and interactional competence (turn-taking, follow-up Q handling, register adjustment to the examiner's tone)
-  - **T2** — emphasizes role-play register, question formation, requesting/refusing patterns (politeness markers, hedging, modulation)
-  - **T3** — emphasizes argument structure, connectors, monologue coherence (thesis → support → counter → conclusion arc)
-- Currently the diagnostic page renders one generic feedback prose for all three tâches — the analyzers already produce per-tâche-distinct internal output (`analyze_tache_1` / `_2` / `_3` in `app/services/`) but the surface copy collapses them into a single voice.
-- Backend: extend the Claude analysis prompt per analyzer with rubric-specific feedback instructions; output dict gains a `tache_specific_feedback` field with EN/FR copy.
-- Frontend: diagnostic page reads `tache_specific_feedback` and routes the right prose to the "Ce qui marche" / "What works" surface.
-- Estimate: 1 day. Filed 2026-04-27.
+## Queued — feedback rendering (F-084)
 
 **F-084** 📋 Basic vs detailed feedback rendering modes
 - Two rendering modes per diagnostic, toggled on the diagnostic page:
   - **Basic** — high-level summary, top 1-2 detected modules, encouragement copy, single-line couche summary. For new users / quick reviews / low-confidence sessions.
   - **Detailed** — full module list (primary + all secondaries expanded), every example shown, every couche scored with its analysis prose. For users who want the full receipts.
 - Currently only one rendering mode exists (the detailed view). Need to (a) extract a "basic mode" component pass over each diagnostic section, (b) add a toggle to the page header, (c) persist the user's preferred default on the User row (basic-by-default for new signups; detailed-by-default for users with 5+ recordings).
-- Depends on F-083 — the per-Tâche prose split is what makes "basic" mode feel meaningfully tâche-aware rather than generic.
-- Estimate: 4-6h after F-083. Filed 2026-04-27.
+- **F-083 dependency satisfied** — the per-Tâche pedagogical rubric ships its data layer in commit (next). F-084 is the frontend that surfaces `summary_prose` / `tache_specific_dimensions[]` / `universal_sidebars` / `retry_recommendation` from the new `diagnostic.tache_rubric` block.
+- Estimate: 4-6h. Filed 2026-04-27.
 
 ---
 
