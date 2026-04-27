@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-27 (backlog reconciliation — F-101/F-102/F-103 filed, F-080d.z rule #3 adopted)
+**Last updated:** 2026-04-27 (backlog gap fill — F-063.1, F-063.3, F-081, F-082, F-083, F-084, F-085, F-094–F-098, F-104–F-107 filed)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -345,7 +345,17 @@ F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end 
 
 ## Queued — follow-ups
 
-_(none — F-063 closed; T1 full loop shipped, mirrors T2 behavior.)_
+**F-063.1** 📋 T1 audio autoplay — examiner's opening prompt
+- Observed during F-063 verification: autoplay doesn't trigger on the examiner's FIRST prompt audio in a Tâche 1 session. Subsequent examiner turns in the same session play inline once the audio context is user-unlocked (via the "Tap to hear the question" ghost button on the first miss). The first turn falls through to the ghost-button fallback every time, even when the user has interacted with the page (briefing CTA tap).
+- Hypothesis: the briefing → `examiner-speaking` phase transition mounts the `<audio>` element and calls `.play()` synchronously in a `useEffect`, which lands outside the user-gesture window from the briefing CTA tap. Subsequent turns fire inside a gesture-derived event chain (PTT release → upload → response → play) so they pass.
+- Fix candidates: route the first turn's `play()` through the same gesture-chained handler the PTT flow uses, OR keep the current architecture and dismiss the autoplay ghost as expected first-turn behavior (cosmetic-only follow-up).
+- Not blocking — F-063 ships with the ghost-button fallback. Filed 2026-04-27.
+
+**F-063.3** 📋 T1 review sheet timing — sheet appears before examiner finishes speaking
+- Observed during F-063 verification: the per-turn review sheet (Confirmer / Refaire cette prise) for the user's just-recorded turn pops up before the AI examiner finishes speaking the FOLLOWING reply. The user is asked to confirm/redo while the examiner audio is still playing — clashes with the "let the examiner finish, then react" interaction model.
+- Root cause: phase machine flips to `reviewing` (which mounts the sheet) immediately after `/turn` upload completes; the examiner reply audio plays in parallel from the `examiner-speaking` phase. The two phases end up overlapping by ~3-6 seconds depending on turn length.
+- Fix candidate: gate the review sheet mount on `audioEnded === true` for the most recent examiner turn (or queue the sheet open behind the audio's `ended` event). Same pattern T2 already handles correctly via deferred-commit (F-062.3) — T1 inherited the structure but the audio-finish gate didn't carry over.
+- Filed 2026-04-27 from F-063 verification.
 
 ---
 
@@ -399,6 +409,28 @@ _(none — F-063 closed; T1 full loop shipped, mirrors T2 behavior.)_
 - Map internal score → TCF band using official TCF Oral rubric (0-699)
 - Frontend diagnostic page hero switches from {noteGlobale}/20 to {tcfScore} / 699 {cefrBand}
 - Paywall radar already shows this; make sure diagnostic matches
+
+---
+
+## Queued — feedback rendering (F-083, F-084)
+
+**F-083** 📋 Per-Tâche pedagogical rubric
+- Different feedback prose per Tâche based on what each task actually tests:
+  - **T1** — emphasizes self-presentation fluidity and interactional competence (turn-taking, follow-up Q handling, register adjustment to the examiner's tone)
+  - **T2** — emphasizes role-play register, question formation, requesting/refusing patterns (politeness markers, hedging, modulation)
+  - **T3** — emphasizes argument structure, connectors, monologue coherence (thesis → support → counter → conclusion arc)
+- Currently the diagnostic page renders one generic feedback prose for all three tâches — the analyzers already produce per-tâche-distinct internal output (`analyze_tache_1` / `_2` / `_3` in `app/services/`) but the surface copy collapses them into a single voice.
+- Backend: extend the Claude analysis prompt per analyzer with rubric-specific feedback instructions; output dict gains a `tache_specific_feedback` field with EN/FR copy.
+- Frontend: diagnostic page reads `tache_specific_feedback` and routes the right prose to the "Ce qui marche" / "What works" surface.
+- Estimate: 1 day. Filed 2026-04-27.
+
+**F-084** 📋 Basic vs detailed feedback rendering modes
+- Two rendering modes per diagnostic, toggled on the diagnostic page:
+  - **Basic** — high-level summary, top 1-2 detected modules, encouragement copy, single-line couche summary. For new users / quick reviews / low-confidence sessions.
+  - **Detailed** — full module list (primary + all secondaries expanded), every example shown, every couche scored with its analysis prose. For users who want the full receipts.
+- Currently only one rendering mode exists (the detailed view). Need to (a) extract a "basic mode" component pass over each diagnostic section, (b) add a toggle to the page header, (c) persist the user's preferred default on the User row (basic-by-default for new signups; detailed-by-default for users with 5+ recordings).
+- Depends on F-083 — the per-Tâche prose split is what makes "basic" mode feel meaningfully tâche-aware rather than generic.
+- Estimate: 4-6h after F-083. Filed 2026-04-27.
 
 ---
 
@@ -595,6 +627,29 @@ Previously called "F-060 launch prep" umbrella. Split into discrete tickets here
 
 ## Deferred — post-launch (Week 3+)
 
+**F-081** ⏸ Audio content refs per module
+- Native-speaker drill recordings attached to modules. Module schema already supports `content_refs` (typed `audio` is one of the allowed `ContentRefType` variants — see F-080c types). This ticket populates the audio entries with real URLs and wires the playback surface on `/learn/[id]`.
+- Backend: extend the seeder + module JSON authoring format to accept audio-file URLs; serve the files (S3 or static).
+- Frontend: `InlineContentRef.tsx` currently renders an "audio: Coming soon" placeholder for `audio` type — replace with a real `<audio>` element + waveform display.
+- Promoted from the "F-080 unblocks" line + F-080c InlineContentRef placeholder note (line 486) where this ticket lived as a passing reference.
+- Estimate: 2 days incl. audio production (native-speaker recordings, level/normalization). Filed 2026-04-27.
+
+**F-082** ⏸ Drill UI on `/learn/[module_id]`
+- Interactive AVOID/PREFER click-through exercises on the standalone module page. User reads the explanation, then practices identifying wrong vs right patterns on a series of cards. Spaced-repetition tracking persists per-user-per-module.
+- Backend: new `user_module_drills` table (user_id, module_id, drill_id, last_seen_at, correct_count, total_attempts) for SRS scheduling; new endpoints to fetch the next drill and submit answers.
+- Frontend: drill component reused on `/learn/[id]`; integrates with `ModuleExamples` (F-080c) for the source content.
+- Promoted from the "F-080 unblocks" line + F-080c InlineContentRef placeholder note (line 486).
+- Estimate: 2-3 days. Filed 2026-04-27.
+
+**F-085** ⏸ Writing integration (Expression Écrite)
+- Promoted from the generic deferred bullet to a discrete numbered ticket. Required dependency for **F-101** (master diagnostic, speaking + writing fusion) and indirectly for **F-102** (student-level dashboard, both modalities feed it).
+- Concrete scope:
+  - **(a)** Text input surface where students paste or type French. Two flavors: structured prompt (TCF Expression Écrite tâche) and free-form (any French text the student wants analyzed).
+  - **(b)** Analysis pipeline parallel to the speaking pipeline — re-use Claude API detection prompts adapted for written text. Same `RemediationModule` library; same detection contract; same persistence layer (a new `writing_recordings` or extended `recordings.modality` column carries it).
+  - **(c)** Module schema reused as-is — written L1-interference patterns surface as `detected_modules` with the same shape as speaking. No schema fork.
+  - **(d)** Writing-specific modules authored in the same JSON format (e.g. `anglicism_orthographique`, `anglicism_syntaxique`, `accord_participe_passe_negligence`). Authoring track ramps post-F-085 ship.
+- Estimate: 4-5 days. Filed 2026-04-27.
+
 **F-093** ⏸ Streaming transcription via WebSocket STT
 - Replace Whisper API batch transcription with streaming provider (Deepgram, OpenAI Realtime API, or Groq Whisper streaming).
 - Backend: WebSocket endpoint for audio streaming, partial-result forwarding, reconnection handling.
@@ -605,6 +660,37 @@ Previously called "F-060 launch prep" umbrella. Split into discrete tickets here
 **F-093.1** ⏸ Progressive transcription UI (no backend change)
 - Frontend-only illusion of streaming using existing batch backend. Show waveform of captured audio, animated "Transcribing..." text, then word-by-word stagger animation when transcript arrives.
 - ~2 hours work. Optional pre-launch in QA window May 2-3 if real-streaming feel is desired before F-093 ships. Filed 2026-04-27.
+
+**F-094** ⏸ TEF Section A examiner mode
+- New examiner mode where the AI plays a role and waits to be ASKED questions by the candidate. TEF Section A is "candidate elicits info from examiner" — the opposite information flow from T1 (examiner asks, candidate responds), T2 (role-play with mixed elicitation), and T3 (candidate-only monologue).
+- Distinct examiner persona prompts: candidate-driven turn order, examiner answers questions and prompts the candidate when they stall.
+- Distinct scoring rubric: quality of question formation, range of registers, ability to handle multi-clause asks ("Could you tell me whether ... and also ...").
+- Reuses the existing conversation engine (Tâche 1 / Tâche 2 share `/start`, `/turn`, `/end`) — the new mode plugs in as a `tache_mode` value with its own examiner persona module.
+- Estimate: 2 days. Filed 2026-04-27.
+
+**F-095** ⏸ DALF C1 with document presentation
+- Compte rendu + débat from a written dossier. Requires a new UI surface: candidate reads a multi-document dossier for 8-10 min prep (timer visible, no recording), then speaks for ~30 min monologue + débat against the AI examiner.
+- New `DocumentPresentation` component — paginated dossier reader with annotation/highlight support; optional "show prep notes" overlay during the monologue phase.
+- Integrates with the existing recording engine (PTT for the débat phase, monologue for the compte rendu). Document content authored as JSON dossiers per topic.
+- Distinct scoring rubric vs TCF: synthesis quality, source-citation in the compte rendu, defense of position in the débat.
+- Estimate: 3-4 days. Filed 2026-04-27.
+
+**F-096** ⏸ Visual identity system
+- Design tokens lock: color palette (the existing FluentPath pastels formalized into a tokenized scale), typography scale (Cabinet Grotesk display + body sizes / weights / line-heights), spacing rhythm (4/8/12/16/20/24/32 grid), component primitives (button states — default/hover/active/disabled/loading; card elevations; input focus rings; iconography decision — 3D illustrations vs flat illustrative vs photographic vs abstract).
+- Output: `design-tokens.css` (or `app/globals.css` extension) + Figma file or markdown spec doc for non-engineering reference.
+- Content-heavy not engineering-heavy; primary deliverable is decisions, not code.
+- Estimate: 1-2 days. Filed 2026-04-27.
+
+**F-097** ⏸ Apply design system across screens
+- Implementation of F-096 across every screen: onboarding, home tab, /ecole list, /ecole/[id] detail, T1/T2/T3 recording, diagnostic page, /learn/[id], profile/settings.
+- Component-by-component refactor: replace inline-style hex codes with tokens, normalize spacing to the F-096 rhythm, swap one-off icon usages for the F-098 iconography pass.
+- Depends on F-096 being locked. Without locked tokens this becomes whack-a-mole.
+- Estimate: 2-3 days after F-096 lands. Filed 2026-04-27.
+
+**F-098** ⏸ Iconography pass
+- 3D illustrations on lesson cards (one per phase / theme rather than today's repeated `illustration-level.jpg`), module category icons (vocab_calque, discourse_structure, verb_aspect, register_mismatch, grammar_interference, word_order, verb_aspect, ortho), achievement / milestone badges (already wired in EcoleProgress as text — promote to iconographic), empty-state illustrations.
+- Stock library curation (Iconscout / 3DIcons / similar) vs custom commission decision: stock for V1 to ship fast; selective custom commissions post-launch as the visual library matures.
+- Estimate: 1-2 days for stock integration; ongoing for custom track. Filed 2026-04-27.
 
 **F-101** ⏸ Master diagnostic — speaking + writing fusion (post-launch)
 - Combined view across Expression Orale (already shipped) and Expression Écrite (F-085). Detected modules from both modalities surface in one place. The product differentiator: a student sees the same English habit appearing in their speaking AND their writing — the cross-modal pattern is the key claim against generalist apps.
@@ -623,6 +709,30 @@ Previously called "F-060 launch prep" umbrella. Split into discrete tickets here
   - (c) **"Recommended for you" module filtering** — surface modules appropriate to the student's level, not high-severity advanced patterns when fundamentals are still missing.
 - Status undecided: sprint candidate (depends on whether the launch product can honestly handle a B2 user without it; if yes, post-launch). Chadi to flag before next planning pass.
 - Estimate: 2 days. Filed 2026-04-27 from sprint reconciliation.
+
+**F-104** ⏸ Pull-up reference tables overlay
+- 15 reference tables embedded in lessons + a persistent pull-up button (lower-right of any lesson screen) that opens an overlay with all tables, searchable.
+- Tier 1 signature tables (verbes + à, verbes + de, verbes pronominaux idiomatiques, prépositions de lieu, …), Tier 2 high-value supporting tables, Tier 3 exam-specific (TCF / TEF / DALF reference grids).
+- Overlay component: bottom-sheet pattern (mirrors `LearnModuleSheet`); search filter at top; tables rendered as `react-markdown` blocks with highlighted-row interaction.
+- Estimate: 2-3 days. Filed 2026-04-27.
+
+**F-105** ⏸ Transcript word-edit flow
+- After recording, before the user submits the candidate transcript for evaluation, allow surgical word-level editing instead of "Try Again" full rerecord.
+- UX: each transcribed word is a tap target → tap → editable input replaces the word inline → enter / blur commits → transcript re-renders with the edit. Edit history not preserved (the edit IS the truth from the user's perspective).
+- Backend: candidate transcript on `conversation_turns` already mutable pre-confirm; need to plumb a "user-edited" flag so analysis can know the source vs the candidate-as-recorded.
+- Sits alongside F-062.3's "Refaire cette prise" — Refaire is "I want to redo this take entirely"; word-edit is "I said this fine, the STT misheard one word."
+- Estimate: 1-2 days. Filed 2026-04-27.
+
+**F-106** ⏸ Master inventory doc — 35-45 grammar topics
+- Bilingual reference doc covering all grammar topics with severity rating 1-5. Track 0 deliverable per the Book-Lab pipeline (the authoring rhythm Chadi runs in parallel with engineering).
+- Authoring track, not engineering. The doc lives outside the codebase (Notion / Google Doc / dedicated repo) and feeds the curriculum + module-authoring + lesson-card-subline workstreams.
+- 15-20h authoring. Filed 2026-04-27.
+
+**F-107** ⏸ Module library expansion (3 → 30+)
+- Post-launch authoring umbrella. Continuous module authoring as patterns surface in real student data. Each module = JSON file + `detection_criteria` + AVOID / PREFER examples + optional `ecole_lesson_id` link.
+- Current library at F-080d ship time: 3 modules (`nuance_reflex`, `to_get_reflex`, `gerondif_confusion`). Target: 30+ post-launch, prioritized by detection-rate × severity from real recordings.
+- Authoring + reseed cycle is well-trodden post-F-080a; engineering work is zero per module unless a new content_ref type or detection prompt class surfaces.
+- No fixed estimate; ongoing track. Filed 2026-04-27.
 
 ⏸ **Stripe integration** — deferred per explicit decision. Backend first, revenue later.
 ⏸ **Test-drive recording before paywall** — post-launch A/B test for conversion optimization
