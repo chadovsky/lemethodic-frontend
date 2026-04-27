@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-27 (backlog gap fill — F-063.1, F-063.3, F-081, F-082, F-083, F-084, F-085, F-094–F-098, F-104–F-107 filed)
+**Last updated:** 2026-04-27 (F-091 epic restructured with F-091a/b/c; F-068 + F-070 superseded; F-091.0 V1 onboarding lock filed in launch prep)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -394,6 +394,7 @@ F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end 
 ## Queued — methodology / content gaps (F-068 to F-070)
 
 **F-068** 📋 TEF option in onboarding
+**Superseded by F-091b** (April 27, 2026). Original scope below preserved for historical record.
 - Split "Immigration" goal into "Immigration — TCF Canada" and "Immigration — TEF Canada"
 - mapOnboardingToBackend routes second option to exam_profile='tef'
 - No backend change needed (exam_profile column already accepts 'tef')
@@ -405,6 +406,7 @@ F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end 
 - Reseed the ecole_lessons table on dev DB before launch
 
 **F-070** 📋 CEFR → TCF /699 score mapping
+**Superseded by F-091c** (April 27, 2026). Original scope below preserved for historical record. Reframe in F-091c generalizes from TCF /699 to per-exam dispatch.
 - Backend analysis engine must emit tcfScore (0-699) alongside noteGlobale (0-20) and cefrBand
 - Map internal score → TCF band using official TCF Oral rubric (0-699)
 - Frontend diagnostic page hero switches from {noteGlobale}/20 to {tcfScore} / 699 {cefrBand}
@@ -623,6 +625,19 @@ Previously called "F-060 launch prep" umbrella. Split into discrete tickets here
 - Compare FluentPath predicted TCF score vs actual exam score
 - Tune analysis engine thresholds if gaps exceed ±50 points on /699 scale
 
+**F-091.0** 📋 V1 onboarding lock to TCF-only
+- **Pre-launch.** Until the F-091 epic ships post-launch, the onboarding flow must not surface non-TCF exam options. The May 4 launch ships TCF-only by decision (April 27, 2026); the launch product is honest about what it actually supports.
+- Two implementation choices, recommendation **(a)**:
+  - **(a)** *Recommended.* Hide the exam-selector step entirely if it currently exists. New users default to `exam_profile = 'tcf'`. Returning users with non-TCF profiles (none exist yet — sanity-check via `SELECT DISTINCT exam_profile FROM users` before locking) keep their value but the UI doesn't surface the choice.
+  - **(b)** Keep the step visible but show TCF as the only selectable card. Other exam cards (TEF, DELF, DALF) replaced by a single greyed-out non-tappable "More exams coming soon" tile.
+- Why (a): less UI surface, and no "coming soon" promise that needs a specific date attached. Confirm by checking current onboarding code before deciding — if the selector is already hidden behind a feature flag, just leave it off; if visible and selectable, hide it.
+- Verification gates:
+  1. New user signup → onboarding flow does not show non-TCF exam options.
+  2. `SELECT DISTINCT exam_profile FROM users` returns only `'tcf'` (or NULL for users created pre-feature).
+  3. Existing test users with `exam_profile = 'tcf'` are unaffected.
+  4. Onboarding analytics event for exam selection (if any) is either removed or fires with `'tcf'` as a constant.
+- Estimate: 1-2 hours. Single commit. Filed 2026-04-27 alongside the F-091 epic restructure.
+
 ---
 
 ## Deferred — post-launch (Week 3+)
@@ -640,6 +655,38 @@ Previously called "F-060 launch prep" umbrella. Split into discrete tickets here
 - Frontend: drill component reused on `/learn/[id]`; integrates with `ModuleExamples` (F-080c) for the source content.
 - Promoted from the "F-080 unblocks" line + F-080c InlineContentRef placeholder note (line 486).
 - Estimate: 2-3 days. Filed 2026-04-27.
+
+**F-091 (epic)** ⏸ Multi-exam routing — TCF + TEF Section B + DELF B1/B2
+- Decision (April 27, 2026): deferred from launch sprint to **post-launch week 1**. For the May 4 launch, FluentPath ships TCF-only (see **F-091.0** in the launch-prep queue for the V1 lock). Multi-exam returns post-launch with proper scope.
+- **Goal:** one engine, swap prompts and scoring per exam. Three concrete targets: TCF Canada (already shipped, baseline), TEF Section B, DELF B1/B2.
+- **Architectural cornerstone:** `app/services/exam_profiles/` already has the dispatch shape (`base.py` interface + `tcf_canada.py` concrete). The epic extends that pattern to the other two exams without forking the engine.
+- **Composed of three sub-tickets — ships when all three are green. Total estimate ~2.5 days.**
+- **Supersedes** F-068 (folded into F-091b) and F-070 (folded into F-091c). Both originals retained as historical records with supersede header notes.
+
+**F-091a** ⏸ Exam-profile dispatch infrastructure
+- Backend only. Extend `app/services/exam_profiles/` with `tef.py` and `delf.py` profile implementations alongside the existing `tcf_canada.py`. Per-exam prompt sets for examiner persona (TEF role-play, DELF entretien dirigé).
+- Thread `users.exam_profile` through analyzer dispatch points (`analyze_tache_1` / `_2` / `_3` and the F-080b module detector) so the right prompts are used per recording. Today every analyzer hardcodes the TCF Canada profile via the existing `get_profile()` lookup; this extends `get_profile(exam_profile)` to dispatch by string.
+- No frontend changes.
+- Estimate: 1 day. Part of F-091 epic.
+
+**F-091b** ⏸ Onboarding goal split + exam_profile wiring
+- Frontend + light backend. Subsumes the original F-068 work verbatim plus the DELF option:
+  - Split "Immigration" goal into "Immigration — TCF Canada" / "Immigration — TEF Canada"
+  - Add "Education — DELF B1/B2" as a new top-level goal
+  - Wire `mapOnboardingToBackend` to set `exam_profile` correctly per option ('tcf' | 'tef' | 'delf')
+  - Confirm `users.exam_profile` column accepts the new values (currently a bare TEXT column; no constraint to relax)
+- **Depends on F-091a shipping first** — otherwise the column value has no dispatch target and the user's experience silently falls through to the TCF profile.
+- Estimate: 2-4 hours. Part of F-091 epic.
+
+**F-091c** ⏸ Generalized scoring infrastructure
+- Backend + frontend. Reframes the original F-070 work from TCF-only to per-exam dispatch.
+- **Backend:** refactor `app/services/scoring_maps.py` from TCF-only to a profile-dispatched layer:
+  - `tcf_from_score` (existing — `/699` scale)
+  - `tef_from_score` (new — `/450` scale + NCLC mapping for the Canadian-immigration cross-walk)
+  - `delf_band_from_score` (new — B1/B2 pass/fail mapping; no continuous scale, just a band assertion against the threshold)
+- **Frontend:** diagnostic hero reads from the active exam profile (via the user shape + the recording's `exam_profile` field) and renders the appropriate scale: `/699` for TCF, `/450` for TEF, band-pass for DELF. Paywall radar already shows TCF /699; that surface is updated alongside the diagnostic hero.
+- **Depends on F-091a** for the profile dispatch target.
+- Estimate: 1 day. Part of F-091 epic.
 
 **F-085** ⏸ Writing integration (Expression Écrite)
 - Promoted from the generic deferred bullet to a discrete numbered ticket. Required dependency for **F-101** (master diagnostic, speaking + writing fusion) and indirectly for **F-102** (student-level dashboard, both modalities feed it).
