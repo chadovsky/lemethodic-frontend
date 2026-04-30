@@ -3,12 +3,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronLeft, Settings } from 'lucide-react'
+import { motion, useReducedMotion } from 'framer-motion'
 import RecordButton, { RecordingState } from './RecordButton'
 import VuMeter from './VuMeter'
 import CountdownTimer from './CountdownTimer'
 import { useAudioRecorder } from '@/hooks/useAudioRecorder'
 import { api, ApiError } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
+import {
+  durationBase,
+  easeFpEnter,
+  recordingDonePulseScale,
+  recordingDonePulseDuration,
+} from '@/lib/motion'
 
 const INK          = '#1A1A1A'
 const INK_SOFT     = '#1A1A1AB3'
@@ -44,6 +51,7 @@ interface Tache3SessionProps {
 export default function Tache3Session({ topicSlug }: Tache3SessionProps) {
   const router = useRouter()
   const user = useAuthStore((s) => s.user)
+  const reduceMotion = useReducedMotion()
 
   const topicId = Number.parseInt(topicSlug ?? '', 10) || 1
 
@@ -384,7 +392,11 @@ export default function Tache3Session({ topicSlug }: Tache3SessionProps) {
           {/* ── RECORDING + PROCESSING STATES ── */}
           {(phase === 'recording' || phase === 'processing') && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
-              <h2
+              <motion.h2
+                key={phase}
+                initial={reduceMotion ? false : { y: 6, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: durationBase, ease: easeFpEnter }}
                 style={{
                   fontFamily: DISPLAY_FONT,
                   fontWeight: 700,
@@ -395,7 +407,7 @@ export default function Tache3Session({ topicSlug }: Tache3SessionProps) {
                 }}
               >
                 {phase === 'processing' ? 'Analyzing…' : 'Recording'}
-              </h2>
+              </motion.h2>
               {phase === 'recording' && (
                 <p
                   style={{
@@ -430,12 +442,24 @@ export default function Tache3Session({ topicSlug }: Tache3SessionProps) {
                 accentColor={phase === 'processing' ? INK_MUTED : CORAL}
               />
 
-              <RecordButton
-                mode="tap"
-                recordingState={recordButtonState}
-                idleColor={CORAL}
-                onTap={() => void finishRecording()}
-              />
+              <motion.div
+                animate={
+                  reduceMotion
+                    ? { scale: 1 }
+                    : phase === 'processing'
+                      ? { scale: recordingDonePulseScale }
+                      : { scale: 1 }
+                }
+                transition={{ duration: recordingDonePulseDuration, ease: easeFpEnter }}
+                style={{ display: 'flex' }}
+              >
+                <RecordButton
+                  mode="tap"
+                  recordingState={recordButtonState}
+                  idleColor={CORAL}
+                  onTap={() => void finishRecording()}
+                />
+              </motion.div>
 
               {phase === 'recording' && (
                 <VuMeter stream={recorder.stream} color={CORAL} />

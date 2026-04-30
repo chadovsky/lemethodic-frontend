@@ -2,6 +2,15 @@
 
 import Link from 'next/link'
 import { Check, Play, Lock } from 'lucide-react'
+import { motion, useReducedMotion } from 'framer-motion'
+import {
+  lessonUnlockScale,
+  lessonUnlockBoxShadow,
+  lessonUnlockBoxShadowTimes,
+  lessonUnlockDuration,
+  easeFpEnter,
+  easeFpDefault,
+} from '@/lib/motion'
 
 // ─── design tokens ───────────────────────────────────────────────────────────
 const INK         = '#1A1A1A'
@@ -20,6 +29,10 @@ export interface LessonListItemProps {
   subline?: string
   descriptor: string
   status: LessonStatus
+  // P-115 — true on the lesson card that just unlocked (after a quiz pass
+  // routed back to the home screen). Plays a one-shot scale + elevation
+  // animation on first render. Stays at default after ~1s.
+  justUnlocked?: boolean
 }
 
 // Number circle
@@ -72,11 +85,34 @@ function StatusIcon({ status }: { status: LessonStatus }) {
   return <Lock size={16} strokeWidth={1.75} color={INK_MUTED} />
 }
 
-export default function LessonListItem({ number, title, subline, descriptor, status }: LessonListItemProps) {
+export default function LessonListItem({ number, title, subline, descriptor, status, justUnlocked }: LessonListItemProps) {
   const isLocked = status === 'locked'
+  const reduceMotion = useReducedMotion()
+  const playUnlock = !!justUnlocked && !reduceMotion
 
   const inner = (
-    <div
+    <motion.div
+      initial={playUnlock ? { scale: lessonUnlockScale[0], boxShadow: lessonUnlockBoxShadow[0] } : false}
+      animate={
+        playUnlock
+          ? {
+              scale: lessonUnlockScale[1],
+              boxShadow: lessonUnlockBoxShadow,
+            }
+          : undefined
+      }
+      transition={
+        playUnlock
+          ? {
+              scale: { duration: 0.4, ease: easeFpEnter },
+              boxShadow: {
+                duration: lessonUnlockDuration,
+                times: lessonUnlockBoxShadowTimes,
+                ease: easeFpDefault,
+              },
+            }
+          : undefined
+      }
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -145,7 +181,7 @@ export default function LessonListItem({ number, title, subline, descriptor, sta
       <div style={{ flexShrink: 0 }}>
         <StatusIcon status={status} />
       </div>
-    </div>
+    </motion.div>
   )
 
   if (isLocked) {

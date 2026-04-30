@@ -3,17 +3,30 @@
 // P-100 — empty-state shown on the Progress dashboard when the user has
 // zero recordings. Routes them to the Speaking Lab Tâche 1 picker to
 // take their first diagnostic, which unlocks the dashboard sections.
+//
+// P-115 — the primary CTA carries a slow attention-pulse loop on first
+// render. Pauses while hovered or pressed; respects prefers-reduced-motion.
 
 import Link from 'next/link'
+import { motion, useReducedMotion } from 'framer-motion'
 import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
+import {
+  attentionPulseScale,
+  attentionPulseDuration,
+  attentionPulseRepeatDelay,
+  easeFpDefault,
+} from '@/lib/motion'
 
 const INK         = '#1A1A1A'
 const INK_SOFT    = '#1A1A1AB3'
 const INK_MUTED   = '#1A1A1A66'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 
+const MotionLink = motion.create(Link)
+
 export default function EmptyState() {
   const lang = useInterfaceLanguage()
+  const reduceMotion = useReducedMotion()
   const eyebrow = lang === 'fr' ? 'Tableau de bord' : 'Dashboard'
   const heading =
     lang === 'fr'
@@ -75,8 +88,25 @@ export default function EmptyState() {
       >
         {body}
       </p>
-      <Link
+      <MotionLink
         href="/speaking/tache-1"
+        animate={
+          reduceMotion
+            ? undefined
+            : { scale: attentionPulseScale }
+        }
+        transition={
+          reduceMotion
+            ? undefined
+            : {
+                duration: attentionPulseDuration,
+                repeat: Infinity,
+                repeatDelay: attentionPulseRepeatDelay,
+                ease: easeFpDefault,
+              }
+        }
+        whileHover={{ scale: 1 }}
+        whileTap={{ scale: 1 }}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -94,7 +124,7 @@ export default function EmptyState() {
         }}
       >
         {ctaLabel}
-      </Link>
+      </MotionLink>
     </div>
   )
 }

@@ -97,6 +97,24 @@ export default function HomeScreen({
   // ─── fetch state ─────────────────────────────────────────────────────────
   const router = useRouter()
   const [lessons, setLessons] = useState<Lesson[] | null>(null)
+  // P-115 — when a quiz finished with a passing score, the QuizClient
+  // wrote the next-lesson number to sessionStorage. Read once on mount,
+  // surface it to the matching LessonListItem so it can play the
+  // unlock animation, then clear the flag so a refresh doesn't replay.
+  const [justUnlockedLesson, setJustUnlockedLesson] = useState<number | null>(null)
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('lemethodic:unlocked-lesson')
+      if (raw) {
+        const n = parseInt(raw, 10)
+        if (Number.isFinite(n)) setJustUnlockedLesson(n)
+        sessionStorage.removeItem('lemethodic:unlocked-lesson')
+      }
+    } catch {
+      // sessionStorage can throw in private-browsing modes — animation is
+      // decorative, no-op.
+    }
+  }, [])
   // F-080d — recurring modules for the "Recommended for you" section.
   // Empty array = section hidden entirely (no banner, no header). Failure
   // to fetch is non-fatal; section just stays hidden.
@@ -557,6 +575,7 @@ export default function HomeScreen({
                         subline={lesson.sublineEn ?? undefined}
                         descriptor={lesson.shortDescription}
                         status={toItemStatus(lesson.status)}
+                        justUnlocked={lesson.lessonNumber === justUnlockedLesson}
                       />
                     </Fragment>
                   )

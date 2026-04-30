@@ -30,9 +30,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronLeft, Volume2, VolumeX, ChevronDown, ChevronUp } from 'lucide-react'
+import { motion, useReducedMotion } from 'framer-motion'
 import ChatBubble from './ChatBubble'
 import RecordButton, { RecordingState } from './RecordButton'
 import VuMeter from './VuMeter'
+import {
+  durationBase,
+  easeFpEnter,
+  recordingDonePulseScale,
+  recordingDonePulseDuration,
+} from '@/lib/motion'
 import { useAudioRecorder } from '@/hooks/useAudioRecorder'
 import { api, ApiError } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
@@ -966,6 +973,7 @@ function BottomBar({
   onPTTStart: () => void
   onPTTEnd: () => void
 }) {
+  const reduceMotion = useReducedMotion()
   const helper =
     phase === 'user-idle' ? 'Hold to talk' :
     phase === 'user-recording' ? 'Recording… release to stop' :
@@ -1005,6 +1013,17 @@ function BottomBar({
           </p>
         )}
 
+        <motion.div
+          animate={
+            reduceMotion
+              ? { scale: 1 }
+              : phase === 'user-transcribing'
+                ? { scale: recordingDonePulseScale }
+                : { scale: 1 }
+          }
+          transition={{ duration: recordingDonePulseDuration, ease: easeFpEnter }}
+          style={{ display: 'flex' }}
+        >
         <RecordButton
           mode="ptt"
           recordingState={recordButtonState}
@@ -1012,12 +1031,17 @@ function BottomBar({
           onPTTStart={phase === 'user-idle' ? onPTTStart : undefined}
           onPTTEnd={phase === 'user-recording' ? onPTTEnd : undefined}
         />
+        </motion.div>
 
         {phase === 'user-recording' && (
           <VuMeter stream={recorderStream} color={INK} />
         )}
 
-        <p
+        <motion.p
+          key={phase}
+          initial={reduceMotion ? false : { y: 6, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: durationBase, ease: easeFpEnter }}
           style={{
             fontFamily: DISPLAY_FONT,
             fontWeight: 700,
@@ -1028,7 +1052,7 @@ function BottomBar({
           }}
         >
           {helper}
-        </p>
+        </motion.p>
 
         {phase === 'user-idle' && (
           <p style={{ fontFamily: DISPLAY_FONT, fontWeight: 500, fontSize: 12, color: INK_MUTED, margin: 0, textAlign: 'center' }}>

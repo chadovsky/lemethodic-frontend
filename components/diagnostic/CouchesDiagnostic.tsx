@@ -1,5 +1,13 @@
 'use client'
 
+import { motion, useReducedMotion } from 'framer-motion'
+import {
+  staggerDiagnosticRow,
+  durationDiagnosticReveal,
+  durationBase,
+  easeFpEnter,
+} from '@/lib/motion'
+
 // ─── design tokens (self-contained) ─────────────────────────────────────────
 const INK          = '#1A1A1A'
 const INK_MUTED    = '#1A1A1A66'
@@ -34,13 +42,22 @@ const BAND_LO = 70  // % of bar width
 const BAND_HI = 85  // % of bar width
 
 // ─── single bar row ───────────────────────────────────────────────────────────
-function CoucheBarRow({ name, score, cefr }: CoucheRow) {
+function CoucheBarRow({ name, score, cefr, index, animate }: CoucheRow & { index: number; animate: boolean }) {
   const scorePct = `${score}%`
   const bandLoPct = `${BAND_LO}%`
   const bandWidthPct = `${BAND_HI - BAND_LO}%`
+  const rowDelay = animate ? index * staggerDiagnosticRow : 0
+  const initial = animate ? { opacity: 0 } : false
+  const fillInitial = animate ? { width: 0 } : false
+  const dotInitial = animate ? { left: '0%', opacity: 0 } : false
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+    <motion.div
+      initial={initial}
+      animate={{ opacity: 1 }}
+      transition={{ delay: rowDelay, duration: durationDiagnosticReveal, ease: easeFpEnter }}
+      style={{ display: 'flex', alignItems: 'center', gap: 12 }}
+    >
 
       {/* LEFT — layer name */}
       <div style={{ width: '35%', flexShrink: 0 }}>
@@ -86,13 +103,15 @@ function CoucheBarRow({ name, score, cefr }: CoucheRow) {
         />
 
         {/* User fill — solid black, from 0 to score */}
-        <div
+        <motion.div
           aria-hidden="true"
+          initial={fillInitial}
+          animate={{ width: scorePct }}
+          transition={{ delay: rowDelay, duration: durationDiagnosticReveal, ease: easeFpEnter }}
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
-            width: scorePct,
             height: '100%',
             backgroundColor: INK,
             borderRadius: 999,
@@ -100,12 +119,14 @@ function CoucheBarRow({ name, score, cefr }: CoucheRow) {
         />
 
         {/* Score dot marker — sits at right edge of fill */}
-        <div
+        <motion.div
           aria-hidden="true"
+          initial={dotInitial}
+          animate={{ left: scorePct, opacity: 1 }}
+          transition={{ delay: rowDelay, duration: durationDiagnosticReveal, ease: easeFpEnter }}
           style={{
             position: 'absolute',
             top: '50%',
-            left: scorePct,
             transform: 'translate(-50%, -50%)',
             width: 10,
             height: 10,
@@ -154,12 +175,20 @@ function CoucheBarRow({ name, score, cefr }: CoucheRow) {
         </span>
       </div>
 
-    </div>
+    </motion.div>
   )
 }
 
 // ─── main export ──────────────────────────────────────────────────────────────
 export default function CouchesDiagnostic({ rows = DEFAULT_ROWS }: Props) {
+  const reduceMotion = useReducedMotion()
+  const animate = !reduceMotion
+  // Bottleneck appears after all bars settle:
+  // (rows-1) * stagger + bar duration, plus a small grace gap.
+  const bottleneckDelay = animate
+    ? Math.max(0, rows.length - 1) * staggerDiagnosticRow + durationDiagnosticReveal + 0.1
+    : 0
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
@@ -191,13 +220,16 @@ export default function CouchesDiagnostic({ rows = DEFAULT_ROWS }: Props) {
 
       {/* Bar rows */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-        {rows.map((row) => (
-          <CoucheBarRow key={row.name} {...row} />
+        {rows.map((row, i) => (
+          <CoucheBarRow key={row.name} {...row} index={i} animate={animate} />
         ))}
       </div>
 
       {/* Bottleneck note */}
-      <p
+      <motion.p
+        initial={animate ? { opacity: 0, y: 4 } : false}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: bottleneckDelay, duration: durationBase, ease: easeFpEnter }}
         style={{
           margin: 0,
           fontFamily: DISPLAY_FONT,
@@ -208,7 +240,7 @@ export default function CouchesDiagnostic({ rows = DEFAULT_ROWS }: Props) {
         }}
       >
         Your bottleneck is the top row. Fix it first.
-      </p>
+      </motion.p>
 
     </div>
   )

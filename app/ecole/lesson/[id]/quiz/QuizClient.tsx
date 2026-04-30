@@ -1,7 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+
+// P-115 — when the user completes a quiz with a passing score, signal the
+// next lesson's unlock to the home screen via sessionStorage. HomeScreen
+// reads this on mount, applies a one-shot animation to the matching lesson
+// card, then clears the flag. Wired now so the animation infrastructure is
+// in place; once F-064 wires real backend lesson-completion, this stays
+// the trigger for the visual cue. Storage key:
+//   `lemethodic:unlocked-lesson` -> stringified lesson number (e.g. "6")
+const UNLOCK_STORAGE_KEY = 'lemethodic:unlocked-lesson'
 
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 const INK        = '#1A1A1A'
@@ -57,6 +66,20 @@ export default function QuizClient({ lessonId }: { lessonId: string }) {
   const [confirmed, setConfirmed] = useState(false)
   const [score, setScore] = useState(0)
   const [finished, setFinished] = useState(false)
+
+  // On a perfect-score finish, write the next-lesson unlock signal so the
+  // home screen can play the unlock animation when the user navigates back.
+  useEffect(() => {
+    if (!finished || score !== QUIZ_QUESTIONS.length) return
+    const parsed = parseInt(lessonId, 10)
+    if (!Number.isFinite(parsed)) return
+    try {
+      sessionStorage.setItem(UNLOCK_STORAGE_KEY, String(parsed + 1))
+    } catch {
+      // sessionStorage can throw in private-browsing modes; the animation
+      // is decorative — silently no-op.
+    }
+  }, [finished, score, lessonId])
 
   const question = QUIZ_QUESTIONS[currentIndex]
   const total = QUIZ_QUESTIONS.length
