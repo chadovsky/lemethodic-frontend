@@ -581,6 +581,15 @@ F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end 
 - Fix candidate: gate the review sheet mount on `audioEnded === true` for the most recent examiner turn (or queue the sheet open behind the audio's `ended` event). Same pattern T2 already handles correctly via deferred-commit (F-062.3) — T1 inherited the structure but the audio-finish gate didn't carry over.
 - Filed 2026-04-27 from F-063 verification.
 
+### F-109 — Register payload field mismatch
+
+**Priority:** High
+**File:** lib/api.ts:648-657
+**Bug:** Frontend sends `name`, backend expects `full_name`. Backend silently accepts, stores empty string.
+**Impact:** All users since bug introduced have empty `full_name`. Blocks Stripe receipts (P-106), marketing emails (M-104, M-108), personalization.
+**Open question:** Did backend rename `full_name` → `name` and frontend wasn't updated, or is one side wrong? Answer determines fix scope.
+**Fix:** TBD pending answer above.
+
 ---
 
 ## Queued — core product wiring (continued)
@@ -1022,6 +1031,15 @@ _(F-091.0 shipped 2026-04-27 — see entry under "Shipped — Week 2 (April 27)"
 **Scope:** Single file. Independent commit. ~10 min work.
 
 **Related:** Worth a future ticket to address `typescript.ignoreBuildErrors: true` itself — silently passing builds with type errors is technical debt. But that's a separate cleanup session blocked on first fixing all latent TS errors.
+
+---
+
+### C-100 — Clean up test user id=5 from production DB
+
+**Priority:** Low
+**Source:** Created during curl debugging, April 30 morning
+**Action:** DELETE FROM users WHERE id = 5; after verifying no FK dependencies
+**When:** Before beta launch, batched with any other test users created during P-100/P-105/P-106 dev
 
 ---
 
