@@ -20,7 +20,7 @@ import type { Lesson, RecordingSummary, RecurringModule } from '@/lib/types'
 
 const INK         = '#1A1A1A'
 const INK_MUTED   = '#1A1A1A66'
-const BG          = '#FAFAF7'
+const BG          = 'var(--fp-canvas)'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 
 export default function ProgressPage() {
@@ -90,13 +90,13 @@ function ProgressDashboard() {
             position: 'sticky',
             top: 0,
             zIndex: 40,
-            height: 56,
+            height: 'calc(56px + var(--fp-safe-top))',
             backgroundColor: BG,
             borderBottom: '1px solid #1A1A1A0A',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '0 16px',
+            padding: 'var(--fp-safe-top) 16px 0 16px',
           }}
         >
           <h1

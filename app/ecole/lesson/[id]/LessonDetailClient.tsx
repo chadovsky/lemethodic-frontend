@@ -26,7 +26,7 @@ const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 const INK         = '#1A1A1A'
 const INK_SOFT    = '#1A1A1AB3'
 const INK_MUTED   = '#1A1A1A66'
-const BG          = '#FAFAF7'
+const BG          = 'var(--fp-canvas)'
 const CTA_BG      = '#1A1A1A'
 
 interface Props {
@@ -67,12 +67,12 @@ export default function LessonDetailClient({ lessonNumber }: Props) {
             position: 'sticky',
             top: 0,
             zIndex: 40,
-            height: 56,
+            height: 'calc(56px + var(--fp-safe-top))',
             backgroundColor: BG,
             borderBottom: '1px solid #1A1A1A0A',
             display: 'flex',
             alignItems: 'center',
-            padding: '0 16px',
+            padding: 'var(--fp-safe-top) 16px 0 16px',
             gap: 12,
           }}
         >

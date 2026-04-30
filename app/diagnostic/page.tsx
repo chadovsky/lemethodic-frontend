@@ -36,7 +36,7 @@ const INK_MUTED    = '#1A1A1A66'
 const SAGE         = '#D4E4D0'
 const BUTTER       = '#FFF0C2'
 const PEACH        = '#FFD8C2'
-const BG           = '#FAFAF7'
+const BG           = 'var(--fp-canvas)'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 
 // ─── mock transcript (shown when no ?session= param — for design-review) ─────
@@ -516,7 +516,7 @@ function DiagnosticInner() {
         style={{
           maxWidth: 440,
           margin: '0 auto',
-          paddingBottom: 120,
+          paddingBottom: 'calc(120px + var(--fp-safe-bottom))',
         }}
       >
         {/* ══ HEADER ══════════════════════════════════════════════════════════ */}

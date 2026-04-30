@@ -84,7 +84,7 @@ export default function TranscriptReviewPanel({
             : 'translateX(-50%) translateY(100%)',
           width: '100%',
           maxWidth: 440,
-          backgroundColor: '#FAFAF7',
+          backgroundColor: 'var(--fp-canvas)',
           borderTopLeftRadius: 28,
           borderTopRightRadius: 28,
           zIndex: 70,
@@ -244,9 +244,9 @@ export default function TranscriptReviewPanel({
         {/* Sticky bottom actions */}
         <div
           style={{
-            padding: '16px 20px 32px',
+            padding: '16px 20px calc(32px + var(--fp-safe-bottom)) 20px',
             borderTop: '1px solid #1A1A1A0A',
-            backgroundColor: '#FAFAF7',
+            backgroundColor: 'var(--fp-canvas)',
             flexShrink: 0,
           }}
         >

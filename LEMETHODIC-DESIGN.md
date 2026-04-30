@@ -71,6 +71,9 @@ These four values were inline in the codebase at first audit; promoted to formal
 | `--fp-track` | `#E8E8E5` | Empty bar track / progress-track surface. | `CouchesDiagnostic.tsx:7` |
 | `--fp-peach-deep` | `#E0A890` | Saturated peach. Restricted use: paywall radar fill/stroke. Not for body UI — pastels handle warmth in-app. | `Paywall.tsx:198-200` |
 | `--fp-sage-deep` | `#2D8B55` | Saturated green. Restricted use: "win" microcopy badges (Save %, free-tier check icons at low alpha). Not for body UI — `--fp-sage` handles target/success semantics. | `Paywall.tsx:319, 708, 711` |
+| `--fp-sage-deep-25` | `#2D8B5540` | 25% alpha variant of `--fp-sage-deep`. Free-tier check-icon background on the Paywall comparison table. | `Paywall.tsx:708` |
+
+**Alpha-variant naming convention (added 2026-05-01):** when a single discrete alpha level is needed for an existing token, define a sibling token named `<token>-NN` where `NN` is the alpha percentage (e.g. `--fp-sage-deep-25` for 25% alpha). Use 8-character hex (e.g. `#2D8B5540`) to match the existing alpha-on-hex pattern used elsewhere in `:root` (`--fp-cta-disabled`, `--fp-ink-soft`, `--fp-ink-muted`). Do **not** use inline `color-mix()` for this — although browser support is fine, the token form is more readable, makes the alpha discoverable in `:root`, and avoids the small risk of `color-mix()` not parsing correctly inside SVG presentation attributes. Multiple alpha siblings of the same token are allowed (e.g. you could later add `--fp-sage-deep-50`); proliferation is the signal to revisit whether the base token wants a chroma adjustment instead.
 
 **Migration note:** these tokens are documented here ahead of the `globals.css` PR. The codebase still has the inline values; promoting them is a mechanical follow-up that should land before P-115 motion work begins (so motion sites referencing these colors can use the tokens directly).
 
@@ -431,11 +434,14 @@ INK SOFT (70%):        rgba(26,26,26,0.7)   (--fp-ink-soft)
 INK MUTED (40%):       rgba(26,26,26,0.4)   (--fp-ink-muted)
 PAPER (frosted):       rgba(255,255,255,0.8)  with backdrop-blur(8px)   (--fp-paper)
 PAPER (solid):         #FFFFFF          (--fp-paper-solid)
-PAGE BACKGROUND:       #FAFAF7          (off-white canvas)
+PAGE BACKGROUND:       #FAFAF7          (--fp-canvas)
 TARGET BAND (sage):    #D4E4D0          (--fp-sage)
 WARMTH (peach):        #FFD8C2          (--fp-peach)
-TRACK (bar empty):     #E8E8E5
-SAVE BADGE GREEN:      #2D8B55          (saturated, sparing use)
+TRACK (bar empty):     #E8E8E5          (--fp-track)
+PEACH DEEP (radar):    #E0A890          (--fp-peach-deep, sales surface only)
+SAGE DEEP (badge):     #2D8B55          (--fp-sage-deep, sparing use)
+SAGE DEEP 25% alpha:   #2D8B5540        (--fp-sage-deep-25, free-tier check bg)
+ERROR (gentle):        #D08272          (--fp-error)
 ```
 
 ### Ready-to-use prompts
@@ -513,7 +519,7 @@ All 12 REVIEW items from the 2026-04-30 first draft were resolved on **2026-05-0
 | 8 | Word-break for French labels | **Global standard: `word-break: break-word; hyphens: auto;` on every label-bearing component.** | French has long compounds ("Approfondissement", "Réflexes anglais"). Soft hyphens at syllable boundaries read more naturally than mid-word breaks. Fold into a `<Label>` primitive in P-115. |
 | 9 | iOS safe-area padding | **Apply `env(safe-area-inset-*)` standard.** Affected components listed in §8. | Mechanical audit. Grep for `position: fixed`/`sticky` at top/bottom edges; add env() padding. Pre-launch hygiene. |
 | 10 | Disclosure body animation | **Framer Motion height-spring.** `<motion.div>` with `animate={{ height: 'auto' }}`, `transition={{ type: 'spring', stiffness: 300, damping: 32 }}`. | P-115 introduces Framer Motion as a project dependency. Disclosure body should live on the same primitive as the rest of the motion language. CSS grid trick documented as fallback. |
-| 11 | P-115 easing standard | **Locked.** Default `ease-out`; entrances `cubic-bezier(0.16, 1, 0.3, 1)`; press feedback no easing; springs `{ stiffness: 300, damping: 32 }`; **no bounce anywhere**. Documented in §9. | Single standard prevents drift across components. Damping ≥ 30 caps overshoot at ~2%, which is the brand ceiling. |
+| 11 | P-115 easing standard | **Locked.** Default `ease-out`; entrances `cubic-bezier(0.16, 1, 0.3, 1)`; press feedback `{ duration: 0 }` (instant snap, no spring); springs `{ stiffness: 300, damping: 32 }` for non-press physics; **no bounce anywhere**. Tailwind 4 utilities shipped: `ease-fp-default`, `ease-fp-enter`, `ease-fp-exit` (hyphenated per TW4 token-to-utility convention). Documented in §9; tokens live in `lib/motion.ts` and `app/globals.css`. | Single standard prevents drift across components. Damping ≥ 30 caps overshoot at ~2%, which is the brand ceiling. Press feedback is duration-zero (not a spring) to faithfully mirror the existing instant-snap UX — `pressSpring` is exported but reserved for non-button physics use cases. |
 | 12 | Modal/sheet/drawer tier-3 elevation | **`0 24px 48px -12px rgba(0,0,0,0.18)` over solid `--fp-paper-solid`.** Documented in §6. | The big jump from tier-2 (0 2px 16px / 0.08) to tier-3 (0 24px 48px / 0.18) is intentional — modals must read as "well above the page." Negative spread keeps the footprint contained. |
 
 ---

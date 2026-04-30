@@ -4,7 +4,7 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 const INK          = '#1A1A1A'
 const INK_MUTED    = '#1A1A1A66'
-const BG           = '#FAFAF7'
+const BG           = 'var(--fp-canvas)'
 
 export default function FeedbackPlaceholderPage() {
   return (

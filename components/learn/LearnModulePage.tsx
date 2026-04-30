@@ -27,7 +27,7 @@ import type { Lesson, ModuleCategory, ModuleWithContext } from '@/lib/types'
 const INK          = '#1A1A1A'
 const INK_SOFT     = '#1A1A1AB3'
 const INK_MUTED    = '#1A1A1A66'
-const BG           = '#FAFAF7'
+const BG           = 'var(--fp-canvas)'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 
 const CATEGORY_BG: Record<ModuleCategory, string> = {

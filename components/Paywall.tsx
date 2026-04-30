@@ -125,11 +125,11 @@ export default function Paywall() {
   return (
     <div
       className="min-h-screen w-full flex flex-col items-center"
-      style={{ backgroundColor: '#FAFAF7' }}
+      style={{ backgroundColor: 'var(--fp-canvas)' }}
     >
       <div
-        className="w-full max-w-[440px] flex flex-col px-5 pb-20"
-        style={{ paddingTop: 48 }}
+        className="w-full max-w-[440px] flex flex-col px-5"
+        style={{ paddingTop: 48, paddingBottom: 'calc(80px + var(--fp-safe-bottom))' }}
       >
 
         {/* ── Diagnostic preview section ─────── */}
@@ -195,8 +195,8 @@ export default function Paywall() {
               <Radar
                 name="You"
                 dataKey="user"
-                stroke="#E0A890"
-                fill="#E0A890"
+                stroke="var(--fp-peach-deep)"
+                fill="var(--fp-peach-deep)"
                 fillOpacity={0.35}
                 strokeWidth={2}
               />
@@ -217,7 +217,7 @@ export default function Paywall() {
         {/* Legend */}
         <div className="flex items-center gap-5 mt-3 justify-center">
           <div className="flex items-center gap-2">
-            <div style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: '#E0A890', opacity: 0.8 }} />
+            <div style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: 'var(--fp-peach-deep)', opacity: 0.8 }} />
             <span style={{ fontSize: 12, fontWeight: 600, color: INK_SOFT }}>You</span>
           </div>
           <div className="flex items-center gap-2">
@@ -290,7 +290,7 @@ export default function Paywall() {
                 onClick={() => setBilling(b)}
                 style={{
                   flex: 1,
-                  height: 38,
+                  height: 44,
                   borderRadius: 10,
                   border: 'none',
                   cursor: 'pointer',
@@ -316,7 +316,7 @@ export default function Paywall() {
                       fontSize: 10,
                       fontWeight: 800,
                       color: '#FFFFFF',
-                      backgroundColor: '#2D8B55',
+                      backgroundColor: 'var(--fp-sage-deep)',
                       borderRadius: 20,
                       padding: '1px 6px',
                       letterSpacing: '0.02em',
@@ -705,10 +705,10 @@ function CellDisplay({ val, highlight = false }: { val: boolean | string; highli
     return (
       <div className="flex justify-center">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-label="Included">
-          <circle cx="9" cy="9" r="9" fill={highlight ? INK : '#2D8B5540'} />
+          <circle cx="9" cy="9" r="9" fill={highlight ? INK : 'var(--fp-sage-deep-25)'} />
           <path
             d="M5 9.2L7.8 12L13 6.5"
-            stroke={highlight ? '#FFFFFF' : '#2D8B55'}
+            stroke={highlight ? '#FFFFFF' : 'var(--fp-sage-deep)'}
             strokeWidth="1.75"
             strokeLinecap="round"
             strokeLinejoin="round"

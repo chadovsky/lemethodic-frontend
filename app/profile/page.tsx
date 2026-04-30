@@ -12,7 +12,7 @@ const INK_MUTED    = '#1A1A1A66'
 const PEACH        = '#FFD8C2'
 const SAGE         = '#D4E4D0'
 const BUTTER       = '#FFF0C2'
-const BG           = '#FAFAF7'
+const BG           = 'var(--fp-canvas)'
 const CARD_BG      = '#FFFFFF'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 const SEPARATOR    = '#1A1A1A0F'
@@ -136,13 +136,13 @@ export default function ProfilePage() {
             position: 'sticky',
             top: 0,
             zIndex: 40,
-            height: 56,
+            height: 'calc(56px + var(--fp-safe-top))',
             backgroundColor: BG,
             borderBottom: `1px solid ${SEPARATOR}`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '0 16px',
+            padding: 'var(--fp-safe-top) 16px 0 16px',
           }}
         >
           <Link

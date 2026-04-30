@@ -4,7 +4,7 @@
 const INK          = '#1A1A1A'
 const INK_MUTED    = '#1A1A1A66'
 const SAGE         = '#D4E4D0'
-const TRACK        = '#E8E8E5'
+const TRACK        = 'var(--fp-track)'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 
 // ─── types ───────────────────────────────────────────────────────────────────
@@ -111,7 +111,7 @@ function CoucheBarRow({ name, score, cefr }: CoucheRow) {
             height: 10,
             borderRadius: '50%',
             backgroundColor: INK,
-            border: '2px solid #FAFAF7',
+            border: '2px solid var(--fp-canvas)',
             boxShadow: '0 1px 3px rgba(0,0,0,0.18)',
             zIndex: 2,
           }}

@@ -22,7 +22,7 @@ const PEACH       = '#FFD8C2'
 const BUTTER      = '#FFF0C2'
 const SAGE        = '#D4E4D0'
 const LAVENDER    = '#E0D4F0'
-const BG          = '#FAFAF7'
+const BG          = 'var(--fp-canvas)'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 
 // F-087 — 27 lessons total: Phase 1 Fondations (1-16) + Phase 2
@@ -190,13 +190,13 @@ export default function HomeScreen({
             position: 'sticky',
             top: 0,
             zIndex: 40,
-            height: 56,
+            height: 'calc(56px + var(--fp-safe-top))',
             backgroundColor: BG,
             borderBottom: '1px solid #1A1A1A0A',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '0 16px',
+            padding: 'var(--fp-safe-top) 16px 0 16px',
           }}
         >
           <Link

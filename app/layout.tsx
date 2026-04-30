@@ -24,7 +24,9 @@ export const viewport: Viewport = {
   themeColor: '#FFD8C2',
   width: 'device-width',
   initialScale: 1,
-  userScalable: false,
+  // userScalable defaults to true — explicitly omitted per WCAG 2.1
+  // (preventing pinch-zoom is an accessibility violation).
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({

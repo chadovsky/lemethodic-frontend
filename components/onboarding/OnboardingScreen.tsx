@@ -165,7 +165,7 @@ export function CTAButton({ label, enabled, onClick }: CTAButtonProps) {
   }
 
   return (
-    <div className="pb-5">
+    <div style={{ paddingBottom: 'calc(20px + var(--fp-safe-bottom))' }}>
       <button
         onClick={onClick}
         disabled={!enabled}

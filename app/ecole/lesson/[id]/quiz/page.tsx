@@ -6,7 +6,7 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 const INK = '#1A1A1A'
-const BG  = '#FAFAF7'
+const BG  = 'var(--fp-canvas)'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -24,12 +24,12 @@ export default async function QuizPage({ params }: Props) {
             position: 'sticky',
             top: 0,
             zIndex: 40,
-            height: 56,
+            height: 'calc(56px + var(--fp-safe-top))',
             backgroundColor: BG,
             borderBottom: '1px solid #1A1A1A0A',
             display: 'flex',
             alignItems: 'center',
-            padding: '0 16px',
+            padding: 'var(--fp-safe-top) 16px 0 16px',
             gap: 12,
           }}
         >

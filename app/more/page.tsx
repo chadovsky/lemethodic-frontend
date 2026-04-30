@@ -7,7 +7,7 @@ const INK_MUTED = '#1A1A1A66'
 export default function MorePage() {
   return (
     <ProtectedRoute>
-    <div style={{ minHeight: '100dvh', backgroundColor: '#FAFAF7', fontFamily: DISPLAY_FONT }}>
+    <div style={{ minHeight: '100dvh', backgroundColor: 'var(--fp-canvas)', fontFamily: DISPLAY_FONT }}>
       <div
         style={{
           maxWidth: 440,

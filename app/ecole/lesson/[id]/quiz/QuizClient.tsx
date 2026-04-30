@@ -9,7 +9,7 @@ const INK_MUTED  = '#1A1A1A66'
 const CTA_BG     = '#1A1A1A'
 const SAGE       = '#D4E4D0'
 const BLUSH      = '#F5D6D6'
-const BG         = '#FAFAF7'
+const BG         = 'var(--fp-canvas)'
 
 interface Question {
   question: string
@@ -200,7 +200,7 @@ export default function QuizClient({ lessonId }: { lessonId: string }) {
           if (confirmed) {
             if (isThisCorrect) {
               bg = SAGE
-              border = `2px solid #2D8B55`
+              border = `2px solid var(--fp-sage-deep)`
               textColor = '#1A4A2E'
             } else if (isSelected && !isThisCorrect) {
               bg = BLUSH

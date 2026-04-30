@@ -24,6 +24,33 @@
   --fp-cta-text: #FFFFFF;
   --fp-cta-disabled: #1A1A1A4D;
 
+  /* LeMethodic promoted tokens (formerly inline one-offs, promoted 2026-05-01) */
+  --fp-canvas: #FAFAF7;       /* off-white page background */
+  --fp-track: #E8E8E5;        /* empty bar / progress-track surface */
+  --fp-peach-deep: #E0A890;   /* saturated peach — paywall radar only */
+  --fp-sage-deep: #2D8B55;    /* saturated green — "win" microcopy badges */
+  /* Alpha variants — naming convention "<token>-NN" where NN is the alpha % */
+  --fp-sage-deep-25: #2D8B5540;  /* 25% alpha — free-tier check icon background */
+
+  /* LeMethodic error — gentle redirect, not system failure
+     (decision log #2, 2026-05-01) */
+  --fp-error: #D08272;
+
+  /* LeMethodic safe-area passthroughs — apply via inline style or CSS class
+     wherever a fixed/sticky element touches a viewport edge. */
+  --fp-safe-top: env(safe-area-inset-top);
+  --fp-safe-bottom: env(safe-area-inset-bottom);
+  --fp-safe-left: env(safe-area-inset-left);
+  --fp-safe-right: env(safe-area-inset-right);
+
+  /* LeMethodic motion language (companion to lib/motion.ts) */
+  --fp-ease-fp-default: cubic-bezier(0, 0, 0.2, 1);
+  --fp-ease-fp-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --fp-ease-fp-exit: cubic-bezier(0.33, 1, 0.68, 1);
+  --fp-duration-fast: 200ms;
+  --fp-duration-base: 300ms;
+  --fp-duration-slow: 400ms;
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -114,6 +141,18 @@
   --color-fp-cta-bg: var(--fp-cta-bg);
   --color-fp-cta-text: var(--fp-cta-text);
   --color-fp-cta-disabled: var(--fp-cta-disabled);
+  --color-fp-canvas: var(--fp-canvas);
+  --color-fp-track: var(--fp-track);
+  --color-fp-peach-deep: var(--fp-peach-deep);
+  --color-fp-sage-deep: var(--fp-sage-deep);
+  --color-fp-sage-deep-25: var(--fp-sage-deep-25);
+  --color-fp-error: var(--fp-error);
+  --ease-fp-default: var(--fp-ease-fp-default);
+  --ease-fp-enter: var(--fp-ease-fp-enter);
+  --ease-fp-exit: var(--fp-ease-fp-exit);
+  --animate-duration-fp-fast: var(--fp-duration-fast);
+  --animate-duration-fp-base: var(--fp-duration-base);
+  --animate-duration-fp-slow: var(--fp-duration-slow);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

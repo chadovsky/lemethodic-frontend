@@ -41,7 +41,7 @@ const INK          = '#1A1A1A'
 const INK_SOFT     = '#1A1A1AB3'
 const INK_MUTED    = '#1A1A1A66'
 const PEACH        = '#FFD8C2'
-const BG           = '#FAFAF7'
+const BG           = 'var(--fp-canvas)'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 
 const TARGET_USER_TURNS = 4
@@ -763,7 +763,7 @@ function BottomBar({
         maxWidth: 440,
         backgroundColor: '#FFFFFF',
         borderTop: '1px solid #1A1A1A14',
-        padding: '20px 24px 20px',
+        padding: '20px 24px calc(20px + var(--fp-safe-bottom)) 24px',
         zIndex: 30,
       }}
     >
@@ -853,7 +853,7 @@ function TurnReviewSheet({
           transform: 'translateX(-50%)',
           width: '100%',
           maxWidth: 440,
-          backgroundColor: '#FAFAF7',
+          backgroundColor: 'var(--fp-canvas)',
           borderTopLeftRadius: 28,
           borderTopRightRadius: 28,
           zIndex: 70,
@@ -936,9 +936,9 @@ function TurnReviewSheet({
         </div>
         <div
           style={{
-            padding: '16px 20px 32px',
+            padding: '16px 20px calc(32px + var(--fp-safe-bottom)) 20px',
             borderTop: '1px solid #1A1A1A0A',
-            backgroundColor: '#FAFAF7',
+            backgroundColor: 'var(--fp-canvas)',
             flexShrink: 0,
           }}
         >

@@ -15,7 +15,7 @@ const SAGE         = '#D4E4D0'
 const BUTTER       = '#FFF0C2'
 const LAVENDER     = '#E0D4F0'
 const SKY          = '#CFE4F5'
-const BG           = '#FAFAF7'
+const BG           = 'var(--fp-canvas)'
 const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
 
 interface Scenario {
