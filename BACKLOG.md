@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-27 (F-076 shipped — CountdownTimer wall-clock rewrite + controlled-mode flag; pre-launch security trio F-075a/b + F-076 all shipped, DO deploy is next)
+**Last updated:** 2026-04-30 (P-100 Real Progress Dashboard shipped to production; F-110 backend dual-emission shipped, F-110.1 frontend migration unblocked)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -499,6 +499,22 @@ F-091.0 ✅ V1 onboarding lock to TCF-only. Pre-launch ticket; May 4 launch ship
 
 ---
 
+## Shipped — Week 2 (April 30)
+
+P-100 ✅ Real Progress Dashboard. Replaces the "Coming soon (F-058)" placeholder on the Progress tab with the 4-section dashboard — live in production on lemethodic-frontend.vercel.app.
+
+**Sections live:**
+1. Snapshot card (current CEFR estimate, target level, exam date countdown)
+2. Couches diagnostic — sustained position (rolling average, reuses `components/diagnostic/CouchesDiagnostic.tsx`)
+3. Activity timeline (14-day dot calendar, plain SVG)
+4. Recurring modules list (top 5 by recurrence_count, severity-colored, linked to École lessons)
+
+**Known follow-up:** Sections 2 and 4 are not yet rendering with a single recording — they currently rely on rolling-window logic that needs the corpus to populate. Filed as **P-100.5** if we want to address before beta launch (could either lower the rolling-window minimum or surface a "1 recording — collecting more data" intermediate state).
+
+**Out of scope (per spec):** streaks (waits on F-067), couche scores time-series chart, total time practiced. Empty-state CTA routes to Speaking Lab.
+
+---
+
 ## In progress
 
 **F-080 epic CLOSED 2026-04-26.** F-080a + F-080b + F-080c shipped 2026-04-25; F-080d shipped 2026-04-26. The intelligence layer is end-to-end live: detection → persistence → diagnostic surface → cross-session recurrence → Raccourci routing.
@@ -651,9 +667,9 @@ F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end 
 ### F-110.1 — Migrate frontend reads from internal_key to key
 
 **Priority:** Medium
-**Blocked by:** Backend dual-emission shipped (F-110 backend, in progress)
+**Blocked by:** nothing; ready to start. Backend dual-emission is shipped — `couches_array` now emits both `key` and `internal_key`, so the frontend can flip reads at any time without coordination.
 **Files:** lib/api.ts: interface RawCouche (type), KNOWN_COUCHE_KEYS filter + mapDiagnosticBlock mapper, mapRecordingSummary mapper
-**Action:** Switch all reads from c.internal_key to c.key. Update type definition. Verify mapDiagnosticBlock still produces same output shape downstream.
+**Action:** migrate lib/api.ts reads — switch all `c.internal_key` references to `c.key`. Update the `RawCouche` type definition to declare `key: CoucheKey`. Verify `mapDiagnosticBlock` still produces the same output shape downstream.
 **Cleanup trigger:** Once shipped, notify backend to execute F-110.2 (remove internal_key dual-emission).
 **When:** Can be done during P-100 work or as a standalone small PR after.
 
