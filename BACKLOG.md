@@ -506,6 +506,64 @@ F-086 + F-087 + F-088 + F-089 shipped 2026-04-27. The F-086→F-089 rename pack 
 
 ---
 
+## P-100 — Real Progress Dashboard
+
+**Priority:** High (Phase 1, Block 4)
+**Status:** Ready to start
+**Scope:** Replace "Coming soon (F-058)" placeholder on Progress tab with functional dashboard. Frontend-only work, no backend instrumentation required for v1.
+
+### Sections (top to bottom)
+
+1. **Snapshot card**
+   - Current CEFR estimate: avg of last 3 recordings' cefrLevel
+   - Target level (from user.targetLevel)
+   - Exam date countdown (from user.examDate)
+   - Plain card, no chart
+
+2. **Couches diagnostic — sustained position**
+   - Reuse components/diagnostic/CouchesDiagnostic.tsx
+   - Feed rolling average of last 5 recordings per couche (le_fond, les_moules_des_idees, les_moules, les_reflexes_anglais)
+   - Fallback: if user has <5 recordings, average all available
+   - Header: "Your sustained position" (vs diagnostic page's single-session snapshot)
+   - Keep bottleneck callout
+   - Preserve 0-100 score resolution (no rounding to 0-4)
+   - Locale-aware labels via display_label_en / display_label_fr (respects user.interfaceLanguage, per F-088)
+
+3. **Activity timeline**
+   - Last 14 days, dot calendar
+   - Two dot states: recording done, lesson completed
+   - Plain SVG/divs, no chart library
+   - Empty days = grey dots
+
+4. **Recurring modules list**
+   - Top 5 by recurrence_count (desc), severity-colored
+   - Each row linked to its École lesson via ecole_lesson_id
+   - Show: name_fr or name_en (locale-driven), recurrence_count, severity badge
+
+### Empty state (zero recordings)
+- Show snapshot card with placeholders
+- Hide sections 2–4
+- Big CTA: "Take your diagnostic to unlock your dashboard" → routes to Speaking Lab (Tâche 1 default)
+
+### Out of scope (defer to P-100.5)
+- Streaks (waits on F-067)
+- Couche scores time-series chart
+- Total time practiced
+
+### Files likely touched
+- app/progress/page.tsx (replace placeholder)
+- components/dashboard/* (new section components)
+- Reuse: components/diagnostic/CouchesDiagnostic.tsx
+- API: GET /users/me/dashboard (or compose from existing endpoints — backend agent will scope)
+
+### Definition of done
+- All 4 sections render with real data on lemethodic-frontend.vercel.app
+- Empty state works for new users (verified end-to-end)
+- Mobile-first verified at 380px width
+- No new chart libraries added
+
+---
+
 ## Queued — core product wiring (F-061.1, F-063, F-064)
 
 **F-061.1** 📋 Tâche 3 topic picker + slug resolution
