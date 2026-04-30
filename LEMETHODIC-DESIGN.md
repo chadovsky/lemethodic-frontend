@@ -36,10 +36,12 @@ All values mirror `app/globals.css` and `components/onboarding/OnboardingScreen.
 |---|---|---|
 | `--fp-peach` | `#FFD8C2` | Primary onboarding accent. Loader background (`app/page.tsx:20`). Tâche 2 examiner bubble. Retry callout cards. |
 | `--fp-sage` | `#D4E4D0` | **Target-band fill** in CouchesDiagnostic (70–85% TCF C1 zone). The single semantic green in the product. Also milestone-met badges. |
-| `--fp-butter` | `#FFF0C2` | Onboarding card variant. **REVIEW:** no current canonical use — Chadi to confirm if butter is "warning/in-progress" or just a third pastel option. |
-| `--fp-lavender` | `#E0D4F0` | Onboarding card variant. **REVIEW:** as above. |
-| `--fp-sky` | `#CFE4F5` | Onboarding card variant. **REVIEW:** as above. |
-| `--fp-blush` | `#F5D6D6` | Onboarding card variant. **REVIEW:** as above; not yet bound to "error/destructive" — destructive currently uses the OKLCH shadcn `--destructive` token. |
+| `--fp-butter` | `#FFF0C2` | Rotation palette — see "Rotation palette" note below. |
+| `--fp-lavender` | `#E0D4F0` | Rotation palette — see "Rotation palette" note below. |
+| `--fp-sky` | `#CFE4F5` | Rotation palette — see "Rotation palette" note below. |
+| `--fp-blush` | `#F5D6D6` | Rotation palette — see "Rotation palette" note below. Destructive states use the dedicated `--fp-error` token (see Neutrals → Error tokens), not blush. |
+
+**Rotation palette (butter, lavender, sky, blush):** these four are a **rotation palette for visual variety** across lesson cards, achievements, content sections, and onboarding option lists. They are **not role-bound** — none means "warning," none means "info," none means "success." Pick one per card for visual diversity, cycle them across a sequence. The constraint is consistency-within-context: a given lesson type or achievement category should pin to one rotation color so a returning user recognizes it. Sage and peach are **excluded** from the rotation — sage is reserved for target/success semantics, peach for warmth anchors.
 
 ### Neutrals — ink-on-paper
 
@@ -59,16 +61,28 @@ All values mirror `app/globals.css` and `components/onboarding/OnboardingScreen.
 | `--fp-cta-text` | `#FFFFFF` | Primary button text. |
 | `--fp-cta-disabled` | `#1A1A1A4D` (30% alpha) | Disabled CTA. |
 
-### One-off colors observed in the codebase (NOT yet tokenized)
+### Promoted tokens (formerly inline one-offs)
 
-These appear inline and should be promoted to tokens before P-115. **REVIEW** each.
+These four values were inline in the codebase at first audit; promoted to formal tokens on 2026-05-01 to make them addressable from `globals.css` and reusable.
 
-| Value | Where | Suggested token |
+| Token | Hex | Role | Original site |
+|---|---|---|---|
+| `--fp-canvas` | `#FAFAF7` | Off-white page background (distinguishes from card surface). Also score-dot border in CouchesDiagnostic. | `Paywall.tsx:128`; `CouchesDiagnostic.tsx:114` |
+| `--fp-track` | `#E8E8E5` | Empty bar track / progress-track surface. | `CouchesDiagnostic.tsx:7` |
+| `--fp-peach-deep` | `#E0A890` | Saturated peach. Restricted use: paywall radar fill/stroke. Not for body UI — pastels handle warmth in-app. | `Paywall.tsx:198-200` |
+| `--fp-sage-deep` | `#2D8B55` | Saturated green. Restricted use: "win" microcopy badges (Save %, free-tier check icons at low alpha). Not for body UI — `--fp-sage` handles target/success semantics. | `Paywall.tsx:319, 708, 711` |
+
+**Migration note:** these tokens are documented here ahead of the `globals.css` PR. The codebase still has the inline values; promoting them is a mechanical follow-up that should land before P-115 motion work begins (so motion sites referencing these colors can use the tokens directly).
+
+### Error / destructive tokens
+
+| Token | Hex | Role |
 |---|---|---|
-| `#FAFAF7` | Paywall main background (`Paywall.tsx:128`); ScoreDot border in CouchesDiagnostic | `--fp-canvas` (off-white page background, distinguishes from card surface) |
-| `#E8E8E5` | Bar track in CouchesDiagnostic | `--fp-track` (the empty-bar / progress-track surface) |
-| `#E0A890` | Radar fill + stroke in Paywall (`#E0A890`, 35% opacity fill) | `--fp-peach-deep` (a saturated peach used only against monochrome charts — currently single-use) |
-| `#2D8B55` | "Save 43%" badge in billing toggle, also free-tier check icon at 25% alpha | `--fp-sage-deep` (a saturated green used only for "win" microcopy — currently single-use) |
+| `--fp-error` | `#D08272` | **Gentle redirect**, not system failure. A desaturated terracotta sitting between `--fp-blush` (#F5D6D6) and the OKLCH shadcn destructive (`oklch(0.577 0.245 27.325)` ≈ saturated red). Use for: form validation errors, "are you sure?" confirmations, undo prompts, retry callouts that imply user action without alarm. |
+
+**Why not raw `--fp-blush`?** Blush at full saturation reads as "soft pink decoration," not "stop." `--fp-error` carries enough chroma to register as a state signal while staying within the brand's warm-paper palette.
+
+**Migration:** the OKLCH `--destructive` token from shadcn stays in `globals.css` for any third-party shadcn component that hardcodes it, but every LeMethodic-authored surface should use `--fp-error` instead. Audit and migrate as part of P-115 prep.
 
 ### Semantic mapping (for Claude Code agents to reach for first)
 
@@ -76,11 +90,13 @@ These appear inline and should be promoted to tokens before P-115. **REVIEW** ea
 - **Secondary action ("Maybe later"):** transparent button, `--fp-ink-muted` text.
 - **Success / target-met:** `--fp-sage` (background fill) or `#2D8B55` (text/icon, see token-promotion note above).
 - **Warmth / introduction / non-stakes choice:** `--fp-peach` for the dominant moment, other pastels for variety in option lists.
-- **Destructive / error:** **REVIEW** — currently inherits shadcn's OKLCH `--destructive` (`oklch(0.577 0.245 27.325)`, a saturated red). Chadi to decide if the brand wants a softer destructive (e.g. `--fp-blush` for non-irreversible warnings, OKLCH red only for "are you sure?" confirmations).
+- **Destructive / error:** `--fp-error` (`#D08272`). Gentle redirect, not system failure. Use for form validation, undo prompts, retry callouts. The OKLCH shadcn `--destructive` is still present in `globals.css` for unmodified third-party shadcn components but should not appear in LeMethodic-authored surfaces.
 
 ### Dark mode
 
-`app/globals.css:62-95` defines a full OKLCH dark-mode token set, but the LeMethodic `--fp-*` tokens are **not** dark-mode aware — they stay the same in `.dark`. **REVIEW:** dark mode is not a launch requirement. Either (a) explicitly drop the dark-mode tokens before launch, or (b) extend `--fp-*` with dark variants in a follow-up. Default position: skip dark mode for v1.
+**Deferred to post-launch (filed as P-150 or similar).** The brand identity is light-first — the warm-paper canvas, frosted card surfaces, and ink-on-paper diagnostic only exist in light mode. The OKLCH dark-mode token set in `app/globals.css:62-95` is unused scaffold inherited from shadcn; it can stay (it costs nothing) but must not be considered a supported product surface.
+
+When dark mode is revisited, the design challenge is non-trivial: "frosted glass over warm canvas" doesn't translate directly to a dark palette without redefining the brand atmosphere. A dark-mode pass should be treated as a brand extension, not a token recolor.
 
 ---
 
@@ -243,20 +259,36 @@ Source: `Paywall.tsx:275-330, 379-410`. **Both toggles use 200ms.** Same easing,
 
 ### Disclosure (collapsed → expanded)
 
-Chevron rotates 180deg over 200ms; content appears with no separate transition. Source: `Paywall.tsx:626-644`. **REVIEW:** P-115 should add a height-spring on the disclosure body to feel less abrupt.
+Chevron rotates 180deg over 200ms. Body uses a **height-spring via Framer Motion** (matching the rest of P-115's motion stack):
+
+```tsx
+<motion.div
+  initial={{ height: 0, opacity: 0 }}
+  animate={{ height: 'auto', opacity: 1 }}
+  exit={{ height: 0, opacity: 0 }}
+  transition={{ type: 'spring', stiffness: 300, damping: 32 }}
+  style={{ overflow: 'hidden' }}
+>
+  {/* disclosure content */}
+</motion.div>
+```
+
+Why Framer Motion over the CSS `grid-template-rows: 0fr → 1fr` trick: P-115 introduces Framer Motion as a project dependency, so disclosure body lives on the same animation primitive as the rest of the motion language. Coherence beats avoiding the dependency. The CSS grid trick is documented as an acceptable fallback for non-Framer surfaces (e.g. a static page). Source pattern: `Paywall.tsx:626-644` (chevron); body animation lands with P-115.
 
 ### Empty state
 
-**REVIEW:** observed pattern is a snapshot card with placeholders + a single primary CTA ("Take your diagnostic to unlock your dashboard" — see P-100 spec). No standardized empty-state component yet. P-115 should formalize:
-- Single illustration or no illustration.
+Observed pattern: snapshot card with placeholders + a single primary CTA (e.g. "Take your diagnostic to unlock your dashboard" — see P-100 spec). P-115 will formalize the standard:
+- Single illustration or no illustration (no decorative mascots).
 - Headline (Cabinet Grotesk 800/22px), one-sentence subhead, single primary CTA.
 - No secondary action in empty states unless the user can actually do something else.
+
+**Note:** this is a P-115 deliverable, not an open decision — the principles above are the standard; the component primitive lands during the motion pass.
 
 ---
 
 ## 5. Layout Principles
 
-**Mobile-first single column.** Every reviewed component lives in a `max-w-[440px]` flex column with horizontal padding `px-5` (20px each side). The verified narrowest viewport is 380px. Tablets and desktops inherit the same column with side gutters — the brand does not have a desktop-native layout (yet). **REVIEW** before any desktop-specific work.
+**Mobile-first single column.** Every reviewed component lives in a `max-w-[440px]` flex column with horizontal padding `px-5` (20px each side). The verified narrowest viewport is 380px. Tablets and desktops inherit the same column with side gutters — graceful degradation, not optimization. A real desktop layout is filed as P-115.1, post-launch (see §8 Breakpoints).
 
 ### Spacing scale (observed, in px)
 
@@ -289,23 +321,24 @@ The codebase uses a mix of Tailwind `gap-*` / `mt-*` and inline `px` values. Con
 
 The brand values whitespace over content density. **Empty space is the methodology breathing.** Anti-pattern: filling a card with sidebars, alternative CTAs, or "you might also like" rails. The product should feel under-decorated, not over-engineered.
 
-**REVIEW:** there is no formal grid system (no columns, no gutters). Mobile single-column makes this fine; if/when desktop ships, decide on a 12-column or simply continue with centered max-width.
+**No formal grid system** (no columns, no gutters) — mobile single-column makes this unnecessary. If/when desktop layout ships under P-115.1, the choice between a 12-column grid and a continued centered-max-width pattern is a decision for that ticket.
 
 ---
 
 ## 6. Depth & Elevation
 
-**Three tiers. No more.**
+**Four tiers. No more.**
 
 | Tier | Use | Shadow | Border |
 |---|---|---|---|
 | 0 — flush | Page background, divider lines | none | optional 1px `#1A1A1A0A`–`#1A1A1A18` hairline |
 | 1 — surface | Default cards, social-proof stats, frosted badges | `0 1px 6px-8px rgba(0,0,0,0.04-0.06)` | none |
 | 2 — emphasis | Selected state, large content cards (pricing, radar, score-dot) | `0 2px 12px-16px rgba(0,0,0,0.05-0.08)` | optional 2px `--fp-ink` (selected only) |
+| 3 — overlay | Modal, sheet, drawer, toast (anything that floats above all page content) | `0 24px 48px -12px rgba(0,0,0,0.18)` | none; relies on shadow alone for separation |
 
-**Backdrop blur is part of elevation, not decoration.** Tier-1 and Tier-2 surfaces both use `backdrop-filter: blur(8px)` over `--fp-paper` (80% white). This is what gives the surface its "frosted glass over warm canvas" feel against the `#FAFAF7` page background.
+**Backdrop blur is part of elevation, not decoration.** Tier-1 and Tier-2 surfaces both use `backdrop-filter: blur(8px)` over `--fp-paper` (80% white). This is what gives the surface its "frosted glass over warm canvas" feel against the `--fp-canvas` (`#FAFAF7`) page background.
 
-**No tier-3 (modal / sheet) defined yet.** **REVIEW:** the existing TurnReviewSheet (Tâche 2) and modal flows likely sit at tier-3 with stronger shadows. Audit before P-115 to confirm or define.
+**Tier-3 specifics.** Modals/sheets/drawers use a solid surface (`--fp-paper-solid`, not the 80% frosted `--fp-paper`) — at this elevation, you want the content unambiguously separated from what's behind it, not partially translucent. The `0 24px 48px -12px` shadow is a deliberate jump from tier-2's `0 2px 16px` — the negative spread (-12px) keeps the shadow's footprint contained while the larger Y-offset and blur read as "this is well above the page." Existing TurnReviewSheet (Tâche 2) and any future bottom sheets should be migrated to this spec as part of P-115's component pass.
 
 **Shadow direction is always straight down** (no offset-x, no inset). The product does not have a directional light source — it has a paper plane.
 
@@ -327,7 +360,7 @@ The brand values whitespace over content density. **Empty space is the methodolo
 
 - **Don't gamify.** No streak fireworks, no level-up modals, no XP bars. (Streaks are out of scope per BACKLOG.md / F-067; the absence is intentional.)
 - **Don't use multiple pastels in the same view as decoration.** Onboarding cycles through pastels because each card is a different choice; a dashboard with peach + butter + sage + lavender on one screen reads like a kid's app.
-- **Don't use the radar chart as the primary diagnostic surface.** The Paywall radar (`Paywall.tsx:160-215`) is a paywall pitch, not the methodology view. The methodology view is the bar stack. **REVIEW:** Chadi to confirm — the radar's continued use on the paywall is a tension with "bars over radars." Either retire the paywall radar (preferred for brand coherence) or constrain it explicitly to "the radar is a sales tool, never a coaching tool."
+- **Radar charts are restricted to conversion/sales surfaces only.** Paywall, marketing pages, and external-facing landing pages may use a radar (the existing `Paywall.tsx:160-215` is the canonical site). **Diagnostic, dashboard, and any in-app analytical view uses the bar pattern** (`components/diagnostic/CouchesDiagnostic.tsx`) per the methodology principle: bars carry a target band and a bottleneck-first sort; a radar reads as "spider visualization," which is decorative on a paywall but misleading as a coaching surface. The rule is binary: pre-conversion = radar permitted; post-conversion or coaching = bars only.
 - **Don't ship dark mode in v1.** The OKLCH dark tokens in `globals.css` are scaffold, not product.
 - **Don't ship emoji in product copy.** "Visa-Urgent" persona reads as serious; emoji breaks the register.
 - **Don't add a third typeface.** Cabinet Grotesk + Geist is the entire palette.
@@ -340,33 +373,49 @@ The brand values whitespace over content density. **Empty space is the methodolo
 
 ### Breakpoints
 
-**Default — and only currently verified — is mobile.** `Paywall.tsx:131` uses `max-w-[440px]`. The DoD on P-100 specifies "mobile-first verified at 380px width."
+**Phase 1 is mobile-first, 380px–440px viewport.** `Paywall.tsx:131` uses `max-w-[440px]`; the P-100 DoD specifies verification at 380px. Tablet and desktop receive the same centered column with side gutters — **graceful degradation, not optimization**. This is intentional: the launch audience (Visa-Urgent persona) is overwhelmingly on phones.
 
-**REVIEW:** no tablet or desktop breakpoint is defined. Three options for v1:
-1. **Stay mobile-only**, render a centered 440px column on any viewport. Acceptable for launch; the audience is on phones.
-2. **Add a `>=md` breakpoint at 768px** that widens the column to 600-680px. Minimal effort.
-3. **Build a real desktop layout** (split-pane diagnostic, side rail). Out of scope pre-launch.
-
-Default position pre-launch: **option 1**. Defer 2 + 3 to post-launch.
+A real tablet/desktop pass (split-pane diagnostic, side-rail navigation, multi-column dashboard) is filed as **P-115.1** follow-up, post-launch. Until P-115.1 lands, do not introduce `md:` / `lg:` Tailwind utilities for layout reflow — they create maintenance burden without an audience.
 
 ### Touch targets
 
-Observed minimums:
-- Primary CTA: **58px tall** (Paywall.tsx:459).
-- Onboarding card: **88px min-height** (OnboardingScreen.tsx:64).
-- Toggle billing pill: **38px tall** (Paywall.tsx:293).
-- Switch track: **28px tall, 48px wide** (Paywall.tsx:384-385).
-- Progress dots: **8px** (visual; the touch target is the surrounding container, not the dot itself).
+Observed minimums and the post-resolution standard:
 
-**Rule:** any tappable element exposed to the user as a primary action must be ≥44px in its smallest dimension (Apple HIG floor). The toggle pill at 38px is borderline — **REVIEW** whether to bump to 44px.
+| Element | Observed | Standard | Source |
+|---|---|---|---|
+| Primary CTA | 58px tall | ≥58px | Paywall.tsx:459 |
+| Onboarding card | 88px min-height | ≥88px | OnboardingScreen.tsx:64 |
+| Toggle billing pill | 38px tall | **44px tall** (bump pending) | Paywall.tsx:293 |
+| Switch track | 28×48px | ≥28×48px (the thumb provides the visual hit area; the gesture target is the full row) | Paywall.tsx:384-385 |
+| Progress dots | 8px visual | ≥44px gesture surround | OnboardingScreen.tsx:34-43 |
+
+**Rule:** any tappable element ≥44px in its smallest dimension (Apple HIG floor). **The 38px billing pill is a non-conformance to fix** — bump to 44px in the next pass through `Paywall.tsx`. Accessibility floor is non-negotiable.
 
 ### Text readability at 380px
 
-All observed font sizes (11–52px) work at 380px without overflow. Long French strings (e.g. "Approfondissement") use `word-break: break-word` only on bar labels (`CouchesDiagnostic.tsx:54`). **REVIEW:** apply `word-break` consistently to any user-facing French label that can exceed its container.
+All observed font sizes (11–52px) work at 380px without overflow. **Global standard: `word-break: break-word; hyphens: auto;` on every label-bearing component** (bar labels, lesson titles, milestone names, achievement names, scenario names — anything carrying user-visible French strings that can exceed its container). The `hyphens: auto` lets the browser insert soft hyphens at French syllable boundaries, which reads more naturally than mid-word breaks.
+
+The current single application on `CouchesDiagnostic.tsx:54` is the prototype. P-115 should fold the standard into a shared `<Label>` primitive (or Tailwind utility class) so future labels inherit it automatically.
 
 ### Safe areas
 
-`min-height: 100dvh` is used on full-page loaders (`app/page.tsx:44-45`) — this respects iOS safe areas. **REVIEW:** confirm `pb-safe` or equivalent padding is applied to bottom CTAs on iOS to avoid the home indicator overlap.
+iOS safe areas matter on every full-bleed surface. Standard:
+
+- **Bottom navigation / bottom CTAs:** `padding-bottom: env(safe-area-inset-bottom)` (in addition to the layout's existing bottom padding).
+- **Headers / top bars:** `padding-top: env(safe-area-inset-top)`.
+- **Full-screen modals/sheets (tier-3):** both insets applied.
+- **Page content (`min-height: 100dvh`):** already correct on `app/page.tsx:44-45`; `100dvh` respects safe areas natively.
+
+**Affected components requiring an audit pass before launch:**
+- `components/onboarding/OnboardingFlow.tsx` (bottom CTAs)
+- `components/Paywall.tsx` (bottom CTA + Maybe later)
+- `components/speaking/Tache1Session.tsx` / `Tache2Session.tsx` / `Tache3Session.tsx` (record button + review sheet)
+- `components/home/HomeScreen.tsx` (any bottom nav)
+- `app/diagnostic/page.tsx` (retry CTA at the bottom of layer 4)
+- Any future bottom-sheet (TurnReviewSheet → migrate to tier-3 spec from §6 with `env(safe-area-inset-bottom)` baked in)
+- Top headers in `/ecole`, `/progress`, `/profile`, `/more`
+
+The audit is mechanical: grep for `position: fixed` and `position: sticky` at top/bottom edges, add the env() padding. Filed as part of P-115 prep.
 
 ---
 
@@ -415,14 +464,17 @@ SAVE BADGE GREEN:      #2D8B55          (saturated, sparing use)
 - Section transitions (tab switch, modal open, route transition): **300-400ms**.
 - **Anything ≥500ms requires explicit justification.** The brand is calm but not slow.
 
-**Easing** — **REVIEW:** P-115 needs to commit a standard. Recommendation:
-- Most state transitions: `ease-out` (snappy on enter, gentle on settle).
-- Entrance from offscreen: `cubic-bezier(0.16, 1, 0.3, 1)` (Vercel's standard "ease-out-expo"-feeling curve).
-- Press feedback: no easing — instant `scale(0.96)` then instant return.
-- Bar fill on diagnostic reveal: `ease-out`, 400ms, with a tiny initial delay (50-100ms per row, staggered) so the user reads them filling in order.
+**Easing — committed standard (locked 2026-05-01):**
+- **Default for every state transition:** `ease-out`. Snappy on enter, gentle on settle. Tailwind `ease-out` and CSS `cubic-bezier(0, 0, 0.2, 1)` are equivalent.
+- **Entrance from offscreen** (route transitions, modal open, sheet slide-up, fresh content arriving): `cubic-bezier(0.16, 1, 0.3, 1)`. The "ease-out-expo"-feeling curve — content enters confidently, settles without overshoot. Tailwind alias to add: `ease-fpEnter`.
+- **Press feedback** (button down/up, card press): no easing — instant `scale(0.96)` and instant return. The brand's tactile signature is *snap*, not *cushion*.
+- **Bar fill on diagnostic reveal:** `ease-out`, 400ms, with 50-100ms staggered delay per row (worst-first → best-last so the eye reads the bottleneck arriving first).
+- **No bounce anywhere.** No `cubic-bezier` curves with overshoot. No CSS `easing` keywords like `cubic-bezier(.68, -.55, .27, 1.55)`.
 
-**Physics**
-- The brand permits **subtle spring** on selected-card lift (the `scale(1.01)` settle) and on disclosure body height. **No bounce** anywhere — the spring should overshoot by ≤2% or not at all. Framer Motion's `spring` config: `{ stiffness: 300, damping: 30 }` as a starting point. **REVIEW** the actual values during P-115.
+**Physics — committed:**
+- Subtle spring permitted on: selected-card lift (the `scale(1.01)` settle), disclosure body height (per §4), modal/sheet entrance.
+- Framer Motion config: `{ type: 'spring', stiffness: 300, damping: 32 }`. Damping ≥ 30 keeps overshoot ≤ ~2%, which is the brand ceiling. If a future component needs more characterful motion, propose new params in PR description rather than tuning silently.
+- Strict ban: any spring config where damping is < 25 or stiffness > 500 — those produce visible bounce.
 
 **Anti-motion**
 - No parallax.
@@ -445,24 +497,27 @@ The codebase is the source of truth. If this DESIGN.md and a shipped component d
 
 ---
 
-## Open decisions for review (consolidated)
+## Decision log
 
-For Chadi to resolve before P-115 ships:
+All 12 REVIEW items from the 2026-04-30 first draft were resolved on **2026-05-01**. Each row records the resolution and the one-line rationale. New decisions get appended below as the brand evolves.
 
-1. **Pastel semantics.** Bind butter / lavender / sky / blush to specific roles, or document them as "pastel rotation, no fixed meaning."
-2. **Destructive color.** Keep shadcn's saturated OKLCH red, or introduce a softer brand destructive using `--fp-blush`.
-3. **Dark mode.** Drop the OKLCH dark tokens, or commit to dark variants of the `--fp-*` set.
-4. **Paywall radar.** Retire it (recommended), or constrain it explicitly to "sales surface only, never coaching."
-5. **Token promotion.** Promote `#FAFAF7`, `#E8E8E5`, `#E0A890`, `#2D8B55` to formal `--fp-*` tokens.
-6. **Tablet/desktop breakpoint.** Stay mobile-only for v1, or add a 768px breakpoint.
-7. **Touch target floor.** Bump 38px billing pill to 44px, or accept the borderline size.
-8. **Word-break consistency.** Apply `word-break: break-word` to all French labels, not just bar labels.
-9. **iOS safe area padding.** Audit bottom CTAs across all routes.
-10. **Disclosure body animation.** Add a height-spring (Framer Motion) or accept the abrupt expand.
-11. **Easing standard for P-115.** Lock the canonical ease curve before motion work begins.
-12. **Modal / sheet / drawer tier.** Define a tier-3 elevation pattern, or audit and document the existing TurnReviewSheet.
+| # | Item | Resolution | Rationale |
+|---|---|---|---|
+| 1 | Pastel semantics (butter/lavender/sky/blush) | **Rotation palette, not role-bound.** Pin one color per content category for recognition; cycle for variety. | Treating four pastels as semantic roles forces invented meanings ("butter = warning?") that nothing in the methodology actually requires. Rotation is honest about what they're for. |
+| 2 | Destructive color | **New `--fp-error` token at `#D08272`.** Desaturated terracotta between `--fp-blush` and shadcn's saturated OKLCH red. | "Gentle redirect, not system failure" matches the brand's calm voice. Raw blush reads as decoration; raw shadcn red reads as alarm. The middle is the brand. |
+| 3 | Dark mode | **Deferred to post-launch (P-150).** Light-first identity. OKLCH dark tokens left as unused scaffold. | Dark mode is a brand extension, not a recolor. The "frosted glass over warm canvas" identity doesn't translate without rethinking atmosphere. Not a v1 problem. |
+| 4 | Paywall radar | **Constrained: radars only on conversion/sales surfaces.** Diagnostic, dashboard, and analytical views use the bar pattern. | The methodology's defensibility is "bottleneck-first prose + target band + ascending sort." A radar undermines that on a coaching surface; on a paywall, it's just a sales visual. |
+| 5 | Token promotion (4 inline one-offs) | **Promoted:** `--fp-canvas` (#FAFAF7), `--fp-track` (#E8E8E5), `--fp-peach-deep` (#E0A890), `--fp-sage-deep` (#2D8B55). | Names match existing `--fp-*` convention. `-deep` suffix signals "saturated variant of an existing pastel, restricted use." Migration is mechanical — lands before P-115. |
+| 6 | Tablet/desktop breakpoint | **Deferred. Phase 1 is mobile-first 380-440px. Tablet/desktop = graceful degradation.** Filed as P-115.1 follow-up. | Visa-Urgent persona is on phones. Adding `md:` / `lg:` reflows pre-launch creates maintenance burden without an audience. Real desktop layout is a post-launch product decision. |
+| 7 | 38px toggle pill (touch target) | **Bump to 44px.** Apple HIG floor is non-negotiable. | Accessibility floor. No exceptions. The 6px addition has no visual cost. |
+| 8 | Word-break for French labels | **Global standard: `word-break: break-word; hyphens: auto;` on every label-bearing component.** | French has long compounds ("Approfondissement", "Réflexes anglais"). Soft hyphens at syllable boundaries read more naturally than mid-word breaks. Fold into a `<Label>` primitive in P-115. |
+| 9 | iOS safe-area padding | **Apply `env(safe-area-inset-*)` standard.** Affected components listed in §8. | Mechanical audit. Grep for `position: fixed`/`sticky` at top/bottom edges; add env() padding. Pre-launch hygiene. |
+| 10 | Disclosure body animation | **Framer Motion height-spring.** `<motion.div>` with `animate={{ height: 'auto' }}`, `transition={{ type: 'spring', stiffness: 300, damping: 32 }}`. | P-115 introduces Framer Motion as a project dependency. Disclosure body should live on the same primitive as the rest of the motion language. CSS grid trick documented as fallback. |
+| 11 | P-115 easing standard | **Locked.** Default `ease-out`; entrances `cubic-bezier(0.16, 1, 0.3, 1)`; press feedback no easing; springs `{ stiffness: 300, damping: 32 }`; **no bounce anywhere**. Documented in §9. | Single standard prevents drift across components. Damping ≥ 30 caps overshoot at ~2%, which is the brand ceiling. |
+| 12 | Modal/sheet/drawer tier-3 elevation | **`0 24px 48px -12px rgba(0,0,0,0.18)` over solid `--fp-paper-solid`.** Documented in §6. | The big jump from tier-2 (0 2px 16px / 0.08) to tier-3 (0 24px 48px / 0.18) is intentional — modals must read as "well above the page." Negative spread keeps the footprint contained. |
 
 ---
 
 **Source files:** `app/globals.css` · `app/page.tsx` · `components/onboarding/OnboardingScreen.tsx` · `components/diagnostic/CouchesDiagnostic.tsx` · `components/Paywall.tsx`.
 **Format basis:** the 9-section pattern from VoltAgent/awesome-design-md. Content is LeMethodic-specific and codified from the existing repo, not imported from external systems.
+**Status:** all 12 review items from the first draft are resolved. Ready for P-115.
