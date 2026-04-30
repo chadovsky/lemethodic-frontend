@@ -1002,7 +1002,6 @@ _(F-091.0 shipped 2026-04-27 — see entry under "Shipped — Week 2 (April 27)"
 
 ## Known issues — not blocking
 
-- `components/onboarding/TargetScoreSelect.tsx:98` — pre-existing v0 unknown-narrowing TypeScript error. Cosmetic, doesn't break build.
 - Backend `main.py` CORS has `allow_credentials=True` — not needed for JWT-only but harmless; leave it.
 - Paywall.tsx has a lingering `{/* ── Test-drive section ─────── */}` code comment referencing deprecated feature. Cosmetic.
 
