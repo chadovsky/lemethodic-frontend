@@ -1092,6 +1092,25 @@ _(F-091.0 shipped 2026-04-27 — see entry under "Shipped — Week 2 (April 27)"
 
 ---
 
+## Process improvements
+
+### EX-100 — Evaluate execution tooling for ticket-by-ticket efficiency
+
+**Priority:** Medium
+**Filed:** 2026-04-30
+**Status:** Queued — review needed
+
+**Context:** Currently using FE/BE Claude Code terminals + manual prompt routing. Three GitHub resources flagged for evaluation:
+- **VoltAgent/awesome-design-md** — DESIGN.md drop-ins for coding agents (relevant to P-102)
+- **gztchan/awesome-design** — curated design resources (relevant to P-102, Method-as-brand)
+- **octopusos/octopus** — AI-Native Autonomous Agent OS (relevant to FE/BE coordination)
+
+**Action:** 30-min evaluation each. Decide if any change current process. Apply before P-102 starts (could reduce P-102 cost from ~$300 + hours to ~$0 + faster).
+
+**When:** Before P-102. After current launch-blocker tickets (P-103, P-104, B-100, B-102, M-100).
+
+---
+
 ## Known issues — not blocking
 
 - Backend `main.py` CORS has `allow_credentials=True` — not needed for JWT-only but harmless; leave it.
