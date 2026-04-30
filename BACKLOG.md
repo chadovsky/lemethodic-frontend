@@ -581,6 +581,30 @@ F-086 + F-087 + F-088 + F-089 shipped 2026-04-27. The F-086→F-089 rename pack 
 
 ---
 
+## P-115 — Interactivity + motion pass
+
+**Priority:** High (pre-launch), Phase 1
+**Status:** Queued
+**Filed:** 2026-04-30
+
+**Scope:** Add Framer Motion to `package.json`. Apply micro-interactions and state transitions across:
+- button presses
+- card transitions
+- lesson unlocks
+- recording-done state
+- diagnostic reveal
+- progress bar fills
+- tab switches
+- empty-state CTAs
+
+**Reference benchmark:** Promova.
+
+**Goal:** every interaction feels alive — 200-400ms eased animations, subtle physics, satisfying feedback. No new chart libraries. Mobile-first 380px verified.
+
+**Dependencies:** EX-101 (LEMETHODIC-DESIGN.md) ships first to anchor motion language consistent with Method-as-brand visual identity. Motion durations, easing curves, and physics parameters live in the DESIGN.md so this ticket can reference them rather than reinvent.
+
+---
+
 ## Queued — core product wiring (F-061.1, F-063, F-064)
 
 **F-061.1** 📋 Tâche 3 topic picker + slug resolution
