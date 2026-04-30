@@ -189,7 +189,7 @@ function SignupInner() {
             marginBottom: 24,
           }}
         >
-          FluentPath
+          LeMethodic
         </p>
 
         {/* Heading */}

@@ -7,8 +7,8 @@ const _geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 const _geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' })
 
 export const metadata: Metadata = {
-  title: 'FluentPath',
-  description: 'Learn French with FluentPath',
+  title: 'LeMethodic',
+  description: 'Learn French with LeMethodic',
   generator: 'v0.app',
   icons: {
     icon: [

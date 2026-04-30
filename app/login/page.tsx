@@ -129,7 +129,7 @@ export default function LoginPage() {
             marginBottom: 24,
           }}
         >
-          FluentPath
+          LeMethodic
         </p>
 
         {/* Heading */}
@@ -300,7 +300,7 @@ export default function LoginPage() {
           textAlign: 'center',
         }}
       >
-        New to FluentPath?{' '}
+        New to LeMethodic?{' '}
         <Link
           href="/onboarding"
           style={{

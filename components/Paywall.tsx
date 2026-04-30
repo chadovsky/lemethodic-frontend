@@ -239,7 +239,7 @@ export default function Paywall() {
               color: INK,
             }}
           >
-            Close the gap with FluentPath.
+            Close the gap with LeMethodic.
           </h2>
           <p
             style={{
@@ -665,7 +665,7 @@ export default function Paywall() {
               >
                 <span style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, fontSize: 12, color: INK_MUTED, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Feature</span>
                 <span style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, fontSize: 12, color: INK_MUTED, textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Free</span>
-                <span style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, fontSize: 12, color: INK, textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.04em' }}>FluentPath</span>
+                <span style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, fontSize: 12, color: INK, textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.04em' }}>LeMethodic</span>
               </div>
 
               {/* Data rows */}

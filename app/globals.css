@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* FluentPath onboarding pastel palette */
+  /* LeMethodic onboarding pastel palette */
   --fp-peach: #FFD8C2;
   --fp-sage: #D4E4D0;
   --fp-butter: #FFF0C2;
@@ -12,14 +12,14 @@
   --fp-sky: #CFE4F5;
   --fp-blush: #F5D6D6;
 
-  /* FluentPath neutrals */
+  /* LeMethodic neutrals */
   --fp-ink: #1A1A1A;
   --fp-ink-soft: #1A1A1AB3;
   --fp-ink-muted: #1A1A1A66;
   --fp-paper: #FFFFFFCC;
   --fp-paper-solid: #FFFFFF;
 
-  /* FluentPath CTA */
+  /* LeMethodic CTA */
   --fp-cta-bg: #1A1A1A;
   --fp-cta-text: #FFFFFF;
   --fp-cta-disabled: #1A1A1A4D;
@@ -99,7 +99,7 @@
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
   --font-display: 'Cabinet Grotesk', 'Geist', sans-serif;
 
-  /* FluentPath design tokens */
+  /* LeMethodic design tokens */
   --color-fp-peach: var(--fp-peach);
   --color-fp-sage: var(--fp-sage);
   --color-fp-butter: var(--fp-butter);
