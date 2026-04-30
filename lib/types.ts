@@ -214,6 +214,19 @@ export interface Recording {
   createdAt: string
 }
 
+// F-110 — list-endpoint summary shape per recording. Trimmed of the heavy
+// transcript/audio fields and extended with cefrLevel + couche scores so
+// the P-100 dashboard can compute rolling averages without N round-trips
+// via getDiagnostic(id). Ordered by createdAt DESC server-side.
+export interface RecordingSummary {
+  id: number
+  tacheMode: TacheMode
+  createdAt: string
+  cefrLevel: string | null
+  clbLevel: string | null
+  couches: Couche[]
+}
+
 // ── Diagnostic (frontend-facing view over Feedback.feedback_grid) ────────────
 
 // F-088 — internal pedagogical keys (backend dimensions, scoring, and

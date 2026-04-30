@@ -28,6 +28,7 @@ import type {
   QuizQuestion,
   QuizResult,
   Recording,
+  RecordingSummary,
   RecurringModulesResponse,
   TacheMode,
   TCFGoal,
@@ -425,6 +426,43 @@ function mapOrdonnance(raw: unknown): OrdonnanceStep[] {
   }))
 }
 
+// F-110 — list-endpoint shape per recording. Distinct from RawRecording
+// (single-recording fetch) because the list trims heavy fields like
+// transcript/audio_url and embeds couche scores so the P-100 dashboard
+// can compute rolling averages without N round-trips.
+interface RawRecordingSummary {
+  id: number
+  tache_mode: TacheMode
+  created_at: string
+  cefr_level: string | null
+  clb_level: string | null
+  couches: RawCouche[]
+}
+
+function mapRecordingSummary(raw: RawRecordingSummary): RecordingSummary {
+  // Same filter+map shape as mapDiagnosticBlock's couche normalization.
+  // F-110.1 will rewrite the `internal_key` reads here AND in
+  // mapDiagnosticBlock together once backend dual-emission lands; until
+  // then both sites read internal_key for consistency.
+  const couches: Couche[] = (raw.couches ?? [])
+    .filter((c) => c && KNOWN_COUCHE_KEYS.has(c.internal_key as CoucheKey))
+    .map((c) => ({
+      key: c.internal_key as CoucheKey,
+      displayLabelEn: c.display_label_en,
+      displayLabelFr: c.display_label_fr,
+      score: c.score ?? 0,
+      analyse: null,
+    }))
+  return {
+    id: raw.id,
+    tacheMode: raw.tache_mode,
+    createdAt: raw.created_at,
+    cefrLevel: raw.cefr_level,
+    clbLevel: raw.clb_level,
+    couches,
+  }
+}
+
 function mapRecording(raw: RawRecording): Recording {
   return {
     id: raw.id,
@@ -769,6 +807,21 @@ export const api = {
         status: raw.status,
         nextUnlocked: raw.next_unlocked,
       }
+    },
+  },
+
+  recordings: {
+    // F-110 — list the user's recordings, ordered by created_at DESC.
+    // Empty array on cold users (zero recordings — drives the P-100
+    // dashboard's empty-state branch). `limit` caps the count returned;
+    // omit for the full history. Each row carries cefr/clb levels +
+    // embedded couche scores so dashboard rolling-averages don't need
+    // per-recording getDiagnostic round-trips.
+    async list(opts: { limit?: number } = {}): Promise<RecordingSummary[]> {
+      const raw = await request<RawRecordingSummary[]>('/api/recordings', {
+        query: { limit: opts.limit },
+      })
+      return raw.map(mapRecordingSummary)
     },
   },
 

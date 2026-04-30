@@ -652,7 +652,7 @@ F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end 
 
 **Priority:** Medium
 **Blocked by:** Backend dual-emission shipped (F-110 backend, in progress)
-**Files:** lib/api.ts: interface RawCouche (type), KNOWN_COUCHE_KEYS filter + mapDiagnosticBlock mapper
+**Files:** lib/api.ts: interface RawCouche (type), KNOWN_COUCHE_KEYS filter + mapDiagnosticBlock mapper, mapRecordingSummary mapper
 **Action:** Switch all reads from c.internal_key to c.key. Update type definition. Verify mapDiagnosticBlock still produces same output shape downstream.
 **Cleanup trigger:** Once shipped, notify backend to execute F-110.2 (remove internal_key dual-emission).
 **When:** Can be done during P-100 work or as a standalone small PR after.
