@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-04-30 (P-100 Real Progress Dashboard shipped to production; F-110 backend dual-emission shipped, F-110.1 frontend migration unblocked)
+**Last updated:** 2026-05-01 (P-115 partial ship: foundation + 4 of 8+ motion surfaces live; remainder queued as P-115.x)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -581,27 +581,32 @@ F-086 + F-087 + F-088 + F-089 shipped 2026-04-27. The F-086→F-089 rename pack 
 
 ---
 
-## P-115 — Interactivity + motion pass
+## Shipped — Week 2 (May 1)
 
-**Priority:** High (pre-launch), Phase 1
-**Status:** Queued
-**Filed:** 2026-04-30
+P-115 ✅ **Partial ship — foundation + 4 of 8+ motion surfaces.** Filed 2026-04-30, foundation shipped 2026-05-01 (`df11866`), motion implementation 2026-05-01 (`64aad94`). Remainder filed as **P-115.x** (see Queued — follow-ups below).
 
-**Scope:** Add Framer Motion to `package.json`. Apply micro-interactions and state transitions across:
-- button presses
-- card transitions
-- lesson unlocks
-- recording-done state
-- diagnostic reveal
-- progress bar fills
-- tab switches
-- empty-state CTAs
+**Foundation (`df11866`):**
+- `framer-motion@^12.38.0` added.
+- `lib/motion.ts` — easing tuples (`easeFpDefault` / `easeFpEnter` / `easeFpExit`), spring presets (`heightSpring` / `liftSpring` / `pressSpring` reserved-for-non-button), `pressInstant` for buttons, duration tokens (`durationFast` / `durationBase` / `durationSlow`), stagger helper, scale constants.
+- `globals.css` — `--fp-canvas`, `--fp-track`, `--fp-peach-deep`, `--fp-sage-deep`, `--fp-sage-deep-25`, `--fp-error` tokens promoted; `--fp-safe-{top,bottom,left,right}` env() passthroughs; motion CSS vars + Tailwind 4 utilities (`ease-fp-default`, `ease-fp-enter`, `ease-fp-exit`).
+- All inline `#FAFAF7`/`#E8E8E5`/`#E0A890`/`#2D8B55` literals migrated to `var(--fp-*)` references across 24 files.
+- `viewportFit: 'cover'` added to viewport metadata (without it, `env(safe-area-inset-*)` returns 0 on iOS); `userScalable: false` removed (WCAG 2.1).
+- Safe-area applied to: BottomNav, Paywall bottom CTA, OnboardingScreen.CTAButton, Tâche 1/2 record bars + review sheets, Tâche 3 main content, TranscriptReviewPanel, LearnModuleSheet inner action, diagnostic root wrapper, plus sticky headers in HomeScreen / /progress / /profile / ecole/lesson / quiz.
+- Paywall billing toggle pill 38px → 44px (HIG floor).
+
+**Motion implementation (`64aad94`) — 4 surfaces:**
+1. **Diagnostic reveal** — `components/diagnostic/CouchesDiagnostic.tsx`. Bars stagger in worst-first using `staggerDiagnosticRow` (0.075s); user-fill width animates 0% → score%, score-dot tracks. Easing `easeFpEnter`, duration `durationDiagnosticReveal` (0.7s, justified). Bottleneck callout fades up after all bars settle.
+2. **Recording-done state** — `Tache1Session.tsx`, `Tache2Session.tsx`, `Tache3Session.tsx`. Record icon scale-pulse `[1, 1.08, 1]` on transcribe/process; status text remounts via `key={phase}` to retrigger upward fade.
+3. **Lesson unlock** — `QuizClient.tsx` writes `lemethodic:unlocked-lesson` to sessionStorage on perfect-score finish; `HomeScreen.tsx` reads + clears + passes `justUnlocked` to `LessonListItem.tsx`; one-shot scale 0.96 → 1.0 + boxShadow tier-1 → tier-2 → none keyframes (1s total). Stoic, not celebratory.
+4. **Empty-state pulse** — `components/dashboard/EmptyState.tsx`. Primary CTA scale `[1, 1.02, 1]` loops every 3s (1.5s active + 1.5s gap). Pauses on `whileHover`/`whileTap` (pause-during-interaction, not permanent kill).
+
+All 4 surfaces respect `prefers-reduced-motion` via `useReducedMotion()`.
+
+**Verification:** `pnpm tsc --noEmit` clean except F-108 pre-existing. Mobile-first 380px verified — no layout reflow risk in any of the animations.
+
+**Out of scope (filed as P-115.x):** button presses, card transitions, tab switches, progress bar fills, onboarding step transitions, streak fire icon. Foundation is in place; remainder is a separate pass.
 
 **Reference benchmark:** Promova.
-
-**Goal:** every interaction feels alive — 200-400ms eased animations, subtle physics, satisfying feedback. No new chart libraries. Mobile-first 380px verified.
-
-**Dependencies:** EX-101 (LEMETHODIC-DESIGN.md) ships first to anchor motion language consistent with Method-as-brand visual identity. Motion durations, easing curves, and physics parameters live in the DESIGN.md so this ticket can reference them rather than reinvent.
 
 ---
 
@@ -696,6 +701,25 @@ F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end 
 **Action:** migrate lib/api.ts reads — switch all `c.internal_key` references to `c.key`. Update the `RawCouche` type definition to declare `key: CoucheKey`. Verify `mapDiagnosticBlock` still produces the same output shape downstream.
 **Cleanup trigger:** Once shipped, notify backend to execute F-110.2 (remove internal_key dual-emission).
 **When:** Can be done during P-100 work or as a standalone small PR after.
+
+### P-115.x — Motion pass: remaining surfaces
+
+**Priority:** Medium
+**Status:** Queued
+**Filed:** 2026-05-01
+**Parent:** P-115 (4 of 8+ surfaces shipped — see "Shipped — Week 2 (May 1)")
+
+**Scope:** the motion surfaces deferred from P-115's first pass.
+- **Button presses** — every primary CTA / card press currently uses inline `transform: scale(0.97)` on pointerdown with no transition. Migrate to `motion.button` with `whileTap={{ scale: scaleButtonPress }}` and `transition={pressInstant}`. Hits Paywall CTA, OnboardingScreen.CTAButton, every Tâche briefing/finalize button.
+- **Card transitions** — onboarding cards, lesson list rows on hover/tap, Tâche scenario picker cards. Existing pattern uses inline scale; migrate to `motion.div` with `liftSpring` for selected-card lift and `pressInstant` for press.
+- **Tab switches** — bottom nav tab change between /, /speaking, /writing, /progress, /more. Currently no transition between routes; add a fade or fade-slide on route content using AnimatePresence + the layout shell.
+- **Progress bar fills** — Quiz progress bar (`QuizClient.tsx:155-173`), any other linear progress bars. Currently uses CSS `transition: width 0.3s ease`; migrate to motion with `easeFpDefault` for consistency.
+- **Onboarding step transitions** — between LanguageSelect → TCFGoalSelect → … → EcoleReveal. Currently a hard cut on `setStep(n+1)`. Add AnimatePresence + slide/fade between steps.
+- **Streak fire icon** — once F-067 ships streaks, a subtle attention pulse on the streak counter when it increments.
+
+**Dependencies:** none; the foundation (`lib/motion.ts`, `framer-motion`, tokens, safe-area) is already shipped via P-115.
+
+**When:** pick up after launch-blockers clear (P-103, P-104, B-100, B-102, M-100). Not pre-launch critical — the 4 shipped surfaces cover the highest-impact moments (diagnostic reveal, recording-done, unlock, empty-state CTA).
 
 ---
 
