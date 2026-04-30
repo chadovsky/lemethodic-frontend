@@ -2,13 +2,11 @@
 
 // Auth store. Token + user, persisted to localStorage so refresh survives.
 // The API client (lib/api.ts) reads the token directly from the
-// "fluentpath_token" key, so setAuth / clearAuth must keep that key in sync.
+// "lemethodic_token" key, so setAuth / clearAuth must keep that key in sync.
 
 import { create } from 'zustand'
 import type { User } from './types'
-
-const TOKEN_KEY = 'fluentpath_token'
-const USER_KEY = 'fluentpath_user'
+import { TOKEN_KEY, USER_KEY } from './storage-keys'
 
 interface AuthState {
   token: string | null

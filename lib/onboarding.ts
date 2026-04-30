@@ -1,16 +1,17 @@
 'use client'
 
 // Onboarding store. Holds the user's answers across the 6 onboarding screens
-// before they've signed up — FluentPath onboards anonymously then commits to
+// before they've signed up — LeMethodic onboards anonymously then commits to
 // the backend at the paywall.
 //
-// Persisted to localStorage key "fluentpath_onboarding" so a refresh mid-flow
+// Persisted to localStorage key "lemethodic_onboarding" so a refresh mid-flow
 // doesn't wipe progress. Call reset() after api.users.completeOnboarding()
 // succeeds.
 
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { OnboardingData } from './types'
+import { ONBOARDING_KEY } from './storage-keys'
 
 interface OnboardingState {
   data: Partial<OnboardingData>
@@ -31,7 +32,7 @@ export const useOnboardingStore = create<OnboardingState>()(
         // subsequent setField creates a fresh record.
         if (typeof window !== 'undefined') {
           try {
-            window.localStorage.removeItem('fluentpath_onboarding')
+            window.localStorage.removeItem(ONBOARDING_KEY)
           } catch {
             // privacy mode / quota — ignore
           }
@@ -39,7 +40,7 @@ export const useOnboardingStore = create<OnboardingState>()(
       },
     }),
     {
-      name: 'fluentpath_onboarding',
+      name: ONBOARDING_KEY,
       storage: createJSONStorage(() =>
         typeof window !== 'undefined'
           ? window.localStorage

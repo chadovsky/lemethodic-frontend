@@ -1,7 +1,7 @@
-// FluentPath API client. Typed fetch wrapper over the tcf-oral-tool FastAPI
+// LeMethodic API client. Typed fetch wrapper over the tcf-oral-tool FastAPI
 // backend. All methods return Promise<T>; non-2xx responses throw ApiError.
 //
-// Token source: localStorage key "fluentpath_token" (written by lib/auth.ts).
+// Token source: localStorage key "lemethodic_token" (written by lib/auth.ts).
 // Base URL: NEXT_PUBLIC_API_URL.
 
 import type {
@@ -34,8 +34,8 @@ import type {
   User,
 } from './types'
 import { useAuthStore } from './auth'
+import { TOKEN_KEY } from './storage-keys'
 
-const TOKEN_KEY = 'fluentpath_token'
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
 
 export class ApiError extends Error implements ApiErrorShape {
