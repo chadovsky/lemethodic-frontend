@@ -1104,8 +1104,8 @@ _(F-091.0 shipped 2026-04-27 — see entry under "Shipped — Week 2 (April 27)"
 ### C-100 — Clean up test user id=5 from production DB
 
 **Priority:** Low
-**Source:** id=5 created during curl debugging (April 30 morning); id=6 created during signup verification test that surfaced F-109 (April 30 morning)
-**Action:** DELETE FROM users WHERE id IN (5, 6); after verifying no FK dependencies
+**Source:** id=5 created during curl debugging (April 30 morning); id=6 created during signup verification test that surfaced F-109 (April 30 morning); id=7 created during F-110 production deploy verification (April 30, email f110-verify-20260430@example.com)
+**Action:** DELETE FROM users WHERE id IN (5, 6, 7); after verifying no FK dependencies
 **When:** Before beta launch, batched with any other test users created during P-100/P-105/P-106 dev
 
 ---
