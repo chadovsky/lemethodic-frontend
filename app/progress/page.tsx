@@ -10,6 +10,9 @@ import { useCallback, useEffect, useState } from 'react'
 import BottomNav from '@/components/home/BottomNav'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import EmptyState from '@/components/dashboard/EmptyState'
+import SnapshotCard from '@/components/dashboard/SnapshotCard'
+import SustainedCouches from '@/components/dashboard/SustainedCouches'
+import ActivityTimeline from '@/components/dashboard/ActivityTimeline'
 import RecurringModulesList from '@/components/dashboard/RecurringModulesList'
 import { api, ApiError } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
@@ -118,8 +121,9 @@ function ProgressDashboard() {
             <EmptyState />
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-              {/* Sections 1-3 (snapshot, sustained couches, activity
-                  timeline) ship in the next P-100 PR. */}
+              <SnapshotCard recordings={recordings} />
+              <SustainedCouches recordings={recordings} />
+              <ActivityTimeline recordings={recordings} lessons={lessons} />
               <RecurringModulesList modules={recurringModules} lessons={lessons} />
             </div>
           )}
