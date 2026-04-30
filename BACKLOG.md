@@ -1008,6 +1008,24 @@ _(F-091.0 shipped 2026-04-27 — see entry under "Shipped — Week 2 (April 27)"
 
 ---
 
+### F-108 — Fix pre-existing TS error in TargetScoreSelect.tsx
+
+**Status:** OPEN
+**Priority:** Low — build pipeline tolerates via `typescript.ignoreBuildErrors: true`
+**Discovered:** April 30, 2026 during Phase 3 brand rename type-check (Phase B)
+
+**Problem:** `components/onboarding/TargetScoreSelect.tsx:98` throws TS2322 — `hasPopular` (destructured option flag) is typed as `unknown` instead of `boolean`.
+
+**Why it's been hiding:** `next.config.mjs` sets `typescript.ignoreBuildErrors: true`. Production builds succeed despite this error.
+
+**Fix:** Narrow `hasPopular` to `boolean` type at the destructure site. Likely 2-line change.
+
+**Scope:** Single file. Independent commit. ~10 min work.
+
+**Related:** Worth a future ticket to address `typescript.ignoreBuildErrors: true` itself — silently passing builds with type errors is technical debt. But that's a separate cleanup session blocked on first fixing all latent TS errors.
+
+---
+
 ## Architectural lessons (ops gotchas from shipped tickets)
 
 ### Uvicorn `--reload` on Windows: worker processes go stale silently
