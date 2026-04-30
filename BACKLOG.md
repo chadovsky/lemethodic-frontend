@@ -47,6 +47,7 @@ F-055 ✅ v0 onboarding screens 2-6 + paywall
 F-056 ✅ v0 home screen + Le Raccourci tab + lesson detail + quiz scaffold
 F-057 ✅ v0 speaking module (Speaking landing, T1, T2 picker, T2 session, T3 session, TranscriptReviewPanel with Pyramide/Rebond/Ciblage)
 F-058 ✅ v0 diagnostic view (CouchesDiagnostic stacked bars, Le Goulet, L'Ordonnance, CorrectedLine)
+_Diagnostic view shipped; Progress page surface tracked separately as P-100; session-details data layer remains a future ticket (referenced inline at lines 335, 349, 422)._
 
 ## Shipped — Week 2 (April 23)
 
