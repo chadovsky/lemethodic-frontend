@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-05-01 (P-115 partial ship: foundation + 4 of 8+ motion surfaces live; P-104 background-tab timer drift fix shipped via visibilitychange listener; remainder queued as P-115.x and P-104.x)
+**Last updated:** 2026-05-01 (P-115 partial ship + P-104 timer drift fix + P-100.5 dashboard rendering bundle — CEFR null handling, F-110.1 migration shipped via P-100.5, recurring-modules placeholder. P-100 is now fully shipped.)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -509,7 +509,7 @@ P-100 ✅ Real Progress Dashboard. Replaces the "Coming soon (F-058)" placeholde
 3. Activity timeline (14-day dot calendar, plain SVG)
 4. Recurring modules list (top 5 by recurrence_count, severity-colored, linked to École lessons)
 
-**Known follow-up:** Sections 2 and 4 are not yet rendering with a single recording — they currently rely on rolling-window logic that needs the corpus to populate. Filed as **P-100.5** if we want to address before beta launch (could either lower the rolling-window minimum or surface a "1 recording — collecting more data" intermediate state).
+**Initial-ship gap (resolved by P-100.5 on 2026-05-01):** Sections 2 and 4 didn't render for a single-recording user, and Section 1 CEFR mismatched the diagnostic page. Investigation found three distinct root causes — see P-100.5 entry under "Shipped — Week 2 (May 1)" for the fixes. P-100 is fully shipped after that bundle.
 
 **Out of scope (per spec):** streaks (waits on F-067), couche scores time-series chart, total time practiced. Empty-state CTA routes to Speaking Lab.
 
@@ -628,6 +628,35 @@ P-104 ✅ **Background-tab timer drift fix — Step 1 (visibilitychange listener
 
 ---
 
+P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that together complete P-100 (Real Progress Dashboard). Filed and shipped 2026-05-01 after a single-recording user surfaced three rendering issues on production: SnapshotCard CEFR mismatched the diagnostic page (A2 vs B2), SustainedCouches didn't render at all, RecurringModulesList silently disappeared.
+
+**Investigation finding:** three distinct root causes, two genuine bugs and one design decision needing a UX patch.
+
+**Fix 1 — CEFR null handling (`app/diagnostic/page.tsx`, `components/dashboard/SnapshotCard.tsx`):**
+- Removed the silent `?? 'B2'` fallback at `diagnostic/page.tsx:451` that masked a null backend `cefr_level` by displaying a hardcoded "B2" hero. The user-reported B2/A2 mismatch was almost certainly this fallback faking data while the F-110 list endpoint (which the dashboard reads) returned the real "A2".
+- Diagnostic hero now renders `tcfBand ?? '—'` in muted color when null, with `aria-label="CEFR band pending"` for screen readers.
+- Narrative fallback no longer interpolates a null `tcfBand` into "null on Tâche 1"; renders "Analysis pending" copy when both `narrativeSummary` and `tcfBand` are absent.
+- SnapshotCard's `Cell` gains a `placeholder` prop that mutes the value color when rendering the "—" placeholder. Both surfaces now agree on the visual signal: muted "—" = data not available; INK = real value.
+
+**Fix 2 — F-110.1 migration shipped via P-100.5 (`lib/api.ts`):**
+- `RawCouche.internal_key` → `RawCouche.key`.
+- `mapRecordingSummary` filter `c.internal_key` → `c.key`; map `key: c.internal_key` → `key: c.key`.
+- `mapDiagnosticBlock` same migration.
+- F-088 docblock updated to reference the new field name.
+- The original symptom: F-110 list endpoint emitted `key` per spec while frontend filtered on `c.internal_key`, silently rejecting every couche entry. SustainedCouches's defensive `if (rows.length === 0) return null` then hid the section entirely. Backend `couches_array` dual-emits both fields during the transition window, so reading `key` works against /history, /{id}, and the F-110 list endpoint uniformly.
+- F-110.1 entry in Queued — follow-ups marked superseded by P-100.5 (same code change). F-110.2 backend cleanup is now safe to execute.
+
+**Fix 3 — Recurring-modules empty placeholder (`components/dashboard/RecurringModulesList.tsx`):**
+- Backend `getRecurringModules` returns empty for users with fewer than 3 distinct recordings (F-080d threshold). Confirmed by the API method's docblock at `api.ts:725-731`. Not a bug — by design.
+- Replaced `if (top5.length === 0) return null` with a placeholder card that renders the section eyebrow + subhead + a one-line copy: "Recurring patterns will appear after your first 3 recordings. Keep practicing." (FR equivalent: "Les schémas récurrents apparaîtront après vos 3 premiers enregistrements. Continuez à pratiquer.")
+- Disappearing UI sections feel like bugs to users; the placeholder communicates the threshold honestly.
+
+**Verification:** `pnpm tsc --noEmit` clean except F-108 pre-existing. After Vercel deploys, verify in InPrivate on `/progress` that Section 1 CEFR matches diagnostic page, Section 2 renders couche bars, Section 4 shows the placeholder copy.
+
+**P-100 status:** fully shipped. The original P-100 ship (2026-04-30, 4-section dashboard) plus P-100.5 (rendering bundle) close the ticket. The P-100.5 follow-up flag from the original ship entry is resolved.
+
+---
+
 ## Queued — core product wiring (F-061.1, F-063, F-064)
 
 **F-061.1** 📋 Tâche 3 topic picker + slug resolution
@@ -713,12 +742,8 @@ F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end 
 
 ### F-110.1 — Migrate frontend reads from internal_key to key
 
-**Priority:** Medium
-**Blocked by:** nothing; ready to start. Backend dual-emission is shipped — `couches_array` now emits both `key` and `internal_key`, so the frontend can flip reads at any time without coordination.
-**Files:** lib/api.ts: interface RawCouche (type), KNOWN_COUCHE_KEYS filter + mapDiagnosticBlock mapper, mapRecordingSummary mapper
-**Action:** migrate lib/api.ts reads — switch all `c.internal_key` references to `c.key`. Update the `RawCouche` type definition to declare `key: CoucheKey`. Verify `mapDiagnosticBlock` still produces the same output shape downstream.
-**Cleanup trigger:** Once shipped, notify backend to execute F-110.2 (remove internal_key dual-emission).
-**When:** Can be done during P-100 work or as a standalone small PR after.
+**Status:** Superseded by P-100.5 (2026-05-01) — same code change shipped as part of the dashboard rendering fix bundle. The migration originally specced here (RawCouche type rename + filter + mapDiagnosticBlock + mapRecordingSummary) shipped verbatim under P-100.5 because Section 2's missing render was caused by exactly this mismatch (frontend reading `internal_key` while F-110 list endpoint emitted `key` only).
+**Cleanup trigger:** F-110.2 backend cleanup is now safe to execute — notify backend to drop `internal_key` from `couches_array` dual-emission.
 
 ### P-104.x — Wall-clock setTimeout cap fallback for deep-throttle edge case
 

@@ -86,8 +86,8 @@ export default function SnapshotCard({ recordings }: Props) {
           gap: 12,
         }}
       >
-        <Cell label={labels.current} value={latestCefr ?? labels.placeholder} />
-        <Cell label={labels.target} value={targetLevel ?? labels.placeholder} />
+        <Cell label={labels.current} value={latestCefr ?? labels.placeholder} placeholder={!latestCefr} />
+        <Cell label={labels.target} value={targetLevel ?? labels.placeholder} placeholder={!targetLevel} />
         {examDays !== null ? (
           <Cell label={labels.exam} value={`${examDays}${labels.daysSuffix}`} />
         ) : (
@@ -98,7 +98,9 @@ export default function SnapshotCard({ recordings }: Props) {
   )
 }
 
-function Cell({ label, value }: { label: string; value: string }) {
+// P-100.5 — when value is a placeholder (e.g. CEFR not yet computed),
+// render in muted color so users can distinguish "—" from a real value.
+function Cell({ label, value, placeholder = false }: { label: string; value: string; placeholder?: boolean }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       <span
@@ -118,7 +120,7 @@ function Cell({ label, value }: { label: string; value: string }) {
           fontFamily: DISPLAY_FONT,
           fontWeight: 800,
           fontSize: 22,
-          color: INK,
+          color: placeholder ? INK_MUTED : INK,
           lineHeight: 1.1,
         }}
       >

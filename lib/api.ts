@@ -310,11 +310,16 @@ interface RawRecording {
 // router (mirrors what analysis.py writes into the Feedback row, but
 // restructured as JSON for the API).
 // F-088 — `la_carte` (internal-key dict) replaced by `couches` (array
-// of {internal_key, display_label_en, display_label_fr, score}). Hard
-// cut: backend no longer emits `la_carte`. See
+// of {key, display_label_en, display_label_fr, score}). Hard cut:
+// backend no longer emits `la_carte`. See
 // app/services/couche_labels.py for the canonical mapping.
 interface RawCouche {
-  internal_key: CoucheKey
+  // P-100.5 / F-110.1 — backend canonical field is `key`. F-110 list
+  // endpoint emits `key` per spec; `couches_array` (used by /history and
+  // /{id} diagnostic block) dual-emits `key` + `internal_key` for the
+  // transition window. Once F-110.2 lands and drops `internal_key`
+  // backend-side, this stays as-is.
+  key: CoucheKey
   display_label_en: string
   display_label_fr: string
   score: number
@@ -440,14 +445,14 @@ interface RawRecordingSummary {
 }
 
 function mapRecordingSummary(raw: RawRecordingSummary): RecordingSummary {
-  // Same filter+map shape as mapDiagnosticBlock's couche normalization.
-  // F-110.1 will rewrite the `internal_key` reads here AND in
-  // mapDiagnosticBlock together once backend dual-emission lands; until
-  // then both sites read internal_key for consistency.
+  // P-100.5 / F-110.1 — read backend's `key` field. Until this migration,
+  // mapRecordingSummary read `internal_key` while the F-110 list endpoint
+  // emitted only `key`, which silently emptied every couches array and
+  // hid SustainedCouches in the dashboard.
   const couches: Couche[] = (raw.couches ?? [])
-    .filter((c) => c && KNOWN_COUCHE_KEYS.has(c.internal_key as CoucheKey))
+    .filter((c) => c && KNOWN_COUCHE_KEYS.has(c.key as CoucheKey))
     .map((c) => ({
-      key: c.internal_key as CoucheKey,
+      key: c.key as CoucheKey,
       displayLabelEn: c.display_label_en,
       displayLabelFr: c.display_label_fr,
       score: c.score ?? 0,
@@ -504,10 +509,14 @@ export function mapDiagnosticBlock(
   // F-088 — read the `couches` array directly. Backend always emits
   // all 4 TCF couches in canonical order; defensive filter is here in
   // case a legacy row ever lands without the field populated.
+  // P-100.5 / F-110.1 — read backend's `key` field uniformly (matches
+  // mapRecordingSummary). `couches_array` dual-emits both `key` and
+  // `internal_key` during the transition window, so reading `key`
+  // works against both /history, /{id}, and the F-110 list endpoint.
   const couches: Couche[] = (d.couches ?? [])
-    .filter((c) => c && KNOWN_COUCHE_KEYS.has(c.internal_key as CoucheKey))
+    .filter((c) => c && KNOWN_COUCHE_KEYS.has(c.key as CoucheKey))
     .map((c) => ({
-      key: c.internal_key as CoucheKey,
+      key: c.key as CoucheKey,
       displayLabelEn: c.display_label_en,
       displayLabelFr: c.display_label_fr,
       score: c.score ?? 0,

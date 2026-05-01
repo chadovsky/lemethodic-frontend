@@ -448,7 +448,11 @@ function DiagnosticInner() {
   // review path still works at /diagnostic with no query param.
   const realMode = diagnostic != null
 
-  const tcfBand = realMode ? diagnostic.cefrLevel ?? 'B2' : 'C1'
+  // P-100.5 — no more silent `?? 'B2'` fallback. When realMode and
+  // backend hasn't computed a CEFR level, render a muted placeholder
+  // rather than masquerade a hardcoded value as data. Mock mode keeps
+  // the canonical 'C1' for design-review.
+  const tcfBand: string | null = realMode ? (diagnostic.cefrLevel ?? null) : 'C1'
   // TODO(Phase 4): derive the /699 TCF score from backend once a CEFR→TCF
   // table exists server-side. For now we surface noteGlobale (/20) as the
   // numeric anchor in real mode; mock mode shows the canonical 428/699.
@@ -476,9 +480,11 @@ function DiagnosticInner() {
     : tacheRubric?.tacheMode === 'tache_2' ? 2
     : tacheRubric?.tacheMode === 'tache_3' ? 3
     : null
-  const narrativeFallback = tacheNumber != null
-    ? `${tcfBand} on Tâche ${tacheNumber}`
-    : `${tcfBand}`
+  // P-100.5 — when both narrativeSummary and tcfBand are absent, surface
+  // an honest "Analysis pending" rather than rendering "null on Tâche 1".
+  const narrativeFallback = tcfBand
+    ? (tacheNumber != null ? `${tcfBand} on Tâche ${tacheNumber}` : tcfBand)
+    : 'Analysis pending — your CEFR band will appear once the backend finishes scoring.'
   const narrativeText = realMode ? (diagnostic.narrativeSummary ?? narrativeFallback) : narrativeFallback
 
   // F-080c: detected modules + ordonnance source. The Diagnostic.goulet
@@ -649,10 +655,14 @@ function DiagnosticInner() {
                   fontWeight: 800,
                   fontSize: 56,
                   lineHeight: 1,
-                  color: INK,
+                  // P-100.5 — muted color when band is pending (null from
+                  // backend) so users can distinguish "we don't know yet"
+                  // from a real CEFR value.
+                  color: tcfBand ? INK : INK_MUTED,
                 }}
+                aria-label={tcfBand ?? 'CEFR band pending'}
               >
-                {tcfBand}
+                {tcfBand ?? '—'}
               </span>
               <span
                 style={{

@@ -32,6 +32,7 @@ export default function RecurringModulesList({ modules, lessons }: Props) {
   const [pickerModule, setPickerModule] = useState<RecurringModule | null>(null)
 
   const top5 = modules.slice(0, 5)
+  const isEmpty = top5.length === 0
 
   const handleTap = useCallback(
     (m: RecurringModule) => {
@@ -44,7 +45,10 @@ export default function RecurringModulesList({ modules, lessons }: Props) {
     [router],
   )
 
-  if (top5.length === 0) return null
+  // P-100.5 — backend returns empty until the user has 3+ recordings
+  // (F-080d threshold). Render a placeholder card instead of hiding the
+  // section entirely so users understand the threshold rather than
+  // wondering where Section 4 went.
 
   // Pre-resolved lesson title + subline for the picker, sourced from the
   // dashboard's already-cached lessons list so the sheet doesn't refetch
@@ -59,6 +63,10 @@ export default function RecurringModulesList({ modules, lessons }: Props) {
     lang === 'fr'
       ? 'Les schémas qui reviennent dans plusieurs sessions.'
       : 'Patterns that show up across multiple sessions.'
+  const emptyCopy =
+    lang === 'fr'
+      ? 'Les schémas récurrents apparaîtront après vos 3 premiers enregistrements. Continuez à pratiquer.'
+      : 'Recurring patterns will appear after your first 3 recordings. Keep practicing.'
 
   return (
     <section
@@ -92,15 +100,40 @@ export default function RecurringModulesList({ modules, lessons }: Props) {
         </p>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {top5.map((m) => (
-          <RecurringModuleCard
-            key={m.module_id}
-            module={m}
-            onTap={() => handleTap(m)}
-          />
-        ))}
-      </div>
+      {isEmpty ? (
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: 16,
+            padding: '18px 18px',
+            border: '1px solid #1A1A1A0A',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          }}
+        >
+          <p
+            style={{
+              fontFamily: DISPLAY_FONT,
+              fontWeight: 500,
+              fontSize: 14,
+              lineHeight: 1.5,
+              color: INK_MUTED,
+              margin: 0,
+            }}
+          >
+            {emptyCopy}
+          </p>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {top5.map((m) => (
+            <RecurringModuleCard
+              key={m.module_id}
+              module={m}
+              onTap={() => handleTap(m)}
+            />
+          ))}
+        </div>
+      )}
 
       {pickerModule && (
         <LearnModuleSheet
