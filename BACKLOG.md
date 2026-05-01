@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-05-01 (P-115 partial ship + P-104 timer drift fix + P-100.5 dashboard rendering bundle — CEFR null handling, F-110.1 migration shipped via P-100.5, recurring-modules placeholder. P-100 is now fully shipped.)
+**Last updated:** 2026-05-01 (P-100 / P-100.5 superseded by P-230 + Phase 1 Architecture Rework from LEMETHODIC-CURRICULUM v0.2 — 33 tickets P-200 through P-269 filed; P-115 + P-104 + P-100.5 still shipped as production state until P-230 implementation lands)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -501,7 +501,7 @@ F-091.0 ✅ V1 onboarding lock to TCF-only. Pre-launch ticket; May 4 launch ship
 
 ## Shipped — Week 2 (April 30)
 
-P-100 ✅ Real Progress Dashboard. Replaces the "Coming soon (F-058)" placeholder on the Progress tab with the 4-section dashboard — live in production on lemethodic-frontend.vercel.app.
+P-100 ✅ Real Progress Dashboard. Replaces the "Coming soon (F-058)" placeholder on the Progress tab with the 4-section dashboard — live in production on lemethodic-frontend.vercel.app. **Superseded by P-230 (LEMETHODIC-CURRICULUM v0.2 §10.4) on 2026-05-01.** The shipped 4-section dashboard is the current production state and stays live until P-230 implementation lands; the original P-100 spec is no longer the target.
 
 **Sections live:**
 1. Snapshot card (current CEFR estimate, target level, exam date countdown)
@@ -523,10 +523,12 @@ F-086 + F-087 + F-088 + F-089 shipped 2026-04-27. The F-086→F-089 rename pack 
 
 ---
 
-## P-100 — Real Progress Dashboard
+## P-100 — Real Progress Dashboard (LEGACY SPEC — SUPERSEDED)
+
+**Status: Superseded by P-230 (LEMETHODIC-CURRICULUM v0.2 §10.4) on 2026-05-01.** Spec block kept below for historical reference only — do not implement against this. P-230 rebuilds /progress per §7.4 with calm/method modes, Block 2 (Goulet Stack), Block 5 (Dialogue Box), Block 8 (Confidence Visualizer).
 
 **Priority:** High (Phase 1, Block 4)
-**Status:** Ready to start
+**Status:** ~~Ready to start~~ Superseded
 **Scope:** Replace "Coming soon (F-058)" placeholder on Progress tab with functional dashboard. Frontend-only work, no backend instrumentation required for v1.
 
 ### Sections (top to bottom)
@@ -630,6 +632,8 @@ P-104 ✅ **Background-tab timer drift fix — Step 1 (visibilitychange listener
 
 P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that together complete P-100 (Real Progress Dashboard). Filed and shipped 2026-05-01 after a single-recording user surfaced three rendering issues on production: SnapshotCard CEFR mismatched the diagnostic page (A2 vs B2), SustainedCouches didn't render at all, RecurringModulesList silently disappeared.
 
+**Superseded by P-230 (LEMETHODIC-CURRICULUM v0.2 §10.4) on 2026-05-01** — the same day the bundle shipped. Rendering fixes are preserved as production state until P-230 implementation lands; the underlying CEFR null handling, F-110.1 migration, and empty-state placeholder all carry forward into the rebuilt dashboard.
+
 **Investigation finding:** three distinct root causes, two genuine bugs and one design decision needing a UX patch.
 
 **Fix 1 — CEFR null handling (`app/diagnostic/page.tsx`, `components/dashboard/SnapshotCard.tsx`):**
@@ -654,6 +658,372 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Verification:** `pnpm tsc --noEmit` clean except F-108 pre-existing. After Vercel deploys, verify in InPrivate on `/progress` that Section 1 CEFR matches diagnostic page, Section 2 renders couche bars, Section 4 shows the placeholder copy.
 
 **P-100 status:** fully shipped. The original P-100 ship (2026-04-30, 4-section dashboard) plus P-100.5 (rendering bundle) close the ticket. The P-100.5 follow-up flag from the original ship entry is resolved.
+
+---
+
+## Phase 1 Architecture Rework — From LEMETHODIC-CURRICULUM v0.2
+
+**Source:** `LEMETHODIC-CURRICULUM.md` §10 (committed 2026-05-01, commit `84320ea`).
+**Filed:** 2026-05-01.
+**Roster:** 33 tickets — 23 Phase 1 (P-200–P-251), 10 Phase 2 deferred stubs (P-260–P-269). Sequenced by dependency. Supersedes the original P-100 spec and the placeholder P-200 tickets that existed prior to the curriculum doc.
+
+### Foundation (§10.1) — must ship first, in order
+
+### P-200 — Diagnostic engine: detector implementation
+
+**Priority:** HIGH (pre-launch blocker)
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.1
+**Dependencies:** none
+**Scope:** implement L1 transfer detector, preposition error detector, subordination counter, connector variety scorer, A2 sentence structure detector, A2 infinitive substitution detector. Plug into existing analysis pipeline alongside couches scoring. Output ceiling markers per level.
+**Owner:** Engineering
+
+### P-201 — Diagnostic engine: level assignment + confidence
+
+**Priority:** HIGH
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.1
+**Dependencies:** P-200
+**Scope:** implement level assignment rule (§3.5). Add confidence scoring. Surface level + confidence on diagnostic page and Snapshot via Block 8.
+**Owner:** Engineering
+
+### P-202 — Cluster data model
+
+**Priority:** HIGH
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.1
+**Dependencies:** none
+**Scope:** backend schema for clusters (grammar topic, vocabulary theme, Tâche application, lesson reference, exercise set reference, prompt reference, detection rubric, lesson delivery format flag). Migration. CRUD for clusters via admin or seed script.
+**Owner:** Engineering
+
+### P-203 — Path data model
+
+**Priority:** HIGH
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.1
+**Dependencies:** P-202
+**Scope:** backend schema for paths (level start, level target, phases, cluster sequence per phase). Path entity, Phase entity, PathCluster join table.
+**Owner:** Engineering
+
+### P-204 — User progress model
+
+**Priority:** HIGH
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.1
+**Dependencies:** P-202, P-203
+**Scope:** backend schema for user's path enrollment, current phase, current cluster, cluster status (not_started / in_progress / absorbed / needs_revisit), cluster history.
+**Owner:** Engineering
+
+### Content scaffolding (§10.2)
+
+### P-210 — B1→B2 path seed data
+
+**Priority:** HIGH (pre-launch blocker)
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.2
+**Dependencies:** P-202, P-203
+**Scope:** seed the B1→B2 path's 15-20 clusters in the database (titles + structure only; content authored separately). Phase boundaries defined.
+**Owner:** Engineering
+
+### P-211 — Cluster content authoring
+
+**Priority:** HIGH (pre-launch blocker)
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.2
+**Dependencies:** P-202, P-210 (seed must exist before content slots into it)
+**Scope:** author lesson + exercise set + practice prompt + detection rubric for each B1→B2 cluster. Decide delivery format per cluster (markdown / PDF / video). Delivered as files into the system.
+**Owner:** Chadi (content authoring, not engineering)
+
+### P-212 — Starter cluster seed for A2 and B2 paths
+
+**Priority:** MEDIUM (pre-launch)
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.2
+**Dependencies:** P-202, P-203
+**Scope:** seed first 3-4 clusters of A2→B1 path and first 3-4 of B2→C1 path. Used as waitlist preview content.
+**Owner:** Engineering (schema seed); Chadi for the small starter content set
+
+### P-213 — Dialogue Box template authoring
+
+**Priority:** MEDIUM (pre-launch)
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.2
+**Dependencies:** none
+**Scope:** author 30-50 Dialogue Box templates (Block 5) varied by context. Placeholders for detected data.
+**Owner:** Chadi
+
+### Onboarding (§10.3)
+
+### P-220 — Onboarding questionnaire rebuild
+
+**Priority:** HIGH
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.3
+**Dependencies:** P-203
+**Scope:** rebuild current onboarding to match §8.3 (10-12 screens). Each answer maps to user profile fields that drive path assignment.
+**Owner:** Engineering
+
+### P-221 — Diagnostic flow integration
+
+**Priority:** HIGH
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.3
+**Dependencies:** P-201, P-220
+**Scope:** after questionnaire, run 3 diagnostic recordings (one per Tâche). Engine output updates user level. Path assignment confirmed/adjusted.
+**Owner:** Engineering
+
+### P-222 — Waitlist UX for A2 and B2+ paths
+
+**Priority:** HIGH (pre-launch)
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.3
+**Dependencies:** P-201, P-221
+**Scope:** when user diagnostic places them in a not-yet-built path, show waitlist screen with explanation, free interim resources, optional early-access opt-in.
+**Owner:** Engineering
+
+### Dashboards (§10.4) — full §7 implementation
+
+### P-230 — Overall Progress dashboard rebuild
+
+**Priority:** HIGH
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.4
+**Dependencies:** P-201, P-204
+**Scope:** rebuild /progress per §7.4. Calm mode default + method mode opt-in. Includes Block 2 (Goulet Stack), Block 5 (Dialogue Box), Block 8 (Confidence Visualizer). Replaces current P-100 surface entirely.
+**Owner:** Engineering
+**Supersedes:** P-100, P-100.5
+
+### P-231 — Speaking dashboard
+
+**Priority:** HIGH
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.4
+**Dependencies:** P-201, P-204
+**Scope:** implement §7.5. New surface, drill-down from Speaking tab. Includes Block 3 (Recording Replay with Inline Diagnostics).
+**Owner:** Engineering
+
+### P-232 — Per-Tâche dashboards
+
+**Priority:** MEDIUM
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.4
+**Dependencies:** P-231
+**Scope:** implement §7.6. Three dashboards (T1, T2, T3). Block 3 reused.
+**Owner:** Engineering
+
+### P-233 — Curriculum view (path surface)
+
+**Priority:** HIGH
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.4
+**Dependencies:** P-203, P-204, P-210
+**Scope:** implement §7.7. New surface accessible from main nav. Includes Block 4 (Path Topography).
+**Owner:** Engineering
+
+### P-234 — Cluster detail view
+
+**Priority:** HIGH
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.4
+**Dependencies:** P-202, P-211
+**Scope:** implement §7.8. Per-cluster page with lesson, exercises, prompt, history. Multi-format lesson rendering (markdown / PDF embed / video embed).
+**Owner:** Engineering
+
+### P-235 — Ceiling Marker Map
+
+**Priority:** HIGH (method mode visibility moat)
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.4
+**Dependencies:** P-200, P-201
+**Scope:** implement Block 1. Surfaceable from Overall Progress (method mode) and Curriculum view (method mode).
+**Owner:** Engineering
+
+### P-236 — Mistake Repository
+
+**Priority:** MEDIUM
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.4
+**Dependencies:** P-200
+**Scope:** implement Block 7. Standalone tab inside Progress.
+**Owner:** Engineering
+
+### P-237 — Time-Adaptive UI (lean version)
+
+**Priority:** HIGH (meta-ticket affecting all dashboards)
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.4
+**Dependencies:** P-230, P-231, P-233
+**Scope:** implement Block 6 lean version. `daysUntilExam` reads + conditional rendering for Dialogue Box copy, Goulet Stack ordering, exam countdown weight, practice CTA emphasis. Full mode redesigns deferred to Phase 2 (P-267).
+**Owner:** Engineering
+
+### Prescription engine (§10.5)
+
+### P-240 — Today's recommended action
+
+**Priority:** HIGH
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.5
+**Dependencies:** P-204, P-213
+**Scope:** prescription logic — given user's current path/phase/cluster + recent submissions + Dialogue Box template selection, output the single recommended next action. Surface on Overall Progress §7.4 section 2.
+**Owner:** Engineering
+
+### P-241 — Cluster-level prescription
+
+**Priority:** MEDIUM
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.5
+**Dependencies:** P-204, P-211
+**Scope:** when a cluster's detection rubric scores "needs revisit", prescription engine routes user back to that cluster instead of advancing.
+**Owner:** Engineering
+
+### Calibration & content ops (§10.6)
+
+### P-250 — Threshold calibration
+
+**Priority:** HIGH
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.6
+**Dependencies:** P-200, P-211
+**Scope:** run real recordings of known-level students (Chadi's existing Preply students with documented levels) through the diagnostic. Tune thresholds in §2.4 and §3.x against ground truth. Iterate until level assignment agrees with Chadi's expert judgment ≥80% of the time.
+**Owner:** Engineering (tuning); Chadi (ground-truth labels)
+
+### P-251 — Lesson content delivery infrastructure
+
+**Priority:** MEDIUM
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.6
+**Dependencies:** none
+**Scope:** implement multi-format lesson delivery (markdown rendered in-app, PDF embedded with download option, video embedded). Specify file storage on Spaces, versioning, FE rendering.
+**Owner:** Engineering
+
+### Phase 2 deferred (§10.7)
+
+Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. Scope is the title only — full specs land when each ticket is taken up post-launch.
+
+### P-260 — Writing analysis pipeline
+
+**Priority:** —
+**Status:** Phase 2 deferred
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.7
+**Dependencies:** TBD (Phase 1 foundation must ship first)
+**Scope:** writing analysis pipeline — full spec at pickup time.
+**Owner:** Engineering
+
+### P-261 — Writing dashboard
+
+**Priority:** —
+**Status:** Phase 2 deferred
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.7
+**Dependencies:** P-260
+**Scope:** writing dashboard — full spec at pickup time.
+**Owner:** Engineering
+
+### P-262 — Cross-modal prescription
+
+**Priority:** —
+**Status:** Phase 2 deferred
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.7
+**Dependencies:** P-240, P-260
+**Scope:** cross-modal prescription (speaking + writing) — full spec at pickup time.
+**Owner:** Engineering
+
+### P-263 — A2 path full content
+
+**Priority:** —
+**Status:** Phase 2 deferred
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.7
+**Dependencies:** P-211, P-212
+**Scope:** A2→B1 path full content authoring (extends P-212 starter set).
+**Owner:** Chadi
+
+### P-264 — B2→C1 path full content
+
+**Priority:** —
+**Status:** Phase 2 deferred
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.7
+**Dependencies:** P-211, P-212
+**Scope:** B2→C1 path full content authoring (extends P-212 starter set).
+**Owner:** Chadi
+
+### P-265 — C1→C2 path
+
+**Priority:** —
+**Status:** Phase 2 deferred
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.7
+**Dependencies:** P-211
+**Scope:** C1→C2 path (structure + content) — full spec at pickup time.
+**Owner:** Chadi (content); Engineering (structure)
+
+### P-266 — Tense + conjugation + idiomaticity detectors
+
+**Priority:** —
+**Status:** Phase 2 deferred
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.7
+**Dependencies:** P-200
+**Scope:** additional detectors beyond P-200's initial set — tense correctness, conjugation accuracy, idiomaticity scoring.
+**Owner:** Engineering
+
+### P-267 — Time-Adaptive UI full mode redesigns
+
+**Priority:** —
+**Status:** Phase 2 deferred
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.7
+**Dependencies:** P-237
+**Scope:** Foundation / Acceleration / Cram modes with different navigation structures (full redesign beyond P-237's lean conditional rendering).
+**Owner:** Engineering
+
+### P-268 — Audio-synced playback for Recording Replay
+
+**Priority:** —
+**Status:** Phase 2 deferred
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.7
+**Dependencies:** P-231
+**Scope:** Block 3 enhancement — audio-synced inline diagnostic playback.
+**Owner:** Engineering
+
+### P-269 — Streak system
+
+**Priority:** —
+**Status:** Phase 2 deferred
+**Filed:** 2026-05-01
+**Source:** LEMETHODIC-CURRICULUM v0.2 §10.7
+**Dependencies:** none
+**Scope:** streak system — F-067 reframed under the curriculum architecture.
+**Owner:** Engineering
+**Note:** F-067 (Queued — polish for real-feel) is now superseded by P-269.
 
 ---
 
