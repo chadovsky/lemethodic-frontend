@@ -858,6 +858,7 @@ Scope: implement multi-format lesson delivery (markdown rendered in-app, PDF emb
 
 - **2026-05-01 — v0.1 initial draft.** Co-PM (Claude) authored from Chadi's pedagogical model and uploaded textbook references. Awaiting Chadi review pass.
 - **2026-05-01 — v0.2 second pass.** All v0.1 open questions resolved. §7 Dashboard hierarchy fully rebuilt — three design principles (show the method / two modes / time-aware) and 8 building blocks (Ceiling Marker Map, Goulet Stack, Recording Replay with Inline Diagnostics, Path Topography, Dialogue Box, Time-Adaptive UI lean, Mistake Repository, Confidence Visualizer). Calm mode default + method mode opt-in. Time-adaptive lean version in Phase 1; full mode redesigns deferred to Phase 2. Cluster count for B1→B2 expanded to 15-20. Onboarding expanded to 10-12 questions. Lesson delivery format = mix per cluster. A2 detection moved to Phase 1. Ticket roster expanded from 24 to 33 tickets (including Phase 2 stubs).
+- 2026-05-01 — v0.2 cluster authoring kickoff. 13 of 22 B1→B2 clusters drafted at curriculum/clusters/. Phase B1.4 (Les Moules) and B1.5 (spiral revisits) deferred pending Chadi authoring of Les Moules IP.
 
 ---
 
