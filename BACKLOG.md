@@ -2,7 +2,7 @@
 
 **Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
-**Last updated:** 2026-05-01 (P-115 partial ship: foundation + 4 of 8+ motion surfaces live; remainder queued as P-115.x)
+**Last updated:** 2026-05-01 (P-115 partial ship: foundation + 4 of 8+ motion surfaces live; P-104 background-tab timer drift fix shipped via visibilitychange listener; remainder queued as P-115.x and P-104.x)
 **Sprint window:** April 21 – May 4, 2026
 **Sprint pivot (2026-04-25):** launch-prep tickets (F-071 through F-079) pushed behind the intelligence-layer initiative. F-080 (Module Library + Intelligence Layer) is now the spine of the remaining sprint window — replaces generic Claude-API feedback with a named library of L1-interference remediation modules and cross-session accumulation.
 
@@ -610,6 +610,24 @@ All 4 surfaces respect `prefers-reduced-motion` via `useReducedMotion()`.
 
 ---
 
+P-104 ✅ **Background-tab timer drift fix — Step 1 (visibilitychange listener).** Pre-launch UX hardening for the per-Tâche cap auto-stop when the user backgrounds the tab mid-recording.
+
+**Investigation finding:** `useAudioRecorder.durationMs` and `CountdownTimer` (owned mode, F-076) already use `Date.now()` deltas, so the values are wall-clock-correct. The residual gap is **state-update cadence** — `setInterval(100ms)` is throttled to ≥1Hz in background tabs (and paused entirely under Chrome's intensive throttling after ~5 min hidden). The downstream `useEffect([recorder.durationMs])` cap-watchers in T1/T2/T3 only fire when `durationMs` lands in React state, so a stale state means a late auto-stop.
+
+**Backend ground-truth check:** the frontend never reports duration to the backend — `uploadConversationTurn` and `createRecording` send only the audio blob plus metadata. Backend computes duration from the audio file. So timer drift is **purely a UX issue**, not data corruption; no DB migration needed.
+
+**Fix (`hooks/useAudioRecorder.ts`):**
+- New `visibilityHandlerRef` to track the listener for cleanup parity with `tickRef`.
+- New `unbindVisibility` cleanup helper, called everywhere `stopTicks` is called (unmount effect, startRecording catch, stopRecording's onstop / onerror / catch, reset).
+- Inside `startRecording`, after the interval is set up: attach a `visibilitychange` listener that calls `setDurationMs(Date.now() - startedAtRef.current)` on tab refocus. This wakes downstream effects within one frame of the user returning, so the cap auto-stop trips immediately rather than waiting for the next throttled `setInterval` tick.
+- Pattern matches F-076's CountdownTimer fix verbatim.
+
+**Verification:** `pnpm tsc --noEmit` clean except F-108 pre-existing.
+
+**Out of scope (filed as P-104.x):** the deep-throttle edge case where the tab is hidden for the entire turn duration plus several minutes, never refocusing in time. Addressed by a wall-clock `setTimeout` cap fallback. Deferred until real user data shows the long-hidden case actually happens.
+
+---
+
 ## Queued — core product wiring (F-061.1, F-063, F-064)
 
 **F-061.1** 📋 Tâche 3 topic picker + slug resolution
@@ -701,6 +719,21 @@ F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end 
 **Action:** migrate lib/api.ts reads — switch all `c.internal_key` references to `c.key`. Update the `RawCouche` type definition to declare `key: CoucheKey`. Verify `mapDiagnosticBlock` still produces the same output shape downstream.
 **Cleanup trigger:** Once shipped, notify backend to execute F-110.2 (remove internal_key dual-emission).
 **When:** Can be done during P-100 work or as a standalone small PR after.
+
+### P-104.x — Wall-clock setTimeout cap fallback for deep-throttle edge case
+
+**Priority:** Low (post-launch)
+**Status:** Queued
+**Filed:** 2026-05-01
+**Parent:** P-104 (Step 1 visibilitychange listener shipped — see "Shipped — Week 2 (May 1)")
+
+**Scope:** harden the per-Tâche cap auto-stop for the deep-throttle edge case where the user backgrounds the tab for the entire turn duration plus several minutes, never refocusing within the cap window. P-104's visibilitychange listener fires the cap on refocus; this ticket bounds the worst-case overrun to ~2s by also scheduling a wall-clock `setTimeout(TURN_CAP_MS, finishRecording)` at recording start, cleared in all stop paths.
+
+**Background:** `setTimeout` is also throttled in background tabs but Chrome doesn't pause it entirely under intensive throttling — a 60s setTimeout fires within ~1-2s of wall-clock t=60 even when hidden. This complements the visibilitychange listener for the case where the user simply doesn't return.
+
+**Implementation sketch:** in each Tâche session's `startRecording`, schedule the timeout. Clear it in `finishRecording`, on phase transitions away from recording, and on unmount. Idempotency is already in place (`recorder.stopRecording()` no-ops when state is `inactive`), so the cap firing twice is safe.
+
+**When:** defer until real user data shows the long-hidden case happens. The Visa-Urgent persona is unlikely to background a TCF practice tab for 5+ min mid-recording. Pre-launch coverage of the brief and moderate cases via P-104 Step 1 is sufficient.
 
 ### P-115.x — Motion pass: remaining surfaces
 

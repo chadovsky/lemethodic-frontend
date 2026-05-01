@@ -8,6 +8,16 @@
 // performance.now(). Chrome's hidden-tab throttle on performance.now() is
 // what caused the F-050 drift where a backgrounded recorder would show wildly
 // wrong durations; Date.now() isn't throttled.
+//
+// P-104 (2026-05-01): a visibilitychange listener forces durationMs to
+// recompute the moment the tab refocuses. Background tabs throttle
+// setInterval to ≥ 1Hz (and pause it entirely under intensive throttling
+// after ~5 min hidden), which means downstream useEffect([durationMs])
+// watchers — including the per-Tâche cap auto-stops — wouldn't fire
+// promptly on return without this. Same pattern as F-076 in
+// CountdownTimer's owned mode. P-104.x covers the deep-throttle edge
+// case (5+ min hidden) via a wall-clock setTimeout fallback; deferred
+// until real user data shows it matters.
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -64,6 +74,9 @@ export function useAudioRecorder(): UseAudioRecorderResult {
   const chunksRef = useRef<Blob[]>([])
   const startedAtRef = useRef<number | null>(null)
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  // P-104 — handler ref so all cleanup paths can detach the listener
+  // without restating the closure.
+  const visibilityHandlerRef = useRef<(() => void) | null>(null)
   // Parallel ref to stream so cleanup callbacks can reach the latest instance
   // without being stale-closure'd through useCallback deps.
   const streamRef = useRef<MediaStream | null>(null)
@@ -72,6 +85,13 @@ export function useAudioRecorder(): UseAudioRecorderResult {
     if (tickRef.current) {
       clearInterval(tickRef.current)
       tickRef.current = null
+    }
+  }, [])
+
+  const unbindVisibility = useCallback(() => {
+    if (visibilityHandlerRef.current) {
+      document.removeEventListener('visibilitychange', visibilityHandlerRef.current)
+      visibilityHandlerRef.current = null
     }
   }, [])
 
@@ -95,6 +115,7 @@ export function useAudioRecorder(): UseAudioRecorderResult {
   useEffect(() => {
     return () => {
       stopTicks()
+      unbindVisibility()
       const rec = recorderRef.current
       if (rec && rec.state !== 'inactive') {
         try {
@@ -115,7 +136,7 @@ export function useAudioRecorder(): UseAudioRecorderResult {
         streamRef.current = null
       }
     }
-  }, [stopTicks])
+  }, [stopTicks, unbindVisibility])
 
   const startRecording = useCallback(async () => {
     // Guard against double-starts.
@@ -160,15 +181,27 @@ export function useAudioRecorder(): UseAudioRecorderResult {
           setDurationMs(Date.now() - startedAtRef.current)
         }
       }, 100)
+      // P-104 — force a durationMs recompute on tab refocus. Background
+      // setInterval throttling (≥ 1Hz, paused entirely under intensive
+      // throttling after ~5 min hidden) would otherwise leave downstream
+      // useEffect([durationMs]) cap-watchers stale on return.
+      const handleVisibilityChange = () => {
+        if (!document.hidden && startedAtRef.current != null) {
+          setDurationMs(Date.now() - startedAtRef.current)
+        }
+      }
+      visibilityHandlerRef.current = handleVisibilityChange
+      document.addEventListener('visibilitychange', handleVisibilityChange)
       setStatus('recording')
     } catch (err) {
       setError(formatMediaError(err))
       setStatus('error')
       stopTicks()
+      unbindVisibility()
       releaseStream()
       recorderRef.current = null
     }
-  }, [status, stopTicks, releaseStream])
+  }, [status, stopTicks, unbindVisibility, releaseStream])
 
   const stopRecording = useCallback((): Promise<Blob> => {
     return new Promise((resolve, reject) => {
@@ -189,6 +222,7 @@ export function useAudioRecorder(): UseAudioRecorderResult {
 
       recorder.onstop = () => {
         stopTicks()
+        unbindVisibility()
         const blob = new Blob(chunksRef.current, {
           type: recorder.mimeType || 'audio/webm',
         })
@@ -198,6 +232,7 @@ export function useAudioRecorder(): UseAudioRecorderResult {
       }
       recorder.onerror = (e: Event) => {
         stopTicks()
+        unbindVisibility()
         releaseStream()
         setStatus('error')
         setError('Recording failed. Try again.')
@@ -208,16 +243,18 @@ export function useAudioRecorder(): UseAudioRecorderResult {
         recorder.stop()
       } catch (err) {
         stopTicks()
+        unbindVisibility()
         releaseStream()
         setStatus('error')
         setError('Could not stop the recording cleanly.')
         reject(err)
       }
     })
-  }, [stopTicks, releaseStream])
+  }, [stopTicks, unbindVisibility, releaseStream])
 
   const reset = useCallback(() => {
     stopTicks()
+    unbindVisibility()
     const rec = recorderRef.current
     if (rec && rec.state !== 'inactive') {
       try {
@@ -233,7 +270,7 @@ export function useAudioRecorder(): UseAudioRecorderResult {
     setDurationMs(0)
     setError(null)
     setStatus('idle')
-  }, [stopTicks, releaseStream])
+  }, [stopTicks, unbindVisibility, releaseStream])
 
   return {
     status,
