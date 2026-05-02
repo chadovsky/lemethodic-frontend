@@ -198,4 +198,33 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* M-101a — visible focus rings for keyboard users. Only applies to
+     :focus-visible (keyboard) so mouse-clicked buttons don't get permanent
+     rings. Components can opt out by setting outline:none + their own ring. */
+  a:focus-visible,
+  button:focus-visible,
+  summary:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  [role='button']:focus-visible {
+    outline: 2px solid var(--fp-ink);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* M-101a — honor users' reduced-motion preference. Strips most transitions
+     and animations app-wide. Components can re-enable critical motion (e.g.
+     loading spinners) via @media (prefers-reduced-motion: no-preference). */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }

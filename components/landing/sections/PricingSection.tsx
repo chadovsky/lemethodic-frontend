@@ -73,6 +73,8 @@ export default function PricingSection({ lang }: { lang: Lang }) {
             >
               {card.comingSoon && (
                 <span
+                  role="status"
+                  aria-label={PRICING.comingSoonBadge[lang]}
                   style={{
                     position: 'absolute',
                     top: 16,
