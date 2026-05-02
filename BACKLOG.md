@@ -672,7 +672,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### P-200 — Diagnostic engine: detector implementation
 
 **Priority:** HIGH (pre-launch blocker)
-**Status:** Queued
+**Status:** Shipped 2026-05-02 (BE-side, lemethodic-backend 3-commit set ending `554d824`). FE consumer pending §7 dashboard work.
 **Filed:** 2026-05-01
 **Source:** LEMETHODIC-CURRICULUM v0.2 §10.1
 **Dependencies:** none
@@ -682,7 +682,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### P-201 — Diagnostic engine: level assignment + confidence
 
 **Priority:** HIGH
-**Status:** Queued
+**Status:** Shipped 2026-05-02 (BE-side, lemethodic-backend 2-commit set ending `0d10d11`). FE consumer pending §7 dashboard work.
 **Filed:** 2026-05-01
 **Source:** LEMETHODIC-CURRICULUM v0.2 §10.1
 **Dependencies:** P-200
@@ -692,7 +692,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### P-202 — Cluster data model
 
 **Priority:** HIGH
-**Status:** Queued
+**Status:** Shipped 2026-05-01 (BE-side, lemethodic-backend commit `d5595b3`).
 **Filed:** 2026-05-01
 **Source:** LEMETHODIC-CURRICULUM v0.2 §10.1
 **Dependencies:** none
@@ -702,7 +702,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### P-203 — Path data model
 
 **Priority:** HIGH
-**Status:** Queued
+**Status:** Shipped 2026-05-01 (BE-side, lemethodic-backend commit `d5595b3`).
 **Filed:** 2026-05-01
 **Source:** LEMETHODIC-CURRICULUM v0.2 §10.1
 **Dependencies:** P-202
@@ -712,7 +712,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### P-204 — User progress model
 
 **Priority:** HIGH
-**Status:** Queued
+**Status:** Shipped 2026-05-01 (BE-side, lemethodic-backend commit `d5595b3`).
 **Filed:** 2026-05-01
 **Source:** LEMETHODIC-CURRICULUM v0.2 §10.1
 **Dependencies:** P-202, P-203
@@ -724,7 +724,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### P-210 — B1→B2 path seed data
 
 **Priority:** HIGH (pre-launch blocker)
-**Status:** Queued
+**Status:** Shipped 2026-05-01 (BE-side, lemethodic-backend commit `79cd629`); production seeded same-day via `scripts/seed_b1_b2_path.py`.
 **Filed:** 2026-05-01
 **Source:** LEMETHODIC-CURRICULUM v0.2 §10.2
 **Dependencies:** P-202, P-203
@@ -734,7 +734,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### P-211 — Cluster content authoring
 
 **Priority:** HIGH (pre-launch blocker)
-**Status:** Queued
+**Status:** Shipped 2026-05-01 (BE-side, lemethodic-backend commit `d862794`); production ingested same-day via `scripts/ingest_b1_b2_cluster_content.py`.
 **Filed:** 2026-05-01
 **Source:** LEMETHODIC-CURRICULUM v0.2 §10.2
 **Dependencies:** P-202, P-210 (seed must exist before content slots into it)
@@ -744,7 +744,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### P-212 — Starter cluster seed for A2 and B2 paths
 
 **Priority:** MEDIUM (pre-launch)
-**Status:** Queued
+**Status:** Superseded by P-210 + P-211 (shipped 2026-05-01). The 22-cluster B1→B2 path is in production with 13 clusters fully authored and 9 placeholders pending. Nothing in P-212's original scope remains uncovered.
 **Filed:** 2026-05-01
 **Source:** LEMETHODIC-CURRICULUM v0.2 §10.2
 **Dependencies:** P-202, P-203
@@ -766,7 +766,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### P-220 — Onboarding questionnaire rebuild
 
 **Priority:** HIGH
-**Status:** Queued
+**Status:** Shipped 2026-05-02 (BE + FE + production verification complete).
 **Filed:** 2026-05-01
 **Source:** LEMETHODIC-CURRICULUM v0.2 §10.3
 **Dependencies:** P-203
@@ -786,7 +786,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### P-221 — Diagnostic flow integration
 
 **Priority:** HIGH
-**Status:** Queued
+**Status:** Shipped 2026-05-02 (BE-side, lemethodic-backend commit `c475bb7`). FE consumer: /ecole banner + /diagnostic/results screen, scope captured separately as follow-up.
 **Filed:** 2026-05-01
 **Source:** LEMETHODIC-CURRICULUM v0.2 §10.3
 **Dependencies:** P-201, P-220
@@ -1122,14 +1122,6 @@ F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end 
 - Root cause: phase machine flips to `reviewing` (which mounts the sheet) immediately after `/turn` upload completes; the examiner reply audio plays in parallel from the `examiner-speaking` phase. The two phases end up overlapping by ~3-6 seconds depending on turn length.
 - Fix candidate: gate the review sheet mount on `audioEnded === true` for the most recent examiner turn (or queue the sheet open behind the audio's `ended` event). Same pattern T2 already handles correctly via deferred-commit (F-062.3) — T1 inherited the structure but the audio-finish gate didn't carry over.
 - Filed 2026-04-27 from F-063 verification.
-
-### F-109 — Full name not preserved end-to-end
-
-**Priority:** Medium
-**Bug:** Signup with "chadi bakhay" stored as full_name='chadi' in DB. Either frontend truncates, or backend falls back to email local-part when frontend sends undefined.
-**Verified:** SQL query on user id=6 (chadi.bakhay@gmail.com) returned full_name='chadi'.
-**Diagnosis path:** Check app/signup/page.tsx — what value is passed as fullName to api.auth.register? If undefined/empty, frontend bug. If full string, backend bug.
-**Impact:** Stripe receipts (P-106) will say "Hi chadi" instead of "Hi Chadi Bakhay". Marketing emails (M-104, M-108) lose last name. Personalization broken.
 
 ### F-110.1 — Migrate frontend reads from internal_key to key
 
@@ -1630,15 +1622,6 @@ _(F-091.0 shipped 2026-04-27 — see entry under "Shipped — Week 2 (April 27)"
 **Scope:** Single file. Independent commit. ~10 min work.
 
 **Related:** Worth a future ticket to address `typescript.ignoreBuildErrors: true` itself — silently passing builds with type errors is technical debt. But that's a separate cleanup session blocked on first fixing all latent TS errors.
-
----
-
-### C-100 — Clean up test user id=5 from production DB
-
-**Priority:** Low
-**Source:** id=5 created during curl debugging (April 30 morning); id=6 created during signup verification test that surfaced F-109 (April 30 morning); id=7 created during F-110 production deploy verification (April 30, email f110-verify-20260430@example.com)
-**Action:** DELETE FROM users WHERE id IN (5, 6, 7); after verifying no FK dependencies
-**When:** Before beta launch, batched with any other test users created during P-100/P-105/P-106 dev
 
 ---
 
