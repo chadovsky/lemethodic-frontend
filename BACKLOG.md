@@ -773,6 +773,16 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Scope:** rebuild current onboarding to match §8.3 (10-12 screens). Each answer maps to user profile fields that drive path assignment.
 **Owner:** Engineering
 
+### P-220.z — Onboarding per-question illustrations and pastels (Phase 1 polish)
+
+**Priority:** LOW
+**Status:** Queued
+**Filed:** 2026-05-02
+**Source:** P-220 plan-first, deferred from rebuild
+**Dependencies:** P-220
+**Scope:** author per-question illustrations + pastel backgrounds for the 11 onboarding questions. The P-220 rebuild cycles the existing 6 illustrations/pastels as a placeholder (see components/onboarding/questionMeta.ts); this ticket replaces them with question-specific assets and updates the meta map.
+**Owner:** Chadi (illustrations) + Engineering (wire-up)
+
 ### P-221 — Diagnostic flow integration
 
 **Priority:** HIGH

@@ -31,9 +31,17 @@ import type {
   RecordingSummary,
   RecurringModulesResponse,
   TacheMode,
-  TCFGoal,
+  UiLanguage,
   User,
 } from './types'
+// `OnboardingData` is consumed by mapStoreToSubmitPayload below.
+// `TCFGoal` is no longer imported — the legacy goal-based exam_profile mapping
+// was removed alongside the questionnaire rebuild (P-220).
+import type {
+  OnboardingQuestionsResponse,
+  OnboardingSubmitRequest,
+  OnboardingSubmitResponse,
+} from './onboarding-questions'
 import { useAuthStore } from './auth'
 import { TOKEN_KEY } from './storage-keys'
 
@@ -617,64 +625,57 @@ export function mapDiagnosticBlockToMoules(
   return { recordingId, moules }
 }
 
-// ── Onboarding shape bridge ──────────────────────────────────────────────────
+// ── Onboarding payload bridge (P-220) ────────────────────────────────────────
 
-// TCF goals on the frontend are coarse motivations; the backend's exam_profile
-// is the specific exam track. This mapping reflects the descriptors shown on
-// onboarding step 2 (TCFGoalSelect). Tune here if the product pivots the
-// association.
-//
-// F-091.0 — V1 onboarding lock to TCF-only. All three goals map to
-// 'tcf_canada' until the F-091 epic ships post-launch. The backend
-// exam_profiles registry only ships TCF Canada today; the previous
-// values 'delf' / 'tcf_general' were silently falling through to TCF
-// Canada via get_profile()'s default-fallback, so the mapping was
-// already a false-promise string in the DB. Locking it here makes
-// the persisted value match the actual analyzer behavior. F-091b
-// will restore goal-aware profile dispatch (with real DELF + TEF
-// implementations).
-//
-// The `goal` field on the user is unaffected — it still persists the
-// motivation ('immigration' / 'studies' / 'general'), which F-091b
-// will read to dispatch into the right exam profile post-launch.
-const GOAL_TO_EXAM_PROFILE: Record<TCFGoal, string> = {
-  immigration: 'tcf_canada',
-  studies: 'tcf_canada',
-  general: 'tcf_canada',
-}
+// Reshape the FE store (Record<questionId, answer>) into the BE's
+// OnboardingSubmitRequest. Only the keys the BE schema accepts are emitted —
+// pydantic has additionalProperties:false on this endpoint, so any stray field
+// would 422. Required fields (q1, q2, q7, q9, q10, q11) are cast through
+// `string` since the store doesn't enforce enum at write time; the BE will
+// reject any drift with 422.
+export function mapStoreToSubmitPayload(
+  data: OnboardingData,
+  interfaceLanguage: UiLanguage,
+): OnboardingSubmitRequest {
+  const get = (id: string) => data[id]
+  const asString = (v: unknown): string | undefined =>
+    typeof v === 'string' ? v : undefined
+  const asNullableString = (v: unknown): string | null | undefined =>
+    typeof v === 'string' ? v : v === null ? null : undefined
+  const asArray = (v: unknown): string[] =>
+    Array.isArray(v) ? v.filter((x) => typeof x === 'string') : []
 
-interface BackendOnboardingPayload {
-  target_level: string | undefined
-  exam_profile: string | undefined
-  exam_date: string | null
-  goal: string | undefined
-  current_level: string | undefined
-  interface_language: string | undefined
-}
-
-// Exported so the signup flow / tests can invoke the mapper without a network
-// round-trip and so future callers (e.g. a profile-edit screen) share one
-// source of truth for the shape conversion.
-export function mapOnboardingToBackend(
-  data: Partial<OnboardingData>,
-): BackendOnboardingPayload {
-  // The store's ExamDate is a tagged union:
-  //   { type: 'quick', label } → user picked a bucket, no concrete date
-  //   { type: 'date',  value } → value is "YYYY-MM" from <input type="month">
-  // Backend Pydantic expects YYYY-MM-DD or null; pad with "-01" for month-only.
-  let examDate: string | null = null
-  const d = data.examDate
-  if (d && d.type === 'date' && d.value) {
-    examDate = /^\d{4}-\d{2}-\d{2}$/.test(d.value) ? d.value : `${d.value}-01`
-  }
+  // q3: store value is a "YYYY-MM-DD" string when a date was picked, null when
+  // the no-exam toggle was used.
+  const q3Value = get('q3_exam_date')
+  const examDate = typeof q3Value === 'string' ? q3Value : null
+  const noExamScheduled = q3Value === null
 
   return {
-    target_level: data.targetScore,
-    exam_profile: data.goal ? GOAL_TO_EXAM_PROFILE[data.goal] : undefined,
-    exam_date: examDate,
-    goal: data.goal,
-    current_level: data.currentLevel,
-    interface_language: data.uiLanguage,
+    q1_current_level: asString(get('q1_current_level')) as
+      OnboardingSubmitRequest['q1_current_level'],
+    q2_target_level: asString(get('q2_target_level')) as
+      OnboardingSubmitRequest['q2_target_level'],
+    q3_exam_date: examDate,
+    q3_no_exam_scheduled: noExamScheduled,
+    q4_motivation: asNullableString(get('q4_motivation')) as
+      OnboardingSubmitRequest['q4_motivation'],
+    q5_strongest_skill: asNullableString(get('q5_strongest_skill')) as
+      OnboardingSubmitRequest['q5_strongest_skill'],
+    q6_weakest_skill: asNullableString(get('q6_weakest_skill')) as
+      OnboardingSubmitRequest['q6_weakest_skill'],
+    q7_hours_per_week: asString(get('q7_hours_per_week')) as
+      OnboardingSubmitRequest['q7_hours_per_week'],
+    q8_topics_tested_on: asArray(get('q8_topics_tested_on')) as
+      OnboardingSubmitRequest['q8_topics_tested_on'],
+    q9_native_language: asString(get('q9_native_language')) as
+      OnboardingSubmitRequest['q9_native_language'],
+    q9_native_language_other: asNullableString(get('q9_native_language_other')),
+    q10_prior_exam_history: asString(get('q10_prior_exam_history')) as
+      OnboardingSubmitRequest['q10_prior_exam_history'],
+    q11_feedback_mode: asString(get('q11_feedback_mode')) as
+      OnboardingSubmitRequest['q11_feedback_mode'],
+    interface_language: interfaceLanguage,
   }
 }
 
@@ -717,19 +718,9 @@ export const api = {
       return mapUser(raw)
     },
 
-    // Backend schema (app/routers/users.py::OnboardingData):
-    //   target_level, exam_profile, exam_date (YYYY-MM-DD | null),
-    //   goal, current_level, interface_language.
-    // Frontend store uses a different shape (targetScore, tagged-union
-    // examDate, uiLanguage, no exam_profile). mapOnboardingToBackend bridges
-    // the two so onboarding screens and the store can stay as-is.
-    async completeOnboarding(data: OnboardingData): Promise<User> {
-      const raw = await request<RawUser>('/api/users/onboarding', {
-        method: 'POST',
-        body: mapOnboardingToBackend(data),
-      })
-      return mapUser(raw)
-    },
+    // P-220 — superseded by api.onboarding.submit. The legacy
+    // /api/users/onboarding endpoint and mapOnboardingToBackend mapper were
+    // removed alongside the questionnaire rebuild.
 
     // F-080d — modules detected in 3+ distinct recordings for the
     // current user, sorted by severity DESC then recurrence_count DESC.
@@ -738,6 +729,20 @@ export const api = {
     // Empty array on cold users (fewer than 3 recurring detections).
     async getRecurringModules(): Promise<RecurringModulesResponse> {
       return request<RecurringModulesResponse>('/api/users/me/recurring_modules')
+    },
+  },
+
+  // P-220 — onboarding questionnaire endpoints. Questions surface is public;
+  // submit requires auth (called from signup right after register).
+  onboarding: {
+    async getQuestions(): Promise<OnboardingQuestionsResponse> {
+      return request<OnboardingQuestionsResponse>('/onboarding/questions')
+    },
+    async submit(payload: OnboardingSubmitRequest): Promise<OnboardingSubmitResponse> {
+      return request<OnboardingSubmitResponse>('/onboarding/submit', {
+        method: 'POST',
+        body: payload,
+      })
     },
   },
 

@@ -113,13 +113,12 @@ function couchesToRows(
 }
 
 // F-088 — section header copy keyed by interface language. Replaces
-// "LA MÉTHODE EN COUCHES" / "Your CEFR-tracking baseline" pair. ES
-// users get the Spanish localization; everything else falls back to
-// EN.
+// "LA MÉTHODE EN COUCHES" / "Your CEFR-tracking baseline" pair.
+// P-220 narrowed InterfaceLanguage to en/fr; the prior 'es' entry
+// was removed alongside the legacy LanguageSelect onboarding step.
 const TCF_SECTION_COPY: Record<InterfaceLanguage, { eyebrow: string; heading: string }> = {
   en: { eyebrow: 'TCF Evaluation',     heading: 'Your CEFR-tracking baseline' },
   fr: { eyebrow: 'Évaluation TCF',     heading: 'Your CEFR-tracking baseline' },
-  es: { eyebrow: 'Evaluación TCF',     heading: 'Your CEFR-tracking baseline' },
 }
 
 // F-084 — pick top 3 rubric dimensions: 1 strength + 2 weaknesses.

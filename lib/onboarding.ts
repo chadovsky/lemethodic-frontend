@@ -1,21 +1,25 @@
 'use client'
 
-// Onboarding store. Holds the user's answers across the 6 onboarding screens
-// before they've signed up — LeMethodic onboards anonymously then commits to
-// the backend at the paywall.
+// Onboarding store (P-220). Holds the user's answers across the BE-driven
+// questionnaire, plus the current step pointer (so refresh-mid-flow resumes at
+// the right question) and the chosen interface language (en/fr toggle in the
+// onboarding header).
 //
-// Persisted to localStorage key "lemethodic_onboarding" so a refresh mid-flow
-// doesn't wipe progress. Call reset() after api.users.completeOnboarding()
-// succeeds.
+// Persisted to localStorage key "lemethodic_onboarding". Call reset() after
+// api.onboarding.submit() succeeds.
 
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import type { OnboardingData } from './types'
+import type { OnboardingAnswer, OnboardingData, UiLanguage } from './types'
 import { ONBOARDING_KEY } from './storage-keys'
 
 interface OnboardingState {
-  data: Partial<OnboardingData>
-  setField: <K extends keyof OnboardingData>(key: K, value: OnboardingData[K]) => void
+  data: OnboardingData
+  currentStepIndex: number
+  interfaceLanguage: UiLanguage
+  setAnswer: (questionId: string, value: OnboardingAnswer) => void
+  setStep: (i: number) => void
+  setLanguage: (lang: UiLanguage) => void
   reset: () => void
 }
 
@@ -23,13 +27,16 @@ export const useOnboardingStore = create<OnboardingState>()(
   persist(
     (set) => ({
       data: {},
-      setField: (key, value) =>
-        set((state) => ({ data: { ...state.data, [key]: value } })),
+      currentStepIndex: 0,
+      interfaceLanguage: 'en',
+      setAnswer: (questionId, value) =>
+        set((state) => ({ data: { ...state.data, [questionId]: value } })),
+      setStep: (i) => set({ currentStepIndex: Math.max(0, i) }),
+      setLanguage: (lang) => set({ interfaceLanguage: lang }),
       reset: () => {
-        set({ data: {} })
-        // Persist middleware would rewrite the key with {data: {}}; drop the
-        // localStorage entry entirely so a reset leaves no trace and any
-        // subsequent setField creates a fresh record.
+        set({ data: {}, currentStepIndex: 0, interfaceLanguage: 'en' })
+        // Persist middleware would rewrite the key with the cleared state;
+        // drop the localStorage entry entirely so a reset leaves no trace.
         if (typeof window !== 'undefined') {
           try {
             window.localStorage.removeItem(ONBOARDING_KEY)
@@ -44,8 +51,7 @@ export const useOnboardingStore = create<OnboardingState>()(
       storage: createJSONStorage(() =>
         typeof window !== 'undefined'
           ? window.localStorage
-          : // no-op storage for SSR
-            {
+          : {
               getItem: () => null,
               setItem: () => {},
               removeItem: () => {},

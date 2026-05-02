@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { api, ApiError } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
 import { useOnboardingStore } from '@/lib/onboarding'
-import type { OnboardingData } from '@/lib/types'
+import { mapStoreToSubmitPayload } from '@/lib/api'
 import {
   INK,
   INK_SOFT,
@@ -112,18 +112,31 @@ function SignupInner() {
       )
       useAuthStore.getState().setAuth(token, user)
 
-      // Best-effort onboarding flush. If the backend accepts the payload it
-      // returns the enriched user shape (all six onboarding fields populated)
-      // — re-seat that into the auth store so HomeScreen can immediately read
-      // exam_date, target_level, etc. without a second /me round-trip.
+      // P-220 onboarding flush. Anonymous users complete the questionnaire
+      // pre-signup; we POST the answers to /onboarding/submit immediately
+      // after register so the BE can assign a path + persona before the
+      // user lands on /ecole. The submit response carries persona +
+      // path_slug — we don't currently surface those on /ecole, but they're
+      // logged for forward use (P-221 diagnostic flow integration will).
       // TODO(F-060): queue failed onboarding payloads for retry from /profile.
-      const onboardingData = useOnboardingStore.getState().data
+      const onboardingState = useOnboardingStore.getState()
+      const onboardingData = onboardingState.data
+      const interfaceLanguage = onboardingState.interfaceLanguage
       if (Object.keys(onboardingData).length > 0) {
         try {
-          const enrichedUser = await api.users.completeOnboarding(
-            onboardingData as OnboardingData,
+          const submitResponse = await api.onboarding.submit(
+            mapStoreToSubmitPayload(onboardingData, interfaceLanguage),
           )
+          // Refresh /me so the auth store carries the BE-assigned interface
+          // language + any other fields the submit route persisted on User.
+          const enrichedUser = await api.users.getMe()
           useAuthStore.getState().setAuth(token, enrichedUser)
+          // eslint-disable-next-line no-console
+          console.info('Onboarding submitted', {
+            path_slug: submitResponse.path_slug,
+            persona: submitResponse.persona,
+            waitlist: submitResponse.waitlist,
+          })
           useOnboardingStore.getState().reset()
         } catch (flushErr) {
           // eslint-disable-next-line no-console

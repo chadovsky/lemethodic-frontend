@@ -230,6 +230,7 @@ export function BackButton({ onClick }: { onClick: () => void }) {
 
 interface OnboardingScreenProps {
   bg: string
+  progressTotal?: number      // P-220: number of dots in the progress strip; default 6 for legacy callers
   progressFilledUpTo: number
   progressCurrent: number
   illustration: string
@@ -240,11 +241,13 @@ interface OnboardingScreenProps {
   ctaEnabled: boolean
   onContinue: () => void
   onBack?: () => void
+  headerRight?: ReactNode    // P-220: slot for the EN/FR language toggle
   children: ReactNode
 }
 
 export function OnboardingScreen({
   bg,
+  progressTotal = 6,
   progressFilledUpTo,
   progressCurrent,
   illustration,
@@ -255,6 +258,7 @@ export function OnboardingScreen({
   ctaEnabled,
   onContinue,
   onBack,
+  headerRight,
   children,
 }: OnboardingScreenProps) {
   return (
@@ -263,7 +267,7 @@ export function OnboardingScreen({
       style={{ backgroundColor: bg }}
     >
       <div className="w-full max-w-[440px] flex flex-col flex-1 min-h-screen px-5">
-        {/* Top row: back button + progress dots */}
+        {/* Top row: back button + progress dots + optional right slot (lang toggle) */}
         <div className="relative flex items-center pt-4" style={{ minHeight: 32 }}>
           {onBack && (
             <div className="absolute left-0">
@@ -271,8 +275,13 @@ export function OnboardingScreen({
             </div>
           )}
           <div className="flex-1">
-            <ProgressDots total={6} filledUpTo={progressFilledUpTo} current={progressCurrent} />
+            <ProgressDots total={progressTotal} filledUpTo={progressFilledUpTo} current={progressCurrent} />
           </div>
+          {headerRight && (
+            <div className="absolute right-0">
+              {headerRight}
+            </div>
+          )}
         </div>
 
         {/* Illustration — floats directly on pastel bg, no container */}

@@ -4,21 +4,21 @@
 
 // ── Onboarding ────────────────────────────────────────────────────────────────
 
-export type UiLanguage = 'en' | 'es'
-export type TCFGoal = 'immigration' | 'studies' | 'general'
-export type CurrentLevel = 'A1_A2' | 'A2_B1' | 'B1_B2' | 'B2_plus'
+// P-220 — UI language is en or fr. The legacy 'es' option was a pre-pivot
+// relic; the BE only serves en/fr copy and the new POST /onboarding/submit
+// only accepts these two values for interface_language.
+export type UiLanguage = 'en' | 'fr'
 
-// Mirrors OnboardingState in components/onboarding/OnboardingFlow.tsx but typed
-// as required fields. Used as the payload to POST /api/users/onboarding.
-export interface OnboardingData {
-  uiLanguage: UiLanguage
-  goal: TCFGoal
-  currentLevel: CurrentLevel
-  targetScore: string
-  examDate:
-    | { type: 'quick'; label: string }
-    | { type: 'date'; value: string }
-}
+// One answer in the questionnaire. Single-selects produce a string (the
+// option's `value`), multi-selects produce string[] (option values),
+// date_input produces "YYYY-MM-DD" or null for the no-exam case, and the
+// q9 freetext follow-up produces a string.
+export type OnboardingAnswer = string | string[] | null
+
+// Map of question_id → answer. The BE drives the question set; the FE just
+// stores whatever values come back from the user. mapStoreToSubmitPayload
+// (lib/api.ts) reshapes this into the OnboardingSubmitRequest the BE expects.
+export type OnboardingData = Record<string, OnboardingAnswer>
 
 // ── User ─────────────────────────────────────────────────────────────────────
 

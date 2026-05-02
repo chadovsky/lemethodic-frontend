@@ -1,61 +1,185 @@
 'use client'
 
+// P-220 — closing reveal screen for the onboarding questionnaire. Pulls the
+// answers out of the store, formats them for display, and computes a
+// persona preview client-side.
+//
+// Persona note: POST /onboarding/submit is the source of truth for the
+// authoritative persona, but submit requires authentication and EcoleReveal
+// is shown pre-signup as the conversion screen. The persona derivation
+// here is a deterministic preview based on q3 (exam date) + q7 (hours per
+// week) — the same inputs the BE uses. If BE logic changes, /ecole's
+// post-signup surface holds the authoritative value.
+
 import Image from 'next/image'
-import { ProgressDots, CTAButton, INK, INK_SOFT, INK_MUTED, PAPER, DISPLAY_FONT } from './OnboardingScreen'
-import type { CurrentLevel } from './CurrentLevelSelect'
-import type { TargetScore } from './TargetScoreSelect'
-import type { ExamDate } from './ExamDateSelect'
+import {
+  ProgressDots,
+  CTAButton,
+  INK,
+  INK_SOFT,
+  INK_MUTED,
+  PAPER,
+  DISPLAY_FONT,
+} from './OnboardingScreen'
+import type { OnboardingData, UiLanguage } from '@/lib/types'
+import type { Persona } from '@/lib/onboarding-questions'
+import { ECOLE_REVEAL_BG, ECOLE_REVEAL_ILLUSTRATION } from './questionMeta'
 
 interface EcoleRevealProps {
-  currentLevel: CurrentLevel
-  targetScore: TargetScore
-  examDate: ExamDate
+  data: OnboardingData
+  language: UiLanguage
   onContinue: () => void
 }
 
-const LEVEL_LABELS: Record<CurrentLevel, string> = {
-  A1_A2: 'Basic everyday situations',
-  A2_B1: 'Familiar topics',
-  B1_B2: 'Most topics, with mistakes',
-  B2_plus: 'Polishing fluency',
+// ── Field formatters ────────────────────────────────────────────────────────
+
+const LEVEL_LABELS: Record<string, { en: string; fr: string }> = {
+  a2: { en: 'A2 — Basic', fr: 'A2 — Élémentaire' },
+  b1: { en: 'B1 — Intermediate', fr: 'B1 — Intermédiaire' },
+  b2: { en: 'B2 — Upper-intermediate', fr: 'B2 — Avancé' },
+  c1: { en: 'C1 — Advanced', fr: 'C1 — Autonome' },
+  c2: { en: 'C2 — Mastery', fr: 'C2 — Maîtrise' },
+  not_sure: { en: 'Not sure yet', fr: 'Je ne sais pas encore' },
 }
 
-function formatExamDate(d: ExamDate): string {
-  if (d.type === 'quick') return d.label
-  // Format "YYYY-MM" → "Month YYYY"
-  const [year, month] = d.value.split('-')
-  const date = new Date(Number(year), Number(month) - 1)
-  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+const HOURS_LABELS: Record<string, { en: string; fr: string }> = {
+  less_than_2: { en: 'Less than 2 hrs/week', fr: 'Moins de 2 h / semaine' },
+  '2_to_5': { en: '2–5 hrs/week', fr: '2 à 5 h / semaine' },
+  '5_to_10': { en: '5–10 hrs/week', fr: '5 à 10 h / semaine' },
+  more_than_10: { en: 'More than 10 hrs/week', fr: 'Plus de 10 h / semaine' },
 }
 
-const VALUE_LINES = [
-  '16 focused lessons — not an infinite syllabus',
-  'Ordered by what English speakers get wrong — not generic French grammar',
-  'Anchored to your TCF — every lesson explains why it matters for the exam',
-]
+const PERSONA_LABELS: Record<Persona, { en: string; fr: string }> = {
+  foundation: { en: 'On track', fr: 'Bonne trajectoire' },
+  acceleration: { en: 'Accelerated', fr: 'Rythme soutenu' },
+  cram: { en: 'Intensive', fr: 'Intensif' },
+}
 
-export default function EcoleReveal({
-  currentLevel,
-  targetScore,
-  examDate,
-  onContinue,
-}: EcoleRevealProps) {
+const SECTION_LABELS = {
+  en: {
+    plan: 'Your plan',
+    target: 'Target',
+    exam: 'Exam',
+    startingPoint: 'Starting point',
+    practice: 'Practice',
+    pace: 'Pace',
+    noExam: 'No exam scheduled',
+    cta: 'Start my École',
+  },
+  fr: {
+    plan: 'Votre plan',
+    target: 'Objectif',
+    exam: 'Examen',
+    startingPoint: 'Point de départ',
+    practice: 'Pratique',
+    pace: 'Cadence',
+    noExam: 'Aucun examen prévu',
+    cta: 'Commencer mon École',
+  },
+} as const
+
+const HEADLINE = {
+  en: "Meet L'École.",
+  fr: "Voici L'École.",
+}
+const SUBHEAD = {
+  en: 'The shortcut. Focused lessons. The exact grammar English speakers keep failing on. Finish it, and B2 is unblocked.',
+  fr: 'Le raccourci. Des leçons ciblées. Les points de grammaire que les anglophones ratent à répétition. Finissez-le, et B2 est débloqué.',
+}
+const VALUE_LINES = {
+  en: [
+    'Focused lessons — not an infinite syllabus',
+    'Ordered by what English speakers get wrong — not generic French grammar',
+    'Anchored to your TCF — every lesson explains why it matters for the exam',
+  ],
+  fr: [
+    'Des leçons ciblées — pas un programme sans fin',
+    'Organisé selon les erreurs typiques des anglophones — pas de la grammaire générique',
+    'Ancré sur votre TCF — chaque leçon explique pourquoi elle compte pour l\'examen',
+  ],
+}
+
+function readString(v: unknown): string | null {
+  return typeof v === 'string' ? v : null
+}
+
+function formatExamDate(data: OnboardingData, language: UiLanguage): string {
+  const raw = readString(data.q3_exam_date)
+  if (!raw) return SECTION_LABELS[language].noExam
+  const d = new Date(raw)
+  if (isNaN(d.getTime())) return raw
+  return d.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
+function levelDisplay(value: string | null, language: UiLanguage): string {
+  if (!value) return '—'
+  const entry = LEVEL_LABELS[value]
+  return entry ? entry[language] : value.toUpperCase()
+}
+
+function hoursDisplay(value: string | null, language: UiLanguage): string {
+  if (!value) return '—'
+  const entry = HOURS_LABELS[value]
+  return entry ? entry[language] : value
+}
+
+// ── Persona preview ─────────────────────────────────────────────────────────
+
+// Mirrors BE persona derivation exactly. BE uses ONLY q3_exam_date:
+//   ≤ 6 weeks                  → cram
+//   6 weeks .. 6 months (~26w) → acceleration
+//   > 6 months OR no exam      → foundation
+// q7 hours_per_week is NOT a persona input — BE uses it for capacity_warning
+// only. If this client-side preview ever diverges from the BE-returned
+// persona, the user would see one label here and another inside /ecole; we
+// keep the function tight so that doesn't happen.
+function derivePersonaPreview(data: OnboardingData): Persona {
+  const examDate = readString(data.q3_exam_date)
+  if (!examDate) return 'foundation'
+
+  const exam = new Date(examDate)
+  if (isNaN(exam.getTime())) return 'foundation'
+  const now = new Date()
+  const msPerWeek = 1000 * 60 * 60 * 24 * 7
+  const weeks = Math.max(0, Math.ceil((exam.getTime() - now.getTime()) / msPerWeek))
+
+  if (weeks <= 6) return 'cram'
+  if (weeks <= 26) return 'acceleration'
+  return 'foundation'
+}
+
+// ── Component ───────────────────────────────────────────────────────────────
+
+export default function EcoleReveal({ data, language, onContinue }: EcoleRevealProps) {
+  const labels = SECTION_LABELS[language]
+  const persona = derivePersonaPreview(data)
+
+  const planRows: Array<{ label: string; value: string }> = [
+    { label: labels.target, value: levelDisplay(readString(data.q2_target_level), language) },
+    { label: labels.exam, value: formatExamDate(data, language) },
+    { label: labels.startingPoint, value: levelDisplay(readString(data.q1_current_level), language) },
+    { label: labels.practice, value: hoursDisplay(readString(data.q7_hours_per_week), language) },
+    { label: labels.pace, value: PERSONA_LABELS[persona][language] },
+  ]
+
   return (
     <div
       className="min-h-screen w-full flex flex-col items-center"
-      style={{ backgroundColor: '#F5D6D6' }}
+      style={{ backgroundColor: ECOLE_REVEAL_BG }}
     >
       <div className="w-full max-w-[440px] flex flex-col flex-1 min-h-screen px-5">
-        {/* Progress dots — all 6 filled, no back */}
         <div className="pt-4">
-          <ProgressDots total={6} filledUpTo={6} current={6} />
+          <ProgressDots total={1} filledUpTo={1} current={1} />
         </div>
 
-        {/* Illustration */}
         <div className="flex justify-center mt-10">
           <Image
-            src="/illustrations/key.png"
-            alt="Golden key illustration"
+            src={ECOLE_REVEAL_ILLUSTRATION}
+            alt={language === 'fr' ? "Illustration L'École" : "L'École illustration"}
             width={240}
             height={240}
             className="object-contain"
@@ -64,7 +188,6 @@ export default function EcoleReveal({
           />
         </div>
 
-        {/* Headline */}
         <h1
           className="text-center mt-8 leading-tight text-balance"
           style={{
@@ -75,10 +198,9 @@ export default function EcoleReveal({
             color: INK,
           }}
         >
-          Meet L'École.
+          {HEADLINE[language]}
         </h1>
 
-        {/* Subhead */}
         <p
           className="text-center mt-3 mx-auto text-pretty"
           style={{
@@ -89,17 +211,12 @@ export default function EcoleReveal({
             maxWidth: 360,
           }}
         >
-          The shortcut. 27 lessons. The exact grammar English speakers keep failing on. Finish it, and B2 is unblocked.
+          {SUBHEAD[language]}
         </p>
 
-        {/* Value lines */}
-        <div
-          className="flex flex-col gap-3 mt-8 mx-auto"
-          style={{ maxWidth: 320, width: '100%' }}
-        >
-          {VALUE_LINES.map((line, i) => (
+        <div className="flex flex-col gap-3 mt-8 mx-auto" style={{ maxWidth: 320, width: '100%' }}>
+          {VALUE_LINES[language].map((line, i) => (
             <div key={i} className="flex items-start gap-3">
-              {/* Check icon */}
               <svg
                 width="18"
                 height="18"
@@ -117,21 +234,13 @@ export default function EcoleReveal({
                   strokeLinejoin="round"
                 />
               </svg>
-              <span
-                style={{
-                  fontWeight: 500,
-                  fontSize: 14,
-                  lineHeight: '22px',
-                  color: INK,
-                }}
-              >
+              <span style={{ fontWeight: 500, fontSize: 14, lineHeight: '22px', color: INK }}>
                 {line}
               </span>
             </div>
           ))}
         </div>
 
-        {/* Personalized summary card */}
         <div
           className="mt-8 mx-auto"
           style={{
@@ -156,18 +265,10 @@ export default function EcoleReveal({
               marginBottom: 12,
             }}
           >
-            Your plan
+            {labels.plan}
           </p>
           <div className="flex flex-col gap-2">
-            {[
-              { label: 'Target', value: targetScore },
-              {
-                label: 'Exam',
-                value: formatExamDate(examDate),
-              },
-              { label: 'Starting point', value: LEVEL_LABELS[currentLevel] },
-              { label: 'Daily practice', value: '~15 minutes' },
-            ].map(({ label, value }) => (
+            {planRows.map(({ label, value }) => (
               <div key={label} className="flex items-baseline gap-1">
                 <span
                   style={{
@@ -175,7 +276,7 @@ export default function EcoleReveal({
                     fontSize: 13,
                     color: INK_SOFT,
                     lineHeight: '20px',
-                    minWidth: 100,
+                    minWidth: 110,
                   }}
                 >
                   {label}:
@@ -196,11 +297,9 @@ export default function EcoleReveal({
           </div>
         </div>
 
-        {/* Spacer */}
         <div className="flex-1" />
 
-        {/* CTA */}
-        <CTAButton label="Start my École" enabled onClick={onContinue} />
+        <CTAButton label={labels.cta} enabled onClick={onContinue} />
       </div>
     </div>
   )
