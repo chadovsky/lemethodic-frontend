@@ -155,7 +155,7 @@ Simulations quotidiennes des Tâches sous contraintes de temps. Feedback IA sur 
 **Section heading:**
 Choose your timeline.
 
-**Two-card layout:**
+**Three-card layout:**
 
 ### **Card 1 — Subscription**
 **$29/month**
@@ -175,6 +175,8 @@ For candidates with 3+ months until their exam.
 **$199** *(one-time payment)*
 *4 weeks of intensified preparation.*
 
+**Coming soon — launches when Stripe goes live.**
+
 For candidates with 4–8 weeks until their exam.
 
 - Everything in subscription, accelerated
@@ -187,7 +189,7 @@ For candidates with 4–8 weeks until their exam.
 
 *14-day money-back guarantee if you've engaged with the program for at least 3 days and it's not working for you.*
 
-[Start the Sprint]
+[Join the Sprint waitlist]
 
 ### **Card 3 — Premium (Coming soon)**
 **$499** *(one-time payment, month 2–3)*
@@ -226,6 +228,8 @@ Pour les candidats avec 3+ mois avant leur examen.
 **199 $** *(paiement unique)*
 *4 semaines de préparation intensifiée.*
 
+**Bientôt — lancement à l'ouverture de Stripe.**
+
 Pour les candidats avec 4–8 semaines avant leur examen.
 
 - Tout ce qui est dans l'abonnement, en accéléré
@@ -238,7 +242,7 @@ Pour les candidats avec 4–8 semaines avant leur examen.
 
 *Garantie de remboursement de 14 jours si vous avez utilisé le programme pendant au moins 3 jours et qu'il ne fonctionne pas pour vous.*
 
-[Commencer le Sprint]
+[Liste d'attente du Sprint]
 
 ### **Carte 3 — Premium (Bientôt)**
 **499 $** *(paiement unique, mois 2-3)*
@@ -380,7 +384,7 @@ L'examen TCF Canada est dans 4 semaines, ou 8 semaines, ou 6 mois. Quelle que so
    - Are the FAQ questions the right ones? You may have heard real candidate questions that I'd want to add.
 
 10. **For FE wire-up:**
-    - Single-page layout, no separate routes
+    - Two routes: / for EN and /fr for FR. Header LanguageToggle uses <Link> between routes (not localStorage). Hreflang SEO metadata per route.
     - Smooth scroll on CTA clicks (or anchor links from hero to pricing section)
     - Both EN and FR available, browser-detect default with EN/FR toggle in header (same pattern as the questionnaire)
     - Premium waitlist CTA captures email + "exam date" (optional) for segmentation later
