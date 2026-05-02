@@ -385,8 +385,6 @@ L'examen TCF Canada est dans 4 semaines, ou 8 semaines, ou 6 mois. Quelle que so
 
 10. **For FE wire-up:**
     - Two routes: / for EN and /fr for FR. Header LanguageToggle uses <Link> between routes (not localStorage). Hreflang SEO metadata per route.
-    - Smooth scroll on CTA clicks (or anchor links from hero to pricing section)
-    - Both EN and FR available, browser-detect default with EN/FR toggle in header (same pattern as the questionnaire)
     - Premium waitlist CTA captures email + "exam date" (optional) for segmentation later
     - Diagnostic CTA routes to /onboarding (existing route, will use the new P-220 questionnaire flow once rebuild ships)
 
