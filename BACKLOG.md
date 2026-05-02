@@ -1035,6 +1035,17 @@ Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. S
 **Owner:** Engineering
 **Note:** F-067 (Queued — polish for real-feel) is now superseded by P-269.
 
+### M-101.z — Landing page custom hero asset + per-section icons (Phase 1 polish)
+
+**Priority:** LOW (post-launch P1)
+**Status:** Queued
+**Filed:** 2026-05-02
+**Source:** M-101a plan-first, deferred from launch
+**Dependencies:** M-101a
+**Scope:** author landing-page custom hero asset + per-section icons. The M-101a build reuses the P-220 pastel palette + at most one P-220 illustration as a placeholder; this ticket replaces them with marketing-specific assets (hero anchor visual, three icons for the differentiation cards, three step indicators if Chadi wants them — currently typographic numbered circles).
+**Owner:** Chadi (illustrations) + Engineering (wire-up)
+**Note:** filed per the P-220.z precedent (Phase 1 polish, illustrations not blocking ship).
+
 ---
 
 ## Queued — core product wiring (F-061.1, F-063, F-064)
