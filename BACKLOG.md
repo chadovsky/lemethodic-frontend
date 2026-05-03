@@ -803,6 +803,36 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Scope:** when user diagnostic places them in a not-yet-built path, show waitlist screen with explanation, free interim resources, optional early-access opt-in.
 **Owner:** Engineering
 
+### P-222.x — capacity_warning UX surface
+
+**Priority:** LOW (post-launch)
+**Status:** Queued
+**Filed:** 2026-05-03
+**Source:** P-222 plan-first, deferred from waitlist v1
+**Dependencies:** P-222
+**Scope:** OnboardingSubmitResponse can carry `capacity_warning` independent of `waitlist` (e.g., a B1→B2 user with too few hours per week vs. their exam date). P-222 v1 ignores this field. This ticket adds a non-blocking advisory surface — banner or toast on /ecole first-load — that surfaces `weeks_to_exam` + recommended-vs-selected hours from the BE warning. Out of scope for waitlist (different code path).
+**Owner:** Engineering
+
+### P-222.y — EcoleReveal pre-signup waitlist-aware copy
+
+**Priority:** LOW (post-launch UX polish)
+**Status:** Queued
+**Filed:** 2026-05-03
+**Source:** P-222 plan-first, UX gap acknowledged
+**Dependencies:** P-222
+**Scope:** EcoleReveal renders pre-signup before /onboarding/submit fires, so a user who'll be waitlisted (q1 = a2/b2/c1) sees "Meet L'École" + persona preview that doesn't apply to them. Either (a) duplicate the BE waitlist-routing logic in FE so EcoleReveal can short-circuit to a "your path isn't ready, you'll see details after signup" preview, or (b) move EcoleReveal post-signup behind /onboarding/submit so it can read the waitlist flag. (b) is structurally cleaner but reshapes the conversion funnel — needs Chadi sign-off.
+**Owner:** Engineering
+
+### P-106.x — /paywall waitlist-aware behavior
+
+**Priority:** MEDIUM (Stripe-dependent)
+**Status:** Queued
+**Filed:** 2026-05-03
+**Source:** P-222 plan-first
+**Dependencies:** P-106 (BE Stripe ship), P-222
+**Scope:** when Stripe ships and /paywall starts charging, waitlist-bound users (those whose /onboarding/submit response will return waitlist=true) must NOT be charged. Per LEMETHODIC-CURRICULUM §8.4, waitlist users get free access during the wait period unless they explicitly opt in to "early-access subscription". Today /paywall is aspirational copy with no charge so the gap is harmless; when P-106 lands, this ticket gates the charge on the (predicted) waitlist outcome OR moves /paywall behind /onboarding/submit so the waitlist response is known before charging.
+**Owner:** Engineering
+
 ### Dashboards (§10.4) — full §7 implementation
 
 ### P-230 — Overall Progress dashboard rebuild
