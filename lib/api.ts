@@ -19,6 +19,7 @@ import type {
   Goulet,
   Lesson,
   LessonDetail,
+  ClusterDetailResponse,
   DiagnosticStateResponse,
   LevelResponse,
   ModuleWithContext,
@@ -36,6 +37,7 @@ import type {
   TodayActionResponse,
   UiLanguage,
   User,
+  UserClusterStateResponse,
 } from './types'
 // `OnboardingData` is consumed by mapStoreToSubmitPayload below.
 // `TCFGoal` is no longer imported — the legacy goal-based exam_profile mapping
@@ -759,6 +761,23 @@ export const api = {
   diagnostic: {
     async getState(): Promise<DiagnosticStateResponse> {
       return request<DiagnosticStateResponse>('/api/diagnostic/state')
+    },
+  },
+
+  // P-234 — cluster detail. Two endpoints, fetched in parallel by the
+  // /cluster/[slug] page. `getUserState` is graceful: BE returns a default
+  // "not_started" record when the user has no UserClusterStatus row for
+  // this cluster, NOT 404.
+  clusters: {
+    async get(slug: string): Promise<ClusterDetailResponse> {
+      return request<ClusterDetailResponse>(
+        `/api/clusters/${encodeURIComponent(slug)}`,
+      )
+    },
+    async getUserState(slug: string): Promise<UserClusterStateResponse> {
+      return request<UserClusterStateResponse>(
+        `/api/users/me/clusters/${encodeURIComponent(slug)}`,
+      )
     },
   },
 

@@ -543,6 +543,66 @@ export interface TodayActionResponse {
   dialogue_box: Record<string, unknown> | null
 }
 
+// ── P-234 cluster detail ────────────────────────────────────────────────────
+// `labels` on cluster + theme is a `{[lang_code]: string}` map (en/fr at
+// minimum). FE picks the user's interfaceLanguage entry, falls back to 'en',
+// then to first-available. `detection_rubric` is deliberately absent from
+// the BE response (internal scoring infrastructure). `practice_prompt` and
+// `exercise_set` are JSONB pass-throughs whose authored shape is owned by
+// the cluster authoring rubric (P-211 / P-211a) — kept loose here.
+
+export interface VocabularyThemeRef {
+  slug: string
+  labels: Record<string, string>
+}
+
+export interface ClusterLesson {
+  format: 'markdown' | 'pdf' | 'video'
+  // Exactly one of `markdown` / `asset_url` carries content per the BE
+  // lesson_format invariant. `markdown` is FR-only Phase 1.
+  markdown: string
+  asset_url: string
+}
+
+export interface ClusterDetailResponse {
+  id: number
+  slug: string
+  labels: Record<string, string>
+  grammar_topic: string
+  vocabulary_theme: VocabularyThemeRef | null
+  tache_application: 'tache_1' | 'tache_2' | 'tache_3'
+  cefr_level: string
+  lesson: ClusterLesson
+  practice_prompt: Record<string, unknown>
+  exercise_set: unknown[]
+}
+
+// One detection event in the user's recording history for a cluster.
+// `detection_result` is per-recording (not per-cluster — that's `status`
+// on the parent state response).
+export interface RecordingHistoryEntry {
+  recording_id: number
+  created_at: string
+  detection_result: 'clean' | 'wobble' | 'fail' | 'not_observed'
+  rubric_score: number | null    // 0..1 when scored
+}
+
+export interface UserClusterStateResponse {
+  cluster_slug: string
+  // Cluster lifecycle. `not_started` is the default applied when no
+  // UserClusterStatus row exists for this user (graceful "not started"
+  // UX, not 404).
+  status: 'not_started' | 'in_progress' | 'absorbed' | 'needs_revisit'
+  last_rubric_score: number | null
+  last_detection_result: 'clean' | 'wobble' | 'fail' | 'not_observed' | null
+  revisit_count: number
+  first_started_at: string | null
+  last_status_change_at: string | null
+  absorbed_at: string | null
+  // Last 10 newest-first (BE-side limit).
+  recording_history: RecordingHistoryEntry[]
+}
+
 // ── API error ────────────────────────────────────────────────────────────────
 
 export interface ApiErrorShape {
