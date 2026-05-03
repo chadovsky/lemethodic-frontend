@@ -21,6 +21,7 @@ import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/lib/auth'
 import { useVerifyAuth } from '@/hooks/useVerifyAuth'
 import LandingHeader from './LandingHeader'
+import LandingFooter from './LandingFooter'
 import HeroSection from './sections/HeroSection'
 import ProblemSection from './sections/ProblemSection'
 import DifferentiationSection from './sections/DifferentiationSection'
@@ -78,6 +79,7 @@ export default function LandingPage({ lang }: LandingPageProps) {
       <MethodologySection lang={lang} />
       <FAQSection lang={lang} />
       <FinalCTASection lang={lang} />
+      <LandingFooter lang={lang} />
     </main>
   )
 }
