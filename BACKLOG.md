@@ -796,7 +796,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### P-222 — Waitlist UX for A2 and B2+ paths
 
 **Priority:** HIGH (pre-launch)
-**Status:** Queued
+**Status:** Shipped 2026-05-03 (FE-side, lemethodic-frontend 3-commit set ending `820d788`; production verified at https://lemethodic.com/onboarding/waitlist).
 **Filed:** 2026-05-01
 **Source:** LEMETHODIC-CURRICULUM v0.2 §10.3
 **Dependencies:** P-201, P-221
@@ -1075,6 +1075,16 @@ Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. S
 **Scope:** author landing-page custom hero asset + per-section icons. The M-101a build reuses the P-220 pastel palette + at most one P-220 illustration as a placeholder; this ticket replaces them with marketing-specific assets (hero anchor visual, three icons for the differentiation cards, three step indicators if Chadi wants them — currently typographic numbered circles).
 **Owner:** Chadi (illustrations) + Engineering (wire-up)
 **Note:** filed per the P-220.z precedent (Phase 1 polish, illustrations not blocking ship).
+
+### B-102 — Privacy + Terms + Refund pages with footer integration
+
+**Priority:** HIGH (pre-launch legal compliance)
+**Status:** Shipped 2026-05-03 (FE-side, lemethodic-frontend commit `3216d4d`; production verified at https://lemethodic.com/{privacy,terms,refund}).
+**Filed:** 2026-05-03
+**Source:** Launch checklist (legal pages required for LemonSqueezy onboarding + Stripe ship).
+**Dependencies:** none (markdown source authored by Chadi).
+**Scope:** three new routes serving docs/{privacy-policy,terms-and-conditions,refund-policy}.md as styled markdown via react-markdown + remark-gfm. Shared `LegalPage` Server Component reads the .md files at request time. New `LandingFooter` component with three legal links + brand mark + copyright + admin@lemethodic.com, mounted on landing routes (`/`, `/fr`) and reused on legal pages. EN-only at v1; FR translations defer to M-101.x post-launch.
+**Owner:** Engineering
 
 ---
 
