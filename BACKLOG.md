@@ -838,13 +838,44 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### P-230 — Overall Progress dashboard rebuild
 
 **Priority:** HIGH
-**Status:** Queued
+**Status:** Shipped 2026-05-03 (FE-side, lemethodic-frontend 3-commit set ending in cleanup commit). Calm mode 4 sections (Snapshot / Today's focus / Goulet Stack / Recent activity). Method mode toggle hidden — depends on P-235 + P-236.
 **Filed:** 2026-05-01
 **Source:** LEMETHODIC-CURRICULUM v0.2 §10.4
 **Dependencies:** P-201, P-204
 **Scope:** rebuild /progress per §7.4. Calm mode default + method mode opt-in. Includes Block 2 (Goulet Stack), Block 5 (Dialogue Box), Block 8 (Confidence Visualizer). Replaces current P-100 surface entirely.
 **Owner:** Engineering
 **Supersedes:** P-100, P-100.5
+**Note:** v1 ships calm mode only. Method mode toggle deferred until Blocks 1 (Ceiling Marker Map, P-235) and 7 (Mistake Repository, P-236) land. dialogue_box always null in production today (P-240b + P-213 not shipped); FE renders reason_code-driven fallback copy with defensive `dialogue_box.text` rendering for when BE populates the field.
+
+### P-230.x — Recent activity calendar view
+
+**Priority:** LOW (post-launch UX polish)
+**Status:** Queued
+**Filed:** 2026-05-03
+**Source:** P-230 plan-first, deferred from v1
+**Dependencies:** P-230
+**Scope:** §7.4 calls for a "calendar view (kept from current implementation)" for Recent activity. v1 ships a linear list of last 5 recordings (matches functional baseline + ships fast). This ticket replaces it with a GitHub-contribution-graph-style grid showing the last 30+ days of recording activity. Requires extending `api.recordings.list` or adding a date-bucketed endpoint.
+**Owner:** Engineering
+
+### P-230.consolidate — Goulet Stack + /ecole "Recommended for you" overlap
+
+**Priority:** LOW (post-launch UX polish)
+**Status:** Queued
+**Filed:** 2026-05-03
+**Source:** P-230 plan-first, data-source overlap acknowledged
+**Dependencies:** P-230
+**Scope:** Goulet Stack (top 3) on /progress and "Recommended for you" (F-080d) on /ecole both consume `getRecurringModules`. Different framings — /ecole = "patterns we've seen" (curriculum-side recommendation), /progress = "bottlenecks blocking you" (severity-ranked dashboard signal) — but the data is the same and the visual treatment is similar. User testing may show this duplication as confusing. Resolution options: (a) keep both with sharper framings, (b) deprecate one, (c) split the data source so /progress reads from a dedicated bottleneck endpoint distinct from /ecole's recurring-detection feed.
+**Owner:** Engineering + Product
+
+### P-230.unify — DailyActionCard vs Today's focus duplication
+
+**Priority:** LOW (post-launch UX polish)
+**Status:** Queued
+**Filed:** 2026-05-03
+**Source:** P-230 plan-first, UX gap acknowledged
+**Dependencies:** P-230
+**Scope:** /ecole's HomeScreen has a DailyActionCard ("today's lesson" — linear curriculum-driven). /progress's TodayFocusSection has a "Today's focus" card ("today's prescribed practice" — engine-recommended). Two daily-action surfaces in one app may confuse users. v1 ships both intentionally per §7.3 (distinct surfaces). This ticket revisits if user testing shows confusion: (a) keep both with sharper framings, (b) deprecate /ecole's daily action card in favor of /progress's, (c) reverse — keep /ecole's, hide /progress's.
+**Owner:** Engineering + Product
 
 ### P-231 — Speaking dashboard
 
