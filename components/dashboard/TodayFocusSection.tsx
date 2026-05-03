@@ -129,6 +129,14 @@ function reasonCodeFallback(action: ActionBlock): string {
 function resolveCta(action: ActionBlock): { href: string; label: string } {
   switch (action.kind) {
     case 'cluster_practice':
+      // P-234: cluster_practice now routes through /cluster/[slug] when a
+      // cluster_slug is available — gives users the lesson + practice prompt
+      // before they record. The cluster page's "Practice now" CTA forwards
+      // to /speaking/tache-{N}?promptCluster={slug}. When cluster_slug is
+      // missing, fall back to the direct Tâche route (degraded but usable).
+      if (action.cluster_slug) {
+        return { href: `/cluster/${action.cluster_slug}`, label: 'Open cluster' }
+      }
       if (action.tache_application) {
         const n = action.tache_application.replace('tache_', '')
         return { href: `/speaking/tache-${n}`, label: 'Start practice' }

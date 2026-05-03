@@ -910,12 +910,40 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### P-234 — Cluster detail view
 
 **Priority:** HIGH
-**Status:** Queued
+**Status:** Shipped 2026-05-03 (FE-side, lemethodic-frontend 3-commit set ending in re-routing commit). v1 ships 3 of 5 §7.8 sections: Cluster header, Lesson body (markdown/PDF), Practice CTA. exercise_set + recording_history are in the BE response but rendered post-launch (P-234.exercises / P-234.history).
 **Filed:** 2026-05-01
 **Source:** LEMETHODIC-CURRICULUM v0.2 §10.4
 **Dependencies:** P-202, P-211
 **Scope:** implement §7.8. Per-cluster page with lesson, exercises, prompt, history. Multi-format lesson rendering (markdown / PDF embed / video embed).
 **Owner:** Engineering
+**Note:** v1 ships at /cluster/[slug]. Visual language paper-on-canvas (mirrors B-102 LegalPage), distinct from /learn/[id]'s category-tinted modules. No `locked` UserClusterStatus state — BE confirmed 4-value enum (not_started/in_progress/absorbed/needs_revisit). TodayFocusSection re-routed: cluster_practice actions now go to /cluster/{slug} instead of directly to /speaking/tache-{N} (cluster page's CTA forwards with ?promptCluster URL param).
+
+### P-234.history — Cluster recording history surface
+
+**Priority:** LOW (post-launch)
+**Status:** Queued
+**Filed:** 2026-05-03
+**Source:** P-234 plan-first; BE shipped data ahead of FE consumption
+**Dependencies:** P-234
+**Scope:** GET /api/users/me/clusters/{slug} already returns `recording_history` (last 10 newest-first, RecordingHistoryEntry items with detection_result + rubric_score). v1 doesn't render this. Add a "My history on this cluster" section: linear list with date / detection_result chip (clean/wobble/fail/not_observed) / rubric_score badge. Tap → /diagnostic?session={recording_id} per existing diagnostic deep-link convention.
+
+### P-234.exercises — Cluster exercise set rendering + answer checking
+
+**Priority:** MEDIUM (post-launch)
+**Status:** Queued
+**Filed:** 2026-05-03
+**Source:** P-234 plan-first; BE shipped data ahead of FE consumption
+**Dependencies:** P-234, P-211a (authoring schema lock-in)
+**Scope:** ClusterDetailResponse.exercise_set is a JSONB array shipped today but unrendered in v1. The authored shape is owned by the cluster authoring rubric (P-211 / P-211a). This ticket adds an Exercises section between Lesson body and Practice CTA: render each exercise per its authored type (multiple-choice / fill-blank / order-the-words / etc.), check answers client-side or via a new BE endpoint, surface scoring. Significant scope — needs schema lock-in from P-211a first.
+
+### P-234.speaking-promptCluster — /speaking/* consume ?promptCluster URL param
+
+**Priority:** MEDIUM (post-launch)
+**Status:** Queued
+**Filed:** 2026-05-03
+**Source:** P-234 — completes the round-trip from cluster detail to practice
+**Dependencies:** P-234, BE practice prompt resolution
+**Scope:** P-234's PracticeCTA emits `/speaking/tache-{N}?promptCluster={slug}`. /speaking/tache-{N} pages currently ignore this param and serve a default/random prompt. This ticket reads the param and either (a) uses the cluster's `practice_prompt` JSONB to override the default Tâche prompt (FE-side lookup), or (b) sends the slug to BE and lets the engine serve the cluster-specific prompt. (b) is cleaner — needs BE to accept the param on the recording-start endpoints.
 
 ### P-235 — Ceiling Marker Map
 
