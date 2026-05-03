@@ -463,6 +463,86 @@ export interface RecurringModulesResponse {
   recurring_modules: RecurringModule[]
 }
 
+// ── P-230 dashboard endpoints ────────────────────────────────────────────────
+// Snake_case mirrors the BE pydantic schemas verbatim. These responses flow
+// through the dashboard sections without a camelCase mapper, matching how
+// other read-only authored content (modules, recurring_modules) is handled.
+
+// SelfReportedBlock — what the user told us during onboarding (from q1).
+export interface SelfReportedBlock {
+  level: 'a2' | 'b1' | 'b2' | 'c1' | 'not_sure' | null
+  confidence: 'high' | 'medium' | 'low' | null
+}
+
+// AssignedBlock — system-derived assessment from P-201. `total_clusters_in_path`
+// is BE-frozen at assessment time (Phase 1 returns 13). Use directly as the
+// coverage denominator — no derivation needed.
+export interface AssignedBlock {
+  level: 'below_B1' | 'B1_emerging' | 'B1_solid' | 'above_B1' | 'insufficient_data'
+  confidence: 'high' | 'medium' | 'low'
+  coverage: number              // 0..1
+  n_clusters_evaluated: number
+  total_clusters_in_path: number
+  computed_at: string           // ISO datetime
+}
+
+export interface LevelResponse {
+  self_reported: SelfReportedBlock
+  assigned: AssignedBlock | null
+  agreement: 'matches' | 'discrepancy' | 'self_only' | 'assigned_only' | 'neither'
+}
+
+// TacheCoverage — per-Tâche "has the user recorded at least one of these?"
+// flag. Drives the diagnostic-in-progress chip + next_recommended_tache CTA.
+export interface TacheCoverage {
+  tache_1: boolean
+  tache_2: boolean
+  tache_3: boolean
+}
+
+export interface DiagnosticStateResponse {
+  stage: 'in_progress' | 'complete' | 'no_path'
+  recordings_done: number
+  tache_coverage: TacheCoverage
+  next_recommended_tache: 1 | 2 | 3 | null
+  latest_assessment_id: number | null
+}
+
+// ActionBlock — the recommendation itself. `kind` drives the high-level
+// branch (cluster_practice / free_practice / path_complete / no_path);
+// `reason_code` further qualifies for fallback Dialogue Box copy authoring.
+export interface ActionBlock {
+  kind: 'cluster_practice' | 'free_practice' | 'path_complete' | 'no_path'
+  cluster_id: number | null
+  cluster_slug: string | null
+  tache_application: 'tache_1' | 'tache_2' | 'tache_3' | null
+  practice_prompt: Record<string, unknown> | null
+  reason_code:
+    | 'regression'
+    | 'needs_revisit'
+    | 'in_progress'
+    | 'next_in_path'
+    | 'free_practice'
+    | 'no_path'
+}
+
+export interface ContextBlock {
+  current_phase_id: number | null
+  current_phase_position: number | null
+  clusters_remaining_in_path: number
+  last_recording_at: string | null
+}
+
+export interface TodayActionResponse {
+  action: ActionBlock
+  context: ContextBlock
+  // dialogue_box is BE-side authored Block 5 tutor copy. Always null in
+  // production today (P-240b + P-213 not shipped). FE renders it when
+  // present (assumed shape: { text: string }) and falls back to
+  // reason_code-driven copy otherwise.
+  dialogue_box: Record<string, unknown> | null
+}
+
 // ── API error ────────────────────────────────────────────────────────────────
 
 export interface ApiErrorShape {

@@ -19,6 +19,8 @@ import type {
   Goulet,
   Lesson,
   LessonDetail,
+  DiagnosticStateResponse,
+  LevelResponse,
   ModuleWithContext,
   Moule,
   MoulesBreakdown,
@@ -31,6 +33,7 @@ import type {
   RecordingSummary,
   RecurringModulesResponse,
   TacheMode,
+  TodayActionResponse,
   UiLanguage,
   User,
 } from './types'
@@ -729,6 +732,33 @@ export const api = {
     // Empty array on cold users (fewer than 3 recurring detections).
     async getRecurringModules(): Promise<RecurringModulesResponse> {
       return request<RecurringModulesResponse>('/api/users/me/recurring_modules')
+    },
+
+    // P-230 — self-reported (q1) + system-derived level + agreement signal.
+    // `assigned` is null until the diagnostic has enough data (3 recordings
+    // typically); the dashboard's Snapshot section flips to a
+    // diagnostic-in-progress card in that case.
+    async getLevel(): Promise<LevelResponse> {
+      return request<LevelResponse>('/api/users/me/level')
+    },
+
+    // P-230 / P-240 — today's prescribed action from the engine. `action`
+    // is the recommendation; `context` is surrounding state (current phase,
+    // clusters remaining, last recording). `dialogue_box` is BE-authored
+    // Block 5 tutor copy, always null in production today (P-240b + P-213
+    // not yet shipped) — FE renders reason_code-driven fallback copy.
+    async getToday(): Promise<TodayActionResponse> {
+      return request<TodayActionResponse>('/api/users/me/today')
+    },
+  },
+
+  // P-230 — diagnostic state for the dashboard. Reads stage (in_progress /
+  // complete / no_path), recordings_done, per-Tâche coverage, and the next
+  // recommended Tâche. Auth-required; returns no_path stage for users with
+  // no enrollment.
+  diagnostic: {
+    async getState(): Promise<DiagnosticStateResponse> {
+      return request<DiagnosticStateResponse>('/api/diagnostic/state')
     },
   },
 
