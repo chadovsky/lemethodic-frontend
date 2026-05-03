@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { api, ApiError } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
 import { useOnboardingStore } from '@/lib/onboarding'
+import { useSubmitResponseStore } from '@/lib/submitResponse'
 import { mapStoreToSubmitPayload } from '@/lib/api'
 import {
   INK,
@@ -119,9 +120,15 @@ function SignupInner() {
       // path_slug — we don't currently surface those on /ecole, but they're
       // logged for forward use (P-221 diagnostic flow integration will).
       // TODO(F-060): queue failed onboarding payloads for retry from /profile.
+      //
+      // P-222 — if the BE returns waitlist=true, capture the response into
+      // useSubmitResponseStore and route to /onboarding/waitlist instead of
+      // /ecole. The waitlist screen reads q1/q2 from the store (captured here
+      // before useOnboardingStore.reset() wipes the answers).
       const onboardingState = useOnboardingStore.getState()
       const onboardingData = onboardingState.data
       const interfaceLanguage = onboardingState.interfaceLanguage
+      let nextRoute = '/ecole'
       if (Object.keys(onboardingData).length > 0) {
         try {
           const submitResponse = await api.onboarding.submit(
@@ -137,6 +144,16 @@ function SignupInner() {
             persona: submitResponse.persona,
             waitlist: submitResponse.waitlist,
           })
+          if (submitResponse.waitlist) {
+            const q1 = onboardingData.q1_current_level
+            const q2 = onboardingData.q2_target_level
+            useSubmitResponseStore.getState().setSubmitContext(
+              submitResponse,
+              typeof q1 === 'string' ? q1 : null,
+              typeof q2 === 'string' ? q2 : null,
+            )
+            nextRoute = '/onboarding/waitlist'
+          }
           useOnboardingStore.getState().reset()
         } catch (flushErr) {
           // eslint-disable-next-line no-console
@@ -144,7 +161,7 @@ function SignupInner() {
         }
       }
 
-      router.push('/ecole')
+      router.push(nextRoute)
     } catch (err) {
       if (err instanceof ApiError) {
         setError(mapRegisterError(err))
