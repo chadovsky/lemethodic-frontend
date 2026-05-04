@@ -1779,14 +1779,36 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 **Scope:** audit every FR string across the FE for tu/vous consistency. Onboarding questionnaire uses vous (`Quel est votre niveau`); waitlist + landing footer use vous; some Block 3 / interim copy specs called out tu-form. Pick one (likely vous given current preponderance), align all surfaces, document the convention in CLAUDE.md so future copy authoring is consistent.
 **Owner:** Engineering + Chadi (copy review)
 
+### F-222 — Sign Out does nothing on click
+
+**Priority:** HIGH (auth-state correctness)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit `4916d72`; production deploy pending Chadi-captured screenshots + interaction trace per F-225)
+**Filed:** 2026-05-04
+**Source:** User-reported bug; root-cause analysis surfaced auth-state drift across stores
+**Dependencies:** none
+**Scope:** Sign Out row on /profile had `onClick={() => {}}` — silent dev-stub no-op. Fixed by extracting canonical `signOut(router)` helper in `lib/auth.ts` that clears auth + onboarding + submit-response stores atomically + routes to `/`. Wired from /profile and refactored WaitlistScreen to use the same helper. Closes broader gap where prior `clearAuth()` only cleared 2 of the 4 persisted localStorage keys.
+**Owner:** Engineering
+**Note:** Verification requires interactive trace per F-225.5 — screenshots alone won't catch a Sign Out regression. Test plan: (1) sign in, (2) navigate to /profile, (3) click Sign Out, (4) verify localStorage has zero `lemethodic_*` keys, (5) verify URL is `/`, (6) verify subsequent visit to /profile redirects to `/` (ProtectedRoute kicks in). Same trace from /onboarding/waitlist sign-out link.
+
+### F-222.x — /profile real-data wire-up
+
+**Priority:** MEDIUM (Active LC, prioritize after responsive sweep starts)
+**Status:** Queued
+**Filed:** 2026-05-04
+**Source:** Surfaced during F-222 root-cause analysis
+**Dependencies:** none
+**Scope:** /profile is largely a hardcoded design mockup. Wire to `useAuthStore.user` + `getMe()`: replace hardcoded `"Chadi"` (line 234), `"chadi@example.com"` (line 387), `"TCF Canada · 47 days to exam"` (line 246), `"TCF C1 (level 5)"` (line 388), `"June 7, 2026"` (line 392), `"Day 7"` streak (line 334), `"4/16"` École progress (line 335), `"47"` days-to-TCF (line 336), avatar initial `"C"` (line 218). Avatar background pastel + Preply CTA + interface language + notifications stubs stay as-is. Empty-state branches needed for users without exam date / target / etc.
+**Owner:** Engineering
+**Note:** Beta-credibility hit if a user opens /profile and sees someone else's name + exam date. Not a functional blocker (Sign Out works post-F-222) but a real perception issue.
+
 ### F-225 — Desktop verification protocol (process change)
 
 **Priority:** HIGH (process gate, launch-blocking)
-**Status:** Shipped 2026-05-04 (FE-side, single doc commit). Non-visual change — verification skipped per the rule's own carve-out.
+**Status:** Shipped 2026-05-04 (FE-side, doc commit `3eb8902`; amended in commit pending — added interactive verification clause F-225.5). Non-visual change — verification skipped per the rule's own carve-out.
 **Filed:** 2026-05-04
 **Source:** Strategic recalibration after desktop-broken-on-every-screen surfaced as launch-blocker
 **Dependencies:** none
-**Scope:** every FE ticket gets `Shipped` status only after attaching (a) 1440px desktop screenshot of every affected route on production and (b) 375px mobile screenshot of every affected route on production. Non-visual tickets (BE-only, config, deps, copy/text not affecting layout, doc updates) note `non-visual change — verification skipped` instead. See `CLAUDE.md` "Shipping verification protocol" section for the canonical rule.
+**Scope:** every FE ticket gets `Shipped` status only after attaching (a) 1440px desktop screenshot of every affected route on production and (b) 375px mobile screenshot of every affected route on production. Non-visual tickets note `non-visual change — verification skipped` instead. F-225.5 amendment (2026-05-04, surfaced during F-222 root-cause): for tickets that change interactive behavior (handlers, navigation, form submission, state mutation), verification additionally requires (c) a recorded interaction trace — Loom link / screen recording / written test plan with pass/fail outcomes. See `CLAUDE.md` "Shipping verification protocol" section for the canonical rule.
 **Owner:** Engineering (process)
 **Note:** Tickets shipped before 2026-05-04 (P-220, P-222, B-102, P-230, P-234, etc.) are grandfathered. The rule applies prospectively. Until F-225's doc commit landed, no other ticket could be marked `Shipped` — F-223, F-222, and any other in-flight FE work waited.
 

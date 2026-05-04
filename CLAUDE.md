@@ -25,8 +25,9 @@ The repo is linked to a v0 project (see README). Edits in v0 push commits direct
 2. **375px mobile screenshot** (iPhone SE width) of every affected route, captured on production.
 3. If a ticket affects multiple screens (e.g. an onboarding-flow change spans 11 questions + reveal), attach all of them.
 4. If the change is genuinely non-visual (BE-only, config, deps, copy/text that doesn't affect layout, doc updates), note `non-visual change — verification skipped` on the BACKLOG entry instead of attaching screenshots.
+5. **Interactive verification (added 2026-05-04, F-225 amendment):** for tickets that change interactive behavior (handlers, navigation, form submission, state mutation), verification requires both: (a) 1440px + 375px screenshots of the affected screen, AND (b) a recorded interaction trace — either a Loom link, a screen recording, or a written test plan with pass/fail observed outcomes documented in the BACKLOG entry. Screenshots alone don't catch a Sign Out that does nothing on click; an interaction trace does.
 
-The rule exists because mobile-first development without desktop verification has shipped broken desktop layouts repeatedly. The soft-beta scope locks in mobile + desktop as both first-class. Until a ticket's two screenshots are attached (or the non-visual exemption is noted), it stays in `Status: Awaiting verification` — not `Shipped`.
+The rule exists because mobile-first development without desktop verification has shipped broken desktop layouts repeatedly. The soft-beta scope locks in mobile + desktop as both first-class. Until a ticket's verification (screenshots + interaction trace where applicable) is attached or the non-visual exemption is noted, it stays in `Status: Awaiting verification` — not `Shipped`.
 
 This protocol applies to every FE ticket, including hotfixes. The only ticket exempt from itself is F-225 (this doc commit) — the rule didn't exist when the work was done.
 
