@@ -1750,6 +1750,27 @@ Belt-and-braces diagnostic pattern: add `print(..., flush=True)` calls in the li
 
 ---
 
+## Shipped — Week 3 (May 2-4)
+
+P-220 ✅ Onboarding questionnaire rebuild (Shipped 2026-05-02). See §10.3 entry above for full status detail.
+P-222 ✅ Waitlist UX (Shipped 2026-05-03). See §10.3 entry.
+B-102 ✅ Privacy + Terms + Refund pages with footer integration (Shipped 2026-05-03). See entry above.
+P-230 ✅ Overall Progress dashboard rebuild (Shipped 2026-05-03). See §10.4 entry.
+P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
+
+### F-225 — Desktop verification protocol (process change)
+
+**Priority:** HIGH (process gate, launch-blocking)
+**Status:** Shipped 2026-05-04 (FE-side, single doc commit). Non-visual change — verification skipped per the rule's own carve-out.
+**Filed:** 2026-05-04
+**Source:** Strategic recalibration after desktop-broken-on-every-screen surfaced as launch-blocker
+**Dependencies:** none
+**Scope:** every FE ticket gets `Shipped` status only after attaching (a) 1440px desktop screenshot of every affected route on production and (b) 375px mobile screenshot of every affected route on production. Non-visual tickets (BE-only, config, deps, copy/text not affecting layout, doc updates) note `non-visual change — verification skipped` instead. See `CLAUDE.md` "Shipping verification protocol" section for the canonical rule.
+**Owner:** Engineering (process)
+**Note:** Tickets shipped before 2026-05-04 (P-220, P-222, B-102, P-230, P-234, etc.) are grandfathered. The rule applies prospectively. Until F-225's doc commit landed, no other ticket could be marked `Shipped` — F-223, F-222, and any other in-flight FE work waited.
+
+---
+
 ## Working protocol reminder
 
 - Every new ticket drafted must reference this BACKLOG.md and use the next available F-0xx number.

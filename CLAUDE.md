@@ -17,6 +17,19 @@ There is **no test runner** configured.
 
 The repo is linked to a v0 project (see README). Edits in v0 push commits directly to this repo, and every merge to `main` auto-deploys. When making changes here, assume `main` is continuously deployed — don't merge half-finished work.
 
+## Shipping verification protocol (F-225, 2026-05-04)
+
+**Hard gate.** Every FE ticket gets the `Shipped` status only after the following are attached to its `BACKLOG.md` entry:
+
+1. **1440px desktop screenshot** of every affected route, captured on production (`lemethodic.com`).
+2. **375px mobile screenshot** (iPhone SE width) of every affected route, captured on production.
+3. If a ticket affects multiple screens (e.g. an onboarding-flow change spans 11 questions + reveal), attach all of them.
+4. If the change is genuinely non-visual (BE-only, config, deps, copy/text that doesn't affect layout, doc updates), note `non-visual change — verification skipped` on the BACKLOG entry instead of attaching screenshots.
+
+The rule exists because mobile-first development without desktop verification has shipped broken desktop layouts repeatedly. The soft-beta scope locks in mobile + desktop as both first-class. Until a ticket's two screenshots are attached (or the non-visual exemption is noted), it stays in `Status: Awaiting verification` — not `Shipped`.
+
+This protocol applies to every FE ticket, including hotfixes. The only ticket exempt from itself is F-225 (this doc commit) — the rule didn't exist when the work was done.
+
 ## Architecture
 
 Next.js 16 App Router + React 19 + TypeScript (strict) + Tailwind v4. Styling is shadcn/ui ("new-york" style, neutral base, lucide icons); generator config in `components.json`. Path alias `@/*` resolves to the repo root, so `@/components`, `@/lib`, `@/hooks` all work.
