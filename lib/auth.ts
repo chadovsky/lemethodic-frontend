@@ -93,3 +93,24 @@ export const useAuthStore = create<AuthState>((set) => ({
   // locked out. A subsequent API 401 will still auto-clear via lib/api.
   markVerified: () => set({ verified: true }),
 }))
+
+// F-222 — canonical sign-out helper. Clears all FE-side persisted state
+// (auth + onboarding answers + waitlist response) so a subsequent sign-in
+// starts fresh, then routes to landing. Use from any surface that exposes
+// a "Sign out" affordance — currently /profile and the waitlist screen's
+// footer link. Caller passes a router instance (Next 16 useRouter()); the
+// MinimalRouter shape avoids dragging next/navigation types into lib/.
+
+import { useOnboardingStore } from './onboarding'
+import { useSubmitResponseStore } from './submitResponse'
+
+interface MinimalRouter {
+  push: (href: string) => void
+}
+
+export function signOut(router: MinimalRouter): void {
+  useAuthStore.getState().clearAuth()
+  useOnboardingStore.getState().reset()
+  useSubmitResponseStore.getState().clear()
+  router.push('/')
+}

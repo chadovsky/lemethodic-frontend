@@ -12,7 +12,7 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuthStore } from '@/lib/auth'
+import { signOut } from '@/lib/auth'
 import { useSubmitResponseStore } from '@/lib/submitResponse'
 import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 import {
@@ -140,9 +140,9 @@ export default function WaitlistScreen() {
   }
 
   function handleSignOut() {
-    clear()
-    useAuthStore.getState().clearAuth()
-    router.push('/')
+    // F-222 — canonical sign-out via lib/auth.signOut helper. Clears
+    // submit-response + onboarding + auth stores in one shot.
+    signOut(router)
   }
 
   return (

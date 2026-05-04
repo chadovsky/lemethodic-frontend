@@ -1,8 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import BottomNav from '@/components/home/BottomNav'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import { signOut } from '@/lib/auth'
 import { ArrowLeft, ChevronRight, Pencil } from 'lucide-react'
 
 // ─── design tokens ────────────────────────────────────────────────────────────
@@ -119,6 +121,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 // ─── page ─────────────────────────────────────────────────────────────────────
 export default function ProfilePage() {
+  const router = useRouter()
   return (
     <ProtectedRoute>
     <div
@@ -418,7 +421,7 @@ export default function ProfilePage() {
                 <ListRow
                   label="Sign out"
                   danger
-                  onClick={() => {}}
+                  onClick={() => signOut(router)}
                 />
               </div>
             </Card>
