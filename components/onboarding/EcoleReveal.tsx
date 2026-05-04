@@ -82,9 +82,13 @@ const HEADLINE = {
   en: "Meet L'École.",
   fr: "Voici L'École.",
 }
+// F-223 — interim copy patch: replaces stale "shortcut/raccourci" framing
+// while F-202 (full L'École intro rebuild with methodology demo) is authored.
+// FR keeps vous-form to match the rest of the FR onboarding context;
+// tu/vous audit + full-app sweep tracked as F-226.
 const SUBHEAD = {
-  en: 'The shortcut. Focused lessons. The exact grammar English speakers keep failing on. Finish it, and B2 is unblocked.',
-  fr: 'Le raccourci. Des leçons ciblées. Les points de grammaire que les anglophones ratent à répétition. Finissez-le, et B2 est débloqué.',
+  en: "This is L'École. Targeted lessons on the grammar traps English speakers hit again and again. Finish it, and B2 unlocks.",
+  fr: "Voici L'École. Des leçons ciblées sur les pièges grammaticaux que les anglophones ratent à répétition. Finissez-la, et B2 est débloqué.",
 }
 const VALUE_LINES = {
   en: [

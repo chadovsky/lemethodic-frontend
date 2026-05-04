@@ -1758,6 +1758,27 @@ B-102 ✅ Privacy + Terms + Refund pages with footer integration (Shipped 2026-0
 P-230 ✅ Overall Progress dashboard rebuild (Shipped 2026-05-03). See §10.4 entry.
 P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 
+### F-223 — "Le raccourci" / "The shortcut" copy cleanup (interim patch)
+
+**Priority:** MEDIUM (user-visible stale copy)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/onboarding` EcoleReveal step per F-225)
+**Filed:** 2026-05-04
+**Source:** F-223 plan-first; raccourci grep surfaced 2 user-facing copy lines on EcoleReveal
+**Dependencies:** none (interim — full rebuild lives at F-202)
+**Scope:** replace stale `Le raccourci` / `The shortcut` framing on `components/onboarding/EcoleReveal.tsx` SUBHEAD (EN + FR). FR keeps vous-form (`Finissez-la`) to match surrounding FR onboarding context — tu/vous audit + full-app sweep tracked as F-226. Comment at `components/home/EcoleProgress.tsx:24` left in place per "git blame is cheaper than re-discovery" call. Historical raccourci references in BACKLOG.md preserved per F-086 precedent.
+**Owner:** Engineering
+**Note:** Interim only. F-202 (full L'École intro rebuild with methodology demo) supersedes this copy entirely.
+
+### F-226 — FR voice audit (tu vs vous) full-app sweep
+
+**Priority:** LOW (post-soft-beta polish)
+**Status:** Queued
+**Filed:** 2026-05-04
+**Source:** Surfaced during F-223 plan-first — Block 3 spec drift between tu-form and vous-form across FR surfaces
+**Dependencies:** none
+**Scope:** audit every FR string across the FE for tu/vous consistency. Onboarding questionnaire uses vous (`Quel est votre niveau`); waitlist + landing footer use vous; some Block 3 / interim copy specs called out tu-form. Pick one (likely vous given current preponderance), align all surfaces, document the convention in CLAUDE.md so future copy authoring is consistent.
+**Owner:** Engineering + Chadi (copy review)
+
 ### F-225 — Desktop verification protocol (process change)
 
 **Priority:** HIGH (process gate, launch-blocking)
