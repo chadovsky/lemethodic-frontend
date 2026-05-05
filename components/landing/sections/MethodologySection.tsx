@@ -1,112 +1,137 @@
 'use client'
 
-// F-200 — Methodology. Surfaces "Les Moules" + "La Méthode en Couches"
-// as named system concepts (brief in-line reframe — full sub-section
-// breakout filed as F-227, copy-authoring task). Editorial: serif accent
-// on the heading, body in sans, narrow column for reading rhythm.
+// F-227 — compressed methodology breakout on landing. Reuses the F-202
+// /ecole/intro Section 2 framework in glance-form: 5 couches as one-line
+// entries, not the deep stacked-blocks treatment. Pure typography — no
+// illustration, no icons, no CTA. The deep version lives behind signup
+// at /ecole/intro; this is the public-side compression.
 //
-// Markdown-style **bold** in copy.ts is parsed and rendered as <strong>.
-// Light-touch parser since copy is FE-authored and only uses **bold**
-// (no other markdown). If methodology copy ever gets richer, swap to
-// react-markdown.
+// Placement: after DifferentiationSection, before HowItWorksSection. F-227
+// reordered LandingPage.tsx to put it at the structural moment when a
+// visitor is asking "but how is this different from drill platforms?"
 
 import type { Lang } from '../copy'
 import { METHODOLOGY } from '../copy'
-import { ED, LETTER_SPACING, LINE_HEIGHT, SANS_FONT, SERIF_FONT } from '@/lib/typography'
+import { ED, SANS_FONT, SERIF_FONT } from '@/lib/typography'
 import RevealOnScroll from '../RevealOnScroll'
 
-// Tiny **bold** parser — splits on **...** segments and emits <strong>.
-// Doesn't handle nesting or other markdown; that's intentional (kept
-// scoped to this surface).
-function renderBoldSegments(text: string): React.ReactNode {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g)
-  return parts.map((part, i) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return (
-        <strong
-          key={i}
-          style={{
-            fontFamily: SERIF_FONT,
-            fontWeight: 600,
-            color: ED.accent,
-            fontStyle: 'italic',
-          }}
-        >
-          {part.slice(2, -2)}
-        </strong>
-      )
-    }
-    return part
-  })
-}
-
 export default function MethodologySection({ lang }: { lang: Lang }) {
-  const paragraphs = METHODOLOGY.paragraphs[lang]
   return (
     <section
       className="w-full"
       style={{
-        backgroundColor: ED.paper,
+        backgroundColor: ED.bg,
         borderTop: `1px solid ${ED.rule}`,
-        borderBottom: `1px solid ${ED.rule}`,
-        padding: 'clamp(80px, 12vw, 140px) clamp(24px, 4vw, 64px)',
+        padding: 'clamp(64px, 10vw, 160px) clamp(24px, 4vw, 64px)',
       }}
     >
       <div className="mx-auto" style={{ maxWidth: 720 }}>
+        {/* Heading — Source Serif 4 italic ed-accent navy */}
         <RevealOnScroll>
-          {/* Eyebrow signaling this is the methodology evidence section */}
-          <p
-            style={{
-              fontFamily: SANS_FONT,
-              fontWeight: 600,
-              fontSize: '0.875rem',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: ED.accent,
-              margin: 0,
-              marginBottom: 24,
-            }}
-          >
-            {lang === 'fr' ? 'La méthode' : 'The method'}
-          </p>
-        </RevealOnScroll>
-        <RevealOnScroll delay={0.08}>
           <h2
             className="text-balance"
             style={{
-              fontFamily: SANS_FONT,
-              fontWeight: 600,
-              fontSize: 'clamp(1.75rem, 3.5vw, 3rem)',
-              lineHeight: LINE_HEIGHT.heading,
-              letterSpacing: LETTER_SPACING.heading,
-              color: ED.fg,
+              fontFamily: SERIF_FONT,
+              fontStyle: 'italic',
+              fontWeight: 400,
+              fontSize: 'clamp(2.5rem, 5.5vw, 4rem)',
+              lineHeight: 1.1,
+              letterSpacing: '-0.015em',
+              color: ED.accent,
               margin: 0,
-              marginBottom: 'clamp(32px, 4vw, 48px)',
             }}
           >
             {METHODOLOGY.heading[lang]}
           </h2>
         </RevealOnScroll>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(20px, 2.5vw, 28px)' }}>
-          {paragraphs.map((p, i) => (
-            <RevealOnScroll key={i} delay={i * 0.08}>
-              <p
-                className="text-pretty"
-                style={{
-                  fontFamily: SANS_FONT,
-                  fontWeight: 400,
-                  fontSize: 'clamp(1rem, 1.4vw, 1.125rem)',
-                  lineHeight: LINE_HEIGHT.body,
-                  letterSpacing: LETTER_SPACING.body,
-                  color: i === paragraphs.length - 1 ? ED.fg : ED.muted,
-                  margin: 0,
-                }}
-              >
-                {renderBoldSegments(p)}
-              </p>
-            </RevealOnScroll>
+
+        {/* Intro framing line — Source Serif 4 italic ed-muted */}
+        <RevealOnScroll delay={0.08}>
+          <p
+            className="text-balance"
+            style={{
+              fontFamily: SERIF_FONT,
+              fontStyle: 'italic',
+              fontWeight: 400,
+              fontSize: 'clamp(1.25rem, 2vw, 1.5rem)',
+              lineHeight: 1.5,
+              color: ED.muted,
+              margin: 0,
+              marginTop: 'clamp(20px, 2vw, 28px)',
+              maxWidth: 720,
+            }}
+          >
+            {METHODOLOGY.intro[lang]}
+          </p>
+        </RevealOnScroll>
+
+        {/* Five couches — vertical list, single line each. Em-dash separator
+            between name (Geist 600) and description (Geist 400). Kept
+            tighter than F-202's 80-120px because this is glance-section. */}
+        <ul
+          style={{
+            listStyle: 'none',
+            padding: 0,
+            margin: 0,
+            marginTop: 'clamp(48px, 6vw, 72px)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'clamp(20px, 2.5vw, 32px)',
+          }}
+        >
+          {METHODOLOGY.couches.map((c, i) => (
+            <li key={c.name[lang]}>
+              <RevealOnScroll delay={0.16 + i * 0.08}>
+                <p
+                  style={{
+                    fontFamily: SANS_FONT,
+                    fontWeight: 400,
+                    fontSize: 'clamp(1.125rem, 1.6vw, 1.5rem)',
+                    lineHeight: 1.5,
+                    color: ED.fg,
+                    margin: 0,
+                  }}
+                >
+                  <strong style={{ fontWeight: 600 }}>{c.name[lang]}</strong>
+                  {' — '}
+                  {c.description[lang]}
+                </p>
+              </RevealOnScroll>
+            </li>
           ))}
-        </div>
+        </ul>
+
+        {/* 1px ed-rule full-bleed below couches */}
+        <RevealOnScroll delay={0.16 + METHODOLOGY.couches.length * 0.08 + 0.1}>
+          <div
+            aria-hidden="true"
+            style={{
+              marginTop: 'clamp(48px, 6vw, 72px)',
+              borderTop: `1px solid ${ED.rule}`,
+            }}
+          />
+        </RevealOnScroll>
+
+        {/* Closer kicker — Source Serif 4 italic ed-fg, centered */}
+        <RevealOnScroll delay={0.16 + METHODOLOGY.couches.length * 0.08 + 0.2}>
+          <p
+            className="text-balance"
+            style={{
+              fontFamily: SERIF_FONT,
+              fontStyle: 'italic',
+              fontWeight: 400,
+              fontSize: 'clamp(1.375rem, 2.2vw, 1.625rem)',
+              lineHeight: 1.45,
+              color: ED.fg,
+              margin: 0,
+              marginTop: 'clamp(48px, 6vw, 72px)',
+              textAlign: 'center',
+              maxWidth: 720,
+            }}
+          >
+            {METHODOLOGY.closer[lang]}
+          </p>
+        </RevealOnScroll>
       </div>
     </section>
   )

@@ -77,9 +77,13 @@ export default function LandingPage({ lang }: LandingPageProps) {
       <HeroSection lang={lang} />
       <ProblemSection lang={lang} />
       <DifferentiationSection lang={lang} />
+      {/* F-227 — Methodology moved here (was after Pricing). Sits at the
+          structural moment a visitor is asking "but how is this different
+          from drill platforms?" — same content as F-202 /ecole/intro
+          Section 2 in compressed glance-form. */}
+      <MethodologySection lang={lang} />
       <HowItWorksSection lang={lang} />
       <PricingSection lang={lang} />
-      <MethodologySection lang={lang} />
       <FAQSection lang={lang} />
       <FinalCTASection lang={lang} />
       <LandingFooter lang={lang} />

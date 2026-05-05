@@ -2143,15 +2143,32 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - Methodology bg flips to `--ed-paper` with top+bottom `--ed-rule` — visual emphasis on the moat-evidence section without breaking the bg-flat rhythm elsewhere.
 - Sprint/Premium "Join the waitlist" CTAs use ghost button (transparent + ed-fg border, fills on hover) — visual hierarchy below Subscription's solid navy CTA. Confirmed conversion ladder.
 
-### F-227 — Methodology section full sub-section breakout
+### F-227 — Methodology breakout on landing (compressed 5-couche surface)
 
-**Priority:** MEDIUM (post-F-200, copy-authoring blocker)
-**Status:** Queued
+**Priority:** MEDIUM (post-F-202, public-side moat surface)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` (EN) + `/fr` (FR) showing MethodologySection with surrounding sections (Differentiation above + HowItWorks below) visible to verify bg rhythm + section ordering per F-225. F-225 interactive verification clause does NOT apply — F-227 is static typography with reveal animations only, no handlers/nav/forms/state mutation.)
 **Filed:** 2026-05-05
-**Source:** F-200 plan-first; in-line reframe is interim, full breakout deferred
-**Dependencies:** F-200; Chadi-input on framing language and examples
-**Scope:** F-200 ships Les Moules + La Méthode en Couches as named concepts in 1-2 paragraphs (interim moat-visibility). This ticket builds the full sub-section: dedicated landing module with hierarchy (couches enumerated, examples per moule, visual diagram of the 4-couche grid, anglophone-specific moules like "calque lexical" / "interférence grammaticale" called out by name with concrete sentence-level examples). Needs Chadi-authored copy + design pass for diagram(s). Likely a standalone scroll section between Methodology and Pricing.
-**Owner:** Chadi (copy + diagram direction) + Engineering (wire-up)
+**Shipped:** 2026-05-01 (FE-side, frontend commit pending)
+**Source:** F-227 spec May 5 with locked compressed copy (khâgneux-reviewed; reuses F-202 Section 2 framework in glance-form)
+**Dependencies:** F-200, F-202 (couche names + descriptions reused — must stay consistent across surfaces)
+**Scope:** rewrite existing MethodologySection.tsx (was F-200 stub: 5-paragraph in-line reframe) to compressed 5-couche format matching F-202 /ecole/intro Section 2. Reorder LandingPage.tsx: MethodologySection moved from after PricingSection to between DifferentiationSection and HowItWorksSection per spec — sits at the structural moment a visitor is asking "but how is this different from drill platforms?". Locked verbatim copy (no paraphrasing) in `components/landing/copy.ts` METHODOLOGY constant; restructured from `{heading, paragraphs[]}` to `{heading, intro, couches[5], closer}`. Pure typography: section header (Source Serif 4 italic ed-accent navy 48-64px) → intro framing line (Source Serif 4 italic ed-muted 20-24px) → 5 couches as vertical list (each: Geist 600 ed-fg name + em-dash + Geist 400 ed-fg description, 20-32px gaps) → 1px ed-rule full-bleed → closer kicker (Source Serif 4 italic ed-fg 22-26px centered). 720px max-width, ed-bg, 64-160px vertical padding clamp. RevealOnScroll stagger: 80ms across 5 couches, kicker delay +200ms after last couche. No illustration, no icons, no CTA, no /ecole/intro deep-link.
+**Owner:** Engineering (Chadi authored copy)
+
+**Calls (resolved):**
+- (a) **Replace existing MethodologySection** (it was the F-200 stub; comment explicitly named F-227 as the rewrite target) rather than add a new section file.
+- (b) **Bg = ed-bg** per spec default (HowItWorks that now follows is ed-paper, so the spec tiebreaker doesn't fire). Methodology→HowItWorks alternation preserved.
+- (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
+- (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
+
+### F-227.rhythm — Pricing→FAQ same-bg adjacency
+
+**Priority:** LOW (visual rhythm polish)
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** F-227 ship side-effect — Methodology reorder created Pricing(bg)→FAQ(bg) adjacency
+**Dependencies:** F-227
+**Scope:** flip FAQSection bg from ed-bg to ed-paper to restore F-214 alternation (post-F-227 ordering: ...HowItWorks(paper)/Pricing(bg)/FAQ(?)/FinalCTA(paper) — flipping FAQ to paper fixes the rhythm but creates 3 papers in a row at FAQ→FinalCTA). Or alternatively flip FinalCTA to ed-bg and keep FAQ at ed-paper. Either approach is a 1-line change. Decision needed on which adjacency to break — needs Chadi taste pass. Not blocking.
+**Owner:** Engineering
 
 ### F-225 — Desktop verification protocol (process change)
 

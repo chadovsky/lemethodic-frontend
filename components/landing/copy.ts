@@ -311,35 +311,69 @@ export const PRICING = {
   } satisfies I18nString,
 }
 
-// ── Section 6 — Methodology ─────────────────────────────────────────────────
+// ── Section 6 — Methodology (F-227 compressed breakout) ────────────────────
 
-// F-200 — brief in-line reframe surfacing Les Moules + La Méthode en Couches
-// as named system concepts. The full sub-section breakout (with hierarchy,
-// examples, diagrams) is filed as F-227 — a copy-authoring task that needs
-// Chadi-input on framing language and examples. v1 ships the moat at
-// minimum credibility: the concepts are named, briefly defined, and tied
-// to where the user encounters them.
+// F-227 — compressed methodology surface for landing. Reuses the F-202
+// /ecole/intro Section 2 framework in glance-form: 5 couches as one-line
+// entries, no deep blocks. Locked verbatim copy (khâgneux-reviewed; do
+// not paraphrase). Couche names match F-202 EXACTLY (Le Fond / Les Moules
+// des Idées / Les Moules / Les Réflexes Anglais / La Voix) — these are
+// the named in-product concepts and must stay consistent across surfaces.
+export interface CoucheCopy {
+  name: I18nString
+  description: I18nString
+}
+
 export const METHODOLOGY = {
   heading: {
-    en: 'The methodology behind LeMethodic.',
-    fr: 'La méthodologie derrière LeMethodic.',
+    en: 'La Méthode en Couches',
+    fr: 'La Méthode en Couches',
   } satisfies I18nString,
-  paragraphs: {
-    en: [
-      'LeMethodic is built on a methodology refined across 7,000+ hours of one-on-one teaching with anglophone French learners on Preply.',
-      "The patterns of error are not random. After thousands of hours, they reveal themselves: which grammatical structures English speakers systematically transfer incorrectly. Which preposition pairs they consistently get wrong. Which moments of speech reveal the B1 ceiling to an examiner.",
-      'The methodology has two named layers. **La Méthode en Couches** — the four TCF criteria (content, structure, grammar, English-speaker patterns) graded as discrete diagnostic dimensions, not collapsed into a single fluency score. **Les Moules** — the recurring grammatical "molds" anglophones fall into when speaking French under exam pressure. Both are visible to you in the diagnostic and the path. The product names what other tools leave invisible.',
-      'The diagnostic detects them. The path corrects them. The dashboard shows you which mold you fell into and which couche it scored against.',
-      "This is not a generic French learning app with AI added. It's a focused exam-preparation system for a specific candidate facing a specific exam.",
-    ],
-    fr: [
-      "LeMethodic est construit sur une méthodologie affinée sur plus de 7 000 heures d'enseignement individuel avec des apprenants anglophones de français sur Preply.",
-      "Les patterns d'erreurs ne sont pas aléatoires. Après des milliers d'heures, ils se révèlent : quelles structures grammaticales les anglophones transfèrent systématiquement de manière incorrecte. Quelles paires de prépositions ils confondent constamment. Quels moments de leur discours révèlent le plafond B1 à un examinateur.",
-      'La méthodologie repose sur deux couches nommées. **La Méthode en Couches** — les quatre critères TCF (contenu, structure, grammaire, schémas anglophones) évalués comme des dimensions diagnostiques distinctes, jamais agrégés en un score unique de fluidité. **Les Moules** — les « moules » grammaticaux récurrents dans lesquels tombent les anglophones quand ils parlent français sous pression d\'examen. Les deux sont visibles dans le diagnostic et le parcours. Le produit nomme ce que les autres outils laissent invisible.',
-      "Le diagnostic les détecte. Le parcours les corrige. Le tableau de bord vous montre dans quel moule vous êtes tombé et contre quelle couche il a été noté.",
-      "Ce n'est pas une application générique d'apprentissage du français avec de l'IA ajoutée. C'est un système ciblé de préparation d'examen pour un candidat spécifique face à un examen spécifique.",
-    ],
-  } satisfies I18nList,
+  intro: {
+    en: "Five layers compose your French. We diagnose the one that's holding you back, and we treat it specifically.",
+    fr: "Cinq couches composent votre français. On diagnostique celle qui vous freine, et on la traite précisément.",
+  } satisfies I18nString,
+  couches: [
+    {
+      name: { en: 'Le Fond', fr: 'Le Fond' },
+      description: {
+        en: 'Ideas, arguments, examples.',
+        fr: 'Les idées, les arguments, les exemples.',
+      },
+    },
+    {
+      name: { en: 'Les Moules des Idées', fr: 'Les Moules des Idées' },
+      description: {
+        en: 'How thought is organized in French.',
+        fr: "Comment la pensée s'organise en français.",
+      },
+    },
+    {
+      name: { en: 'Les Moules', fr: 'Les Moules' },
+      description: {
+        en: 'How sentences are built in French.',
+        fr: 'Comment les phrases se construisent en français.',
+      },
+    },
+    {
+      name: { en: 'Les Réflexes Anglais', fr: 'Les Réflexes Anglais' },
+      description: {
+        en: 'The English habits that slip through unnoticed.',
+        fr: 'Les habitudes anglaises qui passent sans permission.',
+      },
+    },
+    {
+      name: { en: 'La Voix', fr: 'La Voix' },
+      description: {
+        en: 'How it sounds — vowels, liaisons, rhythm.',
+        fr: 'Comment ça sonne — voyelles, liaisons, rythme.',
+      },
+    },
+  ] as CoucheCopy[],
+  closer: {
+    en: "Most platforms tell you to practice more. La Méthode identifies the layer that's dragging — and treats that one, specifically.",
+    fr: 'La plupart des plateformes vous disent de pratiquer plus. La Méthode identifie la couche qui freine — et traite celle-là, précisément.',
+  } satisfies I18nString,
 }
 
 // ── Section 7 — FAQ ─────────────────────────────────────────────────────────
