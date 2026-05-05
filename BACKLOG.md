@@ -794,6 +794,24 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Scope:** single high-quality art-directed illustration for the EcoleReveal closing screen (the funnel's emotional terminal, where the user sees their persona + plan before /paywall). Current placeholder: `/illustration-ecole.png` recycled from P-220 era. F-201 sized the asset slot at 280×280 above the persona label. Per F-200 imagery rules: real photography muted-tone OR art-directed line drawing / geometric primitives. No 3D emoji, no library cartoon, no mascot energy.
 **Owner:** Chadi (art direction / commission) + Engineering (drop-in swap)
 
+### F-214 — Visual depth + design system extension
+
+**Priority:** MEDIUM (soft-beta polish)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` HowItWorks section flip + landing rhythm verification per F-225)
+**Filed:** 2026-05-04
+**Source:** Strategic recalibration — interaction polish queue
+**Dependencies:** F-200, F-212
+**Scope (this commit):**
+- Section-bg alternation: HowItWorks flipped from `--ed-bg` to `--ed-paper` with 1px ed-rule top/bottom borders. Landing rhythm now: bg/bg/bg/**paper**/bg/paper/bg/paper — paper density increases toward conversion. Other sections kept on bg per "rhythm not chaos" rule.
+- New `components/landing/TestimonialCard.tsx`: pattern component only (no data wiring). Serif italic quote (Source Serif), ed-accent left rule (3px), ed-paper bg with 1px ed-rule border, 4px radius, attribution + optional examContext rows. Inherits ed-card-lift on hover. Filed for use post-soft-beta when beta cohort quotes land (M-101 doc note #7 explicitly excluded testimonials from launch).
+- `CLAUDE.md` editorial design system section: codified all F-200 → F-214 primitives (CSS utilities, tokens, JS constants, React components, color hierarchy, visual rules). Single canonical reference.
+**Owner:** Engineering
+**Design calls:**
+- HowItWorks chosen for paper flip because it's the "instructional" section — paper bg gives it the "manual page" feel that Methodology + FinalCTA already enjoy. Differentiation kept on bg because flipping it would invert the card hierarchy (cards are ed-paper on bg; flipping section to paper would force cards to bg which loses elevation).
+- TestimonialCard not added to landing today — no testimonial data exists. Component sits ready.
+**Cuts:**
+- Wire TestimonialCard into a TestimonialSection on landing: filed as F-214.x — needs Chadi-authored quotes from beta cohort.
+
 ### F-212 — Micro-animations + interaction feedback system
 
 **Priority:** HIGH (soft-beta polish — interaction language across the platform)

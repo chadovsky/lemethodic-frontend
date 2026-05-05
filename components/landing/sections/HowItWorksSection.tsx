@@ -17,7 +17,12 @@ export default function HowItWorksSection({ lang }: { lang: Lang }) {
     <section
       className="w-full"
       style={{
-        backgroundColor: ED.bg,
+        // F-214 — flipped to ed-paper for editorial rhythm. Sequence on
+        // landing now: bg / bg / bg / **paper** / bg / paper / bg / paper —
+        // paper appears at increasing density toward conversion.
+        backgroundColor: ED.paper,
+        borderTop: `1px solid ${ED.rule}`,
+        borderBottom: `1px solid ${ED.rule}`,
         padding: 'clamp(80px, 12vw, 140px) clamp(24px, 4vw, 64px)',
       }}
     >

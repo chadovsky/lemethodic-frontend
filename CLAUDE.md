@@ -76,6 +76,57 @@ Geist/Geist Mono are loaded via `next/font/google` in `app/layout.tsx` but the r
 
 - `/paywall` — `components/Paywall.tsx`, a long client component using Recharts (`RadarChart`) plus an expandable comparison table. Imports design tokens from the onboarding primitives. This is the final step of the onboarding funnel — the step-6 `EcoleReveal` CTA pushes here.
 
+### Editorial design system primitives (F-200 → F-214)
+
+The editorial system established by F-200 has these reusable primitives:
+
+**CSS utilities (app/globals.css):**
+- `.prose-legal` — long-form legal copy typography (B-102)
+- `.ed-card-lift` — 200ms hover translateY -2px + shadow ramp. Apply to any ed-paper card.
+- `.ed-btn-press` — scale 0.98 on :active. Apply to all CTAs.
+- `.ed-field` — focus-visible ed-accent border + 18%-opacity ring. Apply to form inputs.
+- `.ed-skeleton` — 1.5s shimmer for skeleton loaders (F-211).
+- `.ed-page-enter` — 250ms route fade-in for major surface transitions (F-213).
+- `.ed-hero-rise` + `.ed-hero-rise-delay-{1|2|3}` — landing first-paint sequence.
+- All utilities respect `prefers-reduced-motion: reduce`.
+
+**Tokens (CSS variables in `:root`):**
+- `--ed-bg` / `--ed-fg` / `--ed-accent` / `--ed-muted` / `--ed-rule` / `--ed-paper` — palette
+- `--ed-ease` — `cubic-bezier(0.16, 1, 0.3, 1)`
+- `--ed-duration-hover` (200ms) / `--ed-duration-state` (600ms) / `--ed-duration-reveal` (700ms)
+
+**JS constants (lib/typography.ts + lib/motion.ts):**
+- `SANS_FONT` (Geist) / `SERIF_FONT` (Source Serif 4) / `TYPE_SCALE` / `LINE_HEIGHT` / `LETTER_SPACING`
+- `ED` (palette object) / `ED_MOTION` (motion tokens)
+- `ED_EASE_CUBIC` / `ED_EASE_CSS` / `ED_DUR` / `ED_STAGGER` (F-212 motion primitives)
+- Hooks: `useRotatingText` / `useCountUp` / `useInViewOnce`
+
+**React components:**
+- `<RevealOnScroll delay={N} distance={D}>` — wrap any element for fade + Y-translate on viewport entry (F-200)
+- `<RotatingKicker lang>` — flagship landing kicker that cycles TCF / TEF / DELF / DALF (F-212)
+- `<TestimonialCard quote attribution examContext?>` — pattern only, not wired to data (F-214)
+
+**OnboardingScreen primitives** (still load-bearing for /onboarding):
+- `<OnboardingScreen>` — design-system kernel (720px desktop, ed-* tokens, optional illustration)
+- `<OnboardingCard>` — selectable card with hover lift + press feedback built in
+- `<CTAButton>` — primary CTA with built-in press feedback
+- `<ProgressDots>`, `<CheckIcon>`, `<BackButton>` — accessory primitives
+
+**Color hierarchy** (F-200):
+- Page chrome: `--ed-bg` (warm off-white) is structural primary
+- Cards/surfaces: `--ed-paper` (white) on bg, with 1px `--ed-rule` border + 0 shadow
+- Primary CTA: `--ed-accent` (deep navy) — premium signal
+- Secondary text: `--ed-muted` (warm gray)
+- Pastels (`--fp-*`): preserved as decorative chip layer ONLY (per-question category, status indicators, exam type chips). Not chrome.
+
+**Visual rules (F-200):**
+- No bouncy gradients, emoji, cartoon illustrations, mascot energy
+- Editorial typography (oversized H1, tight letter-spacing for display)
+- Restrained palette (premium because it withholds, not because it adds)
+- Real photography or art-directed illustration where imagery is needed
+- Slow confident motion: 200ms hover, 300ms state, 600-800ms reveal
+- 4px button radii (premium signal vs soft 14-16px tutorial-app radii)
+
 ### Build config gotchas
 
 `next.config.mjs` sets:
