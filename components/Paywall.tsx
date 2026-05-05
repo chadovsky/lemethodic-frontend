@@ -125,11 +125,25 @@ export default function Paywall() {
   return (
     <div
       className="min-h-screen w-full flex flex-col items-center"
-      style={{ backgroundColor: 'var(--fp-canvas)' }}
+      // F-203 — bg migrated from --fp-canvas (#FAFAF7) to --ed-bg (#FAF7F2).
+      // Visually near-identical (both warm off-white), but unifies under the
+      // editorial system. Full editorial typography pass tracked as
+      // F-203.paywall (Recharts radar + comparison table styling needs care).
+      style={{ backgroundColor: 'var(--ed-bg)' }}
     >
       <div
-        className="w-full max-w-[440px] flex flex-col px-5"
-        style={{ paddingTop: 48, paddingBottom: 'calc(80px + var(--fp-safe-bottom))' }}
+        className="w-full flex flex-col px-5"
+        // F-203 — column widened from 440px to 640px desktop / full-width
+        // mobile. Fixes the "white rails on desktop" launch-blocker. The
+        // radar chart + comparison table inside still cap at narrower
+        // widths via their own styling.
+        style={{
+          maxWidth: 640,
+          paddingLeft: 'clamp(20px, 4vw, 40px)',
+          paddingRight: 'clamp(20px, 4vw, 40px)',
+          paddingTop: 'clamp(48px, 8vw, 96px)',
+          paddingBottom: 'calc(80px + var(--fp-safe-bottom))',
+        }}
       >
 
         {/* ── Diagnostic preview section ─────── */}

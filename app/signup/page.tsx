@@ -16,7 +16,9 @@ import {
   DISPLAY_FONT,
 } from '@/components/onboarding/OnboardingScreen'
 
-const BG = '#FFD8C2' // peach — matches /login + paywall
+// F-203 — bg migrated from peach pastel to editorial system warm off-white.
+// /login + /paywall migrated in same ticket.
+const BG = 'var(--ed-bg)'
 
 function validate(fullName: string, email: string, password: string): string | null {
   if (fullName.trim().length < 2) return 'Enter your name (at least 2 characters)'
@@ -196,25 +198,27 @@ function SignupInner() {
       className="min-h-screen w-full flex flex-col items-center justify-center px-5"
       style={{ backgroundColor: BG }}
     >
-      {/* Card */}
+      {/* F-203 — card migrated to editorial system: paper bg, 1px ed-rule
+          border, 0 shadow, 4px radius. Width slightly wider (440px) to
+          match onboarding column rhythm. */}
       <div
         style={{
           width: '100%',
-          maxWidth: 420,
-          backgroundColor: '#FFFFFF',
-          borderRadius: 24,
-          padding: '32px 28px',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+          maxWidth: 440,
+          backgroundColor: 'var(--ed-paper)',
+          border: '1px solid var(--ed-rule)',
+          borderRadius: 4,
+          padding: 'clamp(32px, 4vw, 48px) clamp(28px, 3vw, 40px)',
         }}
       >
         {/* Brand mark */}
         <p
           style={{
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 700,
-            fontSize: 13,
-            color: INK_MUTED,
-            letterSpacing: '0.08em',
+            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+            fontWeight: 600,
+            fontSize: 12,
+            color: 'var(--ed-muted)',
+            letterSpacing: '0.12em',
             textTransform: 'uppercase',
             marginBottom: 24,
           }}
@@ -225,12 +229,12 @@ function SignupInner() {
         {/* Heading */}
         <h1
           style={{
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 800,
-            fontSize: 28,
-            lineHeight: '36px',
-            color: INK,
-            letterSpacing: '-0.01em',
+            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+            fontWeight: 600,
+            fontSize: 'clamp(24px, 3vw, 32px)',
+            lineHeight: 1.15,
+            color: 'var(--ed-fg)',
+            letterSpacing: '-0.015em',
           }}
         >
           Start your free trial
@@ -239,11 +243,12 @@ function SignupInner() {
         {/* Subhead */}
         <p
           style={{
-            fontWeight: 500,
+            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+            fontWeight: 400,
             fontSize: 15,
-            lineHeight: '22px',
-            color: INK_SOFT,
-            marginTop: 6,
+            lineHeight: 1.6,
+            color: 'var(--ed-muted)',
+            marginTop: 8,
           }}
         >
           {subhead}
@@ -254,11 +259,11 @@ function SignupInner() {
           <label
             htmlFor="fullName"
             style={{
-              fontFamily: DISPLAY_FONT,
+              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
               fontWeight: 600,
               fontSize: 12,
-              color: INK_MUTED,
-              letterSpacing: '0.05em',
+              color: 'var(--ed-muted)',
+              letterSpacing: '0.08em',
               textTransform: 'uppercase',
             }}
           >
@@ -273,16 +278,18 @@ function SignupInner() {
             onKeyDown={handleKeyDown}
             disabled={isLoading}
             style={{
-              height: 52,
-              borderRadius: 14,
-              border: `1.5px solid ${INK_MUTED}`,
-              backgroundColor: '#FFFFFF',
-              padding: '0 16px',
-              fontFamily: DISPLAY_FONT,
-              fontWeight: 500,
+              height: 56,
+              borderRadius: 4,
+              border: '1px solid var(--ed-rule)',
+              backgroundColor: 'var(--ed-paper)',
+              padding: '0 18px',
+              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+              fontWeight: 400,
               fontSize: 15,
-              color: INK,
+              color: 'var(--ed-fg)',
               width: '100%',
+              outline: 'none',
+              transition: 'border-color var(--ed-duration-hover) var(--ed-ease)',
             }}
           />
         </div>
@@ -292,11 +299,11 @@ function SignupInner() {
           <label
             htmlFor="email"
             style={{
-              fontFamily: DISPLAY_FONT,
+              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
               fontWeight: 600,
               fontSize: 12,
-              color: INK_MUTED,
-              letterSpacing: '0.05em',
+              color: 'var(--ed-muted)',
+              letterSpacing: '0.08em',
               textTransform: 'uppercase',
             }}
           >
@@ -313,16 +320,18 @@ function SignupInner() {
             onKeyDown={handleKeyDown}
             disabled={isLoading}
             style={{
-              height: 52,
-              borderRadius: 14,
-              border: `1.5px solid ${INK_MUTED}`,
-              backgroundColor: '#FFFFFF',
-              padding: '0 16px',
-              fontFamily: DISPLAY_FONT,
-              fontWeight: 500,
+              height: 56,
+              borderRadius: 4,
+              border: '1px solid var(--ed-rule)',
+              backgroundColor: 'var(--ed-paper)',
+              padding: '0 18px',
+              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+              fontWeight: 400,
               fontSize: 15,
-              color: INK,
+              color: 'var(--ed-fg)',
               width: '100%',
+              outline: 'none',
+              transition: 'border-color var(--ed-duration-hover) var(--ed-ease)',
             }}
           />
         </div>
@@ -332,11 +341,11 @@ function SignupInner() {
           <label
             htmlFor="password"
             style={{
-              fontFamily: DISPLAY_FONT,
+              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
               fontWeight: 600,
               fontSize: 12,
-              color: INK_MUTED,
-              letterSpacing: '0.05em',
+              color: 'var(--ed-muted)',
+              letterSpacing: '0.08em',
               textTransform: 'uppercase',
             }}
           >
@@ -351,65 +360,61 @@ function SignupInner() {
             onKeyDown={handleKeyDown}
             disabled={isLoading}
             style={{
-              height: 52,
-              borderRadius: 14,
-              border: `1.5px solid ${INK_MUTED}`,
-              backgroundColor: '#FFFFFF',
-              padding: '0 16px',
-              fontFamily: DISPLAY_FONT,
-              fontWeight: 500,
+              height: 56,
+              borderRadius: 4,
+              border: '1px solid var(--ed-rule)',
+              backgroundColor: 'var(--ed-paper)',
+              padding: '0 18px',
+              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+              fontWeight: 400,
               fontSize: 15,
-              color: INK,
+              color: 'var(--ed-fg)',
               width: '100%',
+              outline: 'none',
+              transition: 'border-color var(--ed-duration-hover) var(--ed-ease)',
             }}
           />
         </div>
 
-        {/* Submit */}
+        {/* F-203 — Submit migrated to navy ed-accent (premium signal),
+            4px radius, 56px height, no scale-on-press. Loading state uses
+            ed-rule + ed-muted for disabled feel. */}
         <button
           type="button"
           onClick={handleSubmit}
           disabled={isLoading}
           aria-busy={isLoading}
           style={{
-            marginTop: 24,
+            marginTop: 28,
             width: '100%',
-            height: 52,
-            backgroundColor: isLoading ? CTA_DISABLED : INK,
-            color: '#FFFFFF',
-            borderRadius: 14,
+            height: 56,
+            backgroundColor: isLoading ? 'var(--ed-rule)' : 'var(--ed-accent)',
+            color: isLoading ? 'var(--ed-muted)' : '#FFFFFF',
+            borderRadius: 4,
             border: 'none',
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 700,
+            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+            fontWeight: 600,
             fontSize: 15,
             cursor: isLoading ? 'not-allowed' : 'pointer',
-            letterSpacing: '-0.01em',
+            letterSpacing: '0',
             outline: 'none',
-          }}
-          onPointerDown={(e) => {
-            if (!isLoading) e.currentTarget.style.transform = 'scale(0.97)'
-          }}
-          onPointerUp={(e) => {
-            e.currentTarget.style.transform = 'scale(1)'
-          }}
-          onPointerLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)'
+            transition: 'background-color var(--ed-duration-hover) var(--ed-ease)',
           }}
         >
           {isLoading ? 'Creating account…' : 'Create account & start trial'}
         </button>
 
-        {/* Inline error */}
+        {/* Inline error — softened red to fp-error token (already in palette) */}
         {error && (
           <p
             role="alert"
             style={{
-              marginTop: 12,
-              fontFamily: DISPLAY_FONT,
+              marginTop: 14,
+              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
               fontWeight: 500,
               fontSize: 13,
-              lineHeight: '18px',
-              color: '#B42318',
+              lineHeight: 1.5,
+              color: 'var(--fp-error)',
               textAlign: 'center',
             }}
           >
@@ -421,10 +426,12 @@ function SignupInner() {
       {/* Below the card */}
       <p
         style={{
-          marginTop: 24,
+          marginTop: 28,
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+          fontWeight: 400,
           fontSize: 14,
-          lineHeight: '20px',
-          color: INK_SOFT,
+          lineHeight: 1.5,
+          color: 'var(--ed-muted)',
           textAlign: 'center',
         }}
       >
@@ -432,9 +439,10 @@ function SignupInner() {
         <Link
           href="/login"
           style={{
-            color: INK,
+            color: 'var(--ed-fg)',
             fontWeight: 600,
             textDecoration: 'underline',
+            textUnderlineOffset: 2,
           }}
         >
           Sign in

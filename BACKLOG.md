@@ -794,6 +794,96 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Scope:** single high-quality art-directed illustration for the EcoleReveal closing screen (the funnel's emotional terminal, where the user sees their persona + plan before /paywall). Current placeholder: `/illustration-ecole.png` recycled from P-220 era. F-201 sized the asset slot at 280×280 above the persona label. Per F-200 imagery rules: real photography muted-tone OR art-directed line drawing / geometric primitives. No 3D emoji, no library cartoon, no mascot energy.
 **Owner:** Chadi (art direction / commission) + Engineering (drop-in swap)
 
+### F-203 — Auth flow surfaces editorial migration (signup full + paywall responsive)
+
+**Priority:** HIGH (launch-blocking — auth surfaces are the conversion funnel)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/signup` and `/paywall` per F-225)
+**Filed:** 2026-05-04
+**Source:** F-200 cascade
+**Dependencies:** F-200
+**Scope:** signup got full editorial migration (bg ed-bg, paper card with 1px ed-rule + 0 shadow + 4px radius, all form fields ed-tokens with 56px height + 4px radii + ed-paper bg + ed-rule borders, navy ed-accent submit CTA, Geist throughout). Paywall got minimal responsive fix only (bg → ed-bg, column widened 440→640px to fix desktop white-rails launch-blocker) — full editorial migration of Paywall's pricing chrome / radar chart / comparison table tracked separately as F-203.paywall.
+**Owner:** Engineering
+
+### F-203.paywall — Paywall full editorial migration
+
+**Priority:** MEDIUM (post-soft-beta polish — F-203 minimal responsive fix unblocks launch)
+**Status:** Queued
+**Filed:** 2026-05-04
+**Source:** F-203 scope cut — full Paywall editorial migration deferred
+**Dependencies:** F-203
+**Scope:** migrate Paywall's 660-line pricing chrome to editorial system: typography (DISPLAY_FONT → Geist), Recharts radar styling (axis labels, fill colors, grid stroke → ed-* tokens), value-row checkmarks (current pastel/svg → ed-rule outlined), comparison table (current pill toggles → editorial tabs), trial timeline cards. Significant design work; F-203 minimal fix solves the launch-blocker.
+**Owner:** Engineering
+
+### F-204 — Authenticated dashboard surfaces editorial migration (PLAN-FIRST PROPOSED)
+
+**Priority:** HIGH
+**Status:** Plan-first proposed, awaiting Chadi confirm-or-redirect on scope assignment
+**Filed:** 2026-05-04
+**Source:** F-200 cascade — F-203..F-206 not explicitly scoped by Chadi
+**Dependencies:** F-200, F-201
+**Proposed scope:** migrate `/progress` (P-230 dashboard with Snapshot / Today's focus / Goulet / RecentActivity sections) and `/cluster/[slug]` (P-234 cluster detail with header + lesson + practice CTA) to editorial system. Both surfaces use pastel pastels for chips + cards; migrate to ed-paper + ed-rule + 4px radii while preserving section structure. Status chips on cluster header (4 lifecycle states) need ed-* equivalents. Coverage line + Confidence Visualizer in Snapshot section keep their data-shape but restyle. Estimated 400-500 LOC across ~12 files.
+**Owner:** Engineering
+**Confirm before implementation:** is this the right scope for F-204? Or do you want different surface assignments? Pause here for the next session unless Chadi pre-confirms.
+
+### F-205 — User-state surfaces editorial migration (PLAN-FIRST PROPOSED)
+
+**Priority:** HIGH
+**Status:** Plan-first proposed, awaiting Chadi confirm-or-redirect on scope assignment
+**Filed:** 2026-05-04
+**Source:** F-200 cascade
+**Dependencies:** F-200, F-222.x (/profile real-data wire-up — same surface)
+**Proposed scope:** migrate `/profile` (Settings + Account cards + Sign Out via F-222 helper) and `/diagnostic` (per-recording feedback page with CouchesDiagnostic, DetectedModuleCard, ordonnance) to editorial system. /profile's hardcoded mockup data is F-222.x scope — F-205 just restyles. /diagnostic has dense data display (rubric scores, couches grid) that needs careful migration without breaking F-088 layout invariants. Estimated 500-700 LOC across ~10 files.
+**Owner:** Engineering
+**Confirm before implementation:** is this the right scope for F-205?
+
+### F-206 — Recording + module surfaces editorial migration (PLAN-FIRST PROPOSED)
+
+**Priority:** HIGH
+**Status:** Plan-first proposed, awaiting Chadi confirm-or-redirect on scope assignment
+**Filed:** 2026-05-04
+**Source:** F-200 cascade — final responsive sweep
+**Dependencies:** F-200
+**Proposed scope:** migrate `/speaking` (SpeakingLanding + Tâche pickers), `/speaking/tache-1`, `/speaking/tache-2`, `/speaking/tache-3` (per-Tâche session components), `/speaking/feedback/[session]`, `/learn/[module_id]` (LearnModulePage with category-tinted backgrounds — these EARN their pastel keep per F-200's "pastels survive as accent layer" rule), and `/writing` to editorial system. Recording surfaces have heavy interactive UI (PTT button, vu-meter, transcript review sheet) that needs careful migration without breaking F-061 / F-062 / F-104 invariants. Largest sweep — estimated 800-1200 LOC across ~25 files.
+**Owner:** Engineering
+**Confirm before implementation:** is this the right scope for F-206?
+
+### F-202 — L'École intro rebuild with methodology demo (PAUSED — awaiting Chadi copy)
+
+**Priority:** HIGH (launch-blocking — current /ecole intro is empty placeholder per Block 3 critique)
+**Status:** Plan-first complete, **PAUSED** awaiting Chadi-authored methodology demo copy + design decisions per F-202 plan-first below
+**Filed:** 2026-05-04
+**Source:** Strategic recalibration (May 4): "L'École intro is empty placeholder. Doesn't hit Promova benchmark locked in Block 3" + F-200 cascade
+**Dependencies:** F-200 (editorial system), F-227 (methodology copy framing — same shape blocker, parallel ticket)
+**Scope:** rebuild `/ecole` intro to surface the methodology as live system, not as static description. Replace HomeScreen's current "greeting + streak + exam chip + Today's two cards + lesson list" with an editorial-system landing-style intro that demonstrates Les Moules + La Méthode en Couches as visible product surfaces, then transitions into the 27-lesson path. Promova-bench means polished onboarding-style flow on first /ecole entry, not a single dump-page of cards.
+**Owner:** Engineering (build) + Chadi (methodology demo copy + design decisions)
+
+**F-202 plan-first — open questions for Chadi:**
+
+1. **Scope of "intro"** — three options:
+   - (a) **First-visit intro screen** — full-bleed Promova-style scrolling page that introduces methodology, then unlocks into the lesson list on second visit. Uses sessionStorage / `user.first_seen_at` to gate.
+   - (b) **Always-visible top section** — rebuild the top of HomeScreen (greeting/streak/exam → methodology demo) as a permanent anchor; lesson list follows below. Returning users always see it.
+   - (c) **Separate `/ecole/intro` route** — new route surfaced from /ecole only when methodology hasn't been "acknowledged"; lesson list at /ecole stays mostly intact.
+   Recommend (a) — closest to "Promova-bench" framing, doesn't bloat returning-user flow.
+
+2. **Methodology demo shape** — five candidate forms:
+   - Static visual diagram of the 4 couches (Le Fond / Les Moules / Les Moules des Idées / Les Réflexes Anglais), each with one-line definition + one example anglophone error
+   - Animated scroll-driven sequence (Neuralink-style) where each couche reveals as the user scrolls, with named errors highlighted
+   - Interactive moule picker — sample 3-4 sentence pairs (wrong vs right), user clicks to reveal which moule they're falling into
+   - Recording-as-demo — embedded audio sample + diagnostic preview showing the system marking up a Tâche response with the 4 couches
+   - Simple type-led essay with named-concept callouts (similar to F-200 methodology section but expanded to a full standalone surface)
+   Need: Chadi's pick + content (the actual sentence pairs, audio sample, or essay copy depending on shape).
+
+3. **Lesson list positioning** — 3 options:
+   - Lesson list appears BELOW methodology intro on same scroll
+   - Lesson list moved to its own route (`/ecole/path` or similar), accessed from the intro
+   - Lesson list embedded as final section of intro, scrolling continues into 27 cards
+   Recommend embedded — preserves single-route mental model, methodology is the lead, lessons earn the destination.
+
+4. **Returning-user behavior** — once intro is "seen" (BE marker via /me, sessionStorage flag, or user-initiated "skip intro" button), what does /ecole show?
+   Recommend: methodology intro collapses to a single sticky nav band ("La méthode" → opens modal/sheet); lesson list becomes primary. Daily action card from current HomeScreen rescued + restyled into the lesson-list-led layout.
+
+**Until Chadi's copy + scope decisions land, F-202 sits PAUSED.** The chain skips it and continues at F-203.
+
 ### F-201 — Onboarding flow editorial migration (desktop responsive)
 
 **Priority:** HIGH (launch-blocking — onboarding is the conversion funnel)
