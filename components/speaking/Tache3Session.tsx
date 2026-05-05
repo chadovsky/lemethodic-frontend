@@ -22,7 +22,7 @@ const INK_SOFT     = '#1A1A1AB3'
 const INK_MUTED    = '#1A1A1A66'
 const LAVENDER     = '#E0D4F0'
 const BG           = 'var(--fp-canvas)'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 const PREP_SECS      = 120 // 2 minutes
 const RECORD_SECS    = 180 // 3 minutes

@@ -7,7 +7,7 @@ const INK          = '#1A1A1A'
 const INK_MUTED    = '#1A1A1A66'
 const PEACH        = '#FFD8C2'
 const SAGE         = '#D4E4D0'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 export type BubbleSide = 'examiner' | 'user'
 

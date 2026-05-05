@@ -2160,6 +2160,38 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-005 — Font system upgrade (Switzer + Fraunces)
+
+**Priority:** HIGH (V-series chain root — V-003 + V-004 inherit the new font system)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of every surface (`/`, `/fr`, `/signup`, `/login`, `/paywall`, `/onboarding` (multiple steps), `/onboarding/waitlist`, `/ecole`, `/ecole/intro`, `/progress`, `/more`, `/writing`, `/diagnostic`, `/profile`, `/learn/[id]`, `/cluster/[slug]`, `/ecole/lesson/[id]`) to verify Switzer renders for sans/UI/body and Fraunces renders for display/serif accents. F-225 interactive verification clause does NOT apply — pure font swap, no behavior change.)
+**Filed:** 2026-05-01
+**Shipped:** 2026-05-01 (FE-side, frontend commit pending)
+**Source:** V-series ticket batch 2026-05-01 — visual refinement / verification-found
+**Dependencies:** none (foundational; blocks V-003 + V-004)
+**Scope:** swap Geist (sans) + Source Serif 4 (serif) + Cabinet Grotesk (display) for Switzer (sans/UI/body) + Fraunces (display + serif accents). Switzer loaded via Fontshare CDN `<link>` (weights 400/500/600/700/800), defined as `--font-switzer` CSS variable in globals.css :root. Fraunces loaded via next/font/google with variable axes `['SOFT', 'opsz']` so optical-size scales naturally with display-vs-body usage and SOFT axis is available for editorial warmth on headlines. Cabinet Grotesk + Geist + Geist_Mono + Source_Serif_4 next/font imports retired. Cabinet Grotesk Fontshare `<link>` retired.
+
+**Files touched:**
+- `app/layout.tsx` — drop Geist + Geist_Mono + Source_Serif_4 imports; add Fraunces with axes; swap Cabinet Grotesk `<link>` → Switzer Fontshare `<link>` (with preconnect); html className applies just `${fraunces.variable}` (Switzer is via raw CSS variable, no className needed)
+- `app/globals.css` — add `--font-switzer` to `:root`; @theme tokens updated (`--font-sans: var(--font-switzer)`, `--font-display: var(--font-fraunces)`, `--font-mono` set to system monospace stack); `.prose-legal` font-family rules retargeted to `var(--font-switzer)`
+- `lib/typography.ts` — `SANS_FONT` → `var(--font-switzer)`, `SERIF_FONT` → `var(--font-fraunces)`
+- 60+ component files — bulk sed replace: `var(--font-geist)` → `var(--font-switzer)`, `var(--font-source-serif)` → `var(--font-fraunces)`, all three DISPLAY_FONT variants (`'"Cabinet Grotesk", Geist, sans-serif'` / `"'Cabinet Grotesk', 'Geist', sans-serif"` / mixed-quote) standardized to `'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'`
+- `styles/globals.css` (orphaned duplicate per CLAUDE.md note) NOT touched — not imported anywhere
+
+**Verification notes:**
+- Variable font axes available on Fraunces: opsz (auto-scales with font-size in supported browsers), wght, SOFT (default 0; can be set 0-100 via `font-variation-settings: "SOFT" 30` for warmth on headlines)
+- Switzer Fontshare CDN typically resolves <100ms; flash-of-unstyled-text mitigated by `display=swap` parameter
+- Reading order on production check: H1s (Fraunces serif), body copy (Switzer sans), legal pages (Switzer sans for headers + body), button labels (Switzer sans)
+
+### V-005.heading-axis — apply Fraunces SOFT axis to display headlines
+
+**Priority:** LOW (post-V-005 polish)
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** V-005 spec — "Try SOFT axis at +20-30 for editorial warmth on headlines (defaults to 0/sharp)"
+**Dependencies:** V-005
+**Scope:** apply `font-variation-settings: "SOFT" 28` (or similar) to Fraunces consumers at display sizes (Hero H1, EcoleIntro section headers, MethodologySection header, LegalPage h1). Currently V-005 ships Fraunces with SOFT defaulting to 0 (sharp). The warmth axis is the editorial signature; needs Chadi taste pass on +20 vs +30 vs +40 across surfaces. 1-line addition per H1 site.
+**Owner:** Engineering
+
 ### F-227.rhythm — Pricing→FAQ same-bg adjacency (paired bg flip)
 
 **Priority:** LOW (visual rhythm polish)

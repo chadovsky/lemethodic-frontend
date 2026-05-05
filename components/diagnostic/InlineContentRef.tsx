@@ -12,7 +12,7 @@ import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 const INK          = '#1A1A1A'
 const INK_SOFT     = '#1A1A1AB3'
 const INK_MUTED    = '#1A1A1A66'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface Props {
   ref_: ModuleContentRef

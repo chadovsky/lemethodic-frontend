@@ -2,7 +2,7 @@ import BottomNav from '@/components/home/BottomNav'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 // F-206 — page chrome migrated to editorial system.
-const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 const INK_MUTED = 'var(--ed-muted)'
 
 export default function WritingPage() {

@@ -15,7 +15,7 @@ import type { ClusterLesson } from '@/lib/types'
 const INK = '#1A1A1A'
 const INK_MUTED = '#1A1A1A66'
 const PAPER = '#FFFFFFCC'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface LessonBodyProps {
   lesson: ClusterLesson

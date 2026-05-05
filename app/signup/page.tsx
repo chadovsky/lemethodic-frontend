@@ -224,7 +224,7 @@ function SignupInner() {
         {/* Brand mark */}
         <p
           style={{
-            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+            fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 12,
             color: 'var(--ed-muted)',
@@ -239,7 +239,7 @@ function SignupInner() {
         {/* Heading */}
         <h1
           style={{
-            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+            fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 'clamp(24px, 3vw, 32px)',
             lineHeight: 1.15,
@@ -253,7 +253,7 @@ function SignupInner() {
         {/* Subhead */}
         <p
           style={{
-            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+            fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
             fontWeight: 400,
             fontSize: 15,
             lineHeight: 1.6,
@@ -269,7 +269,7 @@ function SignupInner() {
           <label
             htmlFor="fullName"
             style={{
-              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+              fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
               fontWeight: 600,
               fontSize: 12,
               color: 'var(--ed-muted)',
@@ -293,7 +293,7 @@ function SignupInner() {
               border: '1px solid var(--ed-rule)',
               backgroundColor: 'var(--ed-paper)',
               padding: '0 18px',
-              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+              fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
               fontWeight: 400,
               fontSize: 15,
               color: 'var(--ed-fg)',
@@ -309,7 +309,7 @@ function SignupInner() {
           <label
             htmlFor="email"
             style={{
-              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+              fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
               fontWeight: 600,
               fontSize: 12,
               color: 'var(--ed-muted)',
@@ -335,7 +335,7 @@ function SignupInner() {
               border: '1px solid var(--ed-rule)',
               backgroundColor: 'var(--ed-paper)',
               padding: '0 18px',
-              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+              fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
               fontWeight: 400,
               fontSize: 15,
               color: 'var(--ed-fg)',
@@ -351,7 +351,7 @@ function SignupInner() {
           <label
             htmlFor="password"
             style={{
-              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+              fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
               fontWeight: 600,
               fontSize: 12,
               color: 'var(--ed-muted)',
@@ -375,7 +375,7 @@ function SignupInner() {
               border: '1px solid var(--ed-rule)',
               backgroundColor: 'var(--ed-paper)',
               padding: '0 18px',
-              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+              fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
               fontWeight: 400,
               fontSize: 15,
               color: 'var(--ed-fg)',
@@ -402,7 +402,7 @@ function SignupInner() {
             color: isLoading ? 'var(--ed-muted)' : '#FFFFFF',
             borderRadius: 4,
             border: 'none',
-            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+            fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 15,
             cursor: isLoading ? 'not-allowed' : 'pointer',
@@ -420,7 +420,7 @@ function SignupInner() {
             role="alert"
             style={{
               marginTop: 14,
-              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+              fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
               fontWeight: 500,
               fontSize: 13,
               lineHeight: 1.5,
@@ -437,7 +437,7 @@ function SignupInner() {
       <p
         style={{
           marginTop: 28,
-          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
           fontWeight: 400,
           fontSize: 14,
           lineHeight: 1.5,

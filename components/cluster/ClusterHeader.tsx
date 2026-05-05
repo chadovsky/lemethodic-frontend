@@ -27,7 +27,7 @@ const PEACH = '#FFD8C2'
 const BUTTER = '#FFF0C2'
 const LAVENDER = '#E0D4F0'
 const BLUSH = '#F5D6D6'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface ClusterHeaderProps {
   detail: ClusterDetailResponse

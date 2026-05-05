@@ -27,7 +27,7 @@ export const INK_SOFT = '#1A1A1AB3'
 export const INK_MUTED = '#1A1A1A66'
 export const PAPER = '#FFFFFFCC'
 export const CTA_DISABLED = '#1A1A1A4D'
-export const DISPLAY_FONT = "'Cabinet Grotesk', 'Geist', sans-serif"
+export const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // ── Editorial chrome tokens (F-201 — local re-exports of lib/typography) ───
 // Inlined refs to CSS variables so primitives below don't need to import
@@ -38,7 +38,7 @@ const ED_MUTED = 'var(--ed-muted)'
 const ED_RULE = 'var(--ed-rule)'
 const ED_PAPER = 'var(--ed-paper)'
 const ED_ACCENT = 'var(--ed-accent)'
-const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // ── Progress dots ─────────────────────────────────────────────────────────────
 

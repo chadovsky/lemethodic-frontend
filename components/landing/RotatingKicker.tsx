@@ -13,7 +13,7 @@ import { useState } from 'react'
 import { useRotatingText, ED_DUR, ED_EASE_CSS } from '@/lib/motion'
 import type { Lang } from './copy'
 
-const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 const ED_MUTED = 'var(--ed-muted)'
 
 const EXAMS = ['TCF', 'TEF', 'DELF', 'DALF'] as const

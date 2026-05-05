@@ -51,7 +51,7 @@ const SAGE         = '#D4E4D0'
 const PEACH        = '#FFD8C2'
 const BUTTER       = '#FFF0C2'
 const BG           = 'var(--fp-canvas)'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 const TARGET_USER_TURNS = 6
 const TURN_CAP_MS       = 60_000

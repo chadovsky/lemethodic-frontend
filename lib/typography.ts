@@ -1,22 +1,16 @@
-// F-200 — editorial typography system. Reusable across the F-2xx
-// responsive sweep + interaction polish queue. Establishes the font
-// stacks and type scale; component files import these constants instead
-// of redeclaring inline.
-//
-// Coexists with the legacy `DISPLAY_FONT` constant in
-// components/onboarding/OnboardingScreen.tsx, which surfaces Cabinet
-// Grotesk for surfaces F-2xx hasn't migrated yet.
+// V-005 — typography constants point at Switzer (sans) + Fraunces
+// (display + serif accents) per the V-005 font system upgrade. Both
+// CSS variables are defined globally: `--font-switzer` in globals.css
+// :root (Switzer is Fontshare-CDN loaded), `--font-fraunces` set by
+// next/font on <html> (Google Fonts variable font with opsz + SOFT
+// axes). Cabinet Grotesk / Geist / Source Serif 4 retired.
 
-// Geist (loaded via next/font in app/layout.tsx) is the primary editorial
-// sans. The CSS variable `--font-geist` is set on `<html>`, so any
-// element inheriting `font-family: var(--font-geist)` picks it up.
-// `font-feature-settings` enabled per Geist's recommended typography.
-export const SANS_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+export const SANS_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
-// Source Serif 4 (loaded via next/font) for editorial accent typography:
-// pull-quotes, methodology framing, named-concept callouts. Used
-// sparingly — restraint is the point.
-export const SERIF_FONT = 'var(--font-source-serif), Georgia, "Times New Roman", serif'
+// Fraunces — variable serif with optical-size + SOFT axes. Used for
+// editorial accent typography (pull-quotes, methodology framing, hero
+// display). Used sparingly — restraint is the point.
+export const SERIF_FONT = 'var(--font-fraunces), Georgia, "Times New Roman", serif'
 
 // Editorial type scale. Steps map to common rem values (× 16px base):
 // 14 / 16 / 18 / 20 / 24 / 32 / 48 / 72 / 96 px.

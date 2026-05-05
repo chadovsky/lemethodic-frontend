@@ -8,7 +8,7 @@ import { Home, Mic, PenLine, BarChart2, MoreHorizontal } from 'lucide-react'
 const INK        = '#1A1A1A'
 const INK_MUTED  = '#1A1A1A66'
 const PAPER      = '#FFFFFF'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface Tab {
   href: string

@@ -11,7 +11,7 @@ const PEACH        = '#FFD8C2'
 const SAGE         = '#D4E4D0'
 const LAVENDER     = '#E0D4F0'
 const BG           = 'var(--fp-canvas)'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface TacheCard {
   number: 1 | 2 | 3

@@ -35,7 +35,7 @@
 import { useEffect, useRef } from 'react'
 
 const INK       = '#1A1A1A'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface CountdownTimerProps {
   /** Total seconds at start */

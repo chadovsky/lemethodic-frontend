@@ -1,17 +1,19 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Source_Serif_4 } from 'next/font/google'
+import { Fraunces } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-// F-200 — Geist becomes the primary editorial sans (variable applied as
-// font-family base via the html className). Source Serif 4 added for
-// editorial accent typography (callouts, methodology framing). Cabinet
-// Grotesk stays loaded via the cdnfonts <link> below for surfaces F-2xx
-// hasn't migrated yet (per-surface migration as F-201+ ships). The Geist
-// variable was previously loaded but unused (`_geist`); now applied.
-const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
-const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' })
-const sourceSerif = Source_Serif_4({ subsets: ['latin'], variable: '--font-source-serif' })
+// V-005 — font system upgrade. Switzer replaces Geist for sans/UI/body
+// (loaded via Fontshare CDN, defined as `--font-switzer` CSS variable
+// in globals.css :root). Fraunces replaces Source Serif 4 for display +
+// serif accents (variable axes: opsz + SOFT + wght). The previous
+// per-surface DISPLAY_FONT constants pointing at Cabinet Grotesk /
+// Geist were rewritten to `var(--font-switzer)` in this same ticket.
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-fraunces',
+  axes: ['SOFT', 'opsz'],
+})
 
 export const metadata: Metadata = {
   title: 'LeMethodic',
@@ -42,17 +44,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geist.variable} ${geistMono.variable} ${sourceSerif.variable}`}
-    >
+    <html lang="en" className={fraunces.variable}>
       <head>
-        {/* Cabinet Grotesk preserved for legacy DISPLAY_FONT consumers
-            (onboarding, /progress, /paywall, etc). Per-surface migration
-            to Geist tracked via F-2xx queue. */}
-        <link rel="preconnect" href="https://fonts.cdnfonts.com" />
+        {/* V-005 — Switzer via Fontshare CDN. Fraunces is loaded via
+            next/font above (Google Fonts). Cabinet Grotesk + Geist
+            CDN/Google links retired with V-005. */}
+        <link rel="preconnect" href="https://api.fontshare.com" />
         <link
-          href="https://fonts.cdnfonts.com/css/cabinet-grotesk"
+          href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700,800&display=swap"
           rel="stylesheet"
         />
       </head>

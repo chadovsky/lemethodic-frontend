@@ -12,7 +12,7 @@ const INK_SOFT     = '#1A1A1AB3'
 const INK_MUTED    = '#1A1A1A66'
 const RED_SOFT     = '#C84A3F'
 const GREEN_SOFT   = '#3F7A4A'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 const COPY = {
   fr: { context: 'Contexte', wrong: 'Évitez', right: 'Préférez', why: 'Pourquoi' },

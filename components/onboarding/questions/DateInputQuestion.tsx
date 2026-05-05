@@ -12,7 +12,7 @@ import type { OnboardingQuestion } from '@/lib/onboarding-questions'
 import { readDateInputMeta } from '@/lib/onboarding-questions'
 import type { UiLanguage } from '@/lib/types'
 
-const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 const ED_FG = 'var(--ed-fg)'
 const ED_MUTED = 'var(--ed-muted)'
 const ED_RULE = 'var(--ed-rule)'

@@ -49,7 +49,7 @@ const INK_SOFT     = '#1A1A1AB3'
 const INK_MUTED    = '#1A1A1A66'
 const PEACH        = '#FFD8C2'
 const BG           = 'var(--fp-canvas)'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 const TARGET_USER_TURNS = 4
 const TURN_CAP_MS       = 30_000

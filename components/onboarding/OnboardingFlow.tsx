@@ -69,7 +69,7 @@ function LanguageToggle({
   const ED_FG = 'var(--ed-fg)'
   const ED_MUTED = 'var(--ed-muted)'
   const ED_RULE = 'var(--ed-rule)'
-  const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+  const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
   return (
     <div className="flex items-center" style={{ gap: 4 }}>
       {langs.map((l, i) => {
