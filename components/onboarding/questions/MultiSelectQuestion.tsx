@@ -1,20 +1,14 @@
 'use client'
 
-// P-220 — multi-select question (q8 only at present). Tap to toggle each
-// option. Continue is enabled at all times because the q8 question is
-// optional and an empty selection is valid.
+// F-201 — multi-select (q8 only). Inherits OnboardingScreen kernel.
+// Illustration prop dropped.
 
 import { useState } from 'react'
-import {
-  OnboardingScreen,
-  OnboardingCard,
-  CheckIcon,
-  INK,
-  DISPLAY_FONT,
-} from '../OnboardingScreen'
+import { OnboardingScreen, OnboardingCard, CheckIcon } from '../OnboardingScreen'
 import type { OnboardingQuestion } from '@/lib/onboarding-questions'
 import type { UiLanguage } from '@/lib/types'
-import { getQuestionMeta } from '../questionMeta'
+
+const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface MultiSelectQuestionProps {
   question: OnboardingQuestion
@@ -42,7 +36,6 @@ export default function MultiSelectQuestion({
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set(initialValue ?? []),
   )
-  const meta = getQuestionMeta(question.id)
   const options = question.options ?? []
 
   function toggle(value: string) {
@@ -56,16 +49,11 @@ export default function MultiSelectQuestion({
 
   return (
     <OnboardingScreen
-      bg={meta.bg}
       progressTotal={progressTotal}
       progressFilledUpTo={progressFilledUpTo}
       progressCurrent={progressCurrent}
-      illustration={meta.illustration}
-      illustrationAlt={meta.illustrationAlt}
       headline={question.heading[language]}
       descriptor={question.helper[language]}
-      // Optional questions are always continuable (empty selection is valid).
-      // Required multi-selects (none today) would gate on selected.size > 0.
       ctaEnabled={question.required ? selected.size > 0 : true}
       onContinue={() => onContinue(Array.from(selected))}
       onBack={onBack}
@@ -78,15 +66,14 @@ export default function MultiSelectQuestion({
             key={option.value}
             isSelected={isSelected}
             onClick={() => toggle(option.value)}
-            minHeight={64}
+            minHeight={56}
           >
             <span
               style={{
-                fontFamily: DISPLAY_FONT,
-                fontWeight: 600,
+                fontFamily: SANS,
+                fontWeight: 500,
                 fontSize: 15,
-                color: INK,
-                lineHeight: '22px',
+                lineHeight: 1.5,
                 flex: 1,
                 paddingRight: 12,
               }}

@@ -1,39 +1,27 @@
 'use client'
 
-// P-220 — date_input question (q3 only). Two-mode: pick a date OR toggle the
-// "no exam scheduled" card. Mutually exclusive.
-//
-// Emits:
-//   "YYYY-MM-DD" string  — when a date is picked
-//   null                 — when the no-exam toggle is active
-//
-// HTML5 min/max enforce min_offset_days .. max_offset_days from today.
+// F-201 — date input (q3 only). Refactored to use the OnboardingScreen
+// kernel; inputs go in the cards slot. Illustration dropped, ed-* tokens
+// throughout, 4px border radii, 1px ed-rule borders. The no-exam toggle
+// remains an OnboardingCard so it visually mirrors single/multi-select
+// option cards.
 
 import { useMemo, useState } from 'react'
-import {
-  OnboardingCard,
-  CheckIcon,
-  CTAButton,
-  BackButton,
-  ProgressDots,
-  INK,
-  INK_SOFT,
-  INK_MUTED,
-  PAPER,
-  DISPLAY_FONT,
-} from '../OnboardingScreen'
-import Image from 'next/image'
+import { OnboardingScreen, OnboardingCard, CheckIcon } from '../OnboardingScreen'
 import type { OnboardingQuestion } from '@/lib/onboarding-questions'
 import { readDateInputMeta } from '@/lib/onboarding-questions'
 import type { UiLanguage } from '@/lib/types'
-import { getQuestionMeta } from '../questionMeta'
+
+const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+const ED_FG = 'var(--ed-fg)'
+const ED_MUTED = 'var(--ed-muted)'
+const ED_RULE = 'var(--ed-rule)'
+const ED_PAPER = 'var(--ed-paper)'
 
 interface DateInputQuestionProps {
   question: OnboardingQuestion
   language: UiLanguage
   initialValue: string | null
-  // Whether the previous answer was the no-exam toggle (true) vs. unanswered
-  // (undefined). Distinguishes "user already chose no exam" from cold state.
   initialNoExam: boolean
   progressTotal: number
   progressCurrent: number
@@ -64,7 +52,6 @@ export default function DateInputQuestion({
   onBack,
   headerRight,
 }: DateInputQuestionProps) {
-  const meta = getQuestionMeta(question.id)
   const dateMeta = readDateInputMeta(question)
   const minDate = useMemo(() => offsetDateISO(dateMeta.minOffsetDays), [dateMeta.minOffsetDays])
   const maxDate = useMemo(() => offsetDateISO(dateMeta.maxOffsetDays), [dateMeta.maxOffsetDays])
@@ -92,165 +79,101 @@ export default function DateInputQuestion({
   }
 
   return (
-    <div
-      className="min-h-screen w-full flex flex-col items-center"
-      style={{ backgroundColor: meta.bg }}
+    <OnboardingScreen
+      progressTotal={progressTotal}
+      progressFilledUpTo={progressFilledUpTo}
+      progressCurrent={progressCurrent}
+      headline={question.heading[language]}
+      descriptor={question.helper[language]}
+      ctaEnabled={isEnabled}
+      onContinue={handleContinue}
+      onBack={onBack}
+      headerRight={headerRight}
+      ctaLabel={language === 'fr' ? 'Continuer' : 'Continue'}
     >
-      <div className="w-full max-w-[440px] flex flex-col flex-1 min-h-screen px-5">
-        {/* Top row */}
-        <div className="relative flex items-center pt-4" style={{ minHeight: 32 }}>
-          {onBack && (
-            <div className="absolute left-0">
-              <BackButton onClick={onBack} />
-            </div>
-          )}
-          <div className="flex-1">
-            <ProgressDots total={progressTotal} filledUpTo={progressFilledUpTo} current={progressCurrent} />
-          </div>
-          {headerRight && (
-            <div className="absolute right-0">{headerRight}</div>
-          )}
-        </div>
-
-        <div className="flex justify-center mt-10">
-          <Image
-            src={meta.illustration}
-            alt={meta.illustrationAlt}
-            width={240}
-            height={240}
-            className="object-contain"
-            style={{ filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.15))' }}
-            priority
-          />
-        </div>
-
-        <h1
-          className="text-center mt-8 leading-tight text-balance"
+      {/* Date picker */}
+      <div className="flex flex-col gap-2" style={{ marginBottom: 4 }}>
+        <label
+          htmlFor="exam-date"
           style={{
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 800,
-            fontSize: 32,
-            lineHeight: '40px',
-            color: INK,
+            fontFamily: SANS,
+            fontWeight: 600,
+            fontSize: 12,
+            color: ED_MUTED,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
           }}
         >
-          {question.heading[language]}
-        </h1>
-
-        <p
-          className="text-center mt-3 mx-auto text-pretty"
-          style={{
-            fontWeight: 500,
-            fontSize: 15,
-            lineHeight: '24px',
-            color: INK_SOFT,
-            maxWidth: 320,
-          }}
-        >
-          {question.helper[language]}
-        </p>
-
-        {/* Date picker */}
-        <div className="flex flex-col gap-2 mt-10">
-          <label
-            htmlFor="exam-date"
-            style={{
-              fontFamily: DISPLAY_FONT,
-              fontWeight: 600,
-              fontSize: 13,
-              color: INK_MUTED,
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-            }}
-          >
-            {language === 'fr' ? 'Choisissez une date :' : 'Pick a date:'}
-          </label>
-          <div style={{ position: 'relative', width: '100%' }}>
-            {!dateValue && !dateInputFocused && (
-              <span
-                aria-hidden="true"
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: 20,
-                  transform: 'translateY(-50%)',
-                  fontFamily: DISPLAY_FONT,
-                  fontWeight: 600,
-                  fontSize: 15,
-                  color: INK_MUTED,
-                  pointerEvents: 'none',
-                  zIndex: 1,
-                }}
-              >
-                {language === 'fr' ? 'Sélectionnez une date' : 'Select a date'}
-              </span>
-            )}
-            <input
-              id="exam-date"
-              type="date"
-              value={dateValue}
-              min={minDate}
-              max={maxDate}
-              onChange={(e) => handleDateChange(e.target.value)}
-              onFocus={() => setDateInputFocused(true)}
-              onBlur={() => setDateInputFocused(false)}
-              style={{
-                height: 52,
-                borderRadius: 16,
-                border: dateValue
-                  ? `2px solid ${INK}`
-                  : dateInputFocused
-                  ? `2px solid ${INK_MUTED}`
-                  : `1.5px solid ${INK_MUTED}`,
-                backgroundColor: PAPER,
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                padding: '0 20px',
-                fontFamily: DISPLAY_FONT,
-                fontWeight: 600,
-                fontSize: 15,
-                color: dateValue ? INK : 'transparent',
-                outline: 'none',
-                width: '100%',
-                cursor: 'pointer',
-                position: 'relative',
-              }}
-            />
-          </div>
-        </div>
-
-        {/* No-exam toggle */}
-        <div className="flex flex-col gap-[14px] mt-4">
-          <OnboardingCard
-            isSelected={noExam}
-            onClick={handleNoExamToggle}
-            minHeight={64}
-          >
+          {language === 'fr' ? 'Choisissez une date' : 'Pick a date'}
+        </label>
+        <div style={{ position: 'relative', width: '100%' }}>
+          {!dateValue && !dateInputFocused && (
             <span
+              aria-hidden="true"
               style={{
-                fontFamily: DISPLAY_FONT,
-                fontWeight: 600,
+                position: 'absolute',
+                top: '50%',
+                left: 22,
+                transform: 'translateY(-50%)',
+                fontFamily: SANS,
+                fontWeight: 400,
                 fontSize: 15,
-                color: INK,
-                lineHeight: '22px',
-                flex: 1,
-                paddingRight: 12,
+                color: ED_MUTED,
+                pointerEvents: 'none',
+                zIndex: 1,
               }}
             >
-              {dateMeta.noExamToggleLabel[language]}
+              {language === 'fr' ? 'Sélectionnez une date' : 'Select a date'}
             </span>
-            <CheckIcon visible={noExam} />
-          </OnboardingCard>
+          )}
+          <input
+            id="exam-date"
+            type="date"
+            value={dateValue}
+            min={minDate}
+            max={maxDate}
+            onChange={(e) => handleDateChange(e.target.value)}
+            onFocus={() => setDateInputFocused(true)}
+            onBlur={() => setDateInputFocused(false)}
+            style={{
+              height: 56,
+              borderRadius: 4,
+              border: `1px solid ${dateValue || dateInputFocused ? ED_FG : ED_RULE}`,
+              backgroundColor: ED_PAPER,
+              padding: '0 22px',
+              fontFamily: SANS,
+              fontWeight: 500,
+              fontSize: 15,
+              color: dateValue ? ED_FG : 'transparent',
+              outline: 'none',
+              width: '100%',
+              cursor: 'pointer',
+              transition: 'border-color var(--ed-duration-hover) var(--ed-ease)',
+            }}
+          />
         </div>
-
-        <div className="flex-1" />
-
-        <CTAButton
-          label={language === 'fr' ? 'Continuer' : 'Continue'}
-          enabled={isEnabled}
-          onClick={handleContinue}
-        />
       </div>
-    </div>
+
+      {/* No-exam toggle as a card */}
+      <OnboardingCard
+        isSelected={noExam}
+        onClick={handleNoExamToggle}
+        minHeight={56}
+      >
+        <span
+          style={{
+            fontFamily: SANS,
+            fontWeight: 500,
+            fontSize: 15,
+            lineHeight: 1.5,
+            flex: 1,
+            paddingRight: 12,
+          }}
+        >
+          {dateMeta.noExamToggleLabel[language]}
+        </span>
+        <CheckIcon visible={noExam} />
+      </OnboardingCard>
+    </OnboardingScreen>
   )
 }

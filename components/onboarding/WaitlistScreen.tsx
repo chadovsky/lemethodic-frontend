@@ -26,8 +26,9 @@ import {
 
 type Lang = 'en' | 'fr'
 
-const BG = '#F5D6D6' // --fp-blush — same family as EcoleReveal but for the
-// "your path isn't ready" pause moment rather than the celebration moment.
+// F-201 — bg migrated from blush pastel to editorial system. The "pause
+// moment" framing now reads via typography restraint rather than color.
+const BG = 'var(--ed-bg)'
 
 // ── Slug → display ───────────────────────────────────────────────────────────
 
@@ -154,43 +155,43 @@ export default function WaitlistScreen() {
         {/* Top spacer where progress dots would live on questionnaire screens */}
         <div style={{ minHeight: 32 }} className="pt-4" />
 
-        {/* Heading */}
+        {/* F-201 — heading + body migrated to editorial system */}
         <h1
           className="text-balance mt-12"
           style={{
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 800,
-            fontSize: 32,
-            lineHeight: '40px',
-            letterSpacing: '-0.01em',
-            color: INK,
+            fontFamily: 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif',
+            fontWeight: 600,
+            fontSize: 'clamp(28px, 4vw, 40px)',
+            lineHeight: 1.15,
+            letterSpacing: '-0.015em',
+            color: 'var(--ed-fg)',
           }}
         >
           {copy.heading}
         </h1>
 
-        {/* Body block (paper card for readability against pastel) */}
+        {/* Body block — ed-paper card with 1px ed-rule, no shadow. Editorial flat. */}
         <div
           className="mt-8"
           style={{
-            backgroundColor: PAPER,
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            borderRadius: 20,
-            padding: '20px 22px',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            backgroundColor: 'var(--ed-paper)',
+            border: '1px solid var(--ed-rule)',
+            borderRadius: 4,
+            padding: 'clamp(24px, 3vw, 36px)',
             display: 'flex',
             flexDirection: 'column',
-            gap: 14,
+            gap: 16,
           }}
         >
           <p
             className="text-pretty"
             style={{
-              fontWeight: 500,
-              fontSize: 15,
+              fontFamily: 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif',
+              fontWeight: 400,
+              fontSize: 16,
               lineHeight: 1.6,
-              color: INK,
+              color: 'var(--ed-fg)',
+              margin: 0,
             }}
           >
             {copy.body1(currentLevel, neededPath)}
@@ -200,10 +201,12 @@ export default function WaitlistScreen() {
             <p
               className="text-pretty"
               style={{
-                fontWeight: 500,
+                fontFamily: 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif',
+                fontWeight: 400,
                 fontSize: 15,
                 lineHeight: 1.6,
-                color: INK_SOFT,
+                color: 'var(--ed-muted)',
+                margin: 0,
               }}
             >
               {copy.body2Fallback(fallback)}
@@ -213,10 +216,12 @@ export default function WaitlistScreen() {
           <p
             className="text-pretty"
             style={{
-              fontWeight: 500,
+              fontFamily: 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif',
+              fontWeight: 400,
               fontSize: 15,
               lineHeight: 1.6,
-              color: INK_SOFT,
+              color: 'var(--ed-muted)',
+              margin: 0,
             }}
           >
             {copy.body3}

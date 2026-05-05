@@ -1,29 +1,23 @@
 'use client'
 
-// P-220 — single-select question. Renders one card per option; tapping a
-// card selects it; Continue commits the selection. The q9 'other' case is
-// handled by the parent flow (it inserts a follow-up freetext screen when
-// the chosen value === 'other'); this component just emits the value.
+// F-201 — single-select. Inherits OnboardingScreen kernel (now editorial
+// system + 720px desktop column). Illustration prop dropped per F-201
+// scope decision.
 
 import { useState } from 'react'
-import {
-  OnboardingScreen,
-  OnboardingCard,
-  CheckIcon,
-  INK,
-  DISPLAY_FONT,
-} from '../OnboardingScreen'
+import { OnboardingScreen, OnboardingCard, CheckIcon } from '../OnboardingScreen'
 import type { OnboardingQuestion } from '@/lib/onboarding-questions'
 import type { UiLanguage } from '@/lib/types'
-import { getQuestionMeta } from '../questionMeta'
+
+const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface SingleSelectQuestionProps {
   question: OnboardingQuestion
   language: UiLanguage
   initialValue: string | null
   progressTotal: number
-  progressCurrent: number     // 1-indexed
-  progressFilledUpTo: number  // 1-indexed
+  progressCurrent: number
+  progressFilledUpTo: number
   onContinue: (value: string) => void
   onBack?: () => void
   headerRight?: React.ReactNode
@@ -41,17 +35,13 @@ export default function SingleSelectQuestion({
   headerRight,
 }: SingleSelectQuestionProps) {
   const [selected, setSelected] = useState<string | null>(initialValue)
-  const meta = getQuestionMeta(question.id)
   const options = question.options ?? []
 
   return (
     <OnboardingScreen
-      bg={meta.bg}
       progressTotal={progressTotal}
       progressFilledUpTo={progressFilledUpTo}
       progressCurrent={progressCurrent}
-      illustration={meta.illustration}
-      illustrationAlt={meta.illustrationAlt}
       headline={question.heading[language]}
       descriptor={question.helper[language]}
       ctaEnabled={selected !== null}
@@ -66,15 +56,14 @@ export default function SingleSelectQuestion({
             key={option.value}
             isSelected={isSelected}
             onClick={() => setSelected(option.value)}
-            minHeight={80}
+            minHeight={64}
           >
             <span
               style={{
-                fontFamily: DISPLAY_FONT,
-                fontWeight: 600,
+                fontFamily: SANS,
+                fontWeight: 500,
                 fontSize: 15,
-                color: INK,
-                lineHeight: '22px',
+                lineHeight: 1.5,
                 flex: 1,
                 paddingRight: 12,
               }}

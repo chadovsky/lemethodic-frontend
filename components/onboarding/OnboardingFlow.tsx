@@ -29,7 +29,9 @@ import OtherFreetextScreen from './questions/OtherFreetextScreen'
 import EcoleReveal from './EcoleReveal'
 import { DISPLAY_FONT, INK, INK_MUTED } from './OnboardingScreen'
 
-const LOADER_BG = '#FFD8C2'
+// F-201 — loader bg migrated to editorial system. The previous peach
+// (#FFD8C2) was the M-101a default; ed-bg unifies with the new system.
+const LOADER_BG = 'var(--ed-bg)'
 
 // Synthetic step IDs that aren't BE questions but are rendered as standalone
 // screens between real questions. Today only the q9 freetext follow-up.
@@ -48,6 +50,9 @@ function detectBrowserLanguage(): UiLanguage {
   return lang.startsWith('fr') ? 'fr' : 'en'
 }
 
+// F-201 — toggle restyled to match landing's editorial chrome.
+// Active lang in ed-fg, inactive in ed-muted with hover to ed-fg.
+// No pill backdrop (editorial restraint).
 function LanguageToggle({
   language,
   onChange,
@@ -56,45 +61,45 @@ function LanguageToggle({
   onChange: (lang: UiLanguage) => void
 }) {
   const langs: UiLanguage[] = ['en', 'fr']
+  const ED_FG = 'var(--ed-fg)'
+  const ED_MUTED = 'var(--ed-muted)'
+  const ED_RULE = 'var(--ed-rule)'
+  const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
   return (
-    <div
-      className="flex items-center gap-1"
-      style={{
-        height: 32,
-        padding: 2,
-        borderRadius: 999,
-        backgroundColor: 'rgba(255,255,255,0.6)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-      }}
-    >
-      {langs.map((l) => {
+    <div className="flex items-center" style={{ gap: 4 }}>
+      {langs.map((l, i) => {
         const active = l === language
         return (
-          <button
-            key={l}
-            onClick={() => onChange(l)}
-            aria-pressed={active}
-            className="transition-all duration-150"
-            style={{
-              height: 28,
-              minWidth: 36,
-              padding: '0 10px',
-              borderRadius: 999,
-              border: 'none',
-              cursor: 'pointer',
-              outline: 'none',
-              backgroundColor: active ? INK : 'transparent',
-              color: active ? '#FFFFFF' : INK_MUTED,
-              fontFamily: DISPLAY_FONT,
-              fontWeight: 700,
-              fontSize: 12,
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-            }}
-          >
-            {l}
-          </button>
+          <span key={l} className="flex items-center" style={{ gap: 4 }}>
+            <button
+              onClick={() => onChange(l)}
+              aria-pressed={active}
+              style={{
+                padding: '6px 8px',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                outline: 'none',
+                color: active ? ED_FG : ED_MUTED,
+                fontFamily: SANS,
+                fontWeight: active ? 600 : 500,
+                fontSize: 13,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                transition: 'color var(--ed-duration-hover) var(--ed-ease)',
+              }}
+            >
+              {l}
+            </button>
+            {i === 0 && (
+              <span
+                aria-hidden="true"
+                style={{ color: ED_RULE, fontSize: 12, fontWeight: 400 }}
+              >
+                /
+              </span>
+            )}
+          </span>
         )
       })}
     </div>

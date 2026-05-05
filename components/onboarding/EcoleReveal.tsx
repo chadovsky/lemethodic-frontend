@@ -1,29 +1,36 @@
 'use client'
 
-// P-220 — closing reveal screen for the onboarding questionnaire. Pulls the
-// answers out of the store, formats them for display, and computes a
-// persona preview client-side.
+// F-201 — closing reveal screen migrated to the editorial system.
+// Celebration weight comes from typography: the persona label is
+// oversized (clamp 40-56px) in Source Serif 4 italic, --ed-accent navy.
+// The plan summary card is --ed-paper on --ed-bg with 1px --ed-rule
+// border. No confetti, no checkmarks, no green badges — the persona
+// label + plan specifics carry the moment per F-201 design call.
 //
 // Persona note: POST /onboarding/submit is the source of truth for the
 // authoritative persona, but submit requires authentication and EcoleReveal
 // is shown pre-signup as the conversion screen. The persona derivation
-// here is a deterministic preview based on q3 (exam date) + q7 (hours per
-// week) — the same inputs the BE uses. If BE logic changes, /ecole's
-// post-signup surface holds the authoritative value.
+// here is a deterministic preview based on q3 (exam date) — same inputs
+// the BE uses. If BE logic changes, /ecole's post-signup surface holds
+// the authoritative value.
 
 import Image from 'next/image'
-import {
-  ProgressDots,
-  CTAButton,
-  INK,
-  INK_SOFT,
-  INK_MUTED,
-  PAPER,
-  DISPLAY_FONT,
-} from './OnboardingScreen'
 import type { OnboardingData, UiLanguage } from '@/lib/types'
 import type { Persona } from '@/lib/onboarding-questions'
-import { ECOLE_REVEAL_BG, ECOLE_REVEAL_ILLUSTRATION } from './questionMeta'
+import {
+  ECOLE_REVEAL_ILLUSTRATION,
+  ECOLE_REVEAL_ILLUSTRATION_ALT_EN,
+  ECOLE_REVEAL_ILLUSTRATION_ALT_FR,
+} from './questionMeta'
+
+const ED_BG = 'var(--ed-bg)'
+const ED_FG = 'var(--ed-fg)'
+const ED_MUTED = 'var(--ed-muted)'
+const ED_RULE = 'var(--ed-rule)'
+const ED_PAPER = 'var(--ed-paper)'
+const ED_ACCENT = 'var(--ed-accent)'
+const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+const SERIF = 'var(--font-source-serif), Georgia, "Times New Roman", serif'
 
 interface EcoleRevealProps {
   data: OnboardingData
@@ -64,7 +71,8 @@ const SECTION_LABELS = {
     practice: 'Practice',
     pace: 'Pace',
     noExam: 'No exam scheduled',
-    cta: 'Start my École',
+    cta: "Start your École",
+    eyebrow: 'Your assessment',
   },
   fr: {
     plan: 'Votre plan',
@@ -74,33 +82,14 @@ const SECTION_LABELS = {
     practice: 'Pratique',
     pace: 'Cadence',
     noExam: 'Aucun examen prévu',
-    cta: 'Commencer mon École',
+    cta: 'Commencer votre École',
+    eyebrow: 'Votre évaluation',
   },
 } as const
 
 const HEADLINE = {
-  en: "Meet L'École.",
-  fr: "Voici L'École.",
-}
-// F-223 — interim copy patch: replaces stale "shortcut/raccourci" framing
-// while F-202 (full L'École intro rebuild with methodology demo) is authored.
-// FR keeps vous-form to match the rest of the FR onboarding context;
-// tu/vous audit + full-app sweep tracked as F-226.
-const SUBHEAD = {
-  en: "This is L'École. Targeted lessons on the grammar traps English speakers hit again and again. Finish it, and B2 unlocks.",
-  fr: "Voici L'École. Des leçons ciblées sur les pièges grammaticaux que les anglophones ratent à répétition. Finissez-la, et B2 est débloqué.",
-}
-const VALUE_LINES = {
-  en: [
-    'Focused lessons — not an infinite syllabus',
-    'Ordered by what English speakers get wrong — not generic French grammar',
-    'Anchored to your TCF — every lesson explains why it matters for the exam',
-  ],
-  fr: [
-    'Des leçons ciblées — pas un programme sans fin',
-    'Organisé selon les erreurs typiques des anglophones — pas de la grammaire générique',
-    'Ancré sur votre TCF — chaque leçon explique pourquoi elle compte pour l\'examen',
-  ],
+  en: "Here's your plan.",
+  fr: 'Voici votre plan.',
 }
 
 function readString(v: unknown): string | null {
@@ -131,26 +120,17 @@ function hoursDisplay(value: string | null, language: UiLanguage): string {
   return entry ? entry[language] : value
 }
 
-// ── Persona preview ─────────────────────────────────────────────────────────
-
-// Mirrors BE persona derivation exactly. BE uses ONLY q3_exam_date:
-//   ≤ 6 weeks                  → cram
-//   6 weeks .. 6 months (~26w) → acceleration
-//   > 6 months OR no exam      → foundation
-// q7 hours_per_week is NOT a persona input — BE uses it for capacity_warning
-// only. If this client-side preview ever diverges from the BE-returned
-// persona, the user would see one label here and another inside /ecole; we
-// keep the function tight so that doesn't happen.
+// Mirrors BE persona derivation. ≤6w cram, ≤26w acceleration, else
+// (or no exam) foundation. q7 hours_per_week is NOT a persona input
+// (BE uses it for capacity_warning only).
 function derivePersonaPreview(data: OnboardingData): Persona {
   const examDate = readString(data.q3_exam_date)
   if (!examDate) return 'foundation'
-
   const exam = new Date(examDate)
   if (isNaN(exam.getTime())) return 'foundation'
   const now = new Date()
   const msPerWeek = 1000 * 60 * 60 * 24 * 7
   const weeks = Math.max(0, Math.ceil((exam.getTime() - now.getTime()) / msPerWeek))
-
   if (weeks <= 6) return 'cram'
   if (weeks <= 26) return 'acceleration'
   return 'foundation'
@@ -161,149 +141,222 @@ function derivePersonaPreview(data: OnboardingData): Persona {
 export default function EcoleReveal({ data, language, onContinue }: EcoleRevealProps) {
   const labels = SECTION_LABELS[language]
   const persona = derivePersonaPreview(data)
+  const personaLabel = PERSONA_LABELS[persona][language]
 
   const planRows: Array<{ label: string; value: string }> = [
     { label: labels.target, value: levelDisplay(readString(data.q2_target_level), language) },
     { label: labels.exam, value: formatExamDate(data, language) },
     { label: labels.startingPoint, value: levelDisplay(readString(data.q1_current_level), language) },
     { label: labels.practice, value: hoursDisplay(readString(data.q7_hours_per_week), language) },
-    { label: labels.pace, value: PERSONA_LABELS[persona][language] },
   ]
 
   return (
     <div
       className="min-h-screen w-full flex flex-col items-center"
-      style={{ backgroundColor: ECOLE_REVEAL_BG }}
+      style={{ backgroundColor: ED_BG }}
     >
-      <div className="w-full max-w-[440px] flex flex-col flex-1 min-h-screen px-5">
-        <div className="pt-4">
-          <ProgressDots total={1} filledUpTo={1} current={1} />
-        </div>
+      <div
+        className="w-full flex flex-col flex-1 min-h-screen"
+        style={{
+          maxWidth: 720,
+          padding: '0 clamp(24px, 4vw, 48px)',
+        }}
+      >
+        {/* Top spacer for breathing room */}
+        <div style={{ height: 'clamp(48px, 8vw, 96px)' }} />
 
-        <div className="flex justify-center mt-10">
+        {/* Single hero illustration — placeholder until P-228 ships */}
+        <div
+          className="flex justify-center"
+          style={{ marginBottom: 'clamp(32px, 5vw, 56px)' }}
+        >
           <Image
             src={ECOLE_REVEAL_ILLUSTRATION}
-            alt={language === 'fr' ? "Illustration L'École" : "L'École illustration"}
-            width={240}
-            height={240}
+            alt={
+              language === 'fr'
+                ? ECOLE_REVEAL_ILLUSTRATION_ALT_FR
+                : ECOLE_REVEAL_ILLUSTRATION_ALT_EN
+            }
+            width={280}
+            height={280}
             className="object-contain"
-            style={{ filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.15))' }}
             priority
           />
         </div>
 
-        <h1
-          className="text-center mt-8 leading-tight text-balance"
+        {/* Eyebrow + persona label as the celebration moment */}
+        <div style={{ textAlign: 'center', marginBottom: 'clamp(24px, 3vw, 40px)' }}>
+          <p
+            style={{
+              fontFamily: SANS,
+              fontWeight: 600,
+              fontSize: 12,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: ED_MUTED,
+              margin: 0,
+              marginBottom: 12,
+            }}
+          >
+            {labels.eyebrow}
+          </p>
+          {/* Persona label — oversized Source Serif italic in navy.
+              This IS the celebration. */}
+          <h1
+            style={{
+              fontFamily: SERIF,
+              fontWeight: 400,
+              fontStyle: 'italic',
+              fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
+              lineHeight: 1.1,
+              letterSpacing: '-0.015em',
+              color: ED_ACCENT,
+              margin: 0,
+            }}
+          >
+            {personaLabel}
+          </h1>
+        </div>
+
+        {/* Headline — reinforces the moment */}
+        <h2
+          className="text-balance"
           style={{
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 800,
-            fontSize: 36,
-            lineHeight: '44px',
-            color: INK,
+            fontFamily: SANS,
+            fontWeight: 600,
+            fontSize: 'clamp(28px, 3.5vw, 40px)',
+            lineHeight: 1.15,
+            letterSpacing: '-0.015em',
+            color: ED_FG,
+            margin: 0,
+            marginBottom: 'clamp(24px, 3vw, 40px)',
+            textAlign: 'center',
           }}
         >
           {HEADLINE[language]}
-        </h1>
+        </h2>
 
-        <p
-          className="text-center mt-3 mx-auto text-pretty"
+        {/* Plan summary card — paper on bg with 1px ed-rule, generous
+            interior padding. The card's content IS the celebration. */}
+        <article
           style={{
-            fontWeight: 600,
-            fontSize: 18,
-            lineHeight: '28px',
-            color: INK_SOFT,
-            maxWidth: 360,
-          }}
-        >
-          {SUBHEAD[language]}
-        </p>
-
-        <div className="flex flex-col gap-3 mt-8 mx-auto" style={{ maxWidth: 320, width: '100%' }}>
-          {VALUE_LINES[language].map((line, i) => (
-            <div key={i} className="flex items-start gap-3">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
-                fill="none"
-                aria-hidden="true"
-                style={{ marginTop: 3, flexShrink: 0 }}
-              >
-                <circle cx="9" cy="9" r="9" fill={INK} />
-                <path
-                  d="M5 9.2L7.8 12L13 6.5"
-                  stroke="white"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span style={{ fontWeight: 500, fontSize: 14, lineHeight: '22px', color: INK }}>
-                {line}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <div
-          className="mt-8 mx-auto"
-          style={{
-            maxWidth: 360,
-            width: '100%',
-            backgroundColor: PAPER,
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            borderRadius: 20,
-            padding: '20px 24px',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            backgroundColor: ED_PAPER,
+            border: `1px solid ${ED_RULE}`,
+            borderRadius: 4,
+            padding: 'clamp(32px, 4vw, 56px)',
+            marginBottom: 'clamp(32px, 4vw, 48px)',
           }}
         >
           <p
             style={{
-              fontFamily: DISPLAY_FONT,
-              fontWeight: 700,
-              fontSize: 14,
-              color: INK_MUTED,
-              letterSpacing: '0.05em',
+              fontFamily: SANS,
+              fontWeight: 600,
+              fontSize: 12,
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
-              marginBottom: 12,
+              color: ED_MUTED,
+              margin: 0,
+              marginBottom: 24,
             }}
           >
             {labels.plan}
           </p>
-          <div className="flex flex-col gap-2">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {planRows.map(({ label, value }) => (
-              <div key={label} className="flex items-baseline gap-1">
+              <div
+                key={label}
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  justifyContent: 'space-between',
+                  gap: 16,
+                  paddingBottom: 16,
+                  borderBottom: `1px solid ${ED_RULE}`,
+                }}
+              >
                 <span
                   style={{
-                    fontWeight: 600,
-                    fontSize: 13,
-                    color: INK_SOFT,
-                    lineHeight: '20px',
-                    minWidth: 110,
+                    fontFamily: SANS,
+                    fontWeight: 400,
+                    fontSize: 14,
+                    color: ED_MUTED,
                   }}
                 >
-                  {label}:
+                  {label}
                 </span>
                 <span
                   style={{
-                    fontFamily: DISPLAY_FONT,
-                    fontWeight: 700,
-                    fontSize: 14,
-                    color: INK,
-                    lineHeight: '20px',
+                    fontFamily: SANS,
+                    fontWeight: 500,
+                    fontSize: 16,
+                    color: ED_FG,
+                    textAlign: 'right',
                   }}
                 >
                   {value}
                 </span>
               </div>
             ))}
+            {/* Pace row — last, no border */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'baseline',
+                justifyContent: 'space-between',
+                gap: 16,
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: SANS,
+                  fontWeight: 400,
+                  fontSize: 14,
+                  color: ED_MUTED,
+                }}
+              >
+                {labels.pace}
+              </span>
+              <span
+                style={{
+                  fontFamily: SERIF,
+                  fontStyle: 'italic',
+                  fontWeight: 400,
+                  fontSize: 18,
+                  color: ED_ACCENT,
+                  textAlign: 'right',
+                }}
+              >
+                {personaLabel}
+              </span>
+            </div>
           </div>
+        </article>
+
+        {/* Spacer */}
+        <div className="flex-1" style={{ minHeight: 'clamp(24px, 4vw, 48px)' }} />
+
+        {/* CTA */}
+        <div style={{ paddingBottom: 'calc(20px + var(--fp-safe-bottom))' }}>
+          <button
+            onClick={onContinue}
+            className="w-full"
+            style={{
+              height: 56,
+              backgroundColor: ED_ACCENT,
+              color: '#FFFFFF',
+              borderRadius: 4,
+              fontFamily: SANS,
+              fontWeight: 600,
+              fontSize: 16,
+              letterSpacing: '0',
+              border: 'none',
+              cursor: 'pointer',
+              outline: 'none',
+            }}
+          >
+            {labels.cta}
+          </button>
         </div>
-
-        <div className="flex-1" />
-
-        <CTAButton label={labels.cta} enabled onClick={onContinue} />
       </div>
     </div>
   )

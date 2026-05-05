@@ -775,13 +775,43 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 
 ### P-220.z — Onboarding per-question illustrations and pastels (Phase 1 polish)
 
-**Priority:** LOW
-**Status:** Queued
+**Priority:** —
+**Status:** Closed 2026-05-05 (scope evaporated by F-201). Per-question pastel cycle dropped (clashed with F-200 editorial direction). Per-question illustrations dropped (type-led question screens). EcoleReveal hero asset re-tracked as P-228.
 **Filed:** 2026-05-02
 **Source:** P-220 plan-first, deferred from rebuild
 **Dependencies:** P-220
 **Scope:** author per-question illustrations + pastel backgrounds for the 11 onboarding questions. The P-220 rebuild cycles the existing 6 illustrations/pastels as a placeholder (see components/onboarding/questionMeta.ts); this ticket replaces them with question-specific assets and updates the meta map.
 **Owner:** Chadi (illustrations) + Engineering (wire-up)
+**Note:** Closed by F-201 — the editorial direction (F-200) replaced the pastel-cycle approach with uniform `--ed-bg` across all 11 questions, type-led screens with no per-question illustrations. P-228 inherits the EcoleReveal-only asset scope.
+
+### P-228 — EcoleReveal hero asset (art-directed illustration)
+
+**Priority:** LOW (post-soft-beta; placeholder works)
+**Status:** Queued
+**Filed:** 2026-05-05
+**Source:** F-201 plan-first; P-220.z scope re-tracked
+**Dependencies:** F-201
+**Scope:** single high-quality art-directed illustration for the EcoleReveal closing screen (the funnel's emotional terminal, where the user sees their persona + plan before /paywall). Current placeholder: `/illustration-ecole.png` recycled from P-220 era. F-201 sized the asset slot at 280×280 above the persona label. Per F-200 imagery rules: real photography muted-tone OR art-directed line drawing / geometric primitives. No 3D emoji, no library cartoon, no mascot energy.
+**Owner:** Chadi (art direction / commission) + Engineering (drop-in swap)
+
+### F-201 — Onboarding flow editorial migration (desktop responsive)
+
+**Priority:** HIGH (launch-blocking — onboarding is the conversion funnel)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/onboarding` (multiple steps) + EcoleReveal step + `/onboarding/waitlist` per F-225)
+**Filed:** 2026-05-04
+**Source:** F-200 cascade — F-201..F-214 inherit the editorial system
+**Dependencies:** F-200
+**Scope:** migrate `/onboarding` flow from M-101a/P-220 era pastel chrome to the F-200 editorial system. Per-question pastel cycle dropped (uniform `--ed-bg`). Per-question illustrations dropped (type-led screens). Desktop column 720px (was 440px → caused white-rails launch-blocker). EcoleReveal full editorial migration: persona label oversized in Source Serif italic + navy `--ed-accent`, plan card on `--ed-paper` with 1px `--ed-rule` border, 280×280 placeholder illustration above. WaitlistScreen migrated. OnboardingScreen kernel restyled (4px button radii, 1px ed-rule borders, 0 shadow, ed-* tokens throughout). 4 question components (Single/Multi/Date/OtherFreetext) refactored to inherit kernel + drop illustration. questionMeta.ts retired to just the EcoleReveal asset constants.
+**Owner:** Engineering
+**Design calls** (per F-201 spec — captured in code comments):
+- Card minHeight reduced 80px → 64-72px (editorial density vs M-101a softness).
+- ProgressDots: filled dots 6×6px (was 8×8px) — finer rhythm.
+- BackButton: chevron weight 1.5px (was 2px) — restraint.
+- Toggle in OnboardingFlow header: text-only `EN / FR` slash separator (no pill backdrop) — matches landing's LanguageToggle.
+- EcoleReveal: persona label sized 40-56px clamp (per spec), Source Serif italic, navy. CTA "Start your École" / "Commencer votre École" (was "Start my École" — slight phrasing tighter).
+- WaitlistScreen body card: ed-paper 1px ed-rule, no shadow (was ed-paper + 0 2px 12px shadow + backdrop blur). Editorial flat over softness.
+
+
 
 ### P-221 — Diagnostic flow integration
 

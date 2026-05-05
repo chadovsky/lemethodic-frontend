@@ -1,15 +1,44 @@
 'use client'
 
+// F-201 — onboarding design-system kernel migrated to the editorial
+// system established in F-200. Retains the ProgressDots / OnboardingCard /
+// CheckIcon / CTAButton / BackButton primitives but restyled with `--ed-*`
+// tokens, Geist sans, 4px button radii, 1px ed-rule borders, 0 shadow on
+// cards. Per-question pastel cycle + per-question illustrations dropped
+// (P-220.z scope evaporated; EcoleReveal hero asset moved to P-228).
+//
+// Layout: 720px max-width column on desktop matches F-200's text-section
+// cadence. Mobile keeps full-width with 24px side padding.
+//
+// The `INK` / `INK_SOFT` / `INK_MUTED` / `PAPER` / `CTA_DISABLED` /
+// `DISPLAY_FONT` constants are preserved as exports for unmigrated
+// surfaces (Paywall, /profile, /diagnostic, etc.) that still import from
+// here. Per-surface migration to lib/typography.ts as F-2xx ships.
+
 import Image from 'next/image'
 import { ReactNode } from 'react'
 
-// Shared colors for pointer interaction reuse
+// ── Legacy exports (preserved for unmigrated surfaces) ─────────────────────
+// Tied to Cabinet Grotesk / FluentPath palette. New onboarding chrome uses
+// the editorial system below; these exist only for backward compatibility
+// while F-2xx tickets migrate other consumers.
 export const INK = '#1A1A1A'
 export const INK_SOFT = '#1A1A1AB3'
 export const INK_MUTED = '#1A1A1A66'
 export const PAPER = '#FFFFFFCC'
 export const CTA_DISABLED = '#1A1A1A4D'
 export const DISPLAY_FONT = "'Cabinet Grotesk', 'Geist', sans-serif"
+
+// ── Editorial chrome tokens (F-201 — local re-exports of lib/typography) ───
+// Inlined refs to CSS variables so primitives below don't need to import
+// from lib/typography on every render. Same values, locally-scoped names.
+const ED_BG = 'var(--ed-bg)'
+const ED_FG = 'var(--ed-fg)'
+const ED_MUTED = 'var(--ed-muted)'
+const ED_RULE = 'var(--ed-rule)'
+const ED_PAPER = 'var(--ed-paper)'
+const ED_ACCENT = 'var(--ed-accent)'
+const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // ── Progress dots ─────────────────────────────────────────────────────────────
 
@@ -32,12 +61,14 @@ export function ProgressDots({ total, filledUpTo, current }: ProgressDotsProps) 
         return (
           <div
             key={i}
-            className="rounded-full transition-all duration-300"
+            className="rounded-full transition-all"
             style={{
-              width: isCurrent ? 20 : 8,
-              height: 8,
-              backgroundColor: isFilled ? INK : 'transparent',
-              border: isFilled ? 'none' : `1.5px solid ${INK_MUTED}`,
+              width: isCurrent ? 20 : 6,
+              height: 6,
+              backgroundColor: isFilled ? ED_FG : 'transparent',
+              border: isFilled ? 'none' : `1px solid ${ED_RULE}`,
+              transitionDuration: '300ms',
+              transitionTimingFunction: 'var(--ed-ease)',
             }}
             aria-hidden="true"
           />
@@ -60,41 +91,26 @@ export function OnboardingCard({
   isSelected,
   onClick,
   children,
-  minHeight = 88,
+  minHeight = 72,
 }: OnboardingCardProps) {
-  function handlePointerDown(e: React.PointerEvent<HTMLButtonElement>) {
-    e.currentTarget.style.transform = 'scale(0.96)'
-  }
-  function handlePointerUp(e: React.PointerEvent<HTMLButtonElement>) {
-    e.currentTarget.style.transform = isSelected ? 'scale(1.01)' : 'scale(1)'
-  }
-  function handlePointerLeave(e: React.PointerEvent<HTMLButtonElement>) {
-    e.currentTarget.style.transform = isSelected ? 'scale(1.01)' : 'scale(1)'
-  }
-
   return (
     <button
+      type="button"
       aria-pressed={isSelected}
       onClick={onClick}
-      className="flex items-start justify-between w-full text-left transition-all duration-150"
+      className="flex items-start justify-between w-full text-left"
       style={{
         minHeight,
-        backgroundColor: PAPER,
-        borderRadius: 24,
-        padding: '20px 24px',
-        border: isSelected ? `2px solid ${INK}` : '2px solid transparent',
-        boxShadow: isSelected
-          ? '0 4px 16px rgba(0,0,0,0.08)'
-          : '0 2px 8px rgba(0,0,0,0.06)',
-        transform: isSelected ? 'scale(1.01)' : 'scale(1)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
+        backgroundColor: isSelected ? ED_FG : ED_PAPER,
+        color: isSelected ? ED_PAPER : ED_FG,
+        borderRadius: 4,
+        padding: '18px 22px',
+        border: `1px solid ${isSelected ? ED_FG : ED_RULE}`,
         outline: 'none',
         cursor: 'pointer',
+        transition: `background-color var(--ed-duration-state) var(--ed-ease), border-color var(--ed-duration-state) var(--ed-ease), color var(--ed-duration-state) var(--ed-ease)`,
+        fontFamily: SANS,
       }}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerLeave}
     >
       {children}
     </button>
@@ -104,20 +120,24 @@ export function OnboardingCard({
 // ── Checkmark icon ─────────────────────────────────────────────────────────────
 
 export function CheckIcon({ visible }: { visible: boolean }) {
+  // F-201: thin chevron when unselected, thin checkmark when selected. No
+  // pill backdrop. Inherits color from parent (ED_FG when card unselected,
+  // ED_PAPER when card is selected/inverted).
   if (!visible) {
     return (
       <svg
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
+        width="14"
+        height="14"
+        viewBox="0 0 14 14"
         fill="none"
         aria-hidden="true"
         className="shrink-0 mt-0.5"
+        style={{ color: ED_MUTED }}
       >
         <path
-          d="M6 3L11 8L6 13"
-          stroke={INK_MUTED}
-          strokeWidth="1.75"
+          d="M5 3L9.5 7L5 11"
+          stroke="currentColor"
+          strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -126,18 +146,17 @@ export function CheckIcon({ visible }: { visible: boolean }) {
   }
   return (
     <svg
-      width="22"
-      height="22"
-      viewBox="0 0 22 22"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
       fill="none"
       aria-hidden="true"
       className="shrink-0 mt-0.5"
     >
-      <circle cx="11" cy="11" r="11" fill={INK} />
       <path
-        d="M6.5 11.2L9.5 14.5L15.5 8"
-        stroke="white"
-        strokeWidth="2"
+        d="M3 8.5L6.5 12L13 4.5"
+        stroke="currentColor"
+        strokeWidth="1.75"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -154,40 +173,28 @@ interface CTAButtonProps {
 }
 
 export function CTAButton({ label, enabled, onClick }: CTAButtonProps) {
-  function handlePointerDown(e: React.PointerEvent<HTMLButtonElement>) {
-    if (enabled) e.currentTarget.style.transform = 'scale(0.96)'
-  }
-  function handlePointerUp(e: React.PointerEvent<HTMLButtonElement>) {
-    e.currentTarget.style.transform = 'scale(1)'
-  }
-  function handlePointerLeave(e: React.PointerEvent<HTMLButtonElement>) {
-    e.currentTarget.style.transform = 'scale(1)'
-  }
-
   return (
     <div style={{ paddingBottom: 'calc(20px + var(--fp-safe-bottom))' }}>
       <button
+        type="button"
         onClick={onClick}
         disabled={!enabled}
         aria-disabled={!enabled}
-        className="w-full transition-all duration-200"
+        className="w-full"
         style={{
           height: 56,
-          backgroundColor: enabled ? INK : CTA_DISABLED,
-          color: '#FFFFFF',
-          borderRadius: 16,
-          fontFamily: DISPLAY_FONT,
-          fontWeight: 700,
+          backgroundColor: enabled ? ED_ACCENT : ED_RULE,
+          color: enabled ? '#FFFFFF' : ED_MUTED,
+          borderRadius: 4,
+          fontFamily: SANS,
+          fontWeight: 600,
           fontSize: 16,
-          lineHeight: '24px',
+          letterSpacing: '0',
           border: 'none',
           cursor: enabled ? 'pointer' : 'not-allowed',
           outline: 'none',
-          letterSpacing: '-0.01em',
+          transition: `background-color var(--ed-duration-hover) var(--ed-ease)`,
         }}
-        onPointerDown={handlePointerDown}
-        onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerLeave}
       >
         {label}
       </button>
@@ -200,9 +207,10 @@ export function CTAButton({ label, enabled, onClick }: CTAButtonProps) {
 export function BackButton({ onClick }: { onClick: () => void }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       aria-label="Go back"
-      className="flex items-center justify-center transition-opacity duration-150 hover:opacity-60"
+      className="flex items-center justify-center"
       style={{
         width: 36,
         height: 36,
@@ -211,13 +219,17 @@ export function BackButton({ onClick }: { onClick: () => void }) {
         cursor: 'pointer',
         padding: 0,
         outline: 'none',
+        color: ED_FG,
+        transition: `opacity var(--ed-duration-hover) var(--ed-ease)`,
       }}
+      onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.6' }}
+      onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}
     >
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
         <path
-          d="M12.5 4L7 10L12.5 16"
-          stroke={INK}
-          strokeWidth="2"
+          d="M11.25 4L5.5 9L11.25 14"
+          stroke="currentColor"
+          strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -229,24 +241,28 @@ export function BackButton({ onClick }: { onClick: () => void }) {
 // ── Screen wrapper ─────────────────────────────────────────────────────────────
 
 interface OnboardingScreenProps {
-  bg: string
-  progressTotal?: number      // P-220: number of dots in the progress strip; default 6 for legacy callers
+  // F-201: bg defaults to --ed-bg. Per-question pastel cycle dropped.
+  bg?: string
+  progressTotal?: number
   progressFilledUpTo: number
   progressCurrent: number
-  illustration: string
-  illustrationAlt: string
+  // F-201: illustrations dropped from question screens. Optional prop
+  // remains so EcoleReveal can pass one if it wants the kernel layout
+  // (it doesn't today — EcoleReveal renders its own layout).
+  illustration?: string
+  illustrationAlt?: string
   headline: string
-  descriptor: string
+  descriptor?: string
   ctaLabel?: string
   ctaEnabled: boolean
   onContinue: () => void
   onBack?: () => void
-  headerRight?: ReactNode    // P-220: slot for the EN/FR language toggle
+  headerRight?: ReactNode
   children: ReactNode
 }
 
 export function OnboardingScreen({
-  bg,
+  bg = ED_BG,
   progressTotal = 6,
   progressFilledUpTo,
   progressCurrent,
@@ -266,7 +282,16 @@ export function OnboardingScreen({
       className="min-h-screen w-full flex flex-col items-center"
       style={{ backgroundColor: bg }}
     >
-      <div className="w-full max-w-[440px] flex flex-col flex-1 min-h-screen px-5">
+      {/* F-201: 720px desktop column matches F-200 text-section cadence;
+          mobile uses full width with 24px side padding. The "white rails on
+          desktop" launch-blocker dissolves once --ed-bg covers full bleed. */}
+      <div
+        className="w-full flex flex-col flex-1 min-h-screen"
+        style={{
+          maxWidth: 720,
+          padding: '0 clamp(24px, 4vw, 48px)',
+        }}
+      >
         {/* Top row: back button + progress dots + optional right slot (lang toggle) */}
         <div className="relative flex items-center pt-4" style={{ minHeight: 32 }}>
           {onBack && (
@@ -284,54 +309,63 @@ export function OnboardingScreen({
           )}
         </div>
 
-        {/* Illustration — floats directly on pastel bg, no container */}
-        <div className="flex justify-center mt-10">
-          <Image
-            src={illustration}
-            alt={illustrationAlt}
-            width={240}
-            height={240}
-            className="object-contain"
-            style={{ filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.15))' }}
-            priority
-          />
-        </div>
+        {/* Optional illustration (kept for backward-compat with EcoleReveal-style
+            callers; question screens no longer pass one). */}
+        {illustration && (
+          <div className="flex justify-center" style={{ marginTop: 'clamp(32px, 5vw, 64px)' }}>
+            <Image
+              src={illustration}
+              alt={illustrationAlt ?? ''}
+              width={240}
+              height={240}
+              className="object-contain"
+              priority
+            />
+          </div>
+        )}
 
-        {/* Headline */}
+        {/* Headline — type-led; sized via clamp() for desktop scale-up */}
         <h1
-          className="text-center mt-8 leading-tight text-balance"
+          className="text-balance"
           style={{
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 800,
-            fontSize: 32,
-            lineHeight: '40px',
-            color: INK,
+            fontFamily: SANS,
+            fontWeight: 600,
+            fontSize: 'clamp(28px, 4vw, 48px)',
+            lineHeight: 1.15,
+            letterSpacing: '-0.015em',
+            color: ED_FG,
+            margin: 0,
+            marginTop: illustration ? 'clamp(32px, 4vw, 48px)' : 'clamp(48px, 8vw, 96px)',
           }}
         >
           {headline}
         </h1>
 
         {/* Descriptor */}
-        <p
-          className="text-center mt-3 mx-auto text-pretty"
-          style={{
-            fontWeight: 500,
-            fontSize: 15,
-            lineHeight: '24px',
-            color: INK_SOFT,
-            maxWidth: 320,
-          }}
-        >
-          {descriptor}
-        </p>
+        {descriptor && (
+          <p
+            className="text-pretty"
+            style={{
+              fontFamily: SANS,
+              fontWeight: 400,
+              fontSize: 'clamp(15px, 1.5vw, 17px)',
+              lineHeight: 1.6,
+              color: ED_MUTED,
+              margin: '16px 0 0 0',
+              maxWidth: 560,
+            }}
+          >
+            {descriptor}
+          </p>
+        )}
 
         {/* Cards slot */}
-        <div className="flex flex-col gap-[14px] mt-10">
+        <div className="flex flex-col" style={{ gap: 10, marginTop: 'clamp(32px, 5vw, 56px)' }}>
           {children}
         </div>
 
         {/* Spacer */}
-        <div className="flex-1" />
+        <div className="flex-1" style={{ minHeight: 'clamp(48px, 8vw, 96px)' }} />
 
         {/* CTA */}
         <CTAButton label={ctaLabel} enabled={ctaEnabled} onClick={onContinue} />
