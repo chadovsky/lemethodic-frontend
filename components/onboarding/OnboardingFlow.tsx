@@ -26,7 +26,12 @@ import SingleSelectQuestion from './questions/SingleSelectQuestion'
 import MultiSelectQuestion from './questions/MultiSelectQuestion'
 import DateInputQuestion from './questions/DateInputQuestion'
 import OtherFreetextScreen from './questions/OtherFreetextScreen'
+import ExamPickerQuestion from './questions/ExamPickerQuestion'
 import EcoleReveal from './EcoleReveal'
+import {
+  TARGET_LEVEL_HELPER_BY_EXAM,
+  type ExamValue,
+} from '../landing/copy'
 import { DISPLAY_FONT, INK, INK_MUTED } from './OnboardingScreen'
 
 // F-201 — loader bg migrated to editorial system. The previous peach
@@ -246,11 +251,40 @@ export default function OnboardingFlow() {
   }
 
   if (q.type === 'single_select') {
+    // F-221 — q0_target_exam dispatches to the dedicated 5-card picker
+    // (with format-DNA chips + inline another-exam waitlist branch).
+    // Until BE adds q0_target_exam to /onboarding/questions response,
+    // this branch is dormant; once BE ships, picker activates.
+    if (q.id === 'q0_target_exam') {
+      return (
+        <ExamPickerQuestion
+          {...commonProps}
+          question={q}
+          initialValue={typeof answer === 'string' ? answer : null}
+          onContinue={(value) => {
+            setAnswer(q.id, value)
+            goForward()
+          }}
+        />
+      )
+    }
+    // F-221 — per-exam helper text on q2_target_level. Reads prior
+    // q0_target_exam answer; falls back to BE's default helper when
+    // exam unknown or maps to null.
+    let helperOverride: string | undefined
+    if (q.id === 'q2_target_level') {
+      const exam = data.q0_target_exam
+      if (typeof exam === 'string') {
+        const helper = TARGET_LEVEL_HELPER_BY_EXAM[exam as ExamValue]
+        if (helper) helperOverride = helper[interfaceLanguage]
+      }
+    }
     return (
       <SingleSelectQuestion
         {...commonProps}
         question={q}
         initialValue={typeof answer === 'string' ? answer : null}
+        helperOverride={helperOverride}
         onContinue={(value) => {
           setAnswer(q.id, value)
           // If this question has an 'other' freetext follow-up but the user

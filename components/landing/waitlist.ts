@@ -5,12 +5,17 @@
 
 const KEY = 'lemethodic_waitlist'
 
-export type WaitlistIntent = 'sprint' | 'premium'
+// F-221 — `exam_other` added for the "Another exam" branch on the
+// onboarding exam picker. Captures which exam the user wants in
+// `examName` (free text, e.g., "DALF C1") so M-101c migration can
+// surface intent to the BE later.
+export type WaitlistIntent = 'sprint' | 'premium' | 'exam_other'
 
 export interface WaitlistEntry {
   email: string
   intent: WaitlistIntent
   examDate: string | null    // YYYY-MM-DD or null
+  examName: string | null    // F-221: which exam the user wants (exam_other only)
   submittedAt: string        // ISO timestamp
 }
 
@@ -30,8 +35,11 @@ function readAll(): WaitlistEntry[] {
         e &&
         typeof e === 'object' &&
         typeof e.email === 'string' &&
-        (e.intent === 'sprint' || e.intent === 'premium') &&
+        (e.intent === 'sprint' || e.intent === 'premium' || e.intent === 'exam_other') &&
         (e.examDate === null || typeof e.examDate === 'string') &&
+        (e.examName === null ||
+          e.examName === undefined ||
+          typeof e.examName === 'string') &&
         typeof e.submittedAt === 'string'
       )
     })
@@ -70,6 +78,8 @@ export function submitWaitlist(input: {
   email: string
   intent: WaitlistIntent
   examDate?: string | null
+  // F-221: which exam the user wants (only applies when intent='exam_other').
+  examName?: string | null
 }): SubmitResult {
   const email = input.email.trim().toLowerCase()
   if (!isValidEmail(email)) return { ok: false, reason: 'invalid_email' }
@@ -82,6 +92,7 @@ export function submitWaitlist(input: {
     email,
     intent: input.intent,
     examDate: input.examDate ?? null,
+    examName: input.examName?.trim() || null,
     submittedAt: new Date().toISOString(),
   }
   const next = [...entries, entry]

@@ -29,10 +29,13 @@ export const TOGGLE_LABELS: Record<Lang, string> = {
 
 // ── Section 1 — Hero ────────────────────────────────────────────────────────
 
+// F-221 — brand-layer rewrite (full TCF neutralization for V1 multi-exam
+// landing). Per-exam specifics surface post-onboarding once exam choice
+// is known; landing stays universal.
 export const HERO = {
   h1: {
-    en: "The TCF Canada speaking exam doesn't reward what you know. It rewards what you can produce in 12 minutes under pressure.",
-    fr: "L'examen oral du TCF Canada ne récompense pas ce que vous savez. Il récompense ce que vous pouvez produire en 12 minutes sous pression.",
+    en: "The French speaking exam doesn't reward what you know. It rewards what you can produce in 12 minutes under pressure.",
+    fr: "L'examen oral de français ne récompense pas ce que vous savez. Il récompense ce que vous pouvez produire en 12 minutes sous pression.",
   } satisfies I18nString,
   subhead: {
     en: 'LeMethodic is exam prep for B1 anglophones who can read French, write French, even understand French — but freeze the moment they have to speak it.',
@@ -111,8 +114,8 @@ export const DIFFERENTIATION = {
         fr: 'Feedback IA en temps réel sur l\'oral',
       },
       body: {
-        en: "The TCF speaking test is 12 minutes of pressure. You can't simulate that with flashcards. LeMethodic puts you under the same pressure: real prompts, recorded responses, immediate feedback on what an examiner would actually score you on.",
-        fr: "L'examen oral du TCF, c'est 12 minutes de pression. On ne simule pas cela avec des flashcards. LeMethodic vous met sous la même pression : prompts réels, réponses enregistrées, feedback immédiat sur ce qu'un examinateur évaluerait vraiment.",
+        en: "The exam speaking test is 12 minutes of pressure. You can't simulate that with flashcards. LeMethodic puts you under the same pressure: real prompts, recorded responses, immediate feedback on what an examiner would actually score you on.",
+        fr: "L'examen oral, c'est 12 minutes de pression. On ne simule pas cela avec des flashcards. LeMethodic vous met sous la même pression : prompts réels, réponses enregistrées, feedback immédiat sur ce qu'un examinateur évaluerait vraiment.",
       },
     },
   ] as DiffCardCopy[],
@@ -137,8 +140,8 @@ export const HOW_IT_WORKS = {
         fr: 'Le diagnostic (12 minutes)',
       },
       body: {
-        en: 'Three recordings. Three TCF-realistic prompts. Our engine identifies the specific grammar, vocabulary, and structural patterns that are blocking your B2 score.',
-        fr: 'Trois enregistrements. Trois prompts réalistes du TCF. Notre moteur identifie les patterns grammaticaux, lexicaux et structurels précis qui bloquent votre score B2.',
+        en: 'Three recordings. Three exam-realistic prompts. Our engine identifies the specific grammar, vocabulary, and structural patterns that are blocking your B2 score.',
+        fr: 'Trois enregistrements. Trois prompts réalistes. Notre moteur identifie les patterns grammaticaux, lexicaux et structurels précis qui bloquent votre score B2.',
       },
     },
     {
@@ -324,14 +327,14 @@ export const METHODOLOGY = {
   paragraphs: {
     en: [
       'LeMethodic is built on a methodology refined across 7,000+ hours of one-on-one teaching with anglophone French learners on Preply.',
-      "The patterns of error are not random. After thousands of hours, they reveal themselves: which grammatical structures English speakers systematically transfer incorrectly. Which preposition pairs they consistently get wrong. Which moments of speech reveal the B1 ceiling to a TCF examiner.",
+      "The patterns of error are not random. After thousands of hours, they reveal themselves: which grammatical structures English speakers systematically transfer incorrectly. Which preposition pairs they consistently get wrong. Which moments of speech reveal the B1 ceiling to an examiner.",
       'The methodology has two named layers. **La Méthode en Couches** — the four TCF criteria (content, structure, grammar, English-speaker patterns) graded as discrete diagnostic dimensions, not collapsed into a single fluency score. **Les Moules** — the recurring grammatical "molds" anglophones fall into when speaking French under exam pressure. Both are visible to you in the diagnostic and the path. The product names what other tools leave invisible.',
       'The diagnostic detects them. The path corrects them. The dashboard shows you which mold you fell into and which couche it scored against.',
       "This is not a generic French learning app with AI added. It's a focused exam-preparation system for a specific candidate facing a specific exam.",
     ],
     fr: [
       "LeMethodic est construit sur une méthodologie affinée sur plus de 7 000 heures d'enseignement individuel avec des apprenants anglophones de français sur Preply.",
-      "Les patterns d'erreurs ne sont pas aléatoires. Après des milliers d'heures, ils se révèlent : quelles structures grammaticales les anglophones transfèrent systématiquement de manière incorrecte. Quelles paires de prépositions ils confondent constamment. Quels moments de leur discours révèlent le plafond B1 à un examinateur du TCF.",
+      "Les patterns d'erreurs ne sont pas aléatoires. Après des milliers d'heures, ils se révèlent : quelles structures grammaticales les anglophones transfèrent systématiquement de manière incorrecte. Quelles paires de prépositions ils confondent constamment. Quels moments de leur discours révèlent le plafond B1 à un examinateur.",
       'La méthodologie repose sur deux couches nommées. **La Méthode en Couches** — les quatre critères TCF (contenu, structure, grammaire, schémas anglophones) évalués comme des dimensions diagnostiques distinctes, jamais agrégés en un score unique de fluidité. **Les Moules** — les « moules » grammaticaux récurrents dans lesquels tombent les anglophones quand ils parlent français sous pression d\'examen. Les deux sont visibles dans le diagnostic et le parcours. Le produit nomme ce que les autres outils laissent invisible.',
       "Le diagnostic les détecte. Le parcours les corrige. Le tableau de bord vous montre dans quel moule vous êtes tombé et contre quelle couche il a été noté.",
       "Ce n'est pas une application générique d'apprentissage du français avec de l'IA ajoutée. C'est un système ciblé de préparation d'examen pour un candidat spécifique face à un examen spécifique.",
@@ -354,12 +357,12 @@ export const FAQ = {
   items: [
     {
       question: {
-        en: 'How is this different from PrepMyFrench?',
-        fr: 'En quoi est-ce différent de PrepMyFrench ?',
+        en: 'How is this different from PrepMyFuture?',
+        fr: 'En quoi est-ce différent de PrepMyFuture ?',
       },
       answer: {
-        en: 'PrepMyFrench is generalist TEF/TCF prep for all native languages. LeMethodic is built for one specific candidate: an anglophone preparing for the TCF Canada speaking test. The detection of errors, the path, and the feedback are all tuned for English-speaker interference patterns specifically.',
-        fr: "PrepMyFrench est une préparation TEF/TCF généraliste pour toutes les langues maternelles. LeMethodic est construit pour un candidat spécifique : un anglophone préparant l'oral du TCF Canada. La détection d'erreurs, le parcours, et le feedback sont tous adaptés aux patterns d'interférence anglophones spécifiquement.",
+        en: "Most French exam prep drills grammar and vocabulary. We're the only platform built for speaking practice with AI examiner feedback — tuned for the specific interference patterns English speakers fall into, not generic French grammar.",
+        fr: "La plupart des préparations aux examens de français font travailler la grammaire et le vocabulaire. Nous sommes la seule plateforme construite pour la pratique orale avec feedback IA — adaptée aux schémas d'interférence spécifiques aux anglophones, pas à la grammaire française générique.",
       },
     },
     {
@@ -374,8 +377,8 @@ export const FAQ = {
     },
     {
       question: {
-        en: 'Will this guarantee I pass the TCF?',
-        fr: 'Est-ce que cela garantit que je vais réussir le TCF ?',
+        en: 'Do you guarantee I pass?',
+        fr: 'Garantissez-vous que je vais réussir ?',
       },
       answer: {
         en: "The subscription and Sprint don't include outcome guarantees — passing depends on your effort, not just the platform. The Premium tier (coming month 2-3) includes an outcome-based money-back guarantee.",
@@ -388,8 +391,8 @@ export const FAQ = {
         fr: 'Combien de temps avant de voir des résultats ?',
       },
       answer: {
-        en: 'The diagnostic gives you immediate visibility into your gaps. Real production change takes 4-8 weeks of consistent practice. Candidates ready to commit 5+ hours per week typically see TCF-relevant improvement within 4 weeks.',
-        fr: 'Le diagnostic vous donne une visibilité immédiate sur vos lacunes. Un vrai changement de production prend 4-8 semaines de pratique régulière. Les candidats prêts à investir 5+ heures par semaine voient typiquement une amélioration pertinente pour le TCF en 4 semaines.',
+        en: 'The diagnostic gives you immediate visibility into your gaps. Real production change takes 4-8 weeks of consistent practice. Candidates ready to commit 5+ hours per week typically see exam-relevant improvement within 4 weeks.',
+        fr: 'Le diagnostic vous donne une visibilité immédiate sur vos lacunes. Un vrai changement de production prend 4-8 semaines de pratique régulière. Les candidats prêts à investir 5+ heures par semaine voient typiquement une amélioration pertinente pour leur examen en 4 semaines.',
       },
     },
     {
@@ -413,8 +416,8 @@ export const FINAL_CTA = {
     fr: 'Arrêtez de deviner ce qui bloque votre B2.',
   } satisfies I18nString,
   body: {
-    en: 'The TCF Canada exam is in 4 weeks, or 8 weeks, or 6 months. Whatever your timeline, the first step is the same: 12 minutes of recording, an honest diagnostic, and a decision based on real information instead of anxiety.',
-    fr: "L'examen TCF Canada est dans 4 semaines, ou 8 semaines, ou 6 mois. Quelle que soit votre échéance, la première étape est la même : 12 minutes d'enregistrement, un diagnostic honnête, et une décision basée sur de vraies informations plutôt que sur l'anxiété.",
+    en: 'Your French exam is in 4 weeks, or 8 weeks, or 6 months. Whatever your timeline, the first step is the same: 12 minutes of recording, an honest diagnostic, and a decision based on real information instead of anxiety.',
+    fr: "Votre examen de français est dans 4 semaines, ou 8 semaines, ou 6 mois. Quelle que soit votre échéance, la première étape est la même : 12 minutes d'enregistrement, un diagnostic honnête, et une décision basée sur de vraies informations plutôt que sur l'anxiété.",
   } satisfies I18nString,
   ctaPrimary: {
     en: 'Start the diagnostic',
@@ -483,13 +486,152 @@ export const WAITLIST = {
 
 export const META: Record<Lang, { title: string; description: string }> = {
   en: {
-    title: 'LeMethodic — TCF Canada speaking exam prep for B1 anglophones',
+    title: 'LeMethodic — French exam speaking prep for B1 anglophones',
     description:
-      'Exam-preparation built for English speakers preparing the TCF Canada speaking test. Diagnostic-driven path, AI feedback under real exam pressure.',
+      "Exam preparation built for English speakers preparing French speaking exams (TCF / TEF / DELF). Diagnostic-driven path, AI feedback under real exam pressure.",
   },
   fr: {
-    title: 'LeMethodic — Préparation à l\'oral du TCF Canada pour anglophones B1',
+    title: "LeMethodic — Préparation à l'oral des examens de français pour anglophones B1",
     description:
-      "Préparation d'examen pour anglophones préparant l'oral du TCF Canada. Parcours basé sur diagnostic, feedback IA sous pression d'examen réelle.",
+      "Préparation d'examen pour anglophones préparant les examens de français (TCF / TEF / DELF). Parcours basé sur diagnostic, feedback IA sous pression d'examen réelle.",
   },
 }
+
+// ── F-221 — exam picker (Q1 / q0_target_exam) ─────────────────────────────
+// Five options at the head of the questionnaire. BE drives the question
+// itself via /onboarding/questions; FE matches on `id === 'q0_target_exam'`
+// and dispatches to ExamPickerQuestion.tsx. The format-DNA chip copy here
+// is FE-owned so we can localize without BE round-trip.
+
+export type ExamValue =
+  | 'tcf_canada'
+  | 'tef_canada'
+  | 'delf_b1_b2'
+  | 'another_exam'
+  | 'not_sure'
+
+export interface ExamOption {
+  value: ExamValue
+  // The exam name (e.g., "TCF Canada"). Universal across languages —
+  // exam names aren't translated, just the format-DNA chip copy below.
+  label: string
+  // Format-DNA chip — short positioning line under the exam name.
+  formatDna: I18nString
+  // True when picking this option should skip the rest of the
+  // questionnaire and route to the exam-not-supported waitlist surface.
+  routesToWaitlist: boolean
+}
+
+export const EXAM_OPTIONS: ExamOption[] = [
+  {
+    value: 'tcf_canada',
+    label: 'TCF Canada',
+    formatDna: {
+      en: 'Canadian immigration · Express Entry',
+      fr: 'Immigration canadienne · Entrée Express',
+    },
+    routesToWaitlist: false,
+  },
+  {
+    value: 'tef_canada',
+    label: 'TEF Canada',
+    formatDna: {
+      en: 'Canadian immigration · faster than TCF',
+      fr: 'Immigration canadienne · plus rapide que le TCF',
+    },
+    routesToWaitlist: false,
+  },
+  {
+    value: 'delf_b1_b2',
+    label: 'DELF B1 / B2',
+    formatDna: {
+      en: 'Standardized proficiency · valid worldwide',
+      fr: 'Compétence standardisée · valable mondialement',
+    },
+    routesToWaitlist: false,
+  },
+  {
+    value: 'another_exam',
+    label: 'Another exam',
+    formatDna: {
+      en: "Tell us which one — we'll email you when ready",
+      fr: "Dites-nous lequel — nous vous écrirons quand prêt",
+    },
+    routesToWaitlist: true,
+  },
+  {
+    value: 'not_sure',
+    label: "I'm not sure yet",
+    formatDna: {
+      en: "We'll start you on the most common path",
+      fr: "Nous vous lancerons sur le parcours le plus courant",
+    },
+    routesToWaitlist: false,
+  },
+]
+
+// Per-exam helper text rendered under q2_target_level options when exam
+// is known. Single helper line at question level (not per-option). Maps
+// CEFR target to exam-specific scoring band so the user understands the
+// level in their exam's terms.
+export const TARGET_LEVEL_HELPER_BY_EXAM: Record<ExamValue, I18nString | null> = {
+  tcf_canada: {
+    en: 'For Canadian PR via Express Entry, B2 typically maps to CLB 7-8.',
+    fr: "Pour la résidence permanente canadienne via Entrée Express, B2 correspond généralement à CLB 7-8.",
+  },
+  tef_canada: {
+    en: 'For Canadian PR via Express Entry, B2 typically maps to NCLC 7-8.',
+    fr: "Pour la résidence permanente canadienne via Entrée Express, B2 correspond généralement à NCLC 7-8.",
+  },
+  delf_b1_b2: {
+    en: 'DELF uses CEFR levels directly — pick the one you need.',
+    fr: 'Le DELF utilise directement les niveaux CECR — choisissez celui qu\'il vous faut.',
+  },
+  another_exam: null,   // shouldn't reach this question (waitlist branch)
+  not_sure: null,       // no helper — let the standard helper text stand
+}
+
+// Display name used when interpolating {exam} into waitlist + post-signup
+// surfaces. Used by WaitlistScreen + AnotherExam waitlist UI.
+export const EXAM_DISPLAY_NAME: Record<ExamValue, string> = {
+  tcf_canada: 'TCF Canada',
+  tef_canada: 'TEF Canada',
+  delf_b1_b2: 'DELF B1 / B2',
+  another_exam: 'your exam',
+  not_sure: 'TCF Canada',  // default per Chadi 2026-05-05
+}
+
+// Strings for the inline "Another exam" mini-form that appears when the
+// user picks `another_exam` on the picker. Captures email + which exam
+// they want, stores to localStorage waitlist (lib/waitlist.ts), shows
+// confirmation. Doesn't proceed through the rest of the questionnaire.
+export const EXAM_OTHER_FORM = {
+  en: {
+    heading: "Tell us which exam.",
+    description: "We'll email you when LeMethodic supports it.",
+    examLabel: 'Which exam?',
+    examPlaceholder: 'e.g. DALF C1, DILF, TCF DAP',
+    emailLabel: 'Email',
+    emailPlaceholder: 'your@email.com',
+    submit: 'Join the list',
+    invalidEmail: 'Enter a valid email address.',
+    invalidExam: 'Tell us which exam.',
+    successHeading: "You're on the list.",
+    successBody: "We'll email you when your exam is supported.",
+    backToPicker: 'Pick a different exam',
+  },
+  fr: {
+    heading: 'Dites-nous quel examen.',
+    description: "Nous vous écrirons quand LeMethodic le prendra en charge.",
+    examLabel: 'Quel examen ?',
+    examPlaceholder: 'p. ex. DALF C1, DILF, TCF DAP',
+    emailLabel: 'Email',
+    emailPlaceholder: 'votre@email.com',
+    submit: 'Rejoindre la liste',
+    invalidEmail: 'Entrez une adresse email valide.',
+    invalidExam: "Dites-nous quel examen.",
+    successHeading: 'Vous êtes sur la liste.',
+    successBody: "Nous vous écrirons quand votre examen sera pris en charge.",
+    backToPicker: 'Choisir un autre examen',
+  },
+} as const satisfies Record<Lang, unknown>

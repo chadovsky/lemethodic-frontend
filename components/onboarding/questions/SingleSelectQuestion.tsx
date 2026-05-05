@@ -21,6 +21,10 @@ interface SingleSelectQuestionProps {
   onContinue: (value: string) => void
   onBack?: () => void
   headerRight?: React.ReactNode
+  // F-221 — optional helper text override. Used by OnboardingFlow to
+  // inject per-exam helper text on q2_target_level once q0_target_exam
+  // is known (e.g., "B2 maps to CLB 7-8 for Canadian PR" for TCF Canada).
+  helperOverride?: string
 }
 
 export default function SingleSelectQuestion({
@@ -33,6 +37,7 @@ export default function SingleSelectQuestion({
   onContinue,
   onBack,
   headerRight,
+  helperOverride,
 }: SingleSelectQuestionProps) {
   const [selected, setSelected] = useState<string | null>(initialValue)
   const options = question.options ?? []
@@ -43,7 +48,7 @@ export default function SingleSelectQuestion({
       progressFilledUpTo={progressFilledUpTo}
       progressCurrent={progressCurrent}
       headline={question.heading[language]}
-      descriptor={question.helper[language]}
+      descriptor={helperOverride ?? question.helper[language]}
       ctaEnabled={selected !== null}
       onContinue={() => selected !== null && onContinue(selected)}
       onBack={onBack}

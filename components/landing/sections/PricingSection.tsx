@@ -14,11 +14,15 @@ import type { Lang } from '../copy'
 import { PRICING } from '../copy'
 import { ED, LETTER_SPACING, LINE_HEIGHT, SANS_FONT } from '@/lib/typography'
 import WaitlistForm from '../WaitlistForm'
-import type { WaitlistIntent } from '../waitlist'
+// F-221 — PricingSection only opens WaitlistForm for Sprint/Premium tiers.
+// The wider WaitlistIntent type (incl. 'exam_other') exists for the
+// onboarding ExamPickerQuestion's inline form; PricingSection never sets
+// 'exam_other'.
+type SprintOrPremium = 'sprint' | 'premium'
 import RevealOnScroll from '../RevealOnScroll'
 
 export default function PricingSection({ lang }: { lang: Lang }) {
-  const [waitlistIntent, setWaitlistIntent] = useState<WaitlistIntent | null>(null)
+  const [waitlistIntent, setWaitlistIntent] = useState<SprintOrPremium | null>(null)
 
   return (
     <section

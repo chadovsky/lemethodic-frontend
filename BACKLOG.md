@@ -794,6 +794,30 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Scope:** single high-quality art-directed illustration for the EcoleReveal closing screen (the funnel's emotional terminal, where the user sees their persona + plan before /paywall). Current placeholder: `/illustration-ecole.png` recycled from P-220 era. F-201 sized the asset slot at 280×280 above the persona label. Per F-200 imagery rules: real photography muted-tone OR art-directed line drawing / geometric primitives. No 3D emoji, no library cartoon, no mascot energy.
 **Owner:** Chadi (art direction / commission) + Engineering (drop-in swap)
 
+### F-221 — Exam-target picker + brand-layer rewrite (multi-exam launch)
+
+**Priority:** HIGH (launch — multi-exam onboarding gates which path the user enters)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production test BLOCKED on BE shipping `q0_target_exam` to `/onboarding/questions` response + `target_exam` field on User/UserPathEnrollment + accepting `q0_target_exam` in `/onboarding/submit`. Per Chadi 2026-05-05: BE migration in parallel; FE ready-to-fire when BE lands. Verification per F-225 once BE migration is live.)
+**Filed:** 2026-05-04
+**Source:** Strategic recalibration — exam-selector in onboarding
+**Dependencies:** BE `target_exam` schema migration
+**Scope (FE side, shipped this commit):**
+- Brand-layer rewrite (~12 string edits in `components/landing/copy.ts`): full TCF Canada neutralization on landing → universal "French exam" framing. HERO h1 / DIFFERENTIATION card 3 / HOW_IT_WORKS step 1 / METHODOLOGY paragraph 2 / FAQ "PrepMyFrench" → "PrepMyFuture" with generalized framing / FAQ "guarantee TCF" → "Do you guarantee I pass?" / FINAL_CTA / META all neutralized.
+- New `EXAM_OPTIONS` constant in copy.ts: 5 options (TCF Canada / TEF Canada / DELF B1-B2 / Another exam / Not sure) each with FE-localized format-DNA chip copy (EN+FR).
+- New `TARGET_LEVEL_HELPER_BY_EXAM` constant: per-exam helper text injected on q2_target_level when q0_target_exam is known (e.g., TCF → "B2 maps to CLB 7-8 for Canadian PR").
+- New `EXAM_DISPLAY_NAME` constant: slug → display name mapping for `{exam}` interpolation in waitlist + post-signup surfaces.
+- New `EXAM_OTHER_FORM` copy (EN+FR): inline form copy for "Another exam" branch.
+- `lib/waitlist.ts` extended: `WaitlistIntent` widened to include `'exam_other'`; `WaitlistEntry.examName` field added (free-text "which exam?" capture).
+- `lib/submitResponse.ts` extended: `examAtSubmit` field added; `setSubmitContext` signature gains 4th arg.
+- `app/signup/page.tsx`: signup flush captures `q0_target_exam` to submitResponse store before reset.
+- New `components/onboarding/questions/ExamPickerQuestion.tsx`: 5 large card buttons with format-DNA chips, 88px minHeight, "Another exam" picks reveals inline mini-form (which exam? + email) → submits to localStorage waitlist (intent='exam_other') → parked confirmation. Continue gated on non-another_exam selection.
+- `OnboardingFlow.tsx` dispatch: question id `q0_target_exam` routes to ExamPickerQuestion; q2_target_level reads prior q0 answer to inject helper text.
+- `SingleSelectQuestion.tsx`: optional `helperOverride` prop added (used by OnboardingFlow for q2 per-exam helper).
+- `WaitlistScreen.tsx`: body1 + body3 interpolate `{exam}` from submitResponse store using `EXAM_DISPLAY_NAME` map.
+- `WaitlistForm.tsx` + `PricingSection.tsx`: prop type narrowed to `SprintOrPremium` (the 'exam_other' branch lives inline in ExamPickerQuestion, not the modal).
+**Owner:** Engineering
+**Note:** picker dormant until BE adds q0_target_exam to questions endpoint. Once BE lands: picker fires as Q1 of questionnaire, "Another exam" routes to email capture, "Not sure" submits as `not_sure` (BE backfills to TCF Canada per Chadi). Existing user backfill (test users id IN 5,6,7) is BE's responsibility.
+
 ### F-203 — Auth flow surfaces editorial migration (signup full + paywall responsive)
 
 **Priority:** HIGH (launch-blocking — auth surfaces are the conversion funnel)

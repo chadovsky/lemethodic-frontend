@@ -22,10 +22,14 @@ interface SubmitResponseState {
   // without a /me call.
   currentLevelAtSubmit: string | null
   targetLevelAtSubmit: string | null
+  // F-221: q0_target_exam captured at submit so waitlist + post-signup
+  // surfaces can interpolate the exam name without a /me round-trip.
+  examAtSubmit: string | null
   setSubmitContext: (
     response: OnboardingSubmitResponse,
     currentLevel: string | null,
     targetLevel: string | null,
+    exam: string | null,
   ) => void
   clear: () => void
 }
@@ -36,17 +40,20 @@ export const useSubmitResponseStore = create<SubmitResponseState>()(
       response: null,
       currentLevelAtSubmit: null,
       targetLevelAtSubmit: null,
-      setSubmitContext: (response, currentLevel, targetLevel) =>
+      examAtSubmit: null,
+      setSubmitContext: (response, currentLevel, targetLevel, exam) =>
         set({
           response,
           currentLevelAtSubmit: currentLevel,
           targetLevelAtSubmit: targetLevel,
+          examAtSubmit: exam,
         }),
       clear: () => {
         set({
           response: null,
           currentLevelAtSubmit: null,
           targetLevelAtSubmit: null,
+          examAtSubmit: null,
         })
         if (typeof window !== 'undefined') {
           try {

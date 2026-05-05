@@ -149,10 +149,12 @@ function SignupInner() {
           if (submitResponse.waitlist) {
             const q1 = onboardingData.q1_current_level
             const q2 = onboardingData.q2_target_level
+            const q0 = onboardingData.q0_target_exam
             useSubmitResponseStore.getState().setSubmitContext(
               submitResponse,
               typeof q1 === 'string' ? q1 : null,
               typeof q2 === 'string' ? q2 : null,
+              typeof q0 === 'string' ? q0 : null,
             )
             nextRoute = '/onboarding/waitlist'
           }

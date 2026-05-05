@@ -23,6 +23,8 @@ import {
   PAPER,
   DISPLAY_FONT,
 } from './OnboardingScreen'
+// F-221 — exam slug → display name mapping for {exam} interpolation in body
+import { EXAM_DISPLAY_NAME, type ExamValue } from '../landing/copy'
 
 type Lang = 'en' | 'fr'
 
@@ -62,46 +64,65 @@ function inferNeededPath(currentLevel: string | null): string | null {
 
 // ── Copy ────────────────────────────────────────────────────────────────────
 
+// F-221 — exam-name interpolation. Body1 takes the exam slug from
+// useSubmitResponseStore.examAtSubmit (captured by signup flush before
+// reset). Falls back to the generic "your path" framing when exam unknown.
 const COPY = {
   en: {
     heading: "We haven't built your path yet.",
-    body1: (level: string | null, neededPath: string | null) => {
+    body1: (
+      level: string | null,
+      neededPath: string | null,
+      examName: string | null,
+    ) => {
       const levelLabel = level ? LEVEL_DISPLAY[level] ?? level.toUpperCase() : null
       const pathLabel = neededPath ? PATH_DISPLAY[neededPath] ?? neededPath : null
+      const examPart = examName ? ` for ${examName}` : ''
       if (levelLabel && pathLabel) {
-        return `Based on your level (${levelLabel}), you'd need the ${pathLabel} path. We're focused on B1 → B2 for launch.`
+        return `Based on your level (${levelLabel}), you'd need the ${pathLabel} path${examPart}. We're focused on B1 → B2 for launch.`
       }
       if (levelLabel) {
-        return `Based on your level (${levelLabel}), the path you need isn't part of the launch scope. We're focused on B1 → B2 for now.`
+        return `Based on your level (${levelLabel}), the path you need${examPart} isn't part of the launch scope. We're focused on B1 → B2 for now.`
       }
-      return "The path you need isn't part of the launch scope. We're focused on B1 → B2 for now."
+      return `The path you need${examPart} isn't part of the launch scope. We're focused on B1 → B2 for now.`
     },
     body2Fallback: (fallbackSlug: string) => {
       const label = PATH_DISPLAY[fallbackSlug] ?? fallbackSlug
       return `While you wait, you can preview the ${label} starter content from your dashboard.`
     },
-    body3: "We'll email you when your path is ready.",
+    body3: (examName: string | null) =>
+      examName
+        ? `We'll email you when your ${examName} path is ready.`
+        : "We'll email you when your path is ready.",
     cta: "OK, I'll wait",
     signOut: 'Sign out',
   },
   fr: {
     heading: "Nous n'avons pas encore construit votre parcours.",
-    body1: (level: string | null, neededPath: string | null) => {
+    body1: (
+      level: string | null,
+      neededPath: string | null,
+      examName: string | null,
+    ) => {
       const levelLabel = level ? LEVEL_DISPLAY[level] ?? level.toUpperCase() : null
       const pathLabel = neededPath ? PATH_DISPLAY[neededPath] ?? neededPath : null
+      const examPart = examName ? ` pour ${examName}` : ''
       if (levelLabel && pathLabel) {
-        return `Selon votre niveau (${levelLabel}), vous avez besoin du parcours ${pathLabel}. Nous nous concentrons sur B1 → B2 pour le lancement.`
+        return `Selon votre niveau (${levelLabel}), vous avez besoin du parcours ${pathLabel}${examPart}. Nous nous concentrons sur B1 → B2 pour le lancement.`
       }
       if (levelLabel) {
-        return `Selon votre niveau (${levelLabel}), le parcours dont vous avez besoin n'est pas dans le périmètre du lancement. Nous nous concentrons sur B1 → B2 pour l'instant.`
+        return `Selon votre niveau (${levelLabel}), le parcours dont vous avez besoin${examPart} n'est pas dans le périmètre du lancement. Nous nous concentrons sur B1 → B2 pour l'instant.`
       }
-      return "Le parcours dont vous avez besoin n'est pas dans le périmètre du lancement. Nous nous concentrons sur B1 → B2 pour l'instant."
+      return `Le parcours dont vous avez besoin${examPart} n'est pas dans le périmètre du lancement. Nous nous concentrons sur B1 → B2 pour l'instant.`
     },
     body2Fallback: (fallbackSlug: string) => {
       const label = PATH_DISPLAY[fallbackSlug] ?? fallbackSlug
       return `En attendant, vous pouvez prévisualiser le contenu ${label} de départ depuis votre tableau de bord.`
     },
-    body3: "Nous vous écrirons à l'ouverture de votre parcours.",
+    body3: (examName: string | null) =>
+      examName
+        ? `Nous vous écrirons à l'ouverture de votre parcours ${examName}.`
+        : "Nous vous écrirons à l'ouverture de votre parcours.",
     cta: "D'accord, j'attends",
     signOut: 'Se déconnecter',
   },
@@ -114,6 +135,7 @@ export default function WaitlistScreen() {
   const language = useInterfaceLanguage()
   const response = useSubmitResponseStore((s) => s.response)
   const currentLevel = useSubmitResponseStore((s) => s.currentLevelAtSubmit)
+  const exam = useSubmitResponseStore((s) => s.examAtSubmit)
   const clear = useSubmitResponseStore((s) => s.clear)
 
   // If someone navigates directly to /onboarding/waitlist without a captured
@@ -134,6 +156,10 @@ export default function WaitlistScreen() {
   const copy = COPY[language]
   const neededPath = inferNeededPath(currentLevel)
   const fallback = response.fallback_path_offered ?? null
+  // F-221 — resolve exam slug to display name; null when unknown.
+  const examDisplayName: string | null = exam
+    ? EXAM_DISPLAY_NAME[exam as ExamValue] ?? null
+    : null
 
   function handleAcknowledge() {
     clear()
@@ -194,7 +220,7 @@ export default function WaitlistScreen() {
               margin: 0,
             }}
           >
-            {copy.body1(currentLevel, neededPath)}
+            {copy.body1(currentLevel, neededPath, examDisplayName)}
           </p>
 
           {fallback && (
@@ -224,7 +250,7 @@ export default function WaitlistScreen() {
               margin: 0,
             }}
           >
-            {copy.body3}
+            {copy.body3(examDisplayName)}
           </p>
         </div>
 

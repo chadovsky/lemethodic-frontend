@@ -13,10 +13,18 @@ import { useEffect, useRef, useState } from 'react'
 import { CTAButton, INK, INK_MUTED, INK_SOFT, PAPER, DISPLAY_FONT } from '../onboarding/OnboardingScreen'
 import type { Lang } from './copy'
 import { WAITLIST } from './copy'
-import { submitWaitlist, type WaitlistIntent } from './waitlist'
+import { submitWaitlist } from './waitlist'
+
+// F-221 — WaitlistForm intent narrowed to Sprint/Premium. The new
+// 'exam_other' WaitlistIntent value is handled inline by
+// ExamPickerQuestion (different UX — has a "which exam?" free-text
+// field that this modal doesn't render). Keeping WaitlistForm narrow
+// also satisfies WAITLIST.heading() / .description() / .successBody()
+// helpers which only authored Sprint/Premium copy.
+type SprintOrPremium = 'sprint' | 'premium'
 
 interface WaitlistFormProps {
-  intent: WaitlistIntent
+  intent: SprintOrPremium
   lang: Lang
   onClose: () => void
 }
@@ -247,7 +255,7 @@ function SuccessView({
   alreadyOnList,
   onClose,
 }: {
-  intent: WaitlistIntent
+  intent: SprintOrPremium
   lang: Lang
   alreadyOnList: boolean
   onClose: () => void
