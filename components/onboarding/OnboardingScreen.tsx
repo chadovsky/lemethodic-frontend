@@ -98,7 +98,10 @@ export function OnboardingCard({
       type="button"
       aria-pressed={isSelected}
       onClick={onClick}
-      className="flex items-start justify-between w-full text-left"
+      // F-212: ed-card-lift adds subtle hover translateY + shadow.
+      // ed-btn-press adds 0.98 scale on :active. Combined gives the card
+      // both hover affordance and press feedback.
+      className="flex items-start justify-between w-full text-left ed-card-lift ed-btn-press"
       style={{
         minHeight,
         backgroundColor: isSelected ? ED_FG : ED_PAPER,
@@ -108,7 +111,7 @@ export function OnboardingCard({
         border: `1px solid ${isSelected ? ED_FG : ED_RULE}`,
         outline: 'none',
         cursor: 'pointer',
-        transition: `background-color var(--ed-duration-state) var(--ed-ease), border-color var(--ed-duration-state) var(--ed-ease), color var(--ed-duration-state) var(--ed-ease)`,
+        transition: `background-color var(--ed-duration-state) var(--ed-ease), border-color var(--ed-duration-state) var(--ed-ease), color var(--ed-duration-state) var(--ed-ease), transform var(--ed-duration-hover) var(--ed-ease), box-shadow var(--ed-duration-hover) var(--ed-ease)`,
         fontFamily: SANS,
       }}
     >
@@ -180,7 +183,7 @@ export function CTAButton({ label, enabled, onClick }: CTAButtonProps) {
         onClick={onClick}
         disabled={!enabled}
         aria-disabled={!enabled}
-        className="w-full"
+        className="w-full ed-btn-press"
         style={{
           height: 56,
           backgroundColor: enabled ? ED_ACCENT : ED_RULE,

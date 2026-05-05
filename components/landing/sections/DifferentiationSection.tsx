@@ -45,8 +45,9 @@ export default function DifferentiationSection({ lang }: { lang: Lang }) {
           }}
         >
           {DIFFERENTIATION.cards.map((card, i) => (
-            <RevealOnScroll key={i} delay={i * 0.1}>
+            <RevealOnScroll key={i} delay={i * 0.08}>
               <div
+                className="ed-card-lift"
                 style={{
                   backgroundColor: ED.paper,
                   border: `1px solid ${ED.rule}`,

@@ -794,6 +794,34 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Scope:** single high-quality art-directed illustration for the EcoleReveal closing screen (the funnel's emotional terminal, where the user sees their persona + plan before /paywall). Current placeholder: `/illustration-ecole.png` recycled from P-220 era. F-201 sized the asset slot at 280×280 above the persona label. Per F-200 imagery rules: real photography muted-tone OR art-directed line drawing / geometric primitives. No 3D emoji, no library cartoon, no mascot energy.
 **Owner:** Chadi (art direction / commission) + Engineering (drop-in swap)
 
+### F-212 — Micro-animations + interaction feedback system
+
+**Priority:** HIGH (soft-beta polish — interaction language across the platform)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots + interaction trace per F-225 of /, /fr, /onboarding question screens, signup form interactions, and reduced-motion fallback verification)
+**Filed:** 2026-05-04
+**Source:** Strategic recalibration — interaction polish queue
+**Dependencies:** F-200 (editorial system tokens)
+**Scope (this commit):**
+- `lib/motion.ts` extended with F-212 editorial primitives (kept alongside legacy FluentPath spring system): `ED_EASE_CUBIC` / `ED_EASE_CSS` / `ED_DUR` / `ED_STAGGER` constants + `useRotatingText` + `useCountUp` + `useInViewOnce` hooks.
+- `app/globals.css` adds `.ed-card-lift` (200ms hover translateY -2px + shadow expansion), `.ed-btn-press` (scale 0.98 on :active), `.ed-field` (focus border ed-accent + ring at 18% opacity), `.ed-skeleton` (1.5s shimmer for F-211), `.ed-page-enter` (250ms route fade-in for F-213), `ed-kicker-slide` keyframe (kicker word swap), `ed-hero-rise` keyframes + delay variants (hero first-paint sequence).
+- New `components/landing/RotatingKicker.tsx`: flagship hero kicker. Cycles TCF / TEF / DELF / DALF every 2.5s with 600ms vertical-slide swap. Pauses on hover/focus. Honors prefers-reduced-motion (renders static "TCF · TEF · DELF · DALF" listing). EN prefix "Prep for" / FR "Préparation".
+- `HeroSection.tsx`: kicker mounted above H1. Hero entry sequence applied via `ed-hero-rise` + delay-1/2/3 classes (200/300/500ms staggered first-paint).
+- `OnboardingScreen.OnboardingCard` primitive gains `ed-card-lift` + `ed-btn-press` classes — every selectable card across all 11 onboarding questions inherits the lift + press automatically.
+- `OnboardingScreen.CTAButton` primitive gains `ed-btn-press` — every primary CTA across onboarding/waitlist/EcoleReveal inherits the 0.98-scale press feedback.
+- `DifferentiationSection` + `PricingSection` cards gain `ed-card-lift` class (landing).
+- Stagger duration aligned to `ED_STAGGER.cards` (80ms) on RevealOnScroll consumers (Differentiation + Pricing).
+**Owner:** Engineering
+**Design calls (made solo per F-212 spec):**
+- Card hover shadow ramp: `0 4px 16px rgba(0,0,0,0.06)` + `0 1px 4px rgba(0,0,0,0.04)` — restrained vs the tutorial-app default of larger blurs.
+- Press scale 0.98 (vs 0.96 for FluentPath cards) — gentler editorial press.
+- Stagger 80ms (lower end of 60-120ms range — F-212 spec). Card grids feel snappy at this rate; longer felt laggy.
+- Hover-only on devices with `(hover: hover)` — touch devices skip the lift to avoid sticky-hover bug on tap.
+- Kicker pauses on focus too (not just hover) — keyboard users get the same accessibility benefit as mouse users.
+**Cuts (deferred):**
+- Counter animations (deliverable #6): file as F-212.counter — narrow ROI, /progress and /cluster don't have prominent stat numbers worth animating (status chips and CEFR badges are categorical, not counts).
+- Tab/toggle underline slide (deliverable #7): LanguageToggle is already EN/FR with active-state color shift — adding underline-slide on a 2-state toggle is overkill. Will revisit when a multi-tab surface lands (e.g., F-204.deep dashboard with method/calm mode toggle).
+- Form-field per-input `ed-field` class application: deferred — existing :focus-visible global rule from F-200 (commit 14d0691) already gives inputs visible focus rings. F-212.field will swap to ed-accent ring + 18% opacity once a sweep across all 8+ form locations is justified.
+
 ### F-221 — Exam-target picker + brand-layer rewrite (multi-exam launch)
 
 **Priority:** HIGH (launch — multi-exam onboarding gates which path the user enters)

@@ -144,3 +144,130 @@ export const scaleSelectedLift = 1.01
 // Components consuming this module should respect prefers-reduced-motion.
 // Framer Motion has `useReducedMotion()` for this; CSS sites should wrap
 // transitions in @media (prefers-reduced-motion: no-preference).
+
+// ─────────────────────────────────────────────────────────────────────────────
+// F-212 — Editorial motion primitives (companion to the FluentPath system
+// above). The editorial system uses CSS variable easing (`--ed-ease`) +
+// strict no-bounce, no-spring rules per F-200 spec.
+// ─────────────────────────────────────────────────────────────────────────────
+
+import { useEffect, useRef, useState } from 'react'
+
+/** F-212 editorial easing — mirrors `--ed-ease` from globals.css.
+ *  Use with framer-motion or CSS transitions. */
+export const ED_EASE_CUBIC = [0.16, 1, 0.3, 1] as const
+export const ED_EASE_CSS = 'cubic-bezier(0.16, 1, 0.3, 1)' as const
+
+/** F-212 duration tokens (ms). Match the `--ed-duration-*` CSS vars. */
+export const ED_DUR = {
+  hover: 200,
+  press: 150,
+  state: 300,
+  reveal: 700,
+  heroEntry: 600,
+  rotateWord: 600,
+  counterCount: 1200,
+} as const
+
+/** F-212 stagger gaps between sibling reveals (ms). */
+export const ED_STAGGER = {
+  cards: 80,         // landing differentiation, pricing tiers, FAQ items
+  heroSequence: 200, // landing hero kicker → h1 → subhead first-paint
+} as const
+
+// ── useRotatingText — flagship hero kicker rotation ────────────────────────
+// Cycles through a list of words; pauses on hover (caller wires `pause`).
+// Honors prefers-reduced-motion: returns words[0] frozen + reduced=true so
+// the consumer can swap to a static "TCF · TEF · DELF · DALF" listing.
+
+export interface UseRotatingTextOptions {
+  words: string[]
+  intervalMs?: number
+  pause?: boolean
+}
+
+export function useRotatingText({
+  words,
+  intervalMs = 2500,
+  pause = false,
+}: UseRotatingTextOptions): { current: string; index: number; reduced: boolean } {
+  const [index, setIndex] = useState(0)
+  const [reduced, setReduced] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setReduced(mq.matches)
+    const onChange = (e: MediaQueryListEvent) => setReduced(e.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
+  useEffect(() => {
+    if (pause || words.length <= 1 || reduced) return
+    const id = window.setInterval(() => {
+      setIndex((i) => (i + 1) % words.length)
+    }, intervalMs)
+    return () => window.clearInterval(id)
+  }, [pause, reduced, words.length, intervalMs])
+
+  return { current: words[index] ?? '', index, reduced }
+}
+
+// ── useCountUp — counter animation for stat numbers ────────────────────────
+// Eases from 0 → target. Honors prefers-reduced-motion (returns target
+// instantly). Uses requestAnimationFrame.
+
+export function useCountUp(target: number, durationMs: number = ED_DUR.counterCount): number {
+  const [value, setValue] = useState(0)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      setValue(target)
+      return
+    }
+    const start = performance.now()
+    let raf = 0
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / durationMs)
+      const eased = 1 - Math.pow(1 - t, 3) // ease-out cubic
+      setValue(Math.round(target * eased))
+      if (t < 1) raf = window.requestAnimationFrame(tick)
+    }
+    raf = window.requestAnimationFrame(tick)
+    return () => window.cancelAnimationFrame(raf)
+  }, [target, durationMs])
+  return value
+}
+
+// ── useInViewOnce — IntersectionObserver one-shot reveal trigger ──────────
+
+export function useInViewOnce(threshold: number = 0.2): {
+  ref: (node: Element | null) => void
+  inView: boolean
+} {
+  const [inView, setInView] = useState(false)
+  const observerRef = useRef<IntersectionObserver | null>(null)
+  const ref = (node: Element | null) => {
+    if (observerRef.current) {
+      observerRef.current.disconnect()
+      observerRef.current = null
+    }
+    if (!node) return
+    if (typeof IntersectionObserver === 'undefined') {
+      setInView(true)
+      return
+    }
+    observerRef.current = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setInView(true)
+          observerRef.current?.disconnect()
+        }
+      },
+      { threshold },
+    )
+    observerRef.current.observe(node)
+  }
+  return { ref, inView }
+}

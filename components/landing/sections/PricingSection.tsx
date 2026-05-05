@@ -63,8 +63,9 @@ export default function PricingSection({ lang }: { lang: Lang }) {
           }}
         >
           {PRICING.cards.map((card, i) => (
-            <RevealOnScroll key={card.tier} delay={i * 0.1}>
+            <RevealOnScroll key={card.tier} delay={i * 0.08}>
               <article
+                className="ed-card-lift"
                 style={{
                   backgroundColor: ED.paper,
                   border: `1px solid ${ED.rule}`,

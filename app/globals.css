@@ -356,3 +356,116 @@
   border-left: 3px solid var(--fp-ink);
   color: var(--fp-ink-soft);
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   F-212 — interaction motion utilities. Editorial system: 150-200ms hover,
+   no bounce, opacity/transform only. Reduced-motion respected globally via
+   the existing rule above.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Card hover lift: subtle translateY + shadow expansion. Apply to any
+   surface that wants the editorial card-lift signature (landing
+   differentiation, exam picker, pricing, cluster, /writing prompts). */
+.ed-card-lift {
+  transition:
+    transform var(--ed-duration-hover) var(--ed-ease),
+    box-shadow var(--ed-duration-hover) var(--ed-ease),
+    border-color var(--ed-duration-hover) var(--ed-ease);
+}
+@media (hover: hover) {
+  .ed-card-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
+  }
+}
+
+/* Button press feedback: scale 0.98 on :active. Only fires for actual
+   pointer/keyboard activation, not hover. */
+.ed-btn-press {
+  transition: transform var(--ed-duration-hover) var(--ed-ease),
+    background-color var(--ed-duration-hover) var(--ed-ease),
+    color var(--ed-duration-hover) var(--ed-ease);
+}
+.ed-btn-press:active {
+  transform: scale(0.98);
+}
+
+/* Form field focus: ed-accent ring. Override the generic :focus-visible
+   rule from above for editorial form fields specifically. */
+.ed-field {
+  transition:
+    border-color var(--ed-duration-hover) var(--ed-ease),
+    box-shadow var(--ed-duration-hover) var(--ed-ease);
+}
+.ed-field:focus-visible {
+  outline: none;
+  border-color: var(--ed-accent);
+  box-shadow: 0 0 0 3px rgba(31, 45, 74, 0.18); /* ed-accent at ~18% */
+}
+
+/* F-211 — skeleton shimmer. ed-rule on ed-paper, slow 1.5s sweep, no
+   aggressive pulse. Apply to skeleton loader divs that want the
+   editorial shimmer instead of the legacy pulse. */
+@keyframes ed-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.ed-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--ed-rule) 0%,
+    rgba(229, 224, 216, 0.4) 50%,
+    var(--ed-rule) 100%
+  );
+  background-size: 200% 100%;
+  animation: ed-shimmer 1.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ed-skeleton {
+    animation: none;
+    background: var(--ed-rule);
+  }
+}
+
+/* F-212 — RotatingKicker word slide-in keyframe. */
+@keyframes ed-kicker-slide {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* F-212 — hero entry sequence: fade up + Y-translate. Used by HeroSection
+   on first paint with delays per element (kicker / h1 / subhead). */
+@keyframes ed-hero-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ed-hero-rise {
+  animation: ed-hero-rise 600ms var(--ed-ease) both;
+}
+.ed-hero-rise-delay-1 { animation-delay: 200ms; }
+.ed-hero-rise-delay-2 { animation-delay: 300ms; }
+.ed-hero-rise-delay-3 { animation-delay: 500ms; }
+@media (prefers-reduced-motion: reduce) {
+  .ed-hero-rise { animation: none; opacity: 1; transform: none; }
+}
+
+/* F-213 — page transition fade-in for major route changes. Applied to the
+   <main> wrapper of major surfaces (landing, onboarding, signup, ecole,
+   paywall) so route navigation has subtle fade + Y-translate without
+   adding a router-level abstraction. */
+@keyframes ed-page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ed-page-enter {
+  animation: ed-page-enter 250ms var(--ed-ease) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ed-page-enter { animation: none; }
+}
