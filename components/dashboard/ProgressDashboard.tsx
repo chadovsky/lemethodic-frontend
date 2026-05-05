@@ -88,7 +88,7 @@ export default function ProgressDashboard() {
   }, [load, retryKey])
 
   return (
-    <div style={{ minHeight: '100dvh', backgroundColor: BG, fontFamily: DISPLAY_FONT }}>
+    <div className="ed-page-enter" style={{ minHeight: '100dvh', backgroundColor: BG, fontFamily: DISPLAY_FONT }}>
       {/* F-204: max-width widened 440 → 720 to fix desktop white-rails.
           Section components inside still cap their own widths where
           appropriate (Goulet/RecentActivity keep narrow column rhythm). */}

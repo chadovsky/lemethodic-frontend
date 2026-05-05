@@ -72,7 +72,7 @@ export default function ClusterDetailPage({ slug }: ClusterDetailPageProps) {
   }, [load, retryKey])
 
   return (
-    <div style={{ minHeight: '100dvh', backgroundColor: BG, fontFamily: DISPLAY_FONT }}>
+    <div className="ed-page-enter" style={{ minHeight: '100dvh', backgroundColor: BG, fontFamily: DISPLAY_FONT }}>
       <div style={{ maxWidth: 720, margin: '0 auto', position: 'relative' }}>
         {/* Header — brand mark links back to /progress as nav fallback */}
         <header

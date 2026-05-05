@@ -197,7 +197,7 @@ function SignupInner() {
 
   return (
     <div
-      className="min-h-screen w-full flex flex-col items-center justify-center px-5"
+      className="min-h-screen w-full flex flex-col items-center justify-center px-5 ed-page-enter"
       style={{ backgroundColor: BG }}
     >
       {/* F-203 — card migrated to editorial system: paper bg, 1px ed-rule

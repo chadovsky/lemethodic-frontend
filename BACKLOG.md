@@ -794,6 +794,32 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Scope:** single high-quality art-directed illustration for the EcoleReveal closing screen (the funnel's emotional terminal, where the user sees their persona + plan before /paywall). Current placeholder: `/illustration-ecole.png` recycled from P-220 era. F-201 sized the asset slot at 280×280 above the persona label. Per F-200 imagery rules: real photography muted-tone OR art-directed line drawing / geometric primitives. No 3D emoji, no library cartoon, no mascot energy.
 **Owner:** Chadi (art direction / commission) + Engineering (drop-in swap)
 
+### F-213 — Page transitions + celebration moments
+
+**Priority:** MEDIUM (soft-beta polish)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured screenshots + interaction trace per F-225 — verify route fade-in across /, /signup, /onboarding, /progress, /ecole, /cluster)
+**Filed:** 2026-05-04
+**Source:** Strategic recalibration — interaction polish queue
+**Dependencies:** F-200, F-212 (ed-page-enter CSS class)
+**Scope (this commit):**
+- Applied `ed-page-enter` class (250ms fade-in + Y-translate 8px → 0) to outermost containers of major surfaces: LandingPage `<main>`, ProgressDashboard root, ClusterDetailPage root, HomeScreen root, signup outer div.
+- Subtle fade on first mount per surface — doesn't replay on internal state changes (CSS animation `both` keeps end state). Reduced-motion respected via globals.css fallback rule.
+**Owner:** Engineering
+**Cuts:**
+- Celebration moments (lesson complete, finish onboarding, milestone hit): filed as F-213.celebration. Needs design pass — F-115 lesson-unlock motion is already in place; layered celebrations need Chadi sign-off on what triggers what (e.g., milestone badge ed-accent pulse vs full congratulations screen). Editorial restraint per F-200 means no confetti — designs must be typography-led.
+- /onboarding/waitlist + EcoleReveal + paywall route transitions: not added in this commit (those are terminal/closing surfaces — adding fade-in wouldn't add value, and EcoleReveal already has hero-rise sequence from F-212).
+- Inter-question transition within OnboardingFlow (between q1 and q2 etc.): out of scope — that's a state change, not a route change. Could be F-213.intra if user testing flags abrupt step swaps.
+
+### F-213.celebration — Milestone + completion celebration moments
+
+**Priority:** MEDIUM (post-soft-beta polish)
+**Status:** Queued
+**Filed:** 2026-05-04
+**Source:** F-213 scope cut — celebration design needs Chadi sign-off
+**Dependencies:** F-213, F-115 (lesson-unlock motion already shipped), F-202 (L'École intro design pass)
+**Scope:** layered celebration treatments for lesson complete (per-quiz-pass), finish onboarding (after EcoleReveal continue), and milestone hits (Fondations done at lesson 4, Approfondissement at 16, L'École Complète at 27). Editorial restraint: no confetti. Candidates: typography-led congratulations screen (Source Serif italic for the achievement label), subtle Y-translate + opacity reveal of next-step CTA, ed-accent pulse on milestone badge in EcoleProgress.tsx. Needs Chadi pick + content per moment.
+**Owner:** Engineering + Chadi (celebration copy + design picks)
+
 ### F-210 — Icon system audit (lucide-react retention + custom marks plan)
 
 **Priority:** MEDIUM (audit + filing)

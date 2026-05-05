@@ -193,6 +193,7 @@ export default function HomeScreen({
   // ─── render ──────────────────────────────────────────────────────────────
   return (
     <div
+      className="ed-page-enter"
       style={{
         minHeight: '100dvh',
         backgroundColor: BG,

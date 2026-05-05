@@ -72,7 +72,7 @@ export default function LandingPage({ lang }: LandingPageProps) {
   }, [lang])
 
   return (
-    <main className="min-h-screen w-full" style={{ backgroundColor: PAGE_BG }}>
+    <main className="min-h-screen w-full ed-page-enter" style={{ backgroundColor: PAGE_BG }}>
       <LandingHeader lang={lang} />
       <HeroSection lang={lang} />
       <ProblemSection lang={lang} />
