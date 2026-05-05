@@ -794,6 +794,33 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Scope:** single high-quality art-directed illustration for the EcoleReveal closing screen (the funnel's emotional terminal, where the user sees their persona + plan before /paywall). Current placeholder: `/illustration-ecole.png` recycled from P-220 era. F-201 sized the asset slot at 280×280 above the persona label. Per F-200 imagery rules: real photography muted-tone OR art-directed line drawing / geometric primitives. No 3D emoji, no library cartoon, no mascot energy.
 **Owner:** Chadi (art direction / commission) + Engineering (drop-in swap)
 
+### F-210 — Icon system audit (lucide-react retention + custom marks plan)
+
+**Priority:** MEDIUM (audit + filing)
+**Status:** Shipped 2026-05-04 — non-visual change, audit only. No code changes this turn. Filed P-229 for the custom marks Chadi-authoring task.
+**Filed:** 2026-05-04
+**Source:** Strategic recalibration — interaction polish queue
+**Dependencies:** none
+**Audit findings (this commit, BACKLOG-only):**
+- **lucide-react retained** for all current UI icons. Audit covered ~25 imports: `ArrowLeft / ChevronLeft / ChevronRight / ChevronDown / ChevronUp / Check / Play / Lock / Mic / Bell / Pencil / Settings / Volume2 / VolumeX / XIcon / SearchIcon / MinusIcon / CheckIcon / CircleIcon / MoreHorizontal`. All universal UI icons, no brand specificity. Per F-200 imagery rules: "no library cartoons" applies to illustrations, NOT UI iconography. Lucide is the appropriate stack for nav/affordance/state icons.
+- **No custom marks needed for replacement** — surfaces using lucide today (HomeScreen Bell, BackButton chevron, LessonListItem check/play/lock, Tâche session controls) all benefit from lucide's consistency.
+- **Custom marks needed for ADDITIONS only** — surfaces that don't yet have icons but should get brand-specific marks. Filed as P-229 (Chadi authoring).
+**Cuts:** none — audit complete.
+
+### P-229 — Custom brand marks (methodology + exam + milestone iconography)
+
+**Priority:** LOW (post-soft-beta polish)
+**Status:** Queued
+**Filed:** 2026-05-04
+**Source:** F-210 audit
+**Dependencies:** F-210, F-202 (methodology demo design pass), F-221 (exam picker shipped)
+**Scope:** 9 brand-specific marks for surfaces that should have iconography but currently don't:
+- **Methodology marks** (2): "Les Moules" mark + "La Méthode en Couches" mark. Used in MethodologySection on landing + future F-202 L'École intro demo. Style: line-drawn geometric primitive, ed-fg ink, 24-32px.
+- **Exam monograms** (4): TCF / TEF / DELF / DALF. Used as format-DNA chip prefix in ExamPickerQuestion (currently text-only) and possibly /profile exam display. Style: small letterform mark, 16-20px, ed-accent or ed-fg.
+- **Milestone badges** (3): Fondations / Approfondissement / L'École Complète. Used in EcoleProgress.tsx today (generic Check icon). Replace with editorial badges that signal phase progression.
+Editorial constraint per F-200: line drawings or geometric primitives, no mascot energy, no 3D emoji. Either commissioned by Chadi or authored solo.
+**Owner:** Chadi (art direction / commission) + Engineering (drop-in swap)
+
 ### F-211 — Loading states overhaul (skeleton shimmer migration)
 
 **Priority:** MEDIUM (soft-beta polish)
