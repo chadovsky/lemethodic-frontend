@@ -86,7 +86,9 @@ function SignupInner() {
   const [error, setError] = useState<string | null>(null)
 
   // Rehydrate on mount + bounce an already-authenticated user away from
-  // the signup form — no point creating a second account.
+  // the signup form — no point creating a second account. Stays on /ecole
+  // (not /ecole/intro) because re-hitting /signup is a return visit, not
+  // a fresh first-visit; intro is reachable via header link (F-202.x).
   useEffect(() => {
     useAuthStore.getState().hydrate()
   }, [])
@@ -127,10 +129,16 @@ function SignupInner() {
       // useSubmitResponseStore and route to /onboarding/waitlist instead of
       // /ecole. The waitlist screen reads q1/q2 from the store (captured here
       // before useOnboardingStore.reset() wipes the answers).
+      //
+      // F-202 — non-waitlist users land on /ecole/intro (methodology surface,
+      // first-visit destination) rather than /ecole. The intro CTA pushes
+      // to /ecole. Re-entry from header link → /ecole/intro is filed as
+      // F-202.x. Already-authenticated users hitting /signup directly still
+      // bounce to /ecole (the redirect above doesn't go through this branch).
       const onboardingState = useOnboardingStore.getState()
       const onboardingData = onboardingState.data
       const interfaceLanguage = onboardingState.interfaceLanguage
-      let nextRoute = '/ecole'
+      let nextRoute = '/ecole/intro'
       if (Object.keys(onboardingData).length > 0) {
         try {
           const submitResponse = await api.onboarding.submit(

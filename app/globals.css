@@ -469,3 +469,22 @@
 @media (prefers-reduced-motion: reduce) {
   .ed-page-enter { animation: none; }
 }
+
+/* F-202 — L'École intro curriculum two-block layout. Stacks mobile,
+   side-by-side ≥768px. Each block has a 1px ed-rule left edge as the
+   editorial column marker. */
+.ecole-intro-blocks {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(32px, 4vw, 48px);
+}
+.ecole-intro-block {
+  border-left: 1px solid var(--ed-rule);
+  padding-left: 20px;
+}
+@media (min-width: 768px) {
+  .ecole-intro-blocks {
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(40px, 4vw, 56px);
+  }
+}

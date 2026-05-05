@@ -1031,42 +1031,61 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Scope:** migrate LessonDetailClient (markdown rendering + quiz CTA + back nav) and QuizClient (multi-question flow + answer-checking + result + lesson-unlock animation). Carries F-087 + F-115 motion invariants (lesson-unlock animation in HomeScreen).
 **Owner:** Engineering
 
-### F-202 — L'École intro rebuild with methodology demo (PAUSED — awaiting Chadi copy)
+### F-202 — L'École intro rebuild + methodology surface (post-signup destination)
 
-**Priority:** HIGH (launch-blocking — current /ecole intro is empty placeholder per Block 3 critique)
-**Status:** Plan-first complete, **PAUSED** awaiting Chadi-authored methodology demo copy + design decisions per F-202 plan-first below
+**Priority:** HIGH (launch-blocking — was the empty pink-key placeholder per Block 3 critique)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/ecole/intro` (all 5 sections) + interaction trace `/signup` → register → `/ecole/intro` → CTA → `/ecole` per F-225)
 **Filed:** 2026-05-04
-**Source:** Strategic recalibration (May 4): "L'École intro is empty placeholder. Doesn't hit Promova benchmark locked in Block 3" + F-200 cascade
-**Dependencies:** F-200 (editorial system), F-227 (methodology copy framing — same shape blocker, parallel ticket)
-**Scope:** rebuild `/ecole` intro to surface the methodology as live system, not as static description. Replace HomeScreen's current "greeting + streak + exam chip + Today's two cards + lesson list" with an editorial-system landing-style intro that demonstrates Les Moules + La Méthode en Couches as visible product surfaces, then transitions into the 27-lesson path. Promova-bench means polished onboarding-style flow on first /ecole entry, not a single dump-page of cards.
-**Owner:** Engineering (build) + Chadi (methodology demo copy + design decisions)
+**Shipped:** 2026-05-01 (FE-side, frontend commit pending)
+**Source:** Strategic recalibration (May 4): "L'École intro is empty placeholder. Doesn't hit Promova benchmark" + F-202 spec May 5 with locked methodology copy (khâgneux-reviewed, 8 native-French ear corrections applied) + 5-couche model expansion (Couche 5 — La Voix added)
+**Dependencies:** F-200 (editorial system), F-201 (EcoleReveal), F-203 (signup editorial chrome)
+**Scope:** new route `/ecole/intro` — post-signup methodology surface (the moat made visible). Five sections in order: Frame (welcome) / La Méthode en Couches (5 couche blocks, centerpiece) / How it works (3 sub-blocks, diagnostic→treatment loop, "Le Goulet" introduced as named concept) / Le parcours (Fondations 1–16 + Approfondissement 17–27 + 5 lesson segments Le Piège/La Règle/Le Drill/La Situation/Le Débrief) / CTA → /ecole. Bilingual EN/FR via useInterfaceLanguage hook; copy locked verbatim (no paraphrasing). Signup post-register routing changed: `/ecole` → `/ecole/intro` (waitlist branch unchanged). Reveal-on-scroll stagger via useInViewOnce + 80ms sibling delay. ed-page-enter on root.
+**Owner:** Engineering (Chadi authored methodology copy)
 
-**F-202 plan-first — open questions for Chadi:**
+**Routing/state calls (resolved):**
+- (a) **Separate `/ecole/intro` route** — clean separation, no conditional render in HomeScreen, deep-linkable. Picked Option A from spec.
+- (b) **Flow:** EcoleReveal → /paywall → /signup → /ecole/intro → /ecole. Paywall stays unchanged (the moat is paid-side, protects from competitor snooping; public landing gets compressed version via F-227). Intro CTA → /ecole (DailyActionCard surfaces lesson 1 for new users; robust for return users via header link too). NOT /ecole/lesson/1 — that wouldn't make sense for return users.
+- (c) **/ecole responsive editorial migration** — already shipped in F-206 chrome-level (ed-bg, ed-fg, ed-rule, 720px max-width). Pastels survive as DailyActionCard accent layer per F-200 rule. F-202 scope stayed focused on /ecole/intro alone. Deeper internal migration filed as F-206.lessons.
+- **CTA color:** ed-accent navy (matches EcoleReveal + signup CTA chain) instead of spec's ed-fg/ed-paper. Coherent in-product CTA chain.
 
-1. **Scope of "intro"** — three options:
-   - (a) **First-visit intro screen** — full-bleed Promova-style scrolling page that introduces methodology, then unlocks into the lesson list on second visit. Uses sessionStorage / `user.first_seen_at` to gate.
-   - (b) **Always-visible top section** — rebuild the top of HomeScreen (greeting/streak/exam → methodology demo) as a permanent anchor; lesson list follows below. Returning users always see it.
-   - (c) **Separate `/ecole/intro` route** — new route surfaced from /ecole only when methodology hasn't been "acknowledged"; lesson list at /ecole stays mostly intact.
-   Recommend (a) — closest to "Promova-bench" framing, doesn't bloat returning-user flow.
+**Implementation notes:**
+- New file: `app/ecole/intro/page.tsx` (ProtectedRoute wrapper)
+- New component: `components/ecole/intro/EcoleIntro.tsx` (single orchestrator, ~620 lines, all 5 sections inline; sub-component split filed as F-202.split if it gets unwieldy)
+- Methodology copy: locked in EcoleIntro.tsx as FRAME / METHODE / HOW / PARCOURS / CTA constants per language. *italic* tokens in body strings render as Source Serif 4 ed-accent emphasis (used for "Le Goulet" + "ne" callouts).
+- Reveal component: useInViewOnce-driven opacity + Y-translate, 700ms ed-ease, sibling stagger via delayMs prop.
+- Frame H1: clamp(56-96px) Geist 600. Subhead: Source Serif 4 italic clamp(20-24px) ed-muted.
+- Méthode header: Source Serif 4 italic clamp(40-64px) ed-accent navy. 5 couche blocks at 96-112px vertical separation. Each block: "Couche N" italic small, name Geist 600 32-40px, label Geist 500 small-caps tracking, body 17-19px.
+- Closer line: Source Serif 4 italic 22-28px ed-fg, centered, 96-144px above. Section borderTop ed-rule.
+- How it works on ed-paper bg (alternates from ed-bg). 3 sub-blocks 48-72px apart.
+- Le parcours: two-column grid ≥768px (Fondations + Approfondissement, ed-rule left edge), stacked mobile. 5 segments as numbered list, Source Serif 4 italic numerals in ed-accent.
+- CTA: ed-accent navy bg, white text, 4px radius, 16x32 padding, ed-btn-press class.
+- Signup post-register: `nextRoute = '/ecole/intro'` (was '/ecole'); waitlist branch unchanged. Already-authenticated user redirect from useEffect stays at /ecole (return visit).
+- New globals.css utilities: `.ecole-intro-blocks` + `.ecole-intro-block` for the curriculum side-by-side grid (avoided styled-jsx).
 
-2. **Methodology demo shape** — five candidate forms:
-   - Static visual diagram of the 4 couches (Le Fond / Les Moules / Les Moules des Idées / Les Réflexes Anglais), each with one-line definition + one example anglophone error
-   - Animated scroll-driven sequence (Neuralink-style) where each couche reveals as the user scrolls, with named errors highlighted
-   - Interactive moule picker — sample 3-4 sentence pairs (wrong vs right), user clicks to reveal which moule they're falling into
-   - Recording-as-demo — embedded audio sample + diagnostic preview showing the system marking up a Tâche response with the 4 couches
-   - Simple type-led essay with named-concept callouts (similar to F-200 methodology section but expanded to a full standalone surface)
-   Need: Chadi's pick + content (the actual sentence pairs, audio sample, or essay copy depending on shape).
+**Accessibility:**
+- Each section has aria-label (Welcome / Méthode title / How it works / Le parcours / Begin).
+- Reduced-motion: ed-page-enter respects prefers-reduced-motion (gated in globals.css); useInViewOnce returns inView immediately when IntersectionObserver unavailable.
+- Reveal opacity starts at 0 — if reduced-motion users want sections visible immediately, the IntersectionObserver fires on mount-near-viewport, so they see the same end state without animation.
 
-3. **Lesson list positioning** — 3 options:
-   - Lesson list appears BELOW methodology intro on same scroll
-   - Lesson list moved to its own route (`/ecole/path` or similar), accessed from the intro
-   - Lesson list embedded as final section of intro, scrolling continues into 27 cards
-   Recommend embedded — preserves single-route mental model, methodology is the lead, lessons earn the destination.
+### F-202.x — "À propos de L'École" header link from /ecole
 
-4. **Returning-user behavior** — once intro is "seen" (BE marker via /me, sessionStorage flag, or user-initiated "skip intro" button), what does /ecole show?
-   Recommend: methodology intro collapses to a single sticky nav band ("La méthode" → opens modal/sheet); lesson list becomes primary. Daily action card from current HomeScreen rescued + restyled into the lesson-list-led layout.
+**Priority:** LOW (post-launch UX polish)
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** F-202 ship — return-user re-entry to methodology surface
+**Dependencies:** F-202
+**Scope:** add a small "À propos" / "About" link in /ecole header (or profile menu) that navigates to /ecole/intro. Copy: "À propos de L'École" (FR) / "About L'École" (EN). Position: header right-side, between page title and notifications bell. The intro page is always reachable; this just exposes it for return-users who want to revisit the methodology.
+**Owner:** Engineering
 
-**Until Chadi's copy + scope decisions land, F-202 sits PAUSED.** The chain skips it and continues at F-203.
+### F-202.split — EcoleIntro sub-component decomposition
+
+**Priority:** LOW (refactor)
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** F-202 ship — single orchestrator at ~620 lines is acceptable today, but if Chadi adds methodology icons (P-229) or interactive elements per couche, sections should split.
+**Dependencies:** F-202, P-229 (custom brand marks)
+**Scope:** split `components/ecole/intro/EcoleIntro.tsx` into `IntroFrame.tsx`, `MethodeEnCouches.tsx`, `HowItWorks.tsx`, `LeParcours.tsx`, `IntroCTA.tsx`. Lift the FRAME/METHODE/HOW/PARCOURS/CTA copy constants to a shared `intro-copy.ts`. No visual changes — refactor only.
+**Owner:** Engineering
 
 ### F-201 — Onboarding flow editorial migration (desktop responsive)
 
