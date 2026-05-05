@@ -133,7 +133,7 @@ export default function QuizClient({ lessonId }: { lessonId: string }) {
             margin: 0,
           }}
         >
-          {score === total ? 'Perfect score — lesson complete.' : 'Good effort. Review the lesson and try again.'}
+          {score === total ? 'Perfect score. Lesson complete.' : 'Good effort. Review the lesson and try again.'}
         </p>
         <Link
           href="/"

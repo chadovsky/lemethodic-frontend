@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import LegalPage from '@/components/legal/LegalPage'
 
 export const metadata: Metadata = {
-  title: 'Refund Policy — LeMethodic',
+  title: 'Refund Policy | LeMethodic',
   description: 'When and how you can request a refund for LeMethodic purchases.',
   alternates: { canonical: '/refund' },
 }

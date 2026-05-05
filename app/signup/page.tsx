@@ -359,7 +359,7 @@ function SignupInner() {
               textTransform: 'uppercase',
             }}
           >
-            Password — at least 8 characters
+            Password (at least 8 characters)
           </label>
           <input
             id="password"

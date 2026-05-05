@@ -93,7 +93,9 @@ export default function MethodologySection({ lang }: { lang: Lang }) {
                   }}
                 >
                   <strong style={{ fontWeight: 600 }}>{c.name[lang]}</strong>
-                  {' — '}
+                  {/* FR uses ` : ` (non-breaking space + colon) per
+                      typographic convention; EN uses `: ` */}
+                  {lang === 'fr' ? ' : ' : ': '}
                   {c.description[lang]}
                 </p>
               </RevealOnScroll>

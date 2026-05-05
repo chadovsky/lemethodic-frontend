@@ -2160,6 +2160,30 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-002 — Em-dash strip across FE copy
+
+**Priority:** MEDIUM (editorial polish; em-dash overuse muddied prose voice)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/`, `/fr`, `/ecole/intro` (FR + EN), `/onboarding` EcoleReveal step (FR + EN level labels), `/signup` (Password label), `/privacy`, `/terms`, `/refund` (browser tab title) per F-225. F-225 interactive verification clause does NOT apply — pure typography swap, no behavior change.)
+**Filed:** 2026-05-01
+**Shipped:** 2026-05-01 (FE-side, frontend commit pending; Chadi-approved per-instance 2026-05-01)
+**Source:** V-series ticket batch — em-dash had become a stylistic crutch across FE copy
+**Dependencies:** none
+**Scope:** ~30 user-facing em-dash instances replaced with comma / period / colon / parens / pipe / middle dot per context. Code comments + console.error + dev logs excluded (not user copy). Placeholder glyphs (table cells where data is missing — `'—'` constants, conditional empty-state renders) PRESERVED — standard UX convention.
+
+**Replacements applied:**
+- A. Prose mid-sentence (12 instances): periods in most cases (PROBLEM body kept comma — period would have created fragment; flagged in commit). Colon for defining clauses (DIFF card 1, La Voix description). FR colons use ` : ` non-breaking-space convention. Restructured `...dragging — and treats that one` to `...dragging. Treats that one, specifically.` (deliberate fragment matches FR analog "Et traite celle-là, précisément." Per Chadi counter-edit; "It treats" was rejected as adding unnecessary subject).
+- B. Le Goulet appositive (EN + FR in EcoleIntro): `bottleneck — *Le Goulet* — the layer...` → `bottleneck (*Le Goulet*), the layer...` (parens for named-concept emphasis).
+- C. Term-definition separators (rendered JSX): `{name} — {description}` → `{name}: {description}` for EcoleIntro segments + MethodologySection couches. Made language-aware so FR renders ` : ` (NBSP + colon) per FR typographic convention, EN renders `: `.
+- D. Labels (10 instances): CEFR levels `A2 — Basic` etc. → `A2 · Basic` with middle dot U+00B7 per Chadi counter-edit (cleaner than hyphen, modern editorial convention). Phase divider `Phase 2 — Approfondissement` → `Phase 2: Approfondissement`. Status labels (`Ready — Record now`, `Perfect score — lesson complete`, `Analysis pending — your CEFR band...`, `Low confidence — give us 2 more`, `Video lesson — coming soon.`) → period or restructure. `Password — at least 8 characters` → `Password (at least 8 characters)` (parens). Coaching lines in TranscriptReviewPanel → period.
+- E. Page meta titles (4): `Privacy Policy — LeMethodic`, `Terms and Conditions — LeMethodic`, `Refund Policy — LeMethodic`, landing meta titles → pipe `|` (SEO convention).
+- F. Aria-labels (3): comma or colon depending on screen-reader rhythm.
+
+**Counter-edits applied per Chadi 2026-05-01:**
+1. METH closer EN + EcoleIntro closer EN: `Treats that one, specifically.` (no "It" subject; deliberate fragment matches FR analog rhythm)
+2. CEFR level labels: middle dot `·` (U+00B7) instead of hyphen — modern UX convention
+
+**Note:** PROBLEM body (`landing/copy.ts:65,71`) used comma instead of proposed period; the original sentence structure (`But when X, when Y, — Z`) made `Z` the main clause. Replacing — with period would have created a fragment ("But when X, or when Y."). Comma preserves grammar and the editorial restraint of dropping the em-dash. EN + FR both adjusted.
+
 ### V-001 — Hero H1 + rotating kicker sizing
 
 **Priority:** HIGH (verification-found; H1 overflow on production)

@@ -22,7 +22,7 @@ const RADAR_DATA = [
 ]
 
 const VALUE_ROWS: string[] = [
-  "L'École — 27 lessons unlocking B2 grammar",
+  "L'École. 27 lessons unlocking B2 grammar",
   "Unlimited Tâche 1, 2, 3 practice with AI examiner",
   "Mock Exam mode (recommended after L'École)",
 ]

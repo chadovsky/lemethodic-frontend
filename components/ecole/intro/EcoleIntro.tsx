@@ -44,7 +44,7 @@ const METHODE = {
   en: {
     title: 'La Méthode en Couches',
     intro:
-      "Five layers compose your French. When you hit a wall, it's rarely everywhere — it's in one specific layer. La Méthode finds it, and we treat it directly.",
+      "Five layers compose your French. When you hit a wall, it's rarely everywhere. It's in one specific layer. La Méthode finds it, and we treat it directly.",
     couches: [
       {
         n: 'Couche 1',
@@ -56,7 +56,7 @@ const METHODE = {
         n: 'Couche 2',
         name: 'Les Moules des Idées',
         label: 'Coherence',
-        body: "The architecture of discourse. French speakers nuance, contrast, synthesize — they don't think in straight lines. Without this structure, your French sounds translated, even when every word is correct.",
+        body: "The architecture of discourse. French speakers nuance, contrast, synthesize. They don't think in straight lines. Without this structure, your French sounds translated, even when every word is correct.",
       },
       {
         n: 'Couche 3',
@@ -78,12 +78,12 @@ const METHODE = {
       },
     ],
     closer:
-      'Most platforms tell you to practice more. La Méthode identifies the layer that’s dragging — and treats that one, specifically.',
+      'Most platforms tell you to practice more. La Méthode identifies the layer that’s dragging. Treats that one, specifically.',
   },
   fr: {
     title: 'La Méthode en Couches',
     intro:
-      "Cinq couches composent votre français. Quand vous bloquez, c'est rarement partout — c'est dans une couche précise. La Méthode l'identifie, et on la traite.",
+      "Cinq couches composent votre français. Quand vous bloquez, c'est rarement partout. C'est dans une couche précise. La Méthode l'identifie, et on la traite.",
     couches: [
       {
         n: 'Couche 1',
@@ -95,7 +95,7 @@ const METHODE = {
         n: 'Couche 2',
         name: 'Les Moules des Idées',
         label: 'Cohérence',
-        body: "L'architecture du discours. Les Français nuancent, opposent, synthétisent — ils ne pensent pas en lignes droites. Sans cette structure, votre français a des allures de traduction, même quand chaque mot est correct.",
+        body: "L'architecture du discours. Les Français nuancent, opposent, synthétisent. Ils ne pensent pas en lignes droites. Sans cette structure, votre français a des allures de traduction, même quand chaque mot est correct.",
       },
       {
         n: 'Couche 3',
@@ -117,7 +117,7 @@ const METHODE = {
       },
     ],
     closer:
-      'La plupart des plateformes vous disent de pratiquer plus. La Méthode identifie la couche qui freine — et traite celle-là, précisément.',
+      'La plupart des plateformes vous disent de pratiquer plus. La Méthode identifie la couche qui freine. Et traite celle-là, précisément.',
   },
 } as const
 
@@ -129,7 +129,7 @@ const HOW = {
     blocks: [
       {
         head: 'You record. The diagnostic listens.',
-        body: 'Every speaking task you submit is run through the 5-couche analysis. The AI scores each layer and identifies your bottleneck — *Le Goulet* — the layer dragging your overall performance down.',
+        body: 'Every speaking task you submit is run through the 5-couche analysis. The AI scores each layer and identifies your bottleneck (*Le Goulet*), the layer dragging your overall performance down.',
       },
       {
         head: 'The lessons target that bottleneck.',
@@ -137,7 +137,7 @@ const HOW = {
       },
       {
         head: 'You progress one Goulet at a time.',
-        body: 'Not "practice more." Not "try harder." Specific, layered work on the layer that needs it — until you’re solid across all five.',
+        body: 'Not "practice more." Not "try harder." Specific, layered work on the layer that needs it. Until you’re solid across all five.',
       },
     ],
   },
@@ -148,7 +148,7 @@ const HOW = {
     blocks: [
       {
         head: 'Vous enregistrez. Le diagnostic écoute.',
-        body: 'Chaque tâche orale que vous soumettez est passée au crible des cinq couches. L’IA évalue chaque couche et identifie votre goulet — *Le Goulet* — la couche qui freine l’ensemble.',
+        body: 'Chaque tâche orale que vous soumettez est passée au crible des cinq couches. L’IA évalue chaque couche et identifie votre goulet (*Le Goulet*), la couche qui freine l’ensemble.',
       },
       {
         head: 'Les leçons travaillent ce goulet.',
@@ -156,7 +156,7 @@ const HOW = {
       },
       {
         head: 'Vous progressez un goulet à la fois.',
-        body: 'Pas « pratiquez plus. » Pas « essayez plus fort. » Un travail précis et stratifié sur la couche qui en a besoin — jusqu’à ce que les cinq soient solides.',
+        body: 'Pas « pratiquez plus. » Pas « essayez plus fort. » Un travail précis et stratifié sur la couche qui en a besoin. Jusqu’à ce que les cinq soient solides.',
       },
     ],
   },
@@ -759,7 +759,7 @@ export default function EcoleIntro() {
                       }}
                     >
                       <strong style={{ fontWeight: 600 }}>{s.name}</strong>
-                      {' — '}
+                      {language === 'fr' ? ' : ' : ': '}
                       {s.body}
                     </p>
                   </div>

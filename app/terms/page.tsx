@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import LegalPage from '@/components/legal/LegalPage'
 
 export const metadata: Metadata = {
-  title: 'Terms and Conditions — LeMethodic',
+  title: 'Terms and Conditions | LeMethodic',
   description: 'Terms governing your access to and use of LeMethodic.',
   alternates: { canonical: '/terms' },
 }

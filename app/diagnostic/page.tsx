@@ -487,7 +487,7 @@ function DiagnosticInner() {
   // an honest "Analysis pending" rather than rendering "null on Tâche 1".
   const narrativeFallback = tcfBand
     ? (tacheNumber != null ? `${tcfBand} on Tâche ${tacheNumber}` : tcfBand)
-    : 'Analysis pending — your CEFR band will appear once the backend finishes scoring.'
+    : 'Analysis pending. Your CEFR band will appear once the backend finishes scoring.'
   const narrativeText = realMode ? (diagnostic.narrativeSummary ?? narrativeFallback) : narrativeFallback
 
   // F-080c: detected modules + ordonnance source. The Diagnostic.goulet

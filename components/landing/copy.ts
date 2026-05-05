@@ -38,8 +38,8 @@ export const HERO = {
     fr: "L'examen oral de français ne récompense pas ce que vous savez. Il récompense ce que vous pouvez produire en 12 minutes sous pression.",
   } satisfies I18nString,
   subhead: {
-    en: 'LeMethodic is exam prep for B1 anglophones who can read French, write French, even understand French — but freeze the moment they have to speak it.',
-    fr: "LeMethodic est une préparation d'examen pour anglophones B1 qui lisent, écrivent, et comprennent le français — mais qui se figent au moment de parler.",
+    en: 'LeMethodic is exam prep for B1 anglophones who can read French, write French, even understand French, but freeze the moment they have to speak it.',
+    fr: "LeMethodic est une préparation d'examen pour anglophones B1 qui lisent, écrivent, et comprennent le français, mais qui se figent au moment de parler.",
   } satisfies I18nString,
   ctaPrimary: {
     en: 'Start the 12-minute diagnostic',
@@ -62,13 +62,13 @@ export const PROBLEM = {
   paragraphs: {
     en: [
       "You hit a wall at B1. Most learners do. It's the moment French stops being forgiving.",
-      'You can survive a conversation. You can read articles. You can write structured texts. But when a real French speaker talks at normal speed, or when an examiner asks you to argue a position in 5 minutes — you collapse into safe phrases. Short sentences. Past tense only. The word you needed wasn\'t there when you needed it.',
+      'You can survive a conversation. You can read articles. You can write structured texts. But when a real French speaker talks at normal speed, or when an examiner asks you to argue a position in 5 minutes, you collapse into safe phrases. Short sentences. Past tense only. The word you needed wasn\'t there when you needed it.',
       "Duolingo, Babbel, even Preply tutoring won't fix this. They were built for a different problem: helping you learn French. You don't need to learn more French. You need to break the wall between knowing French and producing French under exam pressure.",
       'That\'s what LeMethodic does.',
     ],
     fr: [
       "Vous avez frappé un mur au niveau B1. La plupart des apprenants y arrivent. C'est le moment où le français cesse d'être indulgent.",
-      "Vous tenez une conversation. Vous lisez des articles. Vous rédigez des textes structurés. Mais quand un francophone parle à vitesse normale, ou quand un examinateur vous demande d'argumenter en 5 minutes — vous vous repliez sur des phrases sûres. Des phrases courtes. Du passé composé partout. Le mot dont vous aviez besoin n'était pas là quand il fallait.",
+      "Vous tenez une conversation. Vous lisez des articles. Vous rédigez des textes structurés. Mais quand un francophone parle à vitesse normale, ou quand un examinateur vous demande d'argumenter en 5 minutes, vous vous repliez sur des phrases sûres. Des phrases courtes. Du passé composé partout. Le mot dont vous aviez besoin n'était pas là quand il fallait.",
       "Duolingo, Babbel, même les cours sur Preply ne résoudront pas cela. Ils ont été construits pour un autre problème : vous apprendre le français. Vous n'avez pas besoin d'apprendre plus de français. Vous avez besoin de briser le mur entre savoir le français et le produire sous pression d'examen.",
       "C'est ce que fait LeMethodic.",
     ],
@@ -94,8 +94,8 @@ export const DIFFERENTIATION = {
         fr: 'Diagnostic, pas programme générique',
       },
       body: {
-        en: 'Most apps push you through generic lessons. LeMethodic starts with 3 recordings to find your specific gaps — the exact patterns blocking your B2 score. Your path is built from your gaps, not from someone else\'s syllabus.',
-        fr: "La plupart des applications vous font suivre des leçons standardisées. LeMethodic commence par 3 enregistrements pour identifier vos lacunes spécifiques — les patterns exacts qui bloquent votre score B2. Votre parcours est construit à partir de vos lacunes, pas d'un programme prédéfini.",
+        en: 'Most apps push you through generic lessons. LeMethodic starts with 3 recordings to find your specific gaps: the exact patterns blocking your B2 score. Your path is built from your gaps, not from someone else\'s syllabus.',
+        fr: "La plupart des applications vous font suivre des leçons standardisées. LeMethodic commence par 3 enregistrements pour identifier vos lacunes spécifiques : les patterns exacts qui bloquent votre score B2. Votre parcours est construit à partir de vos lacunes, pas d'un programme prédéfini.",
       },
     },
     {
@@ -104,8 +104,8 @@ export const DIFFERENTIATION = {
         fr: 'Interférences anglophones, pas français générique',
       },
       body: {
-        en: 'Built on 7,000+ hours of teaching English speakers learning French. The mistakes you make aren\'t random. They follow patterns. LeMethodic detects those patterns and trains you out of them — not generic "French grammar," but the specific traps anglophones fall into and never escape.',
-        fr: "Construit à partir de plus de 7 000 heures d'enseignement à des anglophones apprenant le français. Les erreurs que vous faites ne sont pas aléatoires. Elles suivent des patterns. LeMethodic détecte ces patterns et vous en sort — pas de la « grammaire française » générique, mais les pièges spécifiques dans lesquels les anglophones tombent et n'arrivent jamais à sortir.",
+        en: 'Built on 7,000+ hours of teaching English speakers learning French. The mistakes you make aren\'t random. They follow patterns. LeMethodic detects those patterns and trains you out of them. Not generic "French grammar," but the specific traps anglophones fall into and never escape.',
+        fr: "Construit à partir de plus de 7 000 heures d'enseignement à des anglophones apprenant le français. Les erreurs que vous faites ne sont pas aléatoires. Elles suivent des patterns. LeMethodic détecte ces patterns et vous en sort. Pas de la « grammaire française » générique, mais les pièges spécifiques dans lesquels les anglophones tombent et n'arrivent jamais à sortir.",
       },
     },
     {
@@ -365,14 +365,14 @@ export const METHODOLOGY = {
     {
       name: { en: 'La Voix', fr: 'La Voix' },
       description: {
-        en: 'How it sounds — vowels, liaisons, rhythm.',
-        fr: 'Comment ça sonne — voyelles, liaisons, rythme.',
+        en: 'How it sounds: vowels, liaisons, rhythm.',
+        fr: 'Comment ça sonne : voyelles, liaisons, rythme.',
       },
     },
   ] as CoucheCopy[],
   closer: {
-    en: "Most platforms tell you to practice more. La Méthode identifies the layer that's dragging — and treats that one, specifically.",
-    fr: 'La plupart des plateformes vous disent de pratiquer plus. La Méthode identifie la couche qui freine — et traite celle-là, précisément.',
+    en: "Most platforms tell you to practice more. La Méthode identifies the layer that's dragging. Treats that one, specifically.",
+    fr: 'La plupart des plateformes vous disent de pratiquer plus. La Méthode identifie la couche qui freine. Et traite celle-là, précisément.',
   } satisfies I18nString,
 }
 
@@ -395,8 +395,8 @@ export const FAQ = {
         fr: 'En quoi est-ce différent de PrepMyFuture ?',
       },
       answer: {
-        en: "Most French exam prep drills grammar and vocabulary. We're the only platform built for speaking practice with AI examiner feedback — tuned for the specific interference patterns English speakers fall into, not generic French grammar.",
-        fr: "La plupart des préparations aux examens de français font travailler la grammaire et le vocabulaire. Nous sommes la seule plateforme construite pour la pratique orale avec feedback IA — adaptée aux schémas d'interférence spécifiques aux anglophones, pas à la grammaire française générique.",
+        en: "Most French exam prep drills grammar and vocabulary. We're the only platform built for speaking practice with AI examiner feedback, tuned for the specific interference patterns English speakers fall into, not generic French grammar.",
+        fr: "La plupart des préparations aux examens de français font travailler la grammaire et le vocabulaire. Nous sommes la seule plateforme construite pour la pratique orale avec feedback IA, adaptée aux schémas d'interférence spécifiques aux anglophones, pas à la grammaire française générique.",
       },
     },
     {
@@ -415,8 +415,8 @@ export const FAQ = {
         fr: 'Garantissez-vous que je vais réussir ?',
       },
       answer: {
-        en: "The subscription and Sprint don't include outcome guarantees — passing depends on your effort, not just the platform. The Premium tier (coming month 2-3) includes an outcome-based money-back guarantee.",
-        fr: "L'abonnement et le Sprint n'incluent pas de garantie de résultat — la réussite dépend de votre effort, pas seulement de la plateforme. Le niveau Premium (à venir au mois 2-3) inclut une garantie de remboursement basée sur le résultat.",
+        en: "The subscription and Sprint don't include outcome guarantees. Passing depends on your effort, not just the platform. The Premium tier (coming month 2-3) includes an outcome-based money-back guarantee.",
+        fr: "L'abonnement et le Sprint n'incluent pas de garantie de résultat. La réussite dépend de votre effort, pas seulement de la plateforme. Le niveau Premium (à venir au mois 2-3) inclut une garantie de remboursement basée sur le résultat.",
       },
     },
     {
@@ -520,12 +520,12 @@ export const WAITLIST = {
 
 export const META: Record<Lang, { title: string; description: string }> = {
   en: {
-    title: 'LeMethodic — French exam speaking prep for B1 anglophones',
+    title: 'LeMethodic | French exam speaking prep for B1 anglophones',
     description:
       "Exam preparation built for English speakers preparing French speaking exams (TCF / TEF / DELF). Diagnostic-driven path, AI feedback under real exam pressure.",
   },
   fr: {
-    title: "LeMethodic — Préparation à l'oral des examens de français pour anglophones B1",
+    title: "LeMethodic | Préparation à l'oral des examens de français pour anglophones B1",
     description:
       "Préparation d'examen pour anglophones préparant les examens de français (TCF / TEF / DELF). Parcours basé sur diagnostic, feedback IA sous pression d'examen réelle.",
   },
@@ -588,8 +588,8 @@ export const EXAM_OPTIONS: ExamOption[] = [
     value: 'another_exam',
     label: 'Another exam',
     formatDna: {
-      en: "Tell us which one — we'll email you when ready",
-      fr: "Dites-nous lequel — nous vous écrirons quand prêt",
+      en: "Tell us which one. We'll email you when ready.",
+      fr: "Dites-nous lequel. Nous vous écrirons quand prêt.",
     },
     routesToWaitlist: true,
   },
@@ -618,8 +618,8 @@ export const TARGET_LEVEL_HELPER_BY_EXAM: Record<ExamValue, I18nString | null> =
     fr: "Pour la résidence permanente canadienne via Entrée Express, B2 correspond généralement à NCLC 7-8.",
   },
   delf_b1_b2: {
-    en: 'DELF uses CEFR levels directly — pick the one you need.',
-    fr: 'Le DELF utilise directement les niveaux CECR — choisissez celui qu\'il vous faut.',
+    en: 'DELF uses CEFR levels directly. Pick the one you need.',
+    fr: 'Le DELF utilise directement les niveaux CECR. Choisissez celui qu\'il vous faut.',
   },
   another_exam: null,   // shouldn't reach this question (waitlist branch)
   not_sure: null,       // no helper — let the standard helper text stand

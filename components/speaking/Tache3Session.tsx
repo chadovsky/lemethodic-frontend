@@ -366,7 +366,7 @@ export default function Tache3Session({ topicSlug }: Tache3SessionProps) {
               >
                 {recorder.status === 'requesting-permission'
                   ? 'Requesting mic…'
-                  : 'Ready — Record now'}
+                  : 'Ready. Record now'}
               </button>
 
               <button

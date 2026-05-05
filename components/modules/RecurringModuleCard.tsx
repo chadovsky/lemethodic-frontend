@@ -69,7 +69,7 @@ export default function RecurringModuleCard({ module: m, onTap }: Props) {
     <button
       type="button"
       onClick={onTap}
-      aria-label={`${name} — ${sessionsCopy}`}
+      aria-label={`${name}, ${sessionsCopy}`}
       style={{
         width: '100%',
         backgroundColor: CATEGORY_BG[m.category],

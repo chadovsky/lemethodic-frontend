@@ -393,7 +393,7 @@ function ConfidenceMeter({ confidence }: { confidence: 'high' | 'medium' | 'low'
       ? 'High confidence'
       : confidence === 'medium'
       ? 'Medium confidence'
-      : 'Low confidence — give us 2 more recordings'
+      : 'Low confidence. Give us 2 more recordings'
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       <div

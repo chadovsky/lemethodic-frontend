@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import LegalPage from '@/components/legal/LegalPage'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — LeMethodic',
+  title: 'Privacy Policy | LeMethodic',
   description: 'How LeMethodic collects, uses, and shares your personal information.',
   alternates: { canonical: '/privacy' },
 }

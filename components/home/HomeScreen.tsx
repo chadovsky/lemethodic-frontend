@@ -620,7 +620,7 @@ function PhaseDivider() {
   return (
     <div
       role="separator"
-      aria-label="Phase 2 — Approfondissement"
+      aria-label="Phase 2: Approfondissement"
       style={{
         padding: '24px 16px 12px',
         borderTop: '1px solid #1A1A1A14',
@@ -638,7 +638,7 @@ function PhaseDivider() {
           color: INK_MUTED,
         }}
       >
-        Phase 2 — Approfondissement
+        Phase 2: Approfondissement
       </p>
       <p
         style={{

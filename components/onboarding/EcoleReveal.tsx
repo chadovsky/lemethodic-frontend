@@ -41,11 +41,11 @@ interface EcoleRevealProps {
 // ── Field formatters ────────────────────────────────────────────────────────
 
 const LEVEL_LABELS: Record<string, { en: string; fr: string }> = {
-  a2: { en: 'A2 — Basic', fr: 'A2 — Élémentaire' },
-  b1: { en: 'B1 — Intermediate', fr: 'B1 — Intermédiaire' },
-  b2: { en: 'B2 — Upper-intermediate', fr: 'B2 — Avancé' },
-  c1: { en: 'C1 — Advanced', fr: 'C1 — Autonome' },
-  c2: { en: 'C2 — Mastery', fr: 'C2 — Maîtrise' },
+  a2: { en: 'A2 · Basic', fr: 'A2 · Élémentaire' },
+  b1: { en: 'B1 · Intermediate', fr: 'B1 · Intermédiaire' },
+  b2: { en: 'B2 · Upper-intermediate', fr: 'B2 · Avancé' },
+  c1: { en: 'C1 · Advanced', fr: 'C1 · Autonome' },
+  c2: { en: 'C2 · Mastery', fr: 'C2 · Maîtrise' },
   not_sure: { en: 'Not sure yet', fr: 'Je ne sais pas encore' },
 }
 

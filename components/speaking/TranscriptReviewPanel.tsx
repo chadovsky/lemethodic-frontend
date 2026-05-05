@@ -24,14 +24,14 @@ const MOULES: Moule[] = [
     label: 'PYRAMIDE',
     description: 'Your opener. Broad, gives them room to respond.',
     userLine: 'Bonjour, je voudrais partir en vacances dans un pays francophone.',
-    coaching: "Strong opener — broad request invites the agent to ask back. Add 's'il vous plaît' for register.",
+    coaching: "Strong opener. Broad request invites the agent to ask back. Add 's'il vous plaît' for register.",
     bg: SAGE,
   },
   {
     label: 'REBOND',
     description: 'Your follow-up. Builds on what they said.',
     userLine: 'Oui, je pensais partir en juillet ou août. Quelles destinations me recommandez-vous\u00a0?',
-    coaching: "Good use of 'Quelles' — properly agrees in gender and number. Natural pivot from your timing to their expertise.",
+    coaching: "Good use of 'Quelles'. Properly agrees in gender and number. Natural pivot from your timing to their expertise.",
     bg: BUTTER,
   },
   {

@@ -29,7 +29,7 @@ export default function GouletStackSection({ modules }: GouletStackSectionProps)
   if (top3.length === 0) return null
 
   return (
-    <section aria-label="Goulet Stack — top patterns blocking you">
+    <section aria-label="Goulet Stack, top patterns blocking you">
       <p
         style={{
           fontFamily: DISPLAY_FONT,

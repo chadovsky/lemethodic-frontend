@@ -105,7 +105,7 @@ export default function LessonBody({ lesson }: LessonBodyProps) {
           margin: 0,
         }}
       >
-        Video lesson — coming soon.
+        Video lesson coming soon.
       </p>
       {lesson.asset_url && (
         <a
