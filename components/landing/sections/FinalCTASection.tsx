@@ -19,7 +19,10 @@ export default function FinalCTASection({ lang }: { lang: Lang }) {
     <section
       className="w-full"
       style={{
-        backgroundColor: ED.paper,
+        // F-227.rhythm — flipped from ed-paper to ed-bg. Paired with FAQ
+        // bg→paper flip to land the post-F-227 rhythm Pricing(bg) →
+        // FAQ(paper) → FinalCTA(bg) → Footer. Restores F-214 alternation.
+        backgroundColor: ED.bg,
         padding: 'clamp(96px, 14vw, 160px) clamp(24px, 4vw, 64px)',
       }}
     >

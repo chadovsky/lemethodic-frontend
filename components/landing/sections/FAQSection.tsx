@@ -14,7 +14,11 @@ export default function FAQSection({ lang }: { lang: Lang }) {
     <section
       className="w-full"
       style={{
-        backgroundColor: ED.bg,
+        // F-227.rhythm — flipped from ed-bg to ed-paper to restore F-214
+        // alternation broken by F-227 reorder (Methodology pulled out from
+        // between Pricing and FAQ). FAQ on paper also elevates it as the
+        // resolution moment before final CTA.
+        backgroundColor: ED.paper,
         padding: 'clamp(80px, 12vw, 140px) clamp(24px, 4vw, 64px)',
       }}
     >

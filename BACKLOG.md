@@ -2160,14 +2160,15 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
-### F-227.rhythm — Pricing→FAQ same-bg adjacency
+### F-227.rhythm — Pricing→FAQ same-bg adjacency (paired bg flip)
 
 **Priority:** LOW (visual rhythm polish)
-**Status:** Queued
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop screenshot of `/` showing Pricing → FAQ → FinalCTA visible together to confirm alternation rhythm. EN-only sufficient — bg-color change is language-independent. F-225 interactive verification clause does NOT apply — bg-color only, no behavior change.)
 **Filed:** 2026-05-01
-**Source:** F-227 ship side-effect — Methodology reorder created Pricing(bg)→FAQ(bg) adjacency
+**Shipped:** 2026-05-01 (FE-side, frontend commit pending)
+**Source:** F-227 ship side-effect — Methodology reorder created Pricing(bg)→FAQ(bg) adjacency. Chadi callout 2026-05-01: FAQ on paper subtly elevates it as the resolution moment before final CTA, fits the rhetorical job of the section.
 **Dependencies:** F-227
-**Scope:** flip FAQSection bg from ed-bg to ed-paper to restore F-214 alternation (post-F-227 ordering: ...HowItWorks(paper)/Pricing(bg)/FAQ(?)/FinalCTA(paper) — flipping FAQ to paper fixes the rhythm but creates 3 papers in a row at FAQ→FinalCTA). Or alternatively flip FinalCTA to ed-bg and keep FAQ at ed-paper. Either approach is a 1-line change. Decision needed on which adjacency to break — needs Chadi taste pass. Not blocking.
+**Scope:** post-F-227 rhythm restoration. Two paired flips (the spec billed it as "one-line change" but the codebase had FinalCTA at ed-paper, not ed-bg, so two flips needed to land the stated outcome): FAQSection.tsx bg `ed-bg → ed-paper` + FinalCTASection.tsx bg `ed-paper → ed-bg`. Final landing rhythm: Hero(bg)/Problem(bg)/Differentiation(bg)/Methodology(bg)/HowItWorks(paper)/Pricing(bg)/FAQ(paper)/FinalCTA(bg). One residual same-bg adjacency at the top of the page (Hero→Problem→Differentiation→Methodology = 4 bgs) but that's the editorial canvas the visitor begins on; alternation kicks in from HowItWorks onward and is now perfectly clean.
 **Owner:** Engineering
 
 ### F-225 — Desktop verification protocol (process change)
