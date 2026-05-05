@@ -814,16 +814,26 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Scope:** migrate Paywall's 660-line pricing chrome to editorial system: typography (DISPLAY_FONT → Geist), Recharts radar styling (axis labels, fill colors, grid stroke → ed-* tokens), value-row checkmarks (current pastel/svg → ed-rule outlined), comparison table (current pill toggles → editorial tabs), trial timeline cards. Significant design work; F-203 minimal fix solves the launch-blocker.
 **Owner:** Engineering
 
-### F-204 — Authenticated dashboard surfaces editorial migration (PLAN-FIRST PROPOSED)
+### F-204 — Authenticated dashboard surfaces editorial migration (page chrome only)
 
-**Priority:** HIGH
-**Status:** Plan-first proposed, awaiting Chadi confirm-or-redirect on scope assignment
+**Priority:** HIGH (launch-blocking — desktop white-rails)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/progress` and `/cluster/[slug]` per F-225)
 **Filed:** 2026-05-04
-**Source:** F-200 cascade — F-203..F-206 not explicitly scoped by Chadi
+**Source:** F-200 cascade
 **Dependencies:** F-200, F-201
-**Proposed scope:** migrate `/progress` (P-230 dashboard with Snapshot / Today's focus / Goulet / RecentActivity sections) and `/cluster/[slug]` (P-234 cluster detail with header + lesson + practice CTA) to editorial system. Both surfaces use pastel pastels for chips + cards; migrate to ed-paper + ed-rule + 4px radii while preserving section structure. Status chips on cluster header (4 lifecycle states) need ed-* equivalents. Coverage line + Confidence Visualizer in Snapshot section keep their data-shape but restyle. Estimated 400-500 LOC across ~12 files.
+**Scope:** migrated PAGE CHROME of `/progress` and `/cluster/[slug]` to editorial system: bg → ed-bg, max-width 440 → 720 (fixes white-rails), header restyled (ed-rule border, Geist 600, padding clamp), main padding clamp() responsive, font tokens swapped at the page level. **Section internals (Snapshot/TodayFocus/Goulet/RecentActivity on /progress; ClusterHeader/LessonBody/PracticeCTA on /cluster) keep their FluentPath pastel chips as accent layer per F-200 rule** (pastels survive as decoration, not chrome). Full section-internal editorial migration deferred to F-204.deep.
 **Owner:** Engineering
-**Confirm before implementation:** is this the right scope for F-204? Or do you want different surface assignments? Pause here for the next session unless Chadi pre-confirms.
+**Note:** F-204 deliberately scope-cut to page chrome only because section internals carry data-display chips (status indicators on cluster header, confidence visualizer pips on Snapshot, Tâche+CEFR badges on RecentActivity) where ed-* migration without redesign would lose information. Full migration needs design pass on chip vocabulary.
+
+### F-204.deep — Section-internal editorial migration on /progress + /cluster
+
+**Priority:** MEDIUM (post-soft-beta polish — F-204 chrome fix unblocks launch)
+**Status:** Queued
+**Filed:** 2026-05-04
+**Source:** F-204 scope cut — section internals deferred
+**Dependencies:** F-204
+**Scope:** migrate Snapshot section (level chips + confidence visualizer + agreement copy + diagnostic-in-progress fallback), TodayFocus (Dialogue Box + reason_code copy), GouletStack (RecurringModuleCard reuse), RecentActivity (linear list with Tâche/CEFR badges) on /progress. Plus ClusterHeader (status + last_detection_result chips with traffic-light dots) on /cluster. Each chip vocabulary needs editorial-system equivalent without losing data display.
+**Owner:** Engineering + design pass on chip palette
 
 ### F-205 — User-state surfaces editorial migration (PLAN-FIRST PROPOSED)
 

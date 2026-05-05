@@ -29,10 +29,14 @@ import type {
   TodayActionResponse,
 } from '@/lib/types'
 
-const INK = '#1A1A1A'
-const INK_MUTED = '#1A1A1A66'
-const BG = 'var(--fp-canvas)'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+// F-204 — page chrome migrated to editorial system. Section components
+// (Snapshot/TodayFocus/Goulet/RecentActivity) keep their FluentPath pastel
+// accents as the chip layer per F-200 rule (pastels survive as decoration,
+// not chrome). Full section-level editorial migration tracked as F-204.deep.
+const INK = 'var(--ed-fg)'
+const INK_MUTED = 'var(--ed-muted)'
+const BG = 'var(--ed-bg)'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface DashboardData {
   level: LevelResponse | null
@@ -85,7 +89,10 @@ export default function ProgressDashboard() {
 
   return (
     <div style={{ minHeight: '100dvh', backgroundColor: BG, fontFamily: DISPLAY_FONT }}>
-      <div style={{ maxWidth: 440, margin: '0 auto', position: 'relative' }}>
+      {/* F-204: max-width widened 440 → 720 to fix desktop white-rails.
+          Section components inside still cap their own widths where
+          appropriate (Goulet/RecentActivity keep narrow column rhythm). */}
+      <div style={{ maxWidth: 720, margin: '0 auto', position: 'relative' }}>
         <header
           style={{
             position: 'sticky',
@@ -93,19 +100,20 @@ export default function ProgressDashboard() {
             zIndex: 40,
             height: 'calc(56px + var(--fp-safe-top))',
             backgroundColor: BG,
-            borderBottom: '1px solid #1A1A1A0A',
+            borderBottom: '1px solid var(--ed-rule)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: 'var(--fp-safe-top) 16px 0 16px',
+            padding: 'var(--fp-safe-top) clamp(16px, 3vw, 32px) 0',
           }}
         >
           <h1
             style={{
               fontFamily: DISPLAY_FONT,
-              fontWeight: 700,
-              fontSize: 18,
+              fontWeight: 600,
+              fontSize: 16,
               color: INK,
+              letterSpacing: '0.02em',
               margin: 0,
             }}
           >
@@ -113,7 +121,7 @@ export default function ProgressDashboard() {
           </h1>
         </header>
 
-        <main style={{ padding: '24px 16px', paddingBottom: 88 }}>
+        <main style={{ padding: 'clamp(32px, 5vw, 48px) clamp(16px, 3vw, 32px)', paddingBottom: 88 }}>
           {fetchError ? (
             <ErrorRetry message={fetchError} onRetry={() => setRetryKey((k) => k + 1)} />
           ) : data === null ? (

@@ -22,10 +22,13 @@ import ClusterHeader from './ClusterHeader'
 import LessonBody from './LessonBody'
 import PracticeCTA from './PracticeCTA'
 
-const INK = '#1A1A1A'
-const INK_MUTED = '#1A1A1A66'
-const BG = 'var(--fp-canvas)'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+// F-204 — page chrome migrated to editorial system. Section components
+// (ClusterHeader / LessonBody / PracticeCTA) restyled in this same ticket
+// since they're tightly coupled to the page layout.
+const INK = 'var(--ed-fg)'
+const INK_MUTED = 'var(--ed-muted)'
+const BG = 'var(--ed-bg)'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface ClusterDetailPageProps {
   slug: string
@@ -79,10 +82,10 @@ export default function ClusterDetailPage({ slug }: ClusterDetailPageProps) {
             zIndex: 40,
             height: 'calc(56px + var(--fp-safe-top))',
             backgroundColor: BG,
-            borderBottom: '1px solid #1A1A1A0A',
+            borderBottom: '1px solid var(--ed-rule)',
             display: 'flex',
             alignItems: 'center',
-            padding: 'var(--fp-safe-top) 16px 0 16px',
+            padding: 'var(--fp-safe-top) clamp(16px, 3vw, 32px) 0',
             gap: 12,
           }}
         >
@@ -105,7 +108,7 @@ export default function ClusterDetailPage({ slug }: ClusterDetailPageProps) {
           </Link>
         </header>
 
-        <main style={{ padding: '24px 16px 64px' }}>
+        <main style={{ padding: 'clamp(32px, 5vw, 48px) clamp(16px, 3vw, 32px) 64px' }}>
           {notFound ? (
             <NotFoundState />
           ) : fetchError ? (
