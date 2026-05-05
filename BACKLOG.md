@@ -2160,6 +2160,18 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-001 — Hero H1 + rotating kicker sizing
+
+**Priority:** HIGH (verification-found; H1 overflow on production)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` (EN) + `/fr` (FR) hero showing H1 fits within viewport at every breakpoint and kicker sized at the new clamp scale. F-225 interactive verification clause does NOT apply — pure typography size change, no behavior change. Rotation animation fluidity at the larger size verifiable via the screenshot's "Prep for [TCF/TEF/DELF/DALF]" position.)
+**Filed:** 2026-05-01
+**Shipped:** 2026-05-01 (FE-side, frontend commit pending)
+**Source:** V-series ticket batch — H1 overflowed viewport, kicker undersized
+**Dependencies:** V-005 (Switzer + Fraunces are now live)
+**Scope:** two clamp adjustments in landing hero.
+- Hero H1 (`HeroSection.tsx`): `clamp(2.5rem, 7vw, 6rem)` → `clamp(2.5rem, 6vw, 5rem)`. 40px floor preserved (small mobile); 80px desktop cap (was 96px). The locked H1 string is 26 words — at 96px it overflowed the 920px column at 1440px. 80px fits with breathing room.
+- Rotating kicker (`RotatingKicker.tsx`): `clamp(13px, 1.2vw, 15px)` → `clamp(20px, 1.8vw, 24px)`. Tracking (0.06em) + color (ed-muted) + uppercase preserved. Bottom margin nudged from `clamp(12px, 1.5vw, 20px)` to `clamp(16px, 2vw, 28px)` proportional to the size bump. Slide animation timing untouched — runs at same ED_DUR.rotateWord (600ms) which still reads smoothly at the larger size.
+
 ### V-005 — Font system upgrade (Switzer + Fraunces)
 
 **Priority:** HIGH (V-series chain root — V-003 + V-004 inherit the new font system)

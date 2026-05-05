@@ -42,12 +42,14 @@ export default function RotatingKicker({ lang }: RotatingKickerProps) {
         style={{
           fontFamily: SANS,
           fontWeight: 500,
-          fontSize: 'clamp(13px, 1.2vw, 15px)',
+          // V-001 — bumped from clamp(13px, 1.2vw, 15px) to
+          // clamp(20px, 1.8vw, 24px). Tracking + color preserved.
+          fontSize: 'clamp(20px, 1.8vw, 24px)',
           letterSpacing: '0.06em',
           textTransform: 'uppercase',
           color: ED_MUTED,
           margin: 0,
-          marginBottom: 'clamp(12px, 1.5vw, 20px)',
+          marginBottom: 'clamp(16px, 2vw, 28px)',
         }}
       >
         {PREFIX[lang]} TCF · TEF · DELF · DALF

@@ -30,7 +30,11 @@ export default function HeroSection({ lang }: { lang: Lang }) {
             style={{
               fontFamily: SANS_FONT,
               fontWeight: 700,
-              fontSize: 'clamp(2.5rem, 7vw, 6rem)',
+              // V-001 — tightened from clamp(2.5rem, 7vw, 6rem) (40-96px)
+              // to clamp(2.5rem, 6vw, 5rem) (40-80px). The locked H1 string
+              // is 26 words; the previous 96px cap overflowed viewport on
+              // large desktops. 80px cap fits comfortably at 1440px.
+              fontSize: 'clamp(2.5rem, 6vw, 5rem)',
               lineHeight: LINE_HEIGHT.display,
               letterSpacing: LETTER_SPACING.display,
               color: ED.fg,
