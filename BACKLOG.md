@@ -2160,6 +2160,49 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-008 — Card 2 interference example direction reversed
+
+**Priority:** HIGH (verification-found; wrong audience direction shipped)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` (EN) + `/fr` (FR) showing Card 2 (Anglophone interference) with the reversed pair: `~~Je suis 25 ans~~ / J'ai 25 ans`. Plus a hover trace verifying the 4 pairs cycle through correctly.)
+**Filed:** 2026-05-01
+**Shipped:** 2026-05-01 (FE-side, frontend commit pending)
+**Source:** V-006/V-007/V-008 production verification batch
+**Dependencies:** V-004
+**Scope:** V-004 shipped Card 2 with English-learner-of-French structure (`~~I am agree~~` / `Je suis d'accord`), which actually demonstrates French-speaker-of-English interference — backwards for LeMethodic's audience. V-008 reverses direction: each pair now shows the WRONG French attempt (calque from English structure) and the CORRECT French. Two-line layout per Chadi's lean (cleaner than the 3-line EN-source / wrong-FR / correct-FR treatment): struck-through wrong attempt above (Fraunces italic 1.25rem ed-muted), correct version below (Fraunces italic 1.5rem ed-fg). The reader infers the English source from context.
+
+**Pre-authored 4 pairs (iconic L1-interference mistakes):**
+1. `~~Je suis 25 ans~~` → `J'ai 25 ans` (être/avoir, age)
+2. `~~Je suis faim~~` → `J'ai faim` (être/avoir, hunger)
+3. `~~Je manque toi~~` → `Tu me manques` (word-order, reversed pronoun)
+4. `~~Je suis chaud~~` → `J'ai chaud` (être/avoir, sensation)
+
+EN/FR small-caps prefix labels removed in this rewrite — they were the relics of the wrong-direction layout (English source → French target). Without them, the reader sees the wrong/correct French pairing directly. V-004's `ed-pair-fade` keyframe + 80ms FR-line stagger preserved.
+
+**Files touched:**
+- `components/landing/sections/DifferentiationSection.tsx` — INTERFERENCE_PAIRS shape changed from `{en, fr}[]` to `{wrong, correct}[]`; InterferenceVisual rewritten as 2-line; SANS_FONT span prefixes removed (no longer needed without EN/FR labels)
+
+### V-007 — Final CTA trust line duplicate "Free."
+
+**Priority:** HIGH (verification-found; user-visible duplication)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop screenshot of `/` showing FinalCTASection trust line under primary CTA. EN-only sufficient — bug was an EN-side string concatenation; FR side rendered correctly. F-225 interactive verification clause does NOT apply — copy fix only.)
+**Filed:** 2026-05-01
+**Shipped:** 2026-05-01 (FE-side, frontend commit pending)
+**Source:** V-006/V-007/V-008 production verification batch — trust line read "Free. No card. About 12 minutes. Free." (Free duplicated)
+**Dependencies:** V-002 (em-dash strip touched the FINAL_CTA copy and exposed the bug, though the duplicate was older — F-200 era concatenation that overlapped with FINAL_CTA.ctaSecondary's first sentence)
+**Scope:** in `FinalCTASection.tsx` line 100, the trust span rendered `{FINAL_CTA.ctaSecondary[lang]} {HERO.ctaSecondary[lang].split('.')[0]}.` — concatenating FINAL_CTA's `"Free. No card. About 12 minutes."` with HERO.ctaSecondary's first sentence (which is `"Free"`), producing the duplicate. Removed the `HERO.ctaSecondary` suffix; trust line now reads exactly `FINAL_CTA.ctaSecondary[lang]` ("Free. No card. About 12 minutes." / "Gratuit. Sans carte. Environ 12 minutes."). HERO import removed (no longer used in this file).
+
+### V-006 — Kicker container clipping (rotating word cut off)
+
+**Priority:** HIGH (verification-found; layout bug clipped DELF/DALF)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots showing the kicker mid-rotation through all 4 exam names (TCF / TEF / DELF / DALF) with no character clipping and no container width-jitter between states. Plus a hover trace verifying smooth cycling.)
+**Filed:** 2026-05-01
+**Shipped:** 2026-05-01 (FE-side, frontend commit pending)
+**Source:** V-006/V-007/V-008 production verification batch — DELF and DALF clipped on right edge
+**Dependencies:** V-001 (kicker sizing bumped); F-212 (rotating mechanic)
+**Scope:** in `RotatingKicker.tsx`, the rotating word slot used `minWidth: '4ch'` which sized to 4 × digit-zero width, narrower than 4 uppercase letters with 0.06em letter-spacing. 4-character names (DELF/DALF) overflowed; 3-character names rendered fine. V-006 swaps the minWidth approach for an invisible width sizer — render the widest exam name (computed via `EXAMS.reduce((a,b) => b.length > a.length ? b : a)`) inside the slot at `visibility: hidden`, then absolute-position the visible animated word over it with `textAlign: center`. Container width locks to widest case, animated word centers within the locked width regardless of length. No JS measurement needed; layout-driven sizing.
+
+**Side fix:** earlier V-001 edit only updated the reduced-motion branch's font size + marginBottom because the active-rotation branch had different indentation (10-space vs 8-space inside its parent), and the `replace_all` matched only one. V-006 brings the active branch into line — `clamp(20px, 1.8vw, 24px)` font, `clamp(16px, 2vw, 28px)` marginBottom — so both render paths agree.
+
 ### V-004 — Differentiation cards rebuild (per-card art-directed visuals)
 
 **Priority:** MEDIUM (visual depth; differentiation cards were boring text-only templates)

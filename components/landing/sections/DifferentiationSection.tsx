@@ -82,11 +82,17 @@ function CoucheStackVisual() {
 
 // ── Card 2 — anglophone interference pair (cycles on hover) ────────────────
 
+// V-008 — direction reversed. Audience is English-speakers learning French,
+// so each pair shows the WRONG attempt (calque from English structure) and
+// the CORRECT French. Two-line layout: struck-through wrong attempt above,
+// correct version below. The reader infers the English source from context.
+// All four pairs are iconic L1-interference mistakes (être/avoir confusion
+// for first three; word-order for the fourth).
 const INTERFERENCE_PAIRS = [
-  { en: 'I am agree', fr: "Je suis d'accord" },
-  { en: 'I have 30 years', fr: "J'ai 30 ans" },
-  { en: 'depends of', fr: 'dépend de' },
-  { en: 'since 2020 I live here', fr: "J'habite ici depuis 2020" },
+  { wrong: 'Je suis 25 ans', correct: "J'ai 25 ans" },
+  { wrong: 'Je suis faim', correct: "J'ai faim" },
+  { wrong: 'Je manque toi', correct: 'Tu me manques' },
+  { wrong: 'Je suis chaud', correct: "J'ai chaud" },
 ] as const
 
 function InterferenceVisual() {
@@ -101,18 +107,18 @@ function InterferenceVisual() {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        gap: 14,
+        gap: 12,
       }}
       aria-hidden="true"
     >
       <p
-        key={`en-${pairIdx}`}
+        key={`wrong-${pairIdx}`}
         className="ed-pair-fade"
         style={{
           fontFamily: SERIF_FONT,
           fontStyle: 'italic',
           fontWeight: 400,
-          fontSize: '1.375rem',
+          fontSize: '1.25rem',
           lineHeight: 1.2,
           color: ED.muted,
           margin: 0,
@@ -121,49 +127,22 @@ function InterferenceVisual() {
           textDecorationThickness: '1px',
         }}
       >
-        <span
-          style={{
-            fontFamily: SANS_FONT,
-            fontStyle: 'normal',
-            fontSize: '0.7em',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: ED.muted,
-            marginRight: 8,
-            textDecoration: 'none',
-          }}
-        >
-          EN
-        </span>
-        {pair.en}
+        {pair.wrong}
       </p>
       <p
-        key={`fr-${pairIdx}`}
+        key={`correct-${pairIdx}`}
         className="ed-pair-fade ed-pair-fade-delay"
         style={{
           fontFamily: SERIF_FONT,
           fontStyle: 'italic',
           fontWeight: 400,
-          fontSize: '1.375rem',
+          fontSize: '1.5rem',
           lineHeight: 1.2,
           color: ED.fg,
           margin: 0,
         }}
       >
-        <span
-          style={{
-            fontFamily: SANS_FONT,
-            fontStyle: 'normal',
-            fontSize: '0.7em',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: ED.accent,
-            marginRight: 8,
-          }}
-        >
-          FR
-        </span>
-        {pair.fr}
+        {pair.correct}
       </p>
     </div>
   )

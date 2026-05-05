@@ -10,7 +10,7 @@
 
 import Link from 'next/link'
 import type { Lang } from '../copy'
-import { FINAL_CTA, HERO } from '../copy'
+import { FINAL_CTA } from '../copy'
 import { ED, LETTER_SPACING, LINE_HEIGHT, SANS_FONT } from '@/lib/typography'
 import RevealOnScroll from '../RevealOnScroll'
 
@@ -84,10 +84,10 @@ export default function FinalCTASection({ lang }: { lang: Lang }) {
             >
               {FINAL_CTA.ctaPrimary[lang]}
             </Link>
-            {/* Trust-line rescued from the deleted hero CTA — earns its
-                placement next to the actual primary action. Combines
-                FINAL_CTA.ctaSecondary with the hero's original
-                "Free. No card required" framing. */}
+            {/* Trust-line under the primary action. V-007 — removed the
+                stray "Free." suffix that was being concatenated from
+                HERO.ctaSecondary.split('.')[0]; FINAL_CTA.ctaSecondary
+                already starts with "Free." so the suffix duplicated it. */}
             <span
               style={{
                 fontFamily: SANS_FONT,
@@ -97,7 +97,7 @@ export default function FinalCTASection({ lang }: { lang: Lang }) {
                 color: ED.muted,
               }}
             >
-              {FINAL_CTA.ctaSecondary[lang]} {HERO.ctaSecondary[lang].split('.')[0]}.
+              {FINAL_CTA.ctaSecondary[lang]}
             </span>
           </div>
         </RevealOnScroll>

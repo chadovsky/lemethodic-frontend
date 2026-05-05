@@ -57,6 +57,13 @@ export default function RotatingKicker({ lang }: RotatingKickerProps) {
     )
   }
 
+  // V-006 — find the widest exam by character count to use as the layout
+  // sizer. Length is a sufficient proxy here (DELF/DALF tie at 4 chars;
+  // both are wider than TCF/TEF). The chosen word is rendered invisibly
+  // behind the visible animated word so the container width locks to the
+  // widest case and 4-char words never clip.
+  const widestExam = EXAMS.reduce((a, b) => (b.length > a.length ? b : a))
+
   return (
     <p
       onMouseEnter={() => setHovered(true)}
@@ -67,12 +74,16 @@ export default function RotatingKicker({ lang }: RotatingKickerProps) {
       style={{
         fontFamily: SANS,
         fontWeight: 500,
-        fontSize: 'clamp(13px, 1.2vw, 15px)',
+        // V-001 — kicker bumped to clamp(20px, 1.8vw, 24px); marginBottom
+        // proportional. Earlier V-001 edit only caught the reduced-motion
+        // branch due to an indentation mismatch; V-006 brings the active
+        // branch into line.
+        fontSize: 'clamp(20px, 1.8vw, 24px)',
         letterSpacing: '0.06em',
         textTransform: 'uppercase',
         color: ED_MUTED,
         margin: 0,
-        marginBottom: 'clamp(12px, 1.5vw, 20px)',
+        marginBottom: 'clamp(16px, 2vw, 28px)',
         // Shape the rotating slot — fixed height so the H1 below doesn't
         // shift when the word swaps.
         display: 'inline-flex',
@@ -89,22 +100,28 @@ export default function RotatingKicker({ lang }: RotatingKickerProps) {
       <span
         aria-hidden="true"
         style={{
-          // Mask + relative wrapper so the slide stays inside its lane.
+          // V-006 — width is locked by the invisible sizer (the widest
+          // exam name). Container always sizes to widest case so 4-char
+          // names never clip on right edge. textAlign:center keeps the
+          // 3-char names visually balanced inside the 4-char slot.
           position: 'relative',
           display: 'inline-block',
-          minWidth: '4ch',
           height: '1.1em',
           overflow: 'hidden',
+          textAlign: 'center',
         }}
       >
-        {/* Two-state crossfade with translateY. Each render only mounts
-            one word; the keyed remount gives us the slide-up. */}
+        {/* Width sizer — invisible widest word locks container width. */}
+        <span style={{ visibility: 'hidden' }}>{widestExam}</span>
+        {/* Visible animated word — absolute over the sizer. The keyed
+            remount triggers ed-kicker-slide on every word change. */}
         <span
           key={current}
           style={{
-            display: 'inline-block',
+            display: 'block',
             position: 'absolute',
             left: 0,
+            right: 0,
             top: 0,
             animation: `ed-kicker-slide ${ED_DUR.rotateWord}ms ${ED_EASE_CSS} both`,
           }}
