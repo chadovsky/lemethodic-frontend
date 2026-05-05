@@ -51,6 +51,24 @@
   --fp-duration-base: 300ms;
   --fp-duration-slow: 400ms;
 
+  /* F-200 — editorial design system (taste-range from EMDL + Neuralink +
+     fluentpath.ai inspiration set, executable spec from Chadi 2026-05-05).
+     `--ed-*` namespaced to coexist with the FluentPath pastel palette
+     (--fp-*) and shadcn neutral tokens (--accent / --primary / etc).
+     F-200 establishes; F-201..F-214 inherit. */
+  --ed-bg: #FAF7F2;          /* warm off-white, editorial — not pure white */
+  --ed-fg: #1A1A1A;          /* near-black, softer than #000 */
+  --ed-accent: #1F2D4A;      /* deep editorial navy — credibility + premium */
+  --ed-muted: #6B6B6B;       /* warm gray, secondary text */
+  --ed-rule: #E5E0D8;        /* subtle dividers (renamed from --color-border to avoid Tailwind reserved) */
+  --ed-paper: #FFFFFF;       /* cards / elevated surfaces — pops against bg */
+
+  /* Editorial motion — slower than --fp-* for confident product feel */
+  --ed-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ed-duration-hover: 200ms;
+  --ed-duration-state: 600ms;
+  --ed-duration-reveal: 700ms;
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -153,6 +171,20 @@
   --animate-duration-fp-fast: var(--fp-duration-fast);
   --animate-duration-fp-base: var(--fp-duration-base);
   --animate-duration-fp-slow: var(--fp-duration-slow);
+
+  /* F-200 — editorial palette as Tailwind utilities (bg-ed-bg, text-ed-fg,
+     border-ed-rule, etc). The bg-ed-bg ergonomics are awkward but namespaced
+     deliberately to avoid collision with shadcn --color-accent. */
+  --color-ed-bg: var(--ed-bg);
+  --color-ed-fg: var(--ed-fg);
+  --color-ed-accent: var(--ed-accent);
+  --color-ed-muted: var(--ed-muted);
+  --color-ed-rule: var(--ed-rule);
+  --color-ed-paper: var(--ed-paper);
+  --ease-ed-default: var(--ed-ease);
+  --animate-duration-ed-hover: var(--ed-duration-hover);
+  --animate-duration-ed-state: var(--ed-duration-state);
+  --animate-duration-ed-reveal: var(--ed-duration-reveal);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

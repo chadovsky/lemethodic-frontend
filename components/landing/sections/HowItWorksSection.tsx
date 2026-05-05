@@ -1,92 +1,112 @@
 'use client'
 
-// M-101a — Section 4, how it works. Butter bg, three numbered steps. The
-// numbered circles double as visual anchors; no illustrations needed.
+// F-200 — How it works. Three numbered steps as typographic lock-ups
+// (oversized 01/02/03 numerals + label + body) instead of decorated
+// circles. Editorial restraint: the numbers ARE the visual anchor.
+// Vertical stack, narrow column.
 
 import type { Lang } from '../copy'
 import { HOW_IT_WORKS } from '../copy'
-import { DISPLAY_FONT, INK, INK_SOFT } from '../../onboarding/OnboardingScreen'
+import { ED, LETTER_SPACING, LINE_HEIGHT, SANS_FONT, SERIF_FONT } from '@/lib/typography'
+import RevealOnScroll from '../RevealOnScroll'
 
-const BG = '#FFF0C2' // --fp-butter
+const STEP_NUMS = ['01', '02', '03']
 
 export default function HowItWorksSection({ lang }: { lang: Lang }) {
   return (
     <section
       className="w-full"
-      style={{ backgroundColor: BG, padding: '72px 24px 80px' }}
+      style={{
+        backgroundColor: ED.bg,
+        padding: 'clamp(80px, 12vw, 140px) clamp(24px, 4vw, 64px)',
+      }}
     >
-      <div className="mx-auto" style={{ maxWidth: 760 }}>
-        <h2
-          className="text-balance"
-          style={{
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 800,
-            fontSize: 'clamp(26px, 4vw, 36px)',
-            lineHeight: 1.15,
-            letterSpacing: '-0.01em',
-            color: INK,
-            marginBottom: 32,
-          }}
-        >
-          {HOW_IT_WORKS.heading[lang]}
-        </h2>
+      <div className="mx-auto" style={{ maxWidth: 920 }}>
+        <RevealOnScroll>
+          <h2
+            className="text-balance"
+            style={{
+              fontFamily: SANS_FONT,
+              fontWeight: 600,
+              fontSize: 'clamp(1.75rem, 3.5vw, 3rem)',
+              lineHeight: LINE_HEIGHT.heading,
+              letterSpacing: LETTER_SPACING.heading,
+              color: ED.fg,
+              margin: 0,
+              marginBottom: 'clamp(48px, 6vw, 80px)',
+            }}
+          >
+            {HOW_IT_WORKS.heading[lang]}
+          </h2>
+        </RevealOnScroll>
         <ol
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 24,
+            gap: 'clamp(40px, 5vw, 72px)',
             listStyle: 'none',
             padding: 0,
             margin: 0,
           }}
         >
           {HOW_IT_WORKS.steps.map((step, i) => (
-            <li key={i} style={{ display: 'flex', gap: 18, alignItems: 'flex-start' }}>
-              <div
-                aria-hidden="true"
+            <RevealOnScroll key={i} delay={i * 0.12}>
+              <li
                 style={{
-                  flexShrink: 0,
-                  width: 44,
-                  height: 44,
-                  borderRadius: '50%',
-                  backgroundColor: INK,
-                  color: '#FFFFFF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontFamily: DISPLAY_FONT,
-                  fontWeight: 800,
-                  fontSize: 18,
+                  display: 'grid',
+                  gridTemplateColumns: 'minmax(80px, 120px) 1fr',
+                  gap: 'clamp(20px, 3vw, 40px)',
+                  alignItems: 'baseline',
+                  borderTop: `1px solid ${ED.rule}`,
+                  paddingTop: 'clamp(24px, 3vw, 40px)',
                 }}
               >
-                {i + 1}
-              </div>
-              <div style={{ flex: 1, paddingTop: 4 }}>
-                <h3
+                {/* Numeral — Source Serif for editorial accent */}
+                <span
+                  aria-hidden="true"
                   style={{
-                    fontFamily: DISPLAY_FONT,
-                    fontWeight: 700,
-                    fontSize: 18,
-                    lineHeight: 1.3,
-                    color: INK,
-                    marginBottom: 8,
+                    fontFamily: SERIF_FONT,
+                    fontWeight: 400,
+                    fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                    lineHeight: 1,
+                    letterSpacing: LETTER_SPACING.display,
+                    color: ED.accent,
                   }}
                 >
-                  {step.title[lang]}
-                </h3>
-                <p
-                  className="text-pretty"
-                  style={{
-                    fontWeight: 500,
-                    fontSize: 15,
-                    lineHeight: 1.6,
-                    color: INK_SOFT,
-                  }}
-                >
-                  {step.body[lang]}
-                </p>
-              </div>
-            </li>
+                  {STEP_NUMS[i]}
+                </span>
+                <div>
+                  <h3
+                    style={{
+                      fontFamily: SANS_FONT,
+                      fontWeight: 600,
+                      fontSize: 'clamp(1.25rem, 2vw, 1.5rem)',
+                      lineHeight: LINE_HEIGHT.heading,
+                      letterSpacing: LETTER_SPACING.heading,
+                      color: ED.fg,
+                      margin: 0,
+                      marginBottom: 12,
+                    }}
+                  >
+                    {step.title[lang]}
+                  </h3>
+                  <p
+                    className="text-pretty"
+                    style={{
+                      fontFamily: SANS_FONT,
+                      fontWeight: 400,
+                      fontSize: '1.0625rem',
+                      lineHeight: LINE_HEIGHT.body,
+                      letterSpacing: LETTER_SPACING.body,
+                      color: ED.muted,
+                      margin: 0,
+                    }}
+                  >
+                    {step.body[lang]}
+                  </p>
+                </div>
+              </li>
+            </RevealOnScroll>
           ))}
         </ol>
       </div>

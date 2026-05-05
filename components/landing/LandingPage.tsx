@@ -32,7 +32,10 @@ import FAQSection from './sections/FAQSection'
 import FinalCTASection from './sections/FinalCTASection'
 import type { Lang } from './copy'
 
-const PAGE_BG = '#FFD8C2'
+// F-200 — landing now uses the editorial system bg (warm off-white).
+// The original peach (`#FFD8C2`) was the M-101a hero bg; F-200 retires
+// it from the landing in favor of the more restrained `--ed-bg`.
+const PAGE_BG = 'var(--ed-bg)'
 
 interface LandingPageProps {
   lang: Lang

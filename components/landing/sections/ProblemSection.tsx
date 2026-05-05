@@ -1,50 +1,60 @@
 'use client'
 
-// M-101a — Section 2, the problem. Off-white canvas; long-form text with
-// generous line-height for the diagnosis-style paragraphs.
+// F-200 — Problem. Text-led, no card chrome. Generous line-height, narrow
+// column for editorial reading rhythm. Last paragraph emphasized via
+// fg-not-muted color to land the conclusion ("That's what LeMethodic does.").
 
 import type { Lang } from '../copy'
 import { PROBLEM } from '../copy'
-import { DISPLAY_FONT, INK, INK_SOFT } from '../../onboarding/OnboardingScreen'
-
-const BG = '#FAFAF7' // --fp-canvas
+import { ED, LETTER_SPACING, LINE_HEIGHT, SANS_FONT } from '@/lib/typography'
+import RevealOnScroll from '../RevealOnScroll'
 
 export default function ProblemSection({ lang }: { lang: Lang }) {
   const paragraphs = PROBLEM.paragraphs[lang]
   return (
     <section
       className="w-full"
-      style={{ backgroundColor: BG, padding: '64px 24px 72px' }}
+      style={{
+        backgroundColor: ED.bg,
+        padding: 'clamp(80px, 12vw, 140px) clamp(24px, 4vw, 64px)',
+      }}
     >
       <div className="mx-auto" style={{ maxWidth: 720 }}>
-        <h2
-          className="text-balance"
-          style={{
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 800,
-            fontSize: 'clamp(26px, 4vw, 36px)',
-            lineHeight: 1.15,
-            letterSpacing: '-0.01em',
-            color: INK,
-            marginBottom: 28,
-          }}
-        >
-          {PROBLEM.heading[lang]}
-        </h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <RevealOnScroll>
+          <h2
+            className="text-balance"
+            style={{
+              fontFamily: SANS_FONT,
+              fontWeight: 600,
+              fontSize: 'clamp(1.75rem, 3.5vw, 3rem)',
+              lineHeight: LINE_HEIGHT.heading,
+              letterSpacing: LETTER_SPACING.heading,
+              color: ED.fg,
+              margin: 0,
+              marginBottom: 'clamp(24px, 3vw, 40px)',
+            }}
+          >
+            {PROBLEM.heading[lang]}
+          </h2>
+        </RevealOnScroll>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(16px, 2vw, 24px)' }}>
           {paragraphs.map((p, i) => (
-            <p
-              key={i}
-              className="text-pretty"
-              style={{
-                fontWeight: 500,
-                fontSize: 'clamp(15px, 1.6vw, 17px)',
-                lineHeight: 1.7,
-                color: i === paragraphs.length - 1 ? INK : INK_SOFT,
-              }}
-            >
-              {p}
-            </p>
+            <RevealOnScroll key={i} delay={i * 0.08}>
+              <p
+                className="text-pretty"
+                style={{
+                  fontFamily: SANS_FONT,
+                  fontWeight: 400,
+                  fontSize: 'clamp(1rem, 1.4vw, 1.125rem)',
+                  lineHeight: LINE_HEIGHT.body,
+                  letterSpacing: LETTER_SPACING.body,
+                  color: i === paragraphs.length - 1 ? ED.fg : ED.muted,
+                  margin: 0,
+                }}
+              >
+                {p}
+              </p>
+            </RevealOnScroll>
           ))}
         </div>
       </div>

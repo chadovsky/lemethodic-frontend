@@ -1,85 +1,68 @@
 'use client'
 
-// M-101a — Section 1, hero. Text-only on peach. The H1 is the conversion
-// driver; visual weight comes from typography + whitespace, not imagery.
+// F-200 — hero. Type-led, no CTA (per spec — trust the user to scroll).
+// The trust-line ("Free. No card required. About 12 minutes.") that
+// previously sat under the hero CTA was rescued to FinalCTASection
+// where it earns its placement next to the actual primary CTA.
+//
+// Oversized H1 with editorial display type, tight letter-spacing,
+// generous vertical padding (~160px desktop, ~80px mobile).
 
-import Link from 'next/link'
 import type { Lang } from '../copy'
 import { HERO } from '../copy'
-import { DISPLAY_FONT, INK, INK_SOFT } from '../../onboarding/OnboardingScreen'
-
-const BG = '#FFD8C2' // --fp-peach
+import { ED, LETTER_SPACING, LINE_HEIGHT, SANS_FONT } from '@/lib/typography'
+import RevealOnScroll from '../RevealOnScroll'
 
 export default function HeroSection({ lang }: { lang: Lang }) {
   return (
     <section
       className="w-full"
       style={{
-        backgroundColor: BG,
-        padding: '40px 24px 64px',
+        backgroundColor: ED.bg,
+        // Editorial padding: 160px top / 140px bottom desktop;
+        // 80px / 64px mobile. clamp() interpolates smoothly.
+        padding: 'clamp(80px, 14vw, 160px) clamp(24px, 4vw, 64px) clamp(64px, 10vw, 140px)',
       }}
     >
-      <div className="mx-auto" style={{ maxWidth: 760 }}>
-        <h1
-          className="text-balance"
-          style={{
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 800,
-            fontSize: 'clamp(32px, 5.5vw, 56px)',
-            lineHeight: 1.08,
-            letterSpacing: '-0.015em',
-            color: INK,
-            marginBottom: 20,
-          }}
-        >
-          {HERO.h1[lang]}
-        </h1>
-        <p
-          className="text-pretty"
-          style={{
-            fontWeight: 500,
-            fontSize: 'clamp(16px, 2vw, 19px)',
-            lineHeight: 1.55,
-            color: INK_SOFT,
-            maxWidth: 640,
-            marginBottom: 32,
-          }}
-        >
-          {HERO.subhead[lang]}
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'flex-start' }}>
-          <Link
-            href="/onboarding"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: 56,
-              padding: '0 28px',
-              borderRadius: 16,
-              backgroundColor: INK,
-              color: '#FFFFFF',
-              fontFamily: DISPLAY_FONT,
-              fontWeight: 700,
-              fontSize: 16,
-              letterSpacing: '-0.01em',
-              textDecoration: 'none',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-            }}
-          >
-            {HERO.ctaPrimary[lang]}
-          </Link>
-          <span
-            style={{
-              fontWeight: 500,
-              fontSize: 13,
-              lineHeight: '20px',
-              color: INK_SOFT,
-              maxWidth: 480,
-            }}
-          >
-            {HERO.ctaSecondary[lang]}
-          </span>
+      <div className="mx-auto" style={{ maxWidth: 1280 }}>
+        {/* Inner text column — narrower than container so oversized type
+            doesn't span 1280px on desktop (would feel banner-y, not editorial) */}
+        <div style={{ maxWidth: 920 }}>
+          <RevealOnScroll>
+            <h1
+              className="text-balance"
+              style={{
+                fontFamily: SANS_FONT,
+                fontWeight: 700,
+                // Type scale: 48px floor (mobile), 96px ceiling (desktop)
+                fontSize: 'clamp(2.5rem, 7vw, 6rem)',
+                lineHeight: LINE_HEIGHT.display,
+                letterSpacing: LETTER_SPACING.display,
+                color: ED.fg,
+                margin: 0,
+                marginBottom: 'clamp(20px, 2.5vw, 32px)',
+              }}
+            >
+              {HERO.h1[lang]}
+            </h1>
+          </RevealOnScroll>
+          <RevealOnScroll delay={0.15}>
+            <p
+              className="text-pretty"
+              style={{
+                fontFamily: SANS_FONT,
+                fontWeight: 400,
+                fontSize: 'clamp(1.125rem, 1.6vw, 1.375rem)',
+                lineHeight: LINE_HEIGHT.body,
+                letterSpacing: LETTER_SPACING.body,
+                color: ED.muted,
+                maxWidth: 720,
+                margin: 0,
+              }}
+            >
+              {HERO.subhead[lang]}
+            </p>
+          </RevealOnScroll>
         </div>
       </div>
     </section>

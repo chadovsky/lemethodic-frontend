@@ -310,6 +310,12 @@ export const PRICING = {
 
 // ── Section 6 — Methodology ─────────────────────────────────────────────────
 
+// F-200 — brief in-line reframe surfacing Les Moules + La Méthode en Couches
+// as named system concepts. The full sub-section breakout (with hierarchy,
+// examples, diagrams) is filed as F-227 — a copy-authoring task that needs
+// Chadi-input on framing language and examples. v1 ships the moat at
+// minimum credibility: the concepts are named, briefly defined, and tied
+// to where the user encounters them.
 export const METHODOLOGY = {
   heading: {
     en: 'The methodology behind LeMethodic.',
@@ -318,14 +324,16 @@ export const METHODOLOGY = {
   paragraphs: {
     en: [
       'LeMethodic is built on a methodology refined across 7,000+ hours of one-on-one teaching with anglophone French learners on Preply.',
-      'The patterns of error are not random. After thousands of hours, they reveal themselves: which grammatical structures English speakers systematically transfer incorrectly. Which preposition pairs they consistently get wrong. Which moments of speech reveal the B1 ceiling to a TCF examiner.',
-      'The product encodes those patterns. The diagnostic detects them. The path corrects them.',
+      "The patterns of error are not random. After thousands of hours, they reveal themselves: which grammatical structures English speakers systematically transfer incorrectly. Which preposition pairs they consistently get wrong. Which moments of speech reveal the B1 ceiling to a TCF examiner.",
+      'The methodology has two named layers. **La Méthode en Couches** — the four TCF criteria (content, structure, grammar, English-speaker patterns) graded as discrete diagnostic dimensions, not collapsed into a single fluency score. **Les Moules** — the recurring grammatical "molds" anglophones fall into when speaking French under exam pressure. Both are visible to you in the diagnostic and the path. The product names what other tools leave invisible.',
+      'The diagnostic detects them. The path corrects them. The dashboard shows you which mold you fell into and which couche it scored against.',
       "This is not a generic French learning app with AI added. It's a focused exam-preparation system for a specific candidate facing a specific exam.",
     ],
     fr: [
       "LeMethodic est construit sur une méthodologie affinée sur plus de 7 000 heures d'enseignement individuel avec des apprenants anglophones de français sur Preply.",
       "Les patterns d'erreurs ne sont pas aléatoires. Après des milliers d'heures, ils se révèlent : quelles structures grammaticales les anglophones transfèrent systématiquement de manière incorrecte. Quelles paires de prépositions ils confondent constamment. Quels moments de leur discours révèlent le plafond B1 à un examinateur du TCF.",
-      'Le produit encode ces patterns. Le diagnostic les détecte. Le parcours les corrige.',
+      'La méthodologie repose sur deux couches nommées. **La Méthode en Couches** — les quatre critères TCF (contenu, structure, grammaire, schémas anglophones) évalués comme des dimensions diagnostiques distinctes, jamais agrégés en un score unique de fluidité. **Les Moules** — les « moules » grammaticaux récurrents dans lesquels tombent les anglophones quand ils parlent français sous pression d\'examen. Les deux sont visibles dans le diagnostic et le parcours. Le produit nomme ce que les autres outils laissent invisible.',
+      "Le diagnostic les détecte. Le parcours les corrige. Le tableau de bord vous montre dans quel moule vous êtes tombé et contre quelle couche il a été noté.",
       "Ce n'est pas une application générique d'apprentissage du français avec de l'IA ajoutée. C'est un système ciblé de préparation d'examen pour un candidat spécifique face à un examen spécifique.",
     ],
   } satisfies I18nList,

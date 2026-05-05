@@ -1,10 +1,17 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Source_Serif_4 } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-const _geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
-const _geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' })
+// F-200 — Geist becomes the primary editorial sans (variable applied as
+// font-family base via the html className). Source Serif 4 added for
+// editorial accent typography (callouts, methodology framing). Cabinet
+// Grotesk stays loaded via the cdnfonts <link> below for surfaces F-2xx
+// hasn't migrated yet (per-surface migration as F-201+ ships). The Geist
+// variable was previously loaded but unused (`_geist`); now applied.
+const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
+const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' })
+const sourceSerif = Source_Serif_4({ subsets: ['latin'], variable: '--font-source-serif' })
 
 export const metadata: Metadata = {
   title: 'LeMethodic',
@@ -21,7 +28,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#FFD8C2',
+  themeColor: '#FAF7F2', // F-200: warm off-white editorial bg
   width: 'device-width',
   initialScale: 1,
   // userScalable defaults to true — explicitly omitted per WCAG 2.1
@@ -35,8 +42,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="bg-[#FFD8C2]">
+    <html
+      lang="en"
+      className={`${geist.variable} ${geistMono.variable} ${sourceSerif.variable}`}
+    >
       <head>
+        {/* Cabinet Grotesk preserved for legacy DISPLAY_FONT consumers
+            (onboarding, /progress, /paywall, etc). Per-surface migration
+            to Geist tracked via F-2xx queue. */}
         <link rel="preconnect" href="https://fonts.cdnfonts.com" />
         <link
           href="https://fonts.cdnfonts.com/css/cabinet-grotesk"

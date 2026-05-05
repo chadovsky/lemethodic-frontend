@@ -1801,6 +1801,35 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 **Owner:** Engineering
 **Note:** Beta-credibility hit if a user opens /profile and sees someone else's name + exam date. Not a functional blocker (Sign Out works post-F-222) but a real perception issue.
 
+### F-200 — Landing page desktop responsive + editorial design system foundation
+
+**Priority:** HIGH (launch-blocking — establishes the design system F-201..F-214 inherit)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` and `/fr` per F-225)
+**Filed:** 2026-05-04
+**Source:** Strategic recalibration (desktop broken on every screen surfaced as launch-blocker); executable spec from Chadi 2026-05-05
+**Dependencies:** none
+**Scope:** establishes the editorial design system (`--ed-*` palette + Geist + Source Serif 4 + 8px spacing grid + 600-800ms motion language with `cubic-bezier(0.16, 1, 0.3, 1)`) and applies it to the landing page (`/` + `/fr`). Hero CTA removed (trust the user to scroll). Methodology section gains brief in-line reframe surfacing **Les Moules** + **La Méthode en Couches** as named system concepts (full breakout filed as F-227). Trust-line ("Free. No card required. About 12 minutes.") rescued from deleted hero CTA, surfaced at FinalCTA. RevealOnScroll wrapper added (framer-motion `whileInView`, fade-up 24px, 700ms). 4px button radius, 1px ed-rule borders, 0 shadow on cards (editorial flatness). Pastels (`--fp-*`) preserved as accent layer for unmigrated surfaces.
+**Owner:** Engineering
+**Note:** Naming deviation from spec — used `--ed-*` prefix instead of literal `--color-bg`/`--color-fg`/etc. to avoid collision with shadcn's existing `--color-accent`. Approved by Chadi 2026-05-05. Tailwind utilities are `bg-ed-bg`, `text-ed-fg`, etc.
+**Design calls** (per F-200 spec "make the call yourself"):
+- Button radius **4px** for editorial CTAs (was 14-16px on M-101a) — premium signal.
+- Card surfaces **1px ed-rule + 0 shadow** — editorial flatness vs pastel softness.
+- Hover transitions **opacity/color only, 200ms** — no transforms.
+- Scroll reveals **700ms with cubic-bezier(0.16, 1, 0.3, 1)**, IntersectionObserver at 20% viewport.
+- "Coming soon" tier badges on Pricing — outlined micro-pill (`ed-rule` border, `ed-muted` text) instead of solid ink fill — restraint over loud signaling.
+- Methodology bg flips to `--ed-paper` with top+bottom `--ed-rule` — visual emphasis on the moat-evidence section without breaking the bg-flat rhythm elsewhere.
+- Sprint/Premium "Join the waitlist" CTAs use ghost button (transparent + ed-fg border, fills on hover) — visual hierarchy below Subscription's solid navy CTA. Confirmed conversion ladder.
+
+### F-227 — Methodology section full sub-section breakout
+
+**Priority:** MEDIUM (post-F-200, copy-authoring blocker)
+**Status:** Queued
+**Filed:** 2026-05-05
+**Source:** F-200 plan-first; in-line reframe is interim, full breakout deferred
+**Dependencies:** F-200; Chadi-input on framing language and examples
+**Scope:** F-200 ships Les Moules + La Méthode en Couches as named concepts in 1-2 paragraphs (interim moat-visibility). This ticket builds the full sub-section: dedicated landing module with hierarchy (couches enumerated, examples per moule, visual diagram of the 4-couche grid, anglophone-specific moules like "calque lexical" / "interférence grammaticale" called out by name with concrete sentence-level examples). Needs Chadi-authored copy + design pass for diagram(s). Likely a standalone scroll section between Methodology and Pricing.
+**Owner:** Chadi (copy + diagram direction) + Engineering (wire-up)
+
 ### F-225 — Desktop verification protocol (process change)
 
 **Priority:** HIGH (process gate, launch-blocking)

@@ -1,16 +1,14 @@
-// B-102 — landing footer. Three legal links + brand mark + copyright +
-// admin email. Sits below FinalCTASection on the landing routes (/, /fr).
-// Legal pages also reuse this footer for navigation consistency.
-//
-// Legal-page links target /privacy, /terms, /refund — these are EN-only at
-// v1. FR translations file as M-101.x post-launch; until then the same EN
-// docs are served regardless of landing language.
+'use client'
+
+// F-200 — landing footer. Paper bg with ed-rule top border. Three legal
+// links + brand + copyright + admin email. Editorial restraint: no nav
+// emphasis, plain typography, generous gap. Client component because of
+// hover-color transitions (event handlers); also reused by Server-Component
+// LegalPage at /privacy /terms /refund.
 
 import Link from 'next/link'
 import { BRAND, type Lang } from './copy'
-import { DISPLAY_FONT, INK, INK_SOFT, INK_MUTED } from '../onboarding/OnboardingScreen'
-
-const BG = '#FAFAF7' // --fp-canvas
+import { ED, LETTER_SPACING, SANS_FONT } from '@/lib/typography'
 
 interface LandingFooterProps {
   lang: Lang
@@ -22,14 +20,12 @@ const COPY = {
     terms: 'Terms',
     refund: 'Refund',
     rights: '© 2026 LeMethodic',
-    contactLabel: 'Contact',
   },
   fr: {
     privacy: 'Confidentialité',
     terms: 'Conditions',
     refund: 'Remboursement',
     rights: '© 2026 LeMethodic',
-    contactLabel: 'Contact',
   },
 } as const satisfies Record<Lang, unknown>
 
@@ -39,89 +35,76 @@ export default function LandingFooter({ lang }: LandingFooterProps) {
     <footer
       className="w-full"
       style={{
-        backgroundColor: BG,
-        padding: '40px 24px 32px',
-        borderTop: `1px solid ${INK_MUTED}`,
+        backgroundColor: ED.paper,
+        borderTop: `1px solid ${ED.rule}`,
+        padding: 'clamp(48px, 6vw, 80px) clamp(24px, 4vw, 64px) clamp(40px, 5vw, 56px)',
       }}
     >
       <div
         className="mx-auto"
         style={{
-          maxWidth: 1080,
+          maxWidth: 1280,
           display: 'flex',
           flexDirection: 'column',
-          gap: 24,
+          gap: 32,
         }}
       >
         {/* Top row: brand + nav links */}
         <div
           className="flex flex-wrap items-center justify-between"
-          style={{ gap: 16 }}
+          style={{ gap: 24 }}
         >
           <span
             style={{
-              fontFamily: DISPLAY_FONT,
-              fontWeight: 800,
-              fontSize: 18,
-              color: INK,
-              letterSpacing: '-0.01em',
+              fontFamily: SANS_FONT,
+              fontWeight: 600,
+              fontSize: '1rem',
+              color: ED.fg,
+              letterSpacing: LETTER_SPACING.heading,
             }}
           >
             {BRAND}
           </span>
           <nav
             aria-label={lang === 'fr' ? 'Pages légales' : 'Legal'}
-            style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}
+            style={{ display: 'flex', flexWrap: 'wrap', gap: 28 }}
           >
-            <Link
-              href="/privacy"
-              style={{
-                fontFamily: DISPLAY_FONT,
-                fontWeight: 600,
-                fontSize: 14,
-                color: INK_SOFT,
-                textDecoration: 'none',
-              }}
-            >
-              {copy.privacy}
-            </Link>
-            <Link
-              href="/terms"
-              style={{
-                fontFamily: DISPLAY_FONT,
-                fontWeight: 600,
-                fontSize: 14,
-                color: INK_SOFT,
-                textDecoration: 'none',
-              }}
-            >
-              {copy.terms}
-            </Link>
-            <Link
-              href="/refund"
-              style={{
-                fontFamily: DISPLAY_FONT,
-                fontWeight: 600,
-                fontSize: 14,
-                color: INK_SOFT,
-                textDecoration: 'none',
-              }}
-            >
-              {copy.refund}
-            </Link>
+            {[
+              { href: '/privacy', label: copy.privacy },
+              { href: '/terms', label: copy.terms },
+              { href: '/refund', label: copy.refund },
+            ].map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                style={{
+                  fontFamily: SANS_FONT,
+                  fontWeight: 400,
+                  fontSize: '0.875rem',
+                  color: ED.muted,
+                  textDecoration: 'none',
+                  transition: 'color var(--ed-duration-hover) var(--ed-ease)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = ED.fg }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = ED.muted }}
+              >
+                {label}
+              </Link>
+            ))}
           </nav>
         </div>
 
         {/* Bottom row: copyright + contact */}
         <div
           className="flex flex-wrap items-center justify-between"
-          style={{ gap: 12 }}
+          style={{ gap: 16, paddingTop: 24, borderTop: `1px solid ${ED.rule}` }}
         >
           <span
             style={{
-              fontWeight: 500,
-              fontSize: 13,
-              color: INK_MUTED,
+              fontFamily: SANS_FONT,
+              fontWeight: 400,
+              fontSize: '0.8125rem',
+              color: ED.muted,
             }}
           >
             {copy.rights}
@@ -129,12 +112,15 @@ export default function LandingFooter({ lang }: LandingFooterProps) {
           <a
             href="mailto:admin@lemethodic.com"
             style={{
-              fontFamily: DISPLAY_FONT,
-              fontWeight: 600,
-              fontSize: 13,
-              color: INK_SOFT,
+              fontFamily: SANS_FONT,
+              fontWeight: 400,
+              fontSize: '0.8125rem',
+              color: ED.muted,
               textDecoration: 'none',
+              transition: 'color var(--ed-duration-hover) var(--ed-ease)',
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = ED.fg }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = ED.muted }}
           >
             admin@lemethodic.com
           </a>

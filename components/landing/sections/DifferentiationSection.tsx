@@ -1,79 +1,90 @@
 'use client'
 
-// M-101a — Section 3, differentiation. Sage bg, three cards. Stacked on
-// mobile, three-column on desktop ≥ 880px.
+// F-200 — Differentiation. Three paper cards on warm bg, 1px rule
+// borders, zero shadow (editorial flatness over pastel softness).
+// Disciplined 3-col grid desktop ≥920px, single column below.
 
 import type { Lang } from '../copy'
 import { DIFFERENTIATION } from '../copy'
-import { DISPLAY_FONT, INK, INK_SOFT, PAPER } from '../../onboarding/OnboardingScreen'
-
-const BG = '#D4E4D0' // --fp-sage
+import { ED, LETTER_SPACING, LINE_HEIGHT, SANS_FONT } from '@/lib/typography'
+import RevealOnScroll from '../RevealOnScroll'
 
 export default function DifferentiationSection({ lang }: { lang: Lang }) {
   return (
     <section
       className="w-full"
-      style={{ backgroundColor: BG, padding: '72px 24px 80px' }}
+      style={{
+        backgroundColor: ED.bg,
+        padding: 'clamp(80px, 12vw, 140px) clamp(24px, 4vw, 64px)',
+      }}
     >
-      <div className="mx-auto" style={{ maxWidth: 1080 }}>
-        <h2
-          className="text-balance mx-auto"
-          style={{
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 800,
-            fontSize: 'clamp(26px, 4vw, 36px)',
-            lineHeight: 1.15,
-            letterSpacing: '-0.01em',
-            color: INK,
-            marginBottom: 36,
-            maxWidth: 760,
-          }}
-        >
-          {DIFFERENTIATION.heading[lang]}
-        </h2>
+      <div className="mx-auto" style={{ maxWidth: 1280 }}>
+        <RevealOnScroll>
+          <h2
+            className="text-balance"
+            style={{
+              fontFamily: SANS_FONT,
+              fontWeight: 600,
+              fontSize: 'clamp(1.75rem, 3.5vw, 3rem)',
+              lineHeight: LINE_HEIGHT.heading,
+              letterSpacing: LETTER_SPACING.heading,
+              color: ED.fg,
+              maxWidth: 920,
+              margin: 0,
+              marginBottom: 'clamp(40px, 5vw, 72px)',
+            }}
+          >
+            {DIFFERENTIATION.heading[lang]}
+          </h2>
+        </RevealOnScroll>
         <div
           style={{
             display: 'grid',
-            gap: 16,
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: 'clamp(16px, 2vw, 24px)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
           }}
         >
           {DIFFERENTIATION.cards.map((card, i) => (
-            <div
-              key={i}
-              style={{
-                backgroundColor: PAPER,
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                borderRadius: 24,
-                padding: '24px 24px 26px',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
-              }}
-            >
-              <h3
+            <RevealOnScroll key={i} delay={i * 0.1}>
+              <div
                 style={{
-                  fontFamily: DISPLAY_FONT,
-                  fontWeight: 700,
-                  fontSize: 18,
-                  lineHeight: 1.3,
-                  color: INK,
-                  marginBottom: 12,
+                  backgroundColor: ED.paper,
+                  border: `1px solid ${ED.rule}`,
+                  borderRadius: 4,
+                  padding: 'clamp(24px, 3vw, 40px)',
+                  height: '100%',
                 }}
               >
-                {card.title[lang]}
-              </h3>
-              <p
-                className="text-pretty"
-                style={{
-                  fontWeight: 500,
-                  fontSize: 15,
-                  lineHeight: 1.6,
-                  color: INK_SOFT,
-                }}
-              >
-                {card.body[lang]}
-              </p>
-            </div>
+                <h3
+                  style={{
+                    fontFamily: SANS_FONT,
+                    fontWeight: 600,
+                    fontSize: '1.25rem',
+                    lineHeight: 1.3,
+                    letterSpacing: LETTER_SPACING.heading,
+                    color: ED.fg,
+                    margin: 0,
+                    marginBottom: 16,
+                  }}
+                >
+                  {card.title[lang]}
+                </h3>
+                <p
+                  className="text-pretty"
+                  style={{
+                    fontFamily: SANS_FONT,
+                    fontWeight: 400,
+                    fontSize: '1rem',
+                    lineHeight: LINE_HEIGHT.body,
+                    letterSpacing: LETTER_SPACING.body,
+                    color: ED.muted,
+                    margin: 0,
+                  }}
+                >
+                  {card.body[lang]}
+                </p>
+              </div>
+            </RevealOnScroll>
           ))}
         </div>
       </div>
