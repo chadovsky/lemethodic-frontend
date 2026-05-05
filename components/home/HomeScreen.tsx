@@ -15,15 +15,19 @@ import { api, ApiError } from '@/lib/api'
 import type { Lesson, RecurringModule } from '@/lib/types'
 
 // ─── design tokens ───────────────────────────────────────────────────────────
-const INK         = '#1A1A1A'
-const INK_SOFT    = '#1A1A1AB3'
-const INK_MUTED   = '#1A1A1A66'
+// F-206 — page chrome migrated to editorial system. DailyActionCard
+// pastels (peach/butter/sage/lavender) preserved as accent layer per
+// F-200 rule. F-202 (L'École intro rebuild) eventually supersedes this
+// surface entirely; F-206 is the interim chrome fix.
+const INK         = 'var(--ed-fg)'
+const INK_SOFT    = 'var(--ed-muted)'
+const INK_MUTED   = 'var(--ed-muted)'
 const PEACH       = '#FFD8C2'
 const BUTTER      = '#FFF0C2'
 const SAGE        = '#D4E4D0'
 const LAVENDER    = '#E0D4F0'
-const BG          = 'var(--fp-canvas)'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+const BG          = 'var(--ed-bg)'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // F-087 — 27 lessons total: Phase 1 Fondations (1-16) + Phase 2
 // Approfondissement (17-27). Visual separator inserted between lesson
@@ -197,7 +201,8 @@ export default function HomeScreen({
     >
       <div
         style={{
-          maxWidth: 440,
+          // F-206 — column widened 440 → 720, fixes desktop white-rails.
+          maxWidth: 720,
           margin: '0 auto',
           position: 'relative',
         }}

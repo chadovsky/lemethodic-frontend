@@ -24,11 +24,13 @@ import { api, ApiError } from '@/lib/api'
 import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 import type { Lesson, ModuleCategory, ModuleWithContext } from '@/lib/types'
 
-const INK          = '#1A1A1A'
-const INK_SOFT     = '#1A1A1AB3'
-const INK_MUTED    = '#1A1A1A66'
-const BG           = 'var(--fp-canvas)'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+// F-206 — page chrome migrated to editorial system. CATEGORY_BG pastels
+// preserved per F-200 rule (data-display chip layer for module category).
+const INK          = 'var(--ed-fg)'
+const INK_SOFT     = 'var(--ed-muted)'
+const INK_MUTED    = 'var(--ed-muted)'
+const BG           = 'var(--ed-bg)'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 const CATEGORY_BG: Record<ModuleCategory, string> = {
   vocab_calque:        '#FFD8C2',
@@ -184,7 +186,7 @@ export default function LearnModulePage({ moduleId }: Props) {
 
   return (
     <div style={{ minHeight: '100dvh', backgroundColor: BG, fontFamily: DISPLAY_FONT }}>
-      <div style={{ maxWidth: 440, margin: '0 auto', paddingBottom: 120 }}>
+      <div style={{ maxWidth: 720, margin: '0 auto', paddingBottom: 120 }}>
         {/* Header */}
         <header
           style={{

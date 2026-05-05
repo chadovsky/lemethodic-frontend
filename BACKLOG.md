@@ -856,16 +856,36 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Scope:** /profile inner cards restyle (Preply CTA / Stats / Account / Settings card system to editorial). /diagnostic CouchesDiagnostic + DetectedModuleCard + InlineContentRef + CorrectedLine + GouletCard + ordonnance row migration to editorial chip system. Significant — needs P-088 layout audit to ensure data-display doesn't lose semantic meaning.
 **Owner:** Engineering + design pass
 
-### F-206 — Recording + module surfaces editorial migration (PLAN-FIRST PROPOSED)
+### F-206 — Recording + module surfaces editorial migration (page chrome only)
 
-**Priority:** HIGH
-**Status:** Plan-first proposed, awaiting Chadi confirm-or-redirect on scope assignment
+**Priority:** HIGH (launch-blocking — desktop white-rails)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of all affected routes per F-225)
 **Filed:** 2026-05-04
 **Source:** F-200 cascade — final responsive sweep
 **Dependencies:** F-200
-**Proposed scope:** migrate `/speaking` (SpeakingLanding + Tâche pickers), `/speaking/tache-1`, `/speaking/tache-2`, `/speaking/tache-3` (per-Tâche session components), `/speaking/feedback/[session]`, `/learn/[module_id]` (LearnModulePage with category-tinted backgrounds — these EARN their pastel keep per F-200's "pastels survive as accent layer" rule), and `/writing` to editorial system. Recording surfaces have heavy interactive UI (PTT button, vu-meter, transcript review sheet) that needs careful migration without breaking F-061 / F-062 / F-104 invariants. Largest sweep — estimated 800-1200 LOC across ~25 files.
+**Scope:** migrated PAGE CHROME of `/login`, `/writing`, `/more`, `/ecole` (HomeScreen), and `/learn/[module_id]` (LearnModulePage): bg → ed-bg, max-width 440 → 720, font tokens DISPLAY_FONT → Geist, INK/INK_MUTED → ed-* tokens. Pastel accents preserved per F-200 rule: HomeScreen DailyActionCard backgrounds (peach/butter/sage), LearnModulePage CATEGORY_BG (per-category tints — these EARN their keep as data-display chips), avatar circle on /profile.
 **Owner:** Engineering
-**Confirm before implementation:** is this the right scope for F-206?
+**Note:** /speaking surfaces (SpeakingLanding + 3 Tâche sessions + feedback page) deferred to F-206.speaking — they have heavy interactive UI (PTT button, vu-meter, transcript review sheet, F-061/F-062/F-104 invariants). Editorial migration without invariant audit risks breaking core recording flow. /ecole/lesson/[id] surfaces (LessonDetailClient + quiz) deferred to F-206.lessons.
+
+### F-206.speaking — /speaking surfaces editorial migration
+
+**Priority:** MEDIUM (post-soft-beta polish)
+**Status:** Queued
+**Filed:** 2026-05-04
+**Source:** F-206 scope cut — recording surfaces deferred
+**Dependencies:** F-206, F-061 / F-062 / F-104 invariant audit
+**Scope:** migrate /speaking, /speaking/tache-1[/topic], /speaking/tache-2[/scenario], /speaking/tache-3/[topic], /speaking/feedback/[session]. Recording surfaces have load-bearing UI (PTT, vu-meter, ChatBubble, TranscriptReviewPanel, CountdownTimer, RecordButton). Editorial migration needs invariant audit.
+**Owner:** Engineering + careful audit
+
+### F-206.lessons — /ecole/lesson/[id] + quiz editorial migration
+
+**Priority:** MEDIUM (post-soft-beta polish)
+**Status:** Queued
+**Filed:** 2026-05-04
+**Source:** F-206 scope cut
+**Dependencies:** F-206, F-087 (lesson curriculum invariants)
+**Scope:** migrate LessonDetailClient (markdown rendering + quiz CTA + back nav) and QuizClient (multi-question flow + answer-checking + result + lesson-unlock animation). Carries F-087 + F-115 motion invariants (lesson-unlock animation in HomeScreen).
+**Owner:** Engineering
 
 ### F-202 — L'École intro rebuild with methodology demo (PAUSED — awaiting Chadi copy)
 
