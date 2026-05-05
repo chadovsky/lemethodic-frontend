@@ -185,20 +185,13 @@ function NotFoundState() {
 }
 
 function LoadingSkeleton() {
+  // F-211 — editorial shimmer (ed-skeleton class) replaces Tailwind
+  // animate-pulse. Slower, less aggressive, matches design system.
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div
-        className="animate-pulse"
-        style={{ height: 100, borderRadius: 16, backgroundColor: '#1A1A1A0A' }}
-      />
-      <div
-        className="animate-pulse"
-        style={{ height: 240, borderRadius: 16, backgroundColor: '#1A1A1A06' }}
-      />
-      <div
-        className="animate-pulse"
-        style={{ height: 96, borderRadius: 16, backgroundColor: '#1A1A1A06' }}
-      />
+      <div className="ed-skeleton" style={{ height: 100, borderRadius: 4 }} />
+      <div className="ed-skeleton" style={{ height: 240, borderRadius: 4 }} />
+      <div className="ed-skeleton" style={{ height: 96, borderRadius: 4 }} />
     </div>
   )
 }

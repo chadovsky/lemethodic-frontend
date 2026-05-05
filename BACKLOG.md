@@ -794,6 +794,27 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Scope:** single high-quality art-directed illustration for the EcoleReveal closing screen (the funnel's emotional terminal, where the user sees their persona + plan before /paywall). Current placeholder: `/illustration-ecole.png` recycled from P-220 era. F-201 sized the asset slot at 280×280 above the persona label. Per F-200 imagery rules: real photography muted-tone OR art-directed line drawing / geometric primitives. No 3D emoji, no library cartoon, no mascot energy.
 **Owner:** Chadi (art direction / commission) + Engineering (drop-in swap)
 
+### F-211 — Loading states overhaul (skeleton shimmer migration)
+
+**Priority:** MEDIUM (soft-beta polish)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured screenshots of /, /progress, /cluster, /ecole loading states per F-225)
+**Filed:** 2026-05-04
+**Source:** Strategic recalibration — interaction polish queue
+**Dependencies:** F-200, F-212 (ed-skeleton CSS class)
+**Scope (this commit):**
+- Migrated `animate-pulse` → `ed-skeleton` (1.5s editorial shimmer, ed-rule on ed-paper, no aggressive pulse) on:
+  - `ProgressDashboard.tsx` LoadingSkeleton (4 rows)
+  - `ClusterDetailPage.tsx` LoadingSkeleton (3 rows)
+  - `HomeScreen.tsx` daily-action card skeleton + lesson-list skeleton (5 rows)
+- Border radii unified to 4px (was 16-20px) for editorial consistency.
+- Reduced-motion fallback handled by ed-skeleton class (drops the shimmer animation, keeps a static ed-rule fill).
+**Owner:** Engineering
+**Cuts:**
+- Recording analysis pipeline progressive states ("Recording received" → "Transcribing" → "Analyzing" → "Done"): filed as F-211.recording — touches F-061/F-062/F-104 invariants on the Tâche session components, needs careful audit.
+- Signup → onboarding transition skeleton: filed as F-211.transition — small surface, low priority.
+- LessonDetailClient (1 remaining animate-pulse instance): low-traffic auth-gated surface, F-211.x — sweep alongside F-206.lessons.
+- shadcn `components/ui/skeleton.tsx` legacy primitive: leave as-is (used by other surfaces; per-consumer migration as F-2xx tickets touch them).
+
 ### F-214 — Visual depth + design system extension
 
 **Priority:** MEDIUM (soft-beta polish)

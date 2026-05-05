@@ -149,20 +149,20 @@ function LoadingSkeleton() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div
-        className="animate-pulse"
-        style={{ height: 140, borderRadius: 16, backgroundColor: '#1A1A1A0A' }}
+        className="ed-skeleton"
+        style={{ height: 140, borderRadius: 4 }}
       />
       <div
-        className="animate-pulse"
-        style={{ height: 100, borderRadius: 16, backgroundColor: '#1A1A1A06' }}
+        className="ed-skeleton"
+        style={{ height: 100, borderRadius: 4 }}
       />
       <div
-        className="animate-pulse"
-        style={{ height: 80, borderRadius: 16, backgroundColor: '#1A1A1A06' }}
+        className="ed-skeleton"
+        style={{ height: 80, borderRadius: 4 }}
       />
       <div
-        className="animate-pulse"
-        style={{ height: 80, borderRadius: 16, backgroundColor: '#1A1A1A06' }}
+        className="ed-skeleton"
+        style={{ height: 80, borderRadius: 4 }}
       />
     </div>
   )

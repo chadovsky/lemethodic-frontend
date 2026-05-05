@@ -413,10 +413,9 @@ export default function HomeScreen({
                 />
               ) : lessons === null && !fetchError ? (
                 <div
-                  className="animate-pulse"
+                  className="ed-skeleton"
                   style={{
-                    backgroundColor: '#1A1A1A0A',
-                    borderRadius: 20,
+                    borderRadius: 4,
                     minHeight: 180,
                   }}
                 />
@@ -548,15 +547,14 @@ export default function HomeScreen({
                   </button>
                 </div>
               ) : lessons === null ? (
-                // Loading skeleton — five pulse rows at the lesson-item shape.
+                // F-211 — editorial shimmer rows at the lesson-item shape.
                 Array.from({ length: 5 }).map((_, i) => (
                   <div
                     key={i}
-                    className="animate-pulse"
+                    className="ed-skeleton"
                     style={{
                       height: 56,
-                      borderBottom: '1px solid #1A1A1A0A',
-                      backgroundColor: '#1A1A1A06',
+                      borderBottom: '1px solid var(--ed-rule)',
                     }}
                   />
                 ))
