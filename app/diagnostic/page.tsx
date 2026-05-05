@@ -30,14 +30,18 @@ import type {
 } from '@/lib/types'
 
 // ─── design tokens ────────────────────────────────────────────────────────────
-const INK          = '#1A1A1A'
+// F-205 — page chrome migrated to editorial system. Couches/modules
+// section components keep their FluentPath palette as data-display
+// accent layer per F-200 rule. Full editorial migration of the dense
+// diagnostic surface tracked as F-205.deep.
+const INK          = 'var(--ed-fg)'
 const INK_SOFT     = '#1A1A1AB3'
 const INK_MUTED    = '#1A1A1A66'
 const SAGE         = '#D4E4D0'
 const BUTTER       = '#FFF0C2'
 const PEACH        = '#FFD8C2'
-const BG           = 'var(--fp-canvas)'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
+const BG           = 'var(--ed-bg)'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // ─── mock transcript (shown when no ?session= param — for design-review) ─────
 type Segment = { text?: string; correction?: Correction }
@@ -519,7 +523,8 @@ function DiagnosticInner() {
     >
       <div
         style={{
-          maxWidth: 440,
+          // F-205 — column widened 440 → 720, fixes desktop white-rails
+          maxWidth: 720,
           margin: '0 auto',
           paddingBottom: 'calc(120px + var(--fp-safe-bottom))',
         }}

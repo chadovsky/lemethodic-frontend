@@ -7,17 +7,19 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import { signOut } from '@/lib/auth'
 import { ArrowLeft, ChevronRight, Pencil } from 'lucide-react'
 
-// ─── design tokens ────────────────────────────────────────────────────────────
-const INK          = '#1A1A1A'
-const INK_SOFT     = '#1A1A1AB3'
-const INK_MUTED    = '#1A1A1A66'
+// F-205 — page chrome migrated to editorial system. Inner cards (Preply
+// CTA on sage, Stats on butter, avatar on peach) preserved as decorative
+// accents per F-200 rule. Hardcoded mockup data still F-222.x scope.
+const INK          = 'var(--ed-fg)'
+const INK_SOFT     = 'var(--ed-muted)'
+const INK_MUTED    = 'var(--ed-muted)'
 const PEACH        = '#FFD8C2'
 const SAGE         = '#D4E4D0'
 const BUTTER       = '#FFF0C2'
-const BG           = 'var(--fp-canvas)'
-const CARD_BG      = '#FFFFFF'
-const DISPLAY_FONT = '"Cabinet Grotesk", Geist, sans-serif'
-const SEPARATOR    = '#1A1A1A0F'
+const BG           = 'var(--ed-bg)'
+const CARD_BG      = 'var(--ed-paper)'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+const SEPARATOR    = 'var(--ed-rule)'
 
 // ─── reusable card shell ──────────────────────────────────────────────────────
 function Card({
@@ -131,7 +133,8 @@ export default function ProfilePage() {
         fontFamily: DISPLAY_FONT,
       }}
     >
-      <div style={{ maxWidth: 440, margin: '0 auto', position: 'relative' }}>
+      {/* F-205 — max-width 440 → 720, padding clamp() responsive */}
+      <div style={{ maxWidth: 720, margin: '0 auto', position: 'relative' }}>
 
         {/* ── Header ─────────────────────────────────────────────────── */}
         <header
@@ -169,8 +172,9 @@ export default function ProfilePage() {
           <h1
             style={{
               fontFamily: DISPLAY_FONT,
-              fontWeight: 700,
-              fontSize: 18,
+              fontWeight: 600,
+              fontSize: 16,
+              letterSpacing: '0.02em',
               color: INK,
               margin: 0,
             }}

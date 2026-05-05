@@ -835,16 +835,26 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Scope:** migrate Snapshot section (level chips + confidence visualizer + agreement copy + diagnostic-in-progress fallback), TodayFocus (Dialogue Box + reason_code copy), GouletStack (RecurringModuleCard reuse), RecentActivity (linear list with Tâche/CEFR badges) on /progress. Plus ClusterHeader (status + last_detection_result chips with traffic-light dots) on /cluster. Each chip vocabulary needs editorial-system equivalent without losing data display.
 **Owner:** Engineering + design pass on chip palette
 
-### F-205 — User-state surfaces editorial migration (PLAN-FIRST PROPOSED)
+### F-205 — User-state surfaces editorial migration (page chrome only)
 
-**Priority:** HIGH
-**Status:** Plan-first proposed, awaiting Chadi confirm-or-redirect on scope assignment
+**Priority:** HIGH (launch-blocking — desktop white-rails)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/profile` and `/diagnostic` per F-225)
 **Filed:** 2026-05-04
 **Source:** F-200 cascade
-**Dependencies:** F-200, F-222.x (/profile real-data wire-up — same surface)
-**Proposed scope:** migrate `/profile` (Settings + Account cards + Sign Out via F-222 helper) and `/diagnostic` (per-recording feedback page with CouchesDiagnostic, DetectedModuleCard, ordonnance) to editorial system. /profile's hardcoded mockup data is F-222.x scope — F-205 just restyles. /diagnostic has dense data display (rubric scores, couches grid) that needs careful migration without breaking F-088 layout invariants. Estimated 500-700 LOC across ~10 files.
+**Dependencies:** F-200, F-222.x (/profile real-data wire-up — same surface, separate ticket)
+**Scope:** migrated PAGE CHROME of `/profile` and `/diagnostic`: bg → ed-bg, max-width 440 → 720 (fixes white-rails), token references swapped (INK → ed-fg, DISPLAY_FONT → Geist), header heading restyled (16px Geist 600 + 0.02em). Inner cards on /profile (Preply CTA on sage, Stats on butter, avatar on peach) preserved as accent layer per F-200 rule. /diagnostic's dense couches/modules display preserved untouched — section internals are F-205.deep scope.
 **Owner:** Engineering
-**Confirm before implementation:** is this the right scope for F-205?
+**Note:** /profile's hardcoded mockup data ("Chadi", "chadi@example.com", 47 days) is F-222.x scope — F-205 just restyles chrome. /diagnostic's CouchesDiagnostic + DetectedModuleCard + ordonnance components carry P-088 layout invariants — chrome-only migration avoids breaking those.
+
+### F-205.deep — Section-internal editorial migration on /profile + /diagnostic
+
+**Priority:** MEDIUM (post-soft-beta polish)
+**Status:** Queued
+**Filed:** 2026-05-04
+**Source:** F-205 scope cut
+**Dependencies:** F-205, F-088 (couches schema), F-222.x (profile real-data)
+**Scope:** /profile inner cards restyle (Preply CTA / Stats / Account / Settings card system to editorial). /diagnostic CouchesDiagnostic + DetectedModuleCard + InlineContentRef + CorrectedLine + GouletCard + ordonnance row migration to editorial chip system. Significant — needs P-088 layout audit to ensure data-display doesn't lose semantic meaning.
+**Owner:** Engineering + design pass
 
 ### F-206 — Recording + module surfaces editorial migration (PLAN-FIRST PROPOSED)
 
