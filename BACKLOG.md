@@ -2160,6 +2160,34 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-003 — Hero atmospheric typographic animation
+
+**Priority:** MEDIUM (visual depth; F-200 editorial direction)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` showing hero with atmospheric glyphs visible behind H1+kicker, plus a recorded scroll trace verifying parallax fires at 0.2x scroll speed and disengages when hero leaves viewport. Reduced-motion pass: macOS Settings → Accessibility → Display → Reduce motion ON, verify drift animation halts and parallax stays at 0. F-225 interactive verification clause partially applies — atmospheric animation is decorative, but parallax + IntersectionObserver gate are behavioral; recorded scroll trace required.)
+**Filed:** 2026-05-01
+**Shipped:** 2026-05-01 (FE-side, frontend commit pending)
+**Source:** V-series ticket batch — hero needed visual depth without competing with copy
+**Dependencies:** V-005 (Fraunces font system live)
+**Scope:** atmospheric typographic background mounted inside HeroSection. 5 French accent characters (é, à, ç, ô, î) rendered as massive Fraunces glyphs at 5% ed-fg opacity, distributed across positional zones (top-left, top-right, mid-left, mid-right, bottom-center). Each character has its own drift animation (translate3d + rotate, 70-90s cycles, ease-in-out, infinite, distinct keyframes per character so they drift asynchronously). Negative animation-delay starts each at a different cycle phase to avoid synchronized first-paint reset. Font sizes clamp(240-300, 45-56vw, 640-800px) so atmosphere scales gracefully across viewport widths. Variable-axis: `opsz 144` (display optical size) + `SOFT 30` (editorial warmth). Parallax: 0.2x scroll speed on the parent wrapper (single rAF-throttled scroll listener). IntersectionObserver gates the listener so it only fires while hero is in viewport (no scroll-listener cost on rest of page). Reduced-motion: drift animation gated in CSS (`@media prefers-reduced-motion`), parallax disabled in JS (effectiveScrollY clamped to 0). Static end-state shows characters at initial positions.
+
+**Files touched:**
+- `components/landing/HeroAtmosphere.tsx` (NEW) — orchestrator with parallax + IO scroll gate + reduced-motion detection
+- `app/globals.css` — `.hero-atmosphere` + `.hero-atmosphere-char-N` (5 zones) + 5 `@keyframes hero-drift-N` + reduced-motion gate
+- `components/landing/sections/HeroSection.tsx` — section gains `position: relative` + `overflow: hidden`; `<HeroAtmosphere />` mounts before content; content wrapper gets `position: relative; zIndex: 1` to sit above the atmosphere layer
+- aria-hidden + pointer-events:none on atmosphere — purely decorative, inert to AT and pointer
+
+**No-overlap discipline:** characters positioned in distinct viewport zones (top-left -12%/-8%, top-right -8%/-4%, mid-left 38%/-16%, mid-right 30%/-10%, bottom-center 38%-left/-14% bottom). Negative offsets push characters partially off-canvas so the eye reads them as atmospheric fragments rather than discrete shapes. At narrow viewports (mobile), character font-sizes drop to 240-300px floor, preserving the same off-canvas fragment effect.
+
+### V-003.opacity — atmosphere opacity tuning
+
+**Priority:** LOW (post-V-003 polish)
+**Status:** Queued
+**Filed:** 2026-05-01
+**Source:** V-003 spec — "ed-fg at 4-6% opacity"
+**Dependencies:** V-003
+**Scope:** V-003 ships at 5% opacity (midpoint of 4-6%). Once on production, Chadi can taste-pass the level — bump to 6% if too subtle, drop to 4% if competing with copy. 1-line change in globals.css.
+**Owner:** Engineering
+
 ### V-002 — Em-dash strip across FE copy
 
 **Priority:** MEDIUM (editorial polish; em-dash overuse muddied prose voice)

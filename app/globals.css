@@ -480,6 +480,119 @@
   .ed-page-enter { animation: none; }
 }
 
+/* V-003 — hero atmospheric typographic background. 5 French accent
+   glyphs in Fraunces at ~5% ed-fg opacity, drifting slowly behind hero
+   content. Pointer-events: none and aria-hidden so they're inert.
+   Parallax is JS-driven on the parent wrapper (.hero-atmosphere); each
+   character's drift is pure CSS keyframes here. */
+.hero-atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  /* will-change for the JS-driven parallax transform on this wrapper */
+  will-change: transform;
+}
+.hero-atmosphere-char {
+  position: absolute;
+  font-family: var(--font-fraunces), Georgia, serif;
+  color: var(--ed-fg);
+  opacity: 0.05;
+  line-height: 0.85;
+  font-weight: 400;
+  user-select: none;
+  /* Variable-axis: large optical size + soft warmth for editorial feel */
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+}
+.hero-atmosphere-char-inner {
+  display: inline-block;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  will-change: transform;
+}
+
+/* Per-character zone + animation. Sized clamp(min, vw, max) so the
+   atmosphere scales gracefully from mobile to ultrawide. Each cycle
+   uses different durations and keyframe paths so they drift
+   asynchronously. Negative animation-delay starts each character mid-
+   cycle to avoid synchronized reset on first paint. */
+.hero-atmosphere-char-1 {
+  top: -12%;
+  left: -8%;
+  font-size: clamp(280px, 55vw, 760px);
+}
+.hero-atmosphere-char-1 .hero-atmosphere-char-inner {
+  animation-name: hero-drift-1;
+  animation-duration: 72s;
+  animation-delay: -4s;
+}
+.hero-atmosphere-char-2 {
+  top: -8%;
+  right: -4%;
+  font-size: clamp(260px, 50vw, 700px);
+}
+.hero-atmosphere-char-2 .hero-atmosphere-char-inner {
+  animation-name: hero-drift-2;
+  animation-duration: 84s;
+  animation-delay: -23s;
+}
+.hero-atmosphere-char-3 {
+  top: 38%;
+  left: -16%;
+  font-size: clamp(300px, 56vw, 800px);
+}
+.hero-atmosphere-char-3 .hero-atmosphere-char-inner {
+  animation-name: hero-drift-3;
+  animation-duration: 78s;
+  animation-delay: -41s;
+}
+.hero-atmosphere-char-4 {
+  top: 30%;
+  right: -10%;
+  font-size: clamp(240px, 45vw, 640px);
+}
+.hero-atmosphere-char-4 .hero-atmosphere-char-inner {
+  animation-name: hero-drift-4;
+  animation-duration: 90s;
+  animation-delay: -56s;
+}
+.hero-atmosphere-char-5 {
+  bottom: -14%;
+  left: 38%;
+  font-size: clamp(280px, 52vw, 720px);
+}
+.hero-atmosphere-char-5 .hero-atmosphere-char-inner {
+  animation-name: hero-drift-5;
+  animation-duration: 86s;
+  animation-delay: -12s;
+}
+
+@keyframes hero-drift-1 {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(36px, 22px, 0) rotate(4deg); }
+}
+@keyframes hero-drift-2 {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(-28px, 30px, 0) rotate(-5deg); }
+}
+@keyframes hero-drift-3 {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(40px, -18px, 0) rotate(3deg); }
+}
+@keyframes hero-drift-4 {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(-32px, -24px, 0) rotate(-6deg); }
+}
+@keyframes hero-drift-5 {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(24px, -28px, 0) rotate(5deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-atmosphere-char-inner { animation: none; }
+}
+
 /* F-202 — L'École intro curriculum two-block layout. Stacks mobile,
    side-by-side ≥768px. Each block has a 1px ed-rule left edge as the
    editorial column marker. */

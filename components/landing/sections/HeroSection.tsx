@@ -4,11 +4,14 @@
 // (TCF / TEF / DELF / DALF cycle, pauses on hover) + first-paint entry
 // sequence (kicker fades in first, then h1, then subhead) via the
 // `ed-hero-rise` CSS animation in globals.css with staggered delays.
+// V-003 adds an atmospheric typographic background (5 Fraunces accent
+// glyphs at ~5% opacity drifting slowly with parallax).
 
 import type { Lang } from '../copy'
 import { HERO } from '../copy'
 import { ED, LETTER_SPACING, LINE_HEIGHT, SANS_FONT } from '@/lib/typography'
 import RotatingKicker from '../RotatingKicker'
+import HeroAtmosphere from '../HeroAtmosphere'
 
 export default function HeroSection({ lang }: { lang: Lang }) {
   return (
@@ -17,9 +20,14 @@ export default function HeroSection({ lang }: { lang: Lang }) {
       style={{
         backgroundColor: ED.bg,
         padding: 'clamp(80px, 14vw, 160px) clamp(24px, 4vw, 64px) clamp(64px, 10vw, 140px)',
+        // V-003 — relative + overflow:hidden anchor the absolute-positioned
+        // HeroAtmosphere and clip its drifting glyphs to the section bounds.
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      <div className="mx-auto" style={{ maxWidth: 1280 }}>
+      <HeroAtmosphere />
+      <div className="mx-auto" style={{ maxWidth: 1280, position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 920 }}>
           <div className="ed-hero-rise ed-hero-rise-delay-1">
             <RotatingKicker lang={lang} />
