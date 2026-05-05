@@ -480,6 +480,31 @@
   .ed-page-enter { animation: none; }
 }
 
+/* V-004 — Differentiation card visuals.
+   ed-pair-fade-in: 600ms fade-in for the EN/FR interference pair on cycle.
+   ed-wave-pulse: idle subtle opacity pulse on each waveform bar (paused
+   on hover; hover replaces idle pulse with scaleY amplification). */
+@keyframes ed-pair-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ed-wave-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.7; }
+}
+.ed-pair-fade {
+  animation: ed-pair-fade-in 600ms var(--ed-ease) both;
+}
+.ed-pair-fade-delay {
+  animation-delay: 80ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ed-pair-fade { animation: none; opacity: 1; }
+  /* Idle waveform pulse and hover scaleY both rely on inline styles
+     in DifferentiationSection.tsx; the component reads
+     prefers-reduced-motion (via media query check) to skip them. */
+}
+
 /* V-003 — hero atmospheric typographic background. 5 French accent
    glyphs in Fraunces at ~5% ed-fg opacity, drifting slowly behind hero
    content. Pointer-events: none and aria-hidden so they're inert.

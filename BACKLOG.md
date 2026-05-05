@@ -2160,6 +2160,37 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-004 — Differentiation cards rebuild (per-card art-directed visuals)
+
+**Priority:** MEDIUM (visual depth; differentiation cards were boring text-only templates)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` (EN) + `/fr` (FR) showing all three differentiation cards visible together (Diagnostic-driven / Anglophone interference / Real-time AI feedback) at idle state. Plus a recorded interaction trace per F-225: hover over each card and verify (1) Card 1 illuminated bar shifts on hover, (2) Card 2 EN/FR pair cycles through 4 pairs on repeated hovers, (3) Card 3 waveform amplifies on hover and pulses subtly idle. Reduced-motion pass: macOS Settings → Reduce motion ON, verify all three cards still respond to state changes (state still updates) but transitions/animations skip and end-state is shown.)
+**Filed:** 2026-05-01
+**Shipped:** 2026-05-01 (FE-side, frontend commit pending)
+**Source:** V-series ticket batch — three identical text-only card templates were undifferentiated
+**Dependencies:** V-005 (Fraunces live for the EN/FR italic pair display)
+**Scope:** rebuild DifferentiationSection so each of the three cards has its own art-directed visual element above the headline + body, while preserving the shared editorial chrome (1px ed-rule, ed-paper bg, 4px radius, ed-card-lift on hover, 28-40px clamp padding).
+
+**Per-card visuals:**
+- **Card 1 — Diagnostic-driven**: 5-couche stack visualization. 5 horizontal bars (14px tall × 6px gap) representing Le Fond / Les Moules des Idées / Les Moules / Les Réflexes Anglais / La Voix. Default illuminated bar = #4 (Les Réflexes Anglais — most thematically resonant for the anglophone audience). Inactive bars are 1px ed-rule outline only; active bar is filled ed-accent navy with subtle scaleX(1.02). On hover (`onMouseEnter`), illumination cycles to next layer (visualizes diagnostic re-scoring as bottlenecks unblock). 600ms ease-in-out transitions on backgroundColor + borderColor + transform.
+- **Card 2 — Anglophone interference**: typographic EN/FR comparison pair. EN line in Fraunces italic 1.375rem with line-through (ed-muted), FR line in Fraunces italic 1.375rem ed-fg, EN/FR small-caps prefixes in Switzer. Pairs cycle on hover through 4 examples: `I am agree → Je suis d'accord` / `I have 30 years → J'ai 30 ans` / `depends of → dépend de` / `since 2020 I live here → J'habite ici depuis 2020`. Pair change triggers 600ms ed-pair-fade-in keyframe (opacity + 4px Y-translate); FR delayed 80ms after EN.
+- **Card 3 — Real-time AI feedback**: 32-bar audio waveform graphic. Heights from a static sine-ish array (8-48px). 4px wide bars with 3px gaps, ed-accent at 45% opacity. Idle state: subtle ed-wave-pulse keyframe (opacity 0.45 ↔ 0.7, 1800ms loop, staggered delays so bars pulse asynchronously). On hover: pulse animation halts and each bar transforms scaleY(1.4-1.6, varying by index modulo 3) with staggered transition delays so the amplification ripples across the waveform.
+
+**Layout:**
+- Cards use `display: flex; flex-direction: column; height: 100%` so visual elements anchor at top (130px reserved height for visual container) and body text fills below via `flex: 1`. All three cards have equal height.
+- Shared chrome unchanged: 1px ed-rule + ed-paper bg + 4px radius + ed-card-lift hover + clamp(28px, 3vw, 40px) padding.
+- 3-column grid via `grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))` — same as pre-V-004; collapses to 1-column stack on narrow viewports.
+
+**Reduced-motion handling:**
+- New utility hook `useReducedMotion()` (local to file): reads `(prefers-reduced-motion: reduce)` media query, subscribes to changes.
+- Card 1: scaleX transform + transition both gated; active bar still gets bg color change (instant, no transition).
+- Card 2: idle CSS animation `.ed-pair-fade` already gated in globals.css `@media (prefers-reduced-motion: reduce)` rule (animation: none, opacity: 1).
+- Card 3: idle pulse animation + hover scaleY both skipped (transition: none, animation: none).
+- All three cards still update state on hover; only the *animation* of state change is skipped. End state is shown.
+
+**Files touched:**
+- `components/landing/sections/DifferentiationSection.tsx` — full rewrite. Adds 3 inline visual sub-components (CoucheStackVisual / InterferenceVisual / WaveformVisual) + useReducedMotion hook + visuals[] map indexed by card position
+- `app/globals.css` — added `@keyframes ed-pair-fade-in` + `.ed-pair-fade` class + `.ed-pair-fade-delay` class + `@keyframes ed-wave-pulse` + reduced-motion gate
+
 ### V-003 — Hero atmospheric typographic animation
 
 **Priority:** MEDIUM (visual depth; F-200 editorial direction)
