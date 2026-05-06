@@ -2160,6 +2160,36 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-012c — Whitespace + bento variation (warmth refit phase 3)
+
+**Priority:** MEDIUM (V-012 chain tail; whitespace polish + bento exploration)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` (EN) + `/fr` (FR) end-to-end scroll showing the V-012 chain compositely: warm hero gradient, ed-fg/bg warmth, Methodology generous padding, Differentiation cards with peach/sage/peach-deep visuals, FAQ on paper, FinalCTA on warm-sand with B2 highlight + warm-hover CTA. Plus interaction trace for FinalCTA + Paywall CTA hover, onboarding step pastel rotation. F-225 interactive verification clause applies for the warm-hover CTAs.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06 (FE-side, frontend commit pending)
+**Source:** V-012 strategic recalibration — whitespace generosity on flagship surfaces
+**Dependencies:** V-012a, V-012b
+
+**Padding audit + targeted bumps:**
+- **MethodologySection**: `clamp(64px, 10vw, 160px) → clamp(80px, 11vw, 180px)`. Moat surface earns more breathing room; floor lifted 64→80 for tighter mobile→desktop scaling, cap raised 160→180.
+- **FinalCTASection**: `clamp(96px, 14vw, 160px) → clamp(96px, 14vw, 180px)`. Conversion moment cap raised; floor unchanged.
+- **Hero / Problem / Differentiation / How / Pricing / FAQ**: untouched per spec ("don't blanket-apply"). Hero already at 160-top / 140-bottom; rest already at 80-140.
+
+**Bento exploration: skipped per spec fallback** ("IF unsure, ship the 3-equal pattern as-is. Bento is an upgrade, not required.") The V-004 + V-012b card visuals already carry distinct visual weight (couche stack / EN-FR pair / waveform; peach-deep / peach / sage-deep colors). 3-equal grid reads balanced after warmth landed; bento adds risk for marginal gain. Filed as **V-012c.bento** queued for future taste pass.
+
+**Files touched:**
+- `components/landing/sections/MethodologySection.tsx` (vertical padding clamp)
+- `components/landing/sections/FinalCTASection.tsx` (vertical padding cap)
+
+### V-012c.bento — Differentiation cards bento variation (queued)
+
+**Priority:** LOW (post-V-012 polish; design taste pass)
+**Status:** Queued
+**Filed:** 2026-05-06
+**Source:** V-012c spec — bento exploration deferred per spec fallback
+**Dependencies:** V-012b
+**Scope:** swap the 3-equal-card grid in DifferentiationSection for a bento layout. Two candidate variations to surface in plan-first when picked up: (a) 1 large card 2/3-width spanning Card 1 (Diagnostic-driven, the strategic lead) + 2 stacked smaller cards 1/3-width for Cards 2/3; (b) 2-1-2 pattern with different aspect ratios across breakpoints. Mobile collapses to single-column stack regardless. Card chrome stays — only grid composition changes. Needs Chadi taste pass on which composition reads best with the V-012b warm visuals (peach-deep illuminated bar, peach strikethrough, sage waveform).
+**Owner:** Engineering (Chadi taste pass on composition)
+
 ### V-012b — Per-surface warmth injection (warmth refit phase 2)
 
 **Priority:** HIGH (V-012 mid-chain — hero/Paywall/FinalCTA/EcoleReveal/onboarding/Differentiation cards get warmth)

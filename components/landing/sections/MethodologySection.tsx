@@ -22,7 +22,7 @@ export default function MethodologySection({ lang }: { lang: Lang }) {
       style={{
         backgroundColor: ED.bg,
         borderTop: `1px solid ${ED.rule}`,
-        padding: 'clamp(64px, 10vw, 160px) clamp(24px, 4vw, 64px)',
+        padding: 'clamp(80px, 11vw, 180px) clamp(24px, 4vw, 64px)',
       }}
     >
       <div className="mx-auto" style={{ maxWidth: 720 }}>

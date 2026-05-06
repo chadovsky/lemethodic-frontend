@@ -41,7 +41,7 @@ export default function FinalCTASection({ lang }: { lang: Lang }) {
         // were much better"). Absorbs V-011.color. Headline gets a "B2"
         // highlight in warm-peach-deep below; CTA gains warm hover state.
         backgroundColor: 'var(--ed-warm-sand)',
-        padding: 'clamp(96px, 14vw, 160px) clamp(24px, 4vw, 64px)',
+        padding: 'clamp(96px, 14vw, 180px) clamp(24px, 4vw, 64px)',
       }}
     >
       <div className="mx-auto" style={{ maxWidth: 720, textAlign: 'center' }}>
