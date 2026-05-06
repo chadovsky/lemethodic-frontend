@@ -18,7 +18,12 @@ export default function HeroSection({ lang }: { lang: Lang }) {
     <section
       className="w-full"
       style={{
+        // V-012b — gradient from ed-bg (top) to ed-warm-sand (bottom) gives
+        // hero soft warmth without flooding the chrome. Atmospheric V-003
+        // glyphs sit on top, untouched. Solid backgroundColor preserved as
+        // fallback for browsers without gradient support.
         backgroundColor: ED.bg,
+        backgroundImage: 'linear-gradient(180deg, var(--ed-bg) 0%, var(--ed-warm-sand) 100%)',
         padding: 'clamp(80px, 14vw, 160px) clamp(24px, 4vw, 64px) clamp(64px, 10vw, 140px)',
         // V-003 — relative + overflow:hidden anchor the absolute-positioned
         // HeroAtmosphere and clip its drifting glyphs to the section bounds.

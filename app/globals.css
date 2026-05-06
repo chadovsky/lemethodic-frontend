@@ -427,6 +427,20 @@
   transform: scale(0.97);
 }
 
+/* V-012b — primary-CTA warm hover. Default bg stays ed-accent navy
+   (premium signal); :hover shifts to warm-peach-deep via spring for
+   the soft state warmth Chadi specified. Pair with .ed-btn-press for
+   the active scale(0.97) snap. */
+.ed-cta-warm-hover {
+  transition: background-color var(--ed-duration-hover) var(--ease-spring),
+              color var(--ed-duration-hover) var(--ease-spring);
+}
+@media (hover: hover) {
+  .ed-cta-warm-hover:hover {
+    background-color: var(--ed-warm-peach-deep);
+  }
+}
+
 /* Form field focus: ed-accent ring. V-012a — focus state shift uses
    --ease-spring for soft border + ring transition. */
 .ed-field {

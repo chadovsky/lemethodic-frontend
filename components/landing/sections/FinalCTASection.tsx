@@ -9,20 +9,38 @@
 // moment, distinct from the warm-bg sections above.
 
 import Link from 'next/link'
+import type { ReactNode } from 'react'
 import type { Lang } from '../copy'
 import { FINAL_CTA } from '../copy'
 import { ED, LETTER_SPACING, LINE_HEIGHT, SANS_FONT } from '@/lib/typography'
 import RevealOnScroll from '../RevealOnScroll'
+
+// V-012b — split the headline at "B2" so we can render that token in
+// warm-peach-deep accent color while everything else stays at ed-fg.
+// Both EN and FR end with "B2." so the split target is consistent.
+function highlightB2(text: string): ReactNode[] {
+  const parts = text.split(/(B2)/g)
+  return parts.map((part, i) =>
+    part === 'B2' ? (
+      <span key={i} style={{ color: 'var(--ed-warm-peach-deep)' }}>
+        {part}
+      </span>
+    ) : (
+      <span key={i}>{part}</span>
+    ),
+  )
+}
 
 export default function FinalCTASection({ lang }: { lang: Lang }) {
   return (
     <section
       className="w-full"
       style={{
-        // F-227.rhythm — flipped from ed-paper to ed-bg. Paired with FAQ
-        // bg→paper flip to land the post-F-227 rhythm Pricing(bg) →
-        // FAQ(paper) → FinalCTA(bg) → Footer. Restores F-214 alternation.
-        backgroundColor: ED.bg,
+        // V-012b — section bg shifted from ed-bg to ed-warm-sand for the
+        // conversion-moment warmth Chadi specified ("the colors before
+        // were much better"). Absorbs V-011.color. Headline gets a "B2"
+        // highlight in warm-peach-deep below; CTA gains warm hover state.
+        backgroundColor: 'var(--ed-warm-sand)',
         padding: 'clamp(96px, 14vw, 160px) clamp(24px, 4vw, 64px)',
       }}
     >
@@ -47,7 +65,7 @@ export default function FinalCTASection({ lang }: { lang: Lang }) {
               maxWidth: 640,
             }}
           >
-            {FINAL_CTA.heading[lang]}
+            {highlightB2(FINAL_CTA.heading[lang])}
           </h2>
         </RevealOnScroll>
         <RevealOnScroll delay={0.1}>
@@ -73,6 +91,7 @@ export default function FinalCTASection({ lang }: { lang: Lang }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center' }}>
             <Link
               href="/onboarding"
+              className="ed-cta-warm-hover ed-btn-press"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -91,17 +110,16 @@ export default function FinalCTASection({ lang }: { lang: Lang }) {
             >
               {FINAL_CTA.ctaPrimary[lang]}
             </Link>
-            {/* Trust-line under the primary action. V-007 — removed the
-                stray "Free." suffix that was being concatenated from
-                HERO.ctaSecondary.split('.')[0]; FINAL_CTA.ctaSecondary
-                already starts with "Free." so the suffix duplicated it. */}
+            {/* V-012b — trust-line color shifted from ed-muted (cool gray
+                #6B6B6B) to ed-fg-soft (warm dark #4A4540) for the warmer
+                muted tone Chadi specified in V-011.color (absorbed here). */}
             <span
               style={{
                 fontFamily: SANS_FONT,
                 fontWeight: 400,
                 fontSize: '0.875rem',
                 lineHeight: 1.5,
-                color: ED.muted,
+                color: 'var(--ed-fg-soft)',
               }}
             >
               {FINAL_CTA.ctaSecondary[lang]}

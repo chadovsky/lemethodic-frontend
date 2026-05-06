@@ -22,6 +22,7 @@ interface OtherFreetextScreenProps {
   onContinue: (value: string) => void
   onBack?: () => void
   headerRight?: React.ReactNode
+  bg?: string
 }
 
 const COPY = {
@@ -48,6 +49,7 @@ export default function OtherFreetextScreen({
   onContinue,
   onBack,
   headerRight,
+  bg,
 }: OtherFreetextScreenProps) {
   const [value, setValue] = useState(initialValue ?? '')
   const copy = COPY[language]
@@ -56,6 +58,7 @@ export default function OtherFreetextScreen({
 
   return (
     <OnboardingScreen
+      bg={bg}
       progressTotal={progressTotal}
       progressFilledUpTo={progressFilledUpTo}
       progressCurrent={progressCurrent}

@@ -40,6 +40,7 @@ interface ExamPickerQuestionProps {
   onContinue: (value: string) => void
   onBack?: () => void
   headerRight?: React.ReactNode
+  bg?: string
 }
 
 type AnotherExamState =
@@ -57,6 +58,7 @@ export default function ExamPickerQuestion({
   onContinue,
   onBack,
   headerRight,
+  bg,
 }: ExamPickerQuestionProps) {
   const [selected, setSelected] = useState<ExamValue | null>(
     (initialValue as ExamValue | null) ?? null,
@@ -122,6 +124,7 @@ export default function ExamPickerQuestion({
 
   return (
     <OnboardingScreen
+      bg={bg}
       progressTotal={progressTotal}
       progressFilledUpTo={progressFilledUpTo}
       progressCurrent={progressCurrent}

@@ -136,7 +136,7 @@ export default function Paywall() {
       // Visually near-identical (both warm off-white), but unifies under the
       // editorial system. Full editorial typography pass tracked as
       // F-203.paywall (Recharts radar + comparison table styling needs care).
-      style={{ backgroundColor: 'var(--ed-bg)' }}
+      style={{ backgroundColor: 'var(--ed-warm-cream)' }}
     >
       <div
         className="w-full flex flex-col px-5"
@@ -203,22 +203,27 @@ export default function Paywall() {
                   fill: INK_SOFT,
                 }}
               />
-              {/* Target — dashed outline */}
+              {/* V-012b — Target dashed outline shifted from neutral ink
+                  to warm sage-deep so the radar reads warm at both layers
+                  (user warm-peach, target warm-sage). Pairs with the
+                  ed-warm-cream section bg. */}
               <Radar
                 name="Target"
                 dataKey="target"
-                stroke="#1A1A1A40"
+                stroke="var(--ed-warm-sage-deep)"
                 strokeDasharray="4 3"
                 fill="transparent"
                 strokeWidth={1.5}
               />
-              {/* User — filled accent */}
+              {/* V-012b — User stroke kept on the saturated peach-deep for
+                  shape definition; fill uses the lighter ed-warm-peach
+                  for the soft "you" data wash. */}
               <Radar
                 name="You"
                 dataKey="user"
-                stroke="var(--fp-peach-deep)"
-                fill="var(--fp-peach-deep)"
-                fillOpacity={0.35}
+                stroke="var(--ed-warm-peach-deep)"
+                fill="var(--ed-warm-peach)"
+                fillOpacity={0.5}
                 strokeWidth={2}
               />
               <Tooltip
@@ -238,12 +243,12 @@ export default function Paywall() {
         {/* Legend */}
         <div className="flex items-center gap-5 mt-3 justify-center">
           <div className="flex items-center gap-2">
-            <div style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: 'var(--fp-peach-deep)', opacity: 0.8 }} />
+            <div style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: 'var(--ed-warm-peach-deep)', opacity: 0.8 }} />
             <span style={{ fontSize: 12, fontWeight: 600, color: INK_SOFT }}>You</span>
           </div>
           <div className="flex items-center gap-2">
             <svg width="16" height="8" viewBox="0 0 16 8" aria-hidden="true">
-              <line x1="0" y1="4" x2="16" y2="4" stroke="#1A1A1A40" strokeWidth="1.5" strokeDasharray="4 3" />
+              <line x1="0" y1="4" x2="16" y2="4" stroke="var(--ed-warm-sage-deep)" strokeWidth="1.5" strokeDasharray="4 3" />
             </svg>
             <span style={{ fontSize: 12, fontWeight: 600, color: INK_SOFT }}>Target</span>
           </div>
@@ -470,15 +475,19 @@ export default function Paywall() {
             </div>
           )}
 
-          {/* CTA */}
+          {/* CTA — V-012b: bg switched from legacy INK constant to
+              var(--ed-accent) navy, gains .ed-cta-warm-hover class for
+              the spring-eased warm-peach-deep hover state. The inline
+              transform handlers preserve the press scale snap. */}
           <button
             type="button"
             onClick={handleStartTrial}
+            className="ed-cta-warm-hover"
             style={{
               marginTop: 20,
               width: '100%',
               height: 58,
-              backgroundColor: INK,
+              backgroundColor: 'var(--ed-accent)',
               color: '#FFFFFF',
               borderRadius: 16,
               border: 'none',

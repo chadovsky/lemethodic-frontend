@@ -20,6 +20,7 @@ interface MultiSelectQuestionProps {
   onContinue: (value: string[]) => void
   onBack?: () => void
   headerRight?: React.ReactNode
+  bg?: string
 }
 
 export default function MultiSelectQuestion({
@@ -32,6 +33,7 @@ export default function MultiSelectQuestion({
   onContinue,
   onBack,
   headerRight,
+  bg,
 }: MultiSelectQuestionProps) {
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set(initialValue ?? []),
@@ -49,6 +51,7 @@ export default function MultiSelectQuestion({
 
   return (
     <OnboardingScreen
+      bg={bg}
       progressTotal={progressTotal}
       progressFilledUpTo={progressFilledUpTo}
       progressCurrent={progressCurrent}

@@ -38,6 +38,20 @@ import { DISPLAY_FONT, INK, INK_MUTED } from './OnboardingScreen'
 // (#FFD8C2) was the M-101a default; ed-bg unifies with the new system.
 const LOADER_BG = 'var(--ed-bg)'
 
+// V-012b — Editorial Luxury pastel rotation for the onboarding flow.
+// Promova-style per-step warmth: each visible step gets its own warm
+// pastel bg. Indexed by safeIndex; cycles via modulo for flows longer
+// than 6 steps. The OnboardingScreen wrapper accepts a `bg` prop and
+// inherits V-012a's --ease-spring transitions for soft step shifts.
+const STEP_PASTELS = [
+  'var(--ed-warm-peach)',      // step 0 — warm welcome
+  'var(--ed-warm-sand)',       // step 1 — transition
+  'var(--ed-warm-sage)',       // step 2 — calm, focus
+  'var(--ed-warm-cream)',      // step 3 — breathing room
+  'var(--ed-warm-peach-deep)', // step 4 — warm pre-reveal
+  'var(--ed-warm-sage-deep)',  // step 5 — commitment moment
+] as const
+
 // Synthetic step IDs that aren't BE questions but are rendered as standalone
 // screens between real questions. Today only the q9 freetext follow-up.
 const Q9_OTHER_STEP_ID = 'q9_native_language_other'
@@ -235,12 +249,19 @@ export default function OnboardingFlow() {
         }}
         onBack={onBack}
         headerRight={headerToggle}
+        bg={STEP_PASTELS[safeIndex % STEP_PASTELS.length]}
       />
     )
   }
 
   const q = step.question
   const answer = data[q.id]
+  // V-012b — Promova-style per-step pastel rotation. Each visible step
+  // gets a warm pastel bg from the Editorial Luxury palette. Indexed by
+  // safeIndex modulo PASTEL_ROTATION.length so the cycle handles flows
+  // longer than 6 steps (skip-condition narrowing keeps most users at
+  // ≤6 visible questions).
+  const stepBg = STEP_PASTELS[safeIndex % STEP_PASTELS.length]
   const commonProps = {
     progressTotal: totalSteps,
     progressCurrent: safeIndex + 1,
@@ -248,6 +269,7 @@ export default function OnboardingFlow() {
     language: interfaceLanguage,
     onBack,
     headerRight: headerToggle,
+    bg: stepBg,
   }
 
   if (q.type === 'single_select') {

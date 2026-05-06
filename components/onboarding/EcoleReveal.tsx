@@ -23,12 +23,16 @@ import {
   ECOLE_REVEAL_ILLUSTRATION_ALT_FR,
 } from './questionMeta'
 
-const ED_BG = 'var(--ed-bg)'
+// V-012b — EcoleReveal recoloured for the achievement / calm-pride moment.
+// Section bg shifts to ed-warm-sage; persona label uses ed-warm-espresso
+// for the warm-dark celebration accent (was ed-accent navy). Plan card
+// stays ed-paper with 1px ed-rule (chrome preserved per V-012 spec).
+const ED_BG = 'var(--ed-warm-sage)'
 const ED_FG = 'var(--ed-fg)'
 const ED_MUTED = 'var(--ed-muted)'
 const ED_RULE = 'var(--ed-rule)'
 const ED_PAPER = 'var(--ed-paper)'
-const ED_ACCENT = 'var(--ed-accent)'
+const ED_ACCENT = 'var(--ed-warm-espresso)'
 const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SERIF = 'var(--font-fraunces), Georgia, "Times New Roman", serif'
 

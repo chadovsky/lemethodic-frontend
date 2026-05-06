@@ -25,6 +25,8 @@ interface SingleSelectQuestionProps {
   // inject per-exam helper text on q2_target_level once q0_target_exam
   // is known (e.g., "B2 maps to CLB 7-8 for Canadian PR" for TCF Canada).
   helperOverride?: string
+  // V-012b — pastel rotation bg from OnboardingFlow.
+  bg?: string
 }
 
 export default function SingleSelectQuestion({
@@ -38,12 +40,14 @@ export default function SingleSelectQuestion({
   onBack,
   headerRight,
   helperOverride,
+  bg,
 }: SingleSelectQuestionProps) {
   const [selected, setSelected] = useState<string | null>(initialValue)
   const options = question.options ?? []
 
   return (
     <OnboardingScreen
+      bg={bg}
       progressTotal={progressTotal}
       progressFilledUpTo={progressFilledUpTo}
       progressCurrent={progressCurrent}

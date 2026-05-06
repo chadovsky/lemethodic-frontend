@@ -59,19 +59,21 @@ function CoucheStackVisual() {
     >
       {COUCHE_NAMES.map((_, i) => {
         const active = i === illuminated
+        // V-012b — illuminated bar shifts from ed-accent navy to
+        // warm-peach-deep, matching FinalCTA "B2" highlight color.
         return (
           <div
             key={i}
             style={{
               height: 14,
               borderRadius: 2,
-              backgroundColor: active ? ED.accent : 'transparent',
-              border: `1px solid ${active ? ED.accent : ED.rule}`,
+              backgroundColor: active ? 'var(--ed-warm-peach-deep)' : 'transparent',
+              border: `1px solid ${active ? 'var(--ed-warm-peach-deep)' : ED.rule}`,
               transform: !reduced && active ? 'scaleX(1.02)' : 'scaleX(1)',
               transformOrigin: 'left',
               transition: reduced
                 ? 'none'
-                : 'background-color 600ms var(--ed-ease), border-color 600ms var(--ed-ease), transform 600ms var(--ed-ease)',
+                : 'background-color 600ms var(--ease-spring), border-color 600ms var(--ease-spring), transform 600ms var(--ease-spring)',
             }}
           />
         )
@@ -123,8 +125,10 @@ function InterferenceVisual() {
           color: ED.muted,
           margin: 0,
           textDecoration: 'line-through',
-          textDecorationColor: ED.muted,
-          textDecorationThickness: '1px',
+          // V-012b — strikethrough color shifts to warm-peach for the
+          // "wrong attempt" warmth signal (was neutral ed-muted).
+          textDecorationColor: 'var(--ed-warm-peach)',
+          textDecorationThickness: '1.5px',
         }}
       >
         {pair.wrong}
@@ -180,7 +184,7 @@ function WaveformVisual() {
           style={{
             width: 4,
             height: h,
-            backgroundColor: ED.accent,
+            backgroundColor: 'var(--ed-warm-sage-deep)',
             opacity: 0.45,
             borderRadius: 1,
             transform: !reduced && hovered ? `scaleY(${1.4 + (i % 3) * 0.1})` : 'scaleY(1)',

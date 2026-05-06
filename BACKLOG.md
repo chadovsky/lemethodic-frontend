@@ -2160,6 +2160,52 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-012b — Per-surface warmth injection (warmth refit phase 2)
+
+**Priority:** HIGH (V-012 mid-chain — hero/Paywall/FinalCTA/EcoleReveal/onboarding/Differentiation cards get warmth)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy verification deferred to end-of-V-012c per defer-verification mode. F-225 interactive verification clause partially applies — CTA warm-hover state is interactive; recorded hover trace required for FinalCTA + Paywall CTAs once Chadi captures end-state. All 8 smoke-test routes returned 200; warm tokens confirmed in landing HTML.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06 (FE-side, frontend commit pending)
+**Source:** V-012 strategic recalibration — F-200 went too cold; per-surface warmth injection
+**Dependencies:** V-012a (tokens + spring motion)
+
+**Per-surface changes:**
+
+- **Hero (`HeroSection.tsx`)**: solid `backgroundColor: ED.bg` → `linear-gradient(180deg, var(--ed-bg) 0%, var(--ed-warm-sand) 100%)`. Solid bg preserved as fallback. V-003 atmospheric glyphs untouched.
+
+- **Paywall (`Paywall.tsx`)**: section bg `var(--ed-bg)` → `var(--ed-warm-cream)`. Recharts radar: target stroke `#1A1A1A40` → `var(--ed-warm-sage-deep)`; user stroke `var(--fp-peach-deep)` → `var(--ed-warm-peach-deep)`; user fill `var(--fp-peach-deep) → var(--ed-warm-peach)` with fillOpacity bumped 0.35 → 0.5 (lighter peach needs more opacity for visibility). Legend swatches updated to match. CTA button: bg `INK (legacy)` → `var(--ed-accent)` + `.ed-cta-warm-hover` class for spring-eased peach-deep hover.
+
+- **FinalCTASection (`FinalCTASection.tsx`) — absorbs V-011.color**: section bg `ED.bg` → `var(--ed-warm-sand)`. Headline: new `highlightB2(text)` helper splits on "B2" token and wraps it in span with `color: var(--ed-warm-peach-deep)` (warm accent on the moat-relevant term, both EN + FR). CTA Link: `.ed-cta-warm-hover` + `.ed-btn-press` classes (warm hover + press feedback). Trust line color `ED.muted` → `var(--ed-fg-soft)` (warm muted #4A4540).
+
+- **EcoleReveal (`EcoleReveal.tsx`)**: ED_BG constant `var(--ed-bg)` → `var(--ed-warm-sage)` (achievement / calm pride moment). ED_ACCENT (used for the persona label) `var(--ed-accent)` navy → `var(--ed-warm-espresso)` warm dark. Plan card chrome (ed-paper, 1px ed-rule, 4px radius) preserved.
+
+- **Onboarding flow (Promova-style per-step pastel rotation)**: new `STEP_PASTELS` array in `OnboardingFlow.tsx` indexed by `safeIndex % 6`: peach / sand / sage / cream / peach-deep / sage-deep. `bg` prop threaded through `commonProps` → all 5 question components (SingleSelect, MultiSelect, DateInput, OtherFreetext, ExamPicker) → OnboardingScreen wrapper. Step transitions naturally inherit V-012a `--ease-spring` from OnboardingScreen's existing transitions.
+
+- **Differentiation cards (`DifferentiationSection.tsx`)**:
+  - **Card 1 (CoucheStackVisual)**: illuminated bar `backgroundColor: ED.accent` → `'var(--ed-warm-peach-deep)'`; border matches. Transition string updated from `var(--ed-ease)` → `var(--ease-spring)` (was missed by V-012a sed because the ternary string spanned a different line than the `transition:` keyword).
+  - **Card 2 (InterferenceVisual)**: strikethrough `textDecorationColor: ED.muted` → `'var(--ed-warm-peach)'`; thickness bumped 1px → 1.5px for visibility (peach softer than gray).
+  - **Card 3 (WaveformVisual)**: bar `backgroundColor: ED.accent` → `'var(--ed-warm-sage-deep)'` (paired with Card 1 peach-deep — peach + sage warm chord).
+  - Card chrome (ed-paper, 1px ed-rule, 4px radius, no shadow) preserved per V-012 spec.
+
+**New globals.css utility:**
+- `.ed-cta-warm-hover`: bg-color + color transition with `--ease-spring`; `:hover` shifts bg to `var(--ed-warm-peach-deep)`. `@media (hover: hover)` gate prevents sticky hover on touch devices. Used by FinalCTA Link + Paywall CTA button.
+
+**Files touched:**
+- `app/globals.css` (`.ed-cta-warm-hover` class)
+- `components/landing/sections/HeroSection.tsx` (gradient bg)
+- `components/Paywall.tsx` (section bg, radar fills/strokes, legend, CTA hover)
+- `components/landing/sections/FinalCTASection.tsx` (section bg, B2 highlight helper, CTA classes, trust line color)
+- `components/onboarding/EcoleReveal.tsx` (ED_BG + ED_ACCENT constants)
+- `components/onboarding/OnboardingFlow.tsx` (STEP_PASTELS array + bg prop threading)
+- `components/onboarding/questions/SingleSelectQuestion.tsx` (bg prop)
+- `components/onboarding/questions/MultiSelectQuestion.tsx` (bg prop)
+- `components/onboarding/questions/DateInputQuestion.tsx` (bg prop)
+- `components/onboarding/questions/OtherFreetextScreen.tsx` (bg prop)
+- `components/onboarding/questions/ExamPickerQuestion.tsx` (bg prop)
+- `components/landing/sections/DifferentiationSection.tsx` (card visual colors + transition fix)
+
+**V-011.color absorbed:** the FinalCTA bg shift + B2 highlight + button hover + trust line color all land here. V-011.color marked superseded; BE retiring from BACKLOG separately.
+
 ### V-012a — Token foundation + motion language (warmth refit phase 1)
 
 **Priority:** HIGH (V-012 chain root — V-012b/c inherit tokens + spring motion)

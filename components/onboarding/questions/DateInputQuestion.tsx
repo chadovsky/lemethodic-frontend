@@ -29,6 +29,7 @@ interface DateInputQuestionProps {
   onContinue: (value: string | null) => void
   onBack?: () => void
   headerRight?: React.ReactNode
+  bg?: string
 }
 
 function offsetDateISO(days: number): string {
@@ -51,6 +52,7 @@ export default function DateInputQuestion({
   onContinue,
   onBack,
   headerRight,
+  bg,
 }: DateInputQuestionProps) {
   const dateMeta = readDateInputMeta(question)
   const minDate = useMemo(() => offsetDateISO(dateMeta.minOffsetDays), [dateMeta.minOffsetDays])
@@ -80,6 +82,7 @@ export default function DateInputQuestion({
 
   return (
     <OnboardingScreen
+      bg={bg}
       progressTotal={progressTotal}
       progressFilledUpTo={progressFilledUpTo}
       progressCurrent={progressCurrent}
