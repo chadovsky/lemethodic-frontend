@@ -68,7 +68,7 @@ export function ProgressDots({ total, filledUpTo, current }: ProgressDotsProps) 
               backgroundColor: isFilled ? ED_FG : 'transparent',
               border: isFilled ? 'none' : `1px solid ${ED_RULE}`,
               transitionDuration: '300ms',
-              transitionTimingFunction: 'var(--ed-ease)',
+              transitionTimingFunction: 'var(--ease-spring)',
             }}
             aria-hidden="true"
           />
@@ -111,7 +111,7 @@ export function OnboardingCard({
         border: `1px solid ${isSelected ? ED_FG : ED_RULE}`,
         outline: 'none',
         cursor: 'pointer',
-        transition: `background-color var(--ed-duration-state) var(--ed-ease), border-color var(--ed-duration-state) var(--ed-ease), color var(--ed-duration-state) var(--ed-ease), transform var(--ed-duration-hover) var(--ed-ease), box-shadow var(--ed-duration-hover) var(--ed-ease)`,
+        transition: `background-color var(--ed-duration-state) var(--ease-spring), border-color var(--ed-duration-state) var(--ease-spring), color var(--ed-duration-state) var(--ease-spring), transform var(--ed-duration-hover) var(--ease-spring), box-shadow var(--ed-duration-hover) var(--ease-spring)`,
         fontFamily: SANS,
       }}
     >
@@ -196,7 +196,7 @@ export function CTAButton({ label, enabled, onClick }: CTAButtonProps) {
           border: 'none',
           cursor: enabled ? 'pointer' : 'not-allowed',
           outline: 'none',
-          transition: `background-color var(--ed-duration-hover) var(--ed-ease)`,
+          transition: `background-color var(--ed-duration-hover) var(--ease-spring)`,
         }}
       >
         {label}
@@ -223,7 +223,7 @@ export function BackButton({ onClick }: { onClick: () => void }) {
         padding: 0,
         outline: 'none',
         color: ED_FG,
-        transition: `opacity var(--ed-duration-hover) var(--ed-ease)`,
+        transition: `opacity var(--ed-duration-hover) var(--ease-spring)`,
       }}
       onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.6' }}
       onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}

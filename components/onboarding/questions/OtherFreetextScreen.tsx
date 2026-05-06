@@ -91,7 +91,7 @@ export default function OtherFreetextScreen({
           fontSize: 16,
           color: ED_FG,
           outline: 'none',
-          transition: 'border-color var(--ed-duration-hover) var(--ed-ease)',
+          transition: 'border-color var(--ed-duration-hover) var(--ease-spring)',
         }}
       />
     </OnboardingScreen>

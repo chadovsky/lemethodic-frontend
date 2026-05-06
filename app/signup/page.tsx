@@ -299,7 +299,7 @@ function SignupInner() {
               color: 'var(--ed-fg)',
               width: '100%',
               outline: 'none',
-              transition: 'border-color var(--ed-duration-hover) var(--ed-ease)',
+              transition: 'border-color var(--ed-duration-hover) var(--ease-spring)',
             }}
           />
         </div>
@@ -341,7 +341,7 @@ function SignupInner() {
               color: 'var(--ed-fg)',
               width: '100%',
               outline: 'none',
-              transition: 'border-color var(--ed-duration-hover) var(--ed-ease)',
+              transition: 'border-color var(--ed-duration-hover) var(--ease-spring)',
             }}
           />
         </div>
@@ -381,7 +381,7 @@ function SignupInner() {
               color: 'var(--ed-fg)',
               width: '100%',
               outline: 'none',
-              transition: 'border-color var(--ed-duration-hover) var(--ed-ease)',
+              transition: 'border-color var(--ed-duration-hover) var(--ease-spring)',
             }}
           />
         </div>
@@ -408,7 +408,7 @@ function SignupInner() {
             cursor: isLoading ? 'not-allowed' : 'pointer',
             letterSpacing: '0',
             outline: 'none',
-            transition: 'background-color var(--ed-duration-hover) var(--ed-ease)',
+            transition: 'background-color var(--ed-duration-hover) var(--ease-spring)',
           }}
         >
           {isLoading ? 'Creating account…' : 'Create account & start trial'}

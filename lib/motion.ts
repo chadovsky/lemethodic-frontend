@@ -158,6 +158,13 @@ import { useEffect, useRef, useState } from 'react'
 export const ED_EASE_CUBIC = [0.16, 1, 0.3, 1] as const
 export const ED_EASE_CSS = 'cubic-bezier(0.16, 1, 0.3, 1)' as const
 
+/** V-012a soft-spring easing — mirrors `--ease-spring` from globals.css.
+ *  Default for color / bg / border / shadow state transitions in the
+ *  V-012 warmth refit. Transforms on buttons stay on short ease-out for
+ *  tactile snap; transforms on cards (hover lift) use this spring. */
+export const ED_EASE_SPRING_CUBIC = [0.32, 0.72, 0, 1] as const
+export const ED_EASE_SPRING_CSS = 'cubic-bezier(0.32, 0.72, 0, 1)' as const
+
 /** F-212 duration tokens (ms). Match the `--ed-duration-*` CSS vars. */
 export const ED_DUR = {
   hover: 200,

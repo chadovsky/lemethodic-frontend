@@ -57,20 +57,43 @@
   --fp-duration-base: 300ms;
   --fp-duration-slow: 400ms;
 
-  /* F-200 — editorial design system (taste-range from EMDL + Neuralink +
-     fluentpath.ai inspiration set, executable spec from Chadi 2026-05-05).
-     `--ed-*` namespaced to coexist with the FluentPath pastel palette
-     (--fp-*) and shadcn neutral tokens (--accent / --primary / etc).
-     F-200 establishes; F-201..F-214 inherit. */
-  --ed-bg: #FAF7F2;          /* warm off-white, editorial — not pure white */
-  --ed-fg: #1A1A1A;          /* near-black, softer than #000 */
+  /* F-200 — editorial design system. V-012a softened toward warm-editorial:
+     --ed-bg slightly warmer cream, --ed-fg warm dark instead of near-black,
+     +1 secondary text token (--ed-fg-soft), +7 Editorial Luxury palette
+     tokens for chrome-level warmth (peach/sage/espresso/cream/sand), and
+     a spring easing curve for soft state transitions. The legacy --ed-ease
+     stays available — V-012a replaces it as default for color/bg/border
+     transitions but transforms on buttons keep short ease-out for tactile
+     snap. The --fp-* pastel palette is unchanged; --ed-warm-* tokens
+     overlap some hex values but namespace separation reflects role
+     (--fp-* = decorative chip layer per F-200; --ed-warm-* = chrome). */
+  --ed-bg: #FBF8F4;          /* V-012a — warmer cream (was #FAF7F2) */
+  --ed-fg: #2A2520;          /* V-012a — warm dark (was #1A1A1A near-black) */
+  --ed-fg-soft: #4A4540;     /* V-012a — softer secondary text */
   --ed-accent: #1F2D4A;      /* deep editorial navy — credibility + premium */
   --ed-muted: #6B6B6B;       /* warm gray, secondary text */
-  --ed-rule: #E5E0D8;        /* subtle dividers (renamed from --color-border to avoid Tailwind reserved) */
+  --ed-rule: #E5E0D8;        /* subtle dividers */
   --ed-paper: #FFFFFF;       /* cards / elevated surfaces — pops against bg */
 
-  /* Editorial motion — slower than --fp-* for confident product feel */
+  /* V-012a — Editorial Luxury palette additions. Per-surface chrome-level
+     warmth, distinct from --fp-* decorative chips. Consumers in V-012b
+     wire these into Hero, Paywall, FinalCTA, EcoleReveal, onboarding
+     question screens, and differentiation cards. */
+  --ed-warm-peach: #FFD8C2;
+  --ed-warm-peach-deep: #E0A890;
+  --ed-warm-sage: #B8C4A8;
+  --ed-warm-sage-deep: #8FA279;
+  --ed-warm-espresso: #4A3528;
+  --ed-warm-cream: #FDFBF7;
+  --ed-warm-sand: #F5E6D8;
+
+  /* Editorial motion — V-012a adds --ease-spring for soft state shifts.
+     Default rule going forward: transform = short ease-out (tactile snap),
+     color/bg/border/shadow = spring (soft state). --ed-ease stays for
+     surfaces with their own motion contracts (V-003 hero atmosphere
+     keyframes, hero-rise, kicker-slide). */
   --ed-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
   --ed-duration-hover: 200ms;
   --ed-duration-state: 600ms;
   --ed-duration-reveal: 700ms;
@@ -373,14 +396,16 @@
    the existing rule above.
    ────────────────────────────────────────────────────────────────────────── */
 
-/* Card hover lift: subtle translateY + shadow expansion. Apply to any
-   surface that wants the editorial card-lift signature (landing
-   differentiation, exam picker, pricing, cluster, /writing prompts). */
+/* Card hover lift: subtle translateY + shadow expansion. V-012a — all
+   three transition properties switched to --ease-spring for soft hover
+   feel (transform on cards picks up spring per V-012 "spring physics
+   replaces ease-out"; only button-press transforms keep ease-out for
+   tactile snap). */
 .ed-card-lift {
   transition:
-    transform var(--ed-duration-hover) var(--ed-ease),
-    box-shadow var(--ed-duration-hover) var(--ed-ease),
-    border-color var(--ed-duration-hover) var(--ed-ease);
+    transform var(--ed-duration-hover) var(--ease-spring),
+    box-shadow var(--ed-duration-hover) var(--ease-spring),
+    border-color var(--ed-duration-hover) var(--ease-spring);
 }
 @media (hover: hover) {
   .ed-card-lift:hover {
@@ -389,23 +414,25 @@
   }
 }
 
-/* Button press feedback: scale 0.98 on :active. Only fires for actual
-   pointer/keyboard activation, not hover. */
+/* Button press feedback: scale 0.97 on :active (V-012a — was 0.98).
+   Transform uses 160ms ease-out for tactile snap (no spring overshoot
+   on a button press). Color/bg use --ease-spring at 200ms for soft
+   state. Only fires for pointer/keyboard activation, not hover. */
 .ed-btn-press {
-  transition: transform var(--ed-duration-hover) var(--ed-ease),
-    background-color var(--ed-duration-hover) var(--ed-ease),
-    color var(--ed-duration-hover) var(--ed-ease);
+  transition: transform 160ms ease-out,
+    background-color var(--ed-duration-hover) var(--ease-spring),
+    color var(--ed-duration-hover) var(--ease-spring);
 }
 .ed-btn-press:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
-/* Form field focus: ed-accent ring. Override the generic :focus-visible
-   rule from above for editorial form fields specifically. */
+/* Form field focus: ed-accent ring. V-012a — focus state shift uses
+   --ease-spring for soft border + ring transition. */
 .ed-field {
   transition:
-    border-color var(--ed-duration-hover) var(--ed-ease),
-    box-shadow var(--ed-duration-hover) var(--ed-ease);
+    border-color var(--ed-duration-hover) var(--ease-spring),
+    box-shadow var(--ed-duration-hover) var(--ease-spring);
 }
 .ed-field:focus-visible {
   outline: none;

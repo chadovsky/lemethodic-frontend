@@ -64,7 +64,7 @@ export default function LanguageToggle({ currentLang }: LanguageToggleProps) {
           textTransform: 'uppercase',
           color: ED.muted,
           textDecoration: 'none',
-          transition: 'color var(--ed-duration-hover) var(--ed-ease)',
+          transition: 'color var(--ed-duration-hover) var(--ease-spring)',
         }}
         onMouseEnter={(e) => { e.currentTarget.style.color = ED.fg }}
         onMouseLeave={(e) => { e.currentTarget.style.color = ED.muted }}

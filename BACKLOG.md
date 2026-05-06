@@ -2160,6 +2160,47 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-012a — Token foundation + motion language (warmth refit phase 1)
+
+**Priority:** HIGH (V-012 chain root — V-012b/c inherit tokens + spring motion)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy verification deferred to end-of-V-012c per defer-verification mode. Spot-check a single landing screenshot to verify new --ed-fg warmth (text reads slightly warmer dark, not near-black) and --ed-bg warmth (cream slightly warmer). All 8 routes (/`, /fr, /signup, /onboarding, /ecole, /ecole/intro, /paywall, /diagnostic) returned 200; --ease-spring confirmed in landing HTML output. F-225 interactive verification clause does NOT apply to phase a alone — pure token + motion-language plumbing. Awaiting verification batches with V-012b + V-012c.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06 (FE-side, frontend commit pending)
+**Source:** V-012 strategic recalibration — F-200 went too cold; warmth refit on top
+**Dependencies:** V-005 (Switzer/Fraunces typography stays); F-200 (system foundation)
+
+**Token changes (globals.css :root):**
+- Update: `--ed-bg #FAF7F2 → #FBF8F4` (warmer cream); `--ed-fg #1A1A1A → #2A2520` (warm dark replaces near-black)
+- Add: `--ed-fg-soft: #4A4540` (softer secondary text)
+- Add Editorial Luxury palette tokens (chrome-level warmth, distinct from `--fp-*` decorative chip layer): `--ed-warm-peach: #FFD8C2`, `--ed-warm-peach-deep: #E0A890`, `--ed-warm-sage: #B8C4A8`, `--ed-warm-sage-deep: #8FA279`, `--ed-warm-espresso: #4A3528`, `--ed-warm-cream: #FDFBF7`, `--ed-warm-sand: #F5E6D8`
+- Add: `--ease-spring: cubic-bezier(0.32, 0.72, 0, 1)` (soft state easing)
+- `--ed-ease` (cubic-bezier 0.16,1,0.3,1) preserved for surfaces with their own motion contracts (V-003 hero atmosphere keyframes, hero-rise, kicker-slide, animations)
+
+**Motion rule going forward:**
+- `transform`: short ease-out 160ms — preserves tactile snap (button press, no spring overshoot)
+- `background-color / border-color / color / box-shadow / opacity / width`: spring 200-300ms — soft state transitions
+- Animations (keyframes): keep `--ed-ease` — those have their own timing contracts
+
+**Utility class updates:**
+- `.ed-btn-press`: `:active` scale `0.98 → 0.97` per V-012 spec; transform = 160ms ease-out; bg-color/color = `--ease-spring` 200ms
+- `.ed-card-lift`: transform/box-shadow/border-color all use `--ease-spring` (cards earn the soft hover lift; only button transforms keep ease-out per spec rule)
+- `.ed-field`: focus border-color/box-shadow use `--ease-spring`
+
+**Component inline transitions touched (mass replace):**
+- 18 inline `transition: var(--ed-ease)` references across 11 files swapped to `var(--ease-spring)`. Sed-gated on `/transition:/` lines so animations using `var(--ed-ease)` (DifferentiationSection waveform `animation: ed-wave-pulse ... var(--ed-ease)`) were preserved.
+- One camelCase exception: OnboardingScreen ProgressDots `transitionTimingFunction: 'var(--ed-ease)' → 'var(--ease-spring)'` (the bulk regex didn't catch it; manually updated).
+- Files touched: app/signup/page.tsx, components/ecole/intro/EcoleIntro.tsx, components/landing/LandingFooter.tsx, components/landing/LanguageToggle.tsx, components/landing/sections/DifferentiationSection.tsx, components/landing/sections/PricingSection.tsx, components/onboarding/OnboardingFlow.tsx, components/onboarding/OnboardingScreen.tsx, components/onboarding/questions/DateInputQuestion.tsx, components/onboarding/questions/OtherFreetextScreen.tsx
+
+**lib/motion.ts additions:**
+- `ED_EASE_SPRING_CUBIC` tuple `[0.32, 0.72, 0, 1]` (for framer-motion)
+- `ED_EASE_SPRING_CSS` string `'cubic-bezier(0.32, 0.72, 0, 1)'` (for inline transitions)
+
+**No behavior change beyond:**
+- Slightly warmer text + bg colors site-wide (intentional softer contrast per V-012 spec)
+- Button press scale tighter (0.98 → 0.97)
+- State transitions on color/bg properties feel softer (spring overshoot, not snap)
+- Card hover lifts get a subtle spring settle
+
 ### V-011 — FinalCTA centering fix
 
 **Priority:** HIGH (verification-found; visual reads off-center on production)

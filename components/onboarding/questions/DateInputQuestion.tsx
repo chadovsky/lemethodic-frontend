@@ -148,7 +148,7 @@ export default function DateInputQuestion({
               outline: 'none',
               width: '100%',
               cursor: 'pointer',
-              transition: 'border-color var(--ed-duration-hover) var(--ed-ease)',
+              transition: 'border-color var(--ed-duration-hover) var(--ease-spring)',
             }}
           />
         </div>

@@ -91,7 +91,7 @@ function LanguageToggle({
                 fontSize: 13,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
-                transition: 'color var(--ed-duration-hover) var(--ed-ease)',
+                transition: 'color var(--ed-duration-hover) var(--ease-spring)',
               }}
             >
               {l}

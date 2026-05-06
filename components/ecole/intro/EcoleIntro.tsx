@@ -811,7 +811,7 @@ export default function EcoleIntro() {
               cursor: 'pointer',
               outline: 'none',
               letterSpacing: '0',
-              transition: 'background-color var(--ed-duration-hover) var(--ed-ease)',
+              transition: 'background-color var(--ed-duration-hover) var(--ease-spring)',
             }}
           >
             {cta.button}
