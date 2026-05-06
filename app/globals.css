@@ -427,6 +427,19 @@
   transform: scale(0.97);
 }
 
+/* V-014b — bottom nav gating. The mobile-only BottomNav previously
+   set display:flex inline (which beat Tailwind md:hidden on cascade),
+   leaking the bar onto desktop. Owns layout from CSS now: shows as
+   flex below md, hidden at md+. */
+.fp-bottom-nav {
+  display: flex;
+}
+@media (min-width: 768px) {
+  .fp-bottom-nav {
+    display: none;
+  }
+}
+
 /* V-012b — primary-CTA warm hover. Default bg stays ed-accent navy
    (premium signal); :hover shifts to warm-peach-deep via spring for
    the soft state warmth Chadi specified. Pair with .ed-btn-press for

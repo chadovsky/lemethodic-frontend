@@ -46,12 +46,24 @@ function shouldHideOn(pathname: string): boolean {
 const COPY = {
   en: {
     nav: { ecole: 'École', speaking: 'Speaking', writing: 'Writing', progress: 'Progress' },
-    menu: { profile: 'Profile & settings', logout: 'Sign out' },
+    menu: {
+      profile: 'Profile',
+      settings: 'Settings',
+      account: 'Account',
+      about: 'About',
+      logout: 'Sign out',
+    },
     skipToContent: 'Skip to content',
   },
   fr: {
     nav: { ecole: 'École', speaking: 'Oral', writing: 'Écrit', progress: 'Progrès' },
-    menu: { profile: 'Profil et paramètres', logout: 'Se déconnecter' },
+    menu: {
+      profile: 'Profil',
+      settings: 'Paramètres',
+      account: 'Compte',
+      about: 'À propos',
+      logout: 'Se déconnecter',
+    },
     skipToContent: 'Aller au contenu',
   },
 } as const
@@ -322,23 +334,31 @@ export default function TopNav() {
                   zIndex: 51,
                 }}
               >
-                <Link
-                  href="/more"
-                  role="menuitem"
-                  onClick={() => setMenuOpen(false)}
-                  style={{
-                    display: 'block',
-                    padding: '10px 14px',
-                    fontFamily: SANS,
-                    fontWeight: 500,
-                    fontSize: 13,
-                    color: ED_FG,
-                    textDecoration: 'none',
-                    borderRadius: 2,
-                  }}
-                >
-                  {copy.menu.profile}
-                </Link>
+                {/* V-014c — dropdown expanded to all 4 /more sections via
+                    anchor links so Settings / Account / About are
+                    reachable from desktop without intermediate /more
+                    navigation. /more sections carry matching id
+                    attributes for native anchor scroll. */}
+                {(['profile', 'settings', 'account', 'about'] as const).map((section) => (
+                  <Link
+                    key={section}
+                    href={`/more#${section}`}
+                    role="menuitem"
+                    onClick={() => setMenuOpen(false)}
+                    style={{
+                      display: 'block',
+                      padding: '10px 14px',
+                      fontFamily: SANS,
+                      fontWeight: 500,
+                      fontSize: 13,
+                      color: ED_FG,
+                      textDecoration: 'none',
+                      borderRadius: 2,
+                    }}
+                  >
+                    {copy.menu[section]}
+                  </Link>
+                ))}
                 <hr style={{ margin: '4px 0', border: 'none', borderTop: `1px solid ${ED_RULE}` }} />
                 <button
                   type="button"

@@ -30,9 +30,12 @@ export default function BottomNav() {
   return (
     <nav
       aria-label="Main navigation"
-      // V-013c — mobile-only. Hidden above md (768px); the desktop
-      // surface gets <TopNav /> mounted in app/layout.tsx instead.
-      className="md:hidden"
+      // V-013c / V-014b — mobile-only. Hidden above md (768px). Layout
+      // is owned by `.fp-bottom-nav` in globals.css so the @media gate
+      // can flip `display: none` cleanly. (V-013c had `style.display:
+      // 'flex'` here, which beat Tailwind md:hidden on cascade — the
+      // bar leaked onto desktop.)
+      className="fp-bottom-nav"
       style={{
         position: 'fixed',
         bottom: 0,
@@ -42,7 +45,6 @@ export default function BottomNav() {
         paddingBottom: 'var(--fp-safe-bottom)',
         backgroundColor: PAPER,
         borderTop: '1px solid #1A1A1A0F',
-        display: 'flex',
         alignItems: 'stretch',
         zIndex: 50,
       }}

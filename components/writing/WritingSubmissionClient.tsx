@@ -187,8 +187,25 @@ export default function WritingSubmissionClient({ promptId }: Props) {
           window.localStorage.removeItem(draftKey)
         } catch {}
       }
-    } catch {
-      setSubmission({ kind: 'submitError', text: sendText, message: copy.submitError })
+    } catch (err) {
+      // V-014a — surface BE response details so production triage can
+      // see the failure cause directly. Generic "Couldn't submit" was
+      // masking 422 / 500 / auth status codes.
+      // eslint-disable-next-line no-console
+      console.error('Writing submit failed', err)
+      let detail: string = copy.submitError
+      if (err instanceof ApiError) {
+        const bodyDetail =
+          err.body && typeof err.body === 'object' && 'detail' in err.body
+            ? typeof (err.body as { detail: unknown }).detail === 'string'
+              ? (err.body as { detail: string }).detail
+              : JSON.stringify((err.body as { detail: unknown }).detail)
+            : null
+        detail = bodyDetail
+          ? `${copy.submitError} (${err.status}: ${bodyDetail})`
+          : `${copy.submitError} (HTTP ${err.status})`
+      }
+      setSubmission({ kind: 'submitError', text: sendText, message: detail })
     }
   }
 

@@ -151,8 +151,9 @@ export default function MorePageClient() {
   return (
     <div className="ed-page-enter" style={{ minHeight: '100dvh', backgroundColor: ED_BG, fontFamily: SANS }}>
       <div style={{ maxWidth: 720, margin: '0 auto', padding: 'clamp(32px, 5vw, 56px) clamp(20px, 4vw, 40px) 96px' }}>
-        {/* Profile section — top of page, no header label, just the visual */}
-        <section aria-label={copy.sections.profile} style={{ marginBottom: 32 }}>
+        {/* Profile section — top of page, no header label, just the visual.
+            V-014c — id="profile" anchors the TopNav dropdown link. */}
+        <section id="profile" aria-label={copy.sections.profile} style={{ marginBottom: 32, scrollMarginTop: 80 }}>
           <div
             style={{
               backgroundColor: ED_PAPER,
@@ -245,7 +246,7 @@ export default function MorePageClient() {
         </section>
 
         {/* Settings */}
-        <Section title={copy.sections.settings}>
+        <Section id="settings" title={copy.sections.settings}>
           <Row label={copy.settings.language}>
             <div style={{ display: 'flex', gap: 4 }}>
               {(['en', 'fr'] as const).map((l) => {
@@ -280,7 +281,7 @@ export default function MorePageClient() {
         </Section>
 
         {/* Account */}
-        <Section title={copy.sections.account}>
+        <Section id="account" title={copy.sections.account}>
           <Row label={copy.account.changePassword} hint={copy.account.changePasswordHint} disabled />
           <button
             type="button"
@@ -311,7 +312,7 @@ export default function MorePageClient() {
         </Section>
 
         {/* About */}
-        <Section title={copy.sections.about}>
+        <Section id="about" title={copy.sections.about}>
           <Row label={copy.about.version} value={APP_VERSION} />
           <RowLink label={copy.about.support} href={`mailto:${SUPPORT_EMAIL}`} value={SUPPORT_EMAIL} external />
           <RowLink label={copy.about.terms} href="/terms" />
@@ -325,9 +326,11 @@ export default function MorePageClient() {
 
 // ── Section + Row primitives ──────────────────────────────────────────────
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ id, title, children }: { id?: string; title: string; children: React.ReactNode }) {
   return (
-    <section aria-label={title} style={{ marginBottom: 32 }}>
+    // V-014c — scroll-margin-top accommodates the 64px sticky TopNav so
+    // anchor jumps from /more#settings etc. land below the nav, not under it.
+    <section id={id} aria-label={title} style={{ marginBottom: 32, scrollMarginTop: 80 }}>
       <h2
         style={{
           fontFamily: SANS,

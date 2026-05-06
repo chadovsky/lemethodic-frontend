@@ -24,13 +24,18 @@ const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-se
 const SERIF = 'var(--font-fraunces), Georgia, serif'
 
 type LevelFilter = 'all' | 'B1' | 'B2'
+type TacheFilter = 'all' | '1' | '2' | '3'
 
 const COPY = {
   en: {
     pageTitle: 'Writing',
     pageSubtitle: 'Practice prompts with Claude analysis on the 4 couches.',
-    levelFilters: { all: 'All levels', B1: 'B1', B2: 'B2' },
-    topicFilterAll: 'All topics',
+    tacheAll: 'All tasks',
+    tache1: 'Tâche 1',
+    tache2: 'Tâche 2',
+    tache3: 'Tâche 3',
+    levelAll: 'All levels',
+    topicAll: 'All topics',
     sectionLabels: { 1: 'Tâche 1', 2: 'Tâche 2', 3: 'Tâche 3' } as const,
     minutes: 'min',
     words: 'words',
@@ -41,8 +46,12 @@ const COPY = {
   fr: {
     pageTitle: 'Production écrite',
     pageSubtitle: 'Sujets de pratique avec analyse Claude sur les 4 couches.',
-    levelFilters: { all: 'Tous niveaux', B1: 'B1', B2: 'B2' },
-    topicFilterAll: 'Tous sujets',
+    tacheAll: 'Toutes les tâches',
+    tache1: 'Tâche 1',
+    tache2: 'Tâche 2',
+    tache3: 'Tâche 3',
+    levelAll: 'Tous niveaux',
+    topicAll: 'Tous sujets',
     sectionLabels: { 1: 'Tâche 1', 2: 'Tâche 2', 3: 'Tâche 3' } as const,
     minutes: 'min',
     words: 'mots',
@@ -58,6 +67,7 @@ export default function WritingPromptPicker() {
   const [prompts, setPrompts] = useState<WritingPrompt[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [retryKey, setRetryKey] = useState(0)
+  const [tacheFilter, setTacheFilter] = useState<TacheFilter>('all')
   const [levelFilter, setLevelFilter] = useState<LevelFilter>('all')
   const [topicFilter, setTopicFilter] = useState<string>('all')
 
@@ -82,10 +92,12 @@ export default function WritingPromptPicker() {
     return Array.from(new Set(prompts.map((p) => p.topic_tag))).sort()
   }, [prompts])
 
-  // Apply filters then group by tache_level.
+  // V-014d — applies all three filters (tache_level / level / topic_tag),
+  // then groups remaining prompts by tache_level for section rendering.
   const grouped = useMemo(() => {
     if (!prompts) return null
     const filtered = prompts.filter((p) => {
+      if (tacheFilter !== 'all' && String(p.tache_level) !== tacheFilter) return false
       if (levelFilter !== 'all' && p.level !== levelFilter) return false
       if (topicFilter !== 'all' && p.topic_tag !== topicFilter) return false
       return true
@@ -93,7 +105,7 @@ export default function WritingPromptPicker() {
     const groups: Record<1 | 2 | 3, WritingPrompt[]> = { 1: [], 2: [], 3: [] }
     for (const p of filtered) groups[p.tache_level].push(p)
     return groups
-  }, [prompts, levelFilter, topicFilter])
+  }, [prompts, tacheFilter, levelFilter, topicFilter])
 
   return (
     <div
@@ -139,23 +151,33 @@ export default function WritingPromptPicker() {
           </h1>
         </header>
 
-        {/* Filter chips */}
+        {/* V-014d — three filter rows, all radio-style. Tâche level
+            was missing from V-013a; chip styling restyled (4px radius,
+            ed-paper unselected, ed-warm-peach-deep selected). */}
         {prompts && prompts.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 32 }}>
             <FilterRow
-              label={copy.levelFilters.all}
               options={[
-                { value: 'all', label: copy.levelFilters.all },
-                { value: 'B1', label: copy.levelFilters.B1 },
-                { value: 'B2', label: copy.levelFilters.B2 },
+                { value: 'all', label: copy.tacheAll },
+                { value: '1', label: copy.tache1 },
+                { value: '2', label: copy.tache2 },
+                { value: '3', label: copy.tache3 },
+              ]}
+              value={tacheFilter}
+              onChange={(v) => setTacheFilter(v as TacheFilter)}
+            />
+            <FilterRow
+              options={[
+                { value: 'all', label: copy.levelAll },
+                { value: 'B1', label: 'B1' },
+                { value: 'B2', label: 'B2' },
               ]}
               value={levelFilter}
               onChange={(v) => setLevelFilter(v as LevelFilter)}
             />
             <FilterRow
-              label={copy.topicFilterAll}
               options={[
-                { value: 'all', label: copy.topicFilterAll },
+                { value: 'all', label: copy.topicAll },
                 ...topics.map((t) => ({ value: t, label: t })),
               ]}
               value={topicFilter}
@@ -221,32 +243,43 @@ export default function WritingPromptPicker() {
 // ── Sub-components ────────────────────────────────────────────────────────
 
 interface FilterRowProps {
-  label: string
   options: { value: string; label: string }[]
   value: string
   onChange: (value: string) => void
 }
 
+// V-014d — chip restyle. Selected: warm-peach-deep bg, white text.
+// Unselected: ed-paper bg, ed-rule border, ed-fg text. Hover: warm-cream
+// tint via spring. 4px radius (was 999 pill — felt off-rhythm against
+// the surrounding 4px chrome).
 function FilterRow({ options, value, onChange }: FilterRowProps) {
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+    <div role="radiogroup" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
       {options.map((opt) => {
         const active = opt.value === value
         return (
           <button
             key={opt.value}
             type="button"
+            role="radio"
+            aria-checked={active}
             onClick={() => onChange(opt.value)}
             className="ed-btn-press"
+            onMouseEnter={(e) => {
+              if (!active) e.currentTarget.style.backgroundColor = 'var(--ed-warm-cream)'
+            }}
+            onMouseLeave={(e) => {
+              if (!active) e.currentTarget.style.backgroundColor = ED_PAPER
+            }}
             style={{
               fontFamily: SANS,
-              fontWeight: 500,
+              fontWeight: active ? 600 : 500,
               fontSize: 13,
-              padding: '6px 14px',
-              borderRadius: 999,
+              padding: '8px 14px',
+              borderRadius: 4,
               border: `1px solid ${active ? 'var(--ed-warm-peach-deep)' : ED_RULE}`,
-              backgroundColor: active ? 'var(--ed-warm-peach)' : 'transparent',
-              color: active ? ED_FG : ED_FG_SOFT,
+              backgroundColor: active ? 'var(--ed-warm-peach-deep)' : ED_PAPER,
+              color: active ? '#FFFFFF' : ED_FG,
               cursor: 'pointer',
               textTransform: 'capitalize',
               transition: 'background-color var(--ed-duration-hover) var(--ease-spring), border-color var(--ed-duration-hover) var(--ease-spring), color var(--ed-duration-hover) var(--ease-spring)',
