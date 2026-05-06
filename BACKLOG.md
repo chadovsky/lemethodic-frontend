@@ -2160,6 +2160,115 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-013c — Nav system overhaul (mobile BottomNav + desktop TopNav)
+
+**Priority:** HIGH (V-013 chain tail; pre-launch surface completeness)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured screenshots: 1440px desktop on /ecole + /writing + /more + /progress + /diagnostic showing TopNav at top with active underline; 1440px desktop scrolled past 8px to capture backdrop-blur + ed-rule border state; 375px mobile on same routes showing BottomNav with TopNav hidden; verify TopNav DOES NOT render on /, /fr, /signup, /paywall, /onboarding, /privacy, /terms, /refund. Plus interaction trace: click profile avatar → dropdown opens → click outside → dismisses; click "Sign out" → logout fires → redirects to /. F-225 interactive verification clause applies.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06 (FE-side, frontend commit pending)
+**Source:** V-013 spec — bottom nav leaking onto desktop; no proper desktop top nav
+**Dependencies:** V-012 (warm tokens + spring motion inherited); V-013a, V-013b (in-product surfaces TopNav links to)
+
+**Two changes:**
+- `components/home/BottomNav.tsx` — gained className `md:hidden` so mobile-only
+- `components/nav/TopNav.tsx` (NEW) — Apple-style sticky desktop nav, mounted globally via app/layout.tsx
+
+**TopNav visibility logic:**
+- Hide below md breakpoint (768px): `className="hidden md:flex"`
+- Hide on marketing/conversion/legal/auth paths: returns null on `/`, `/fr`, `/signup`, `/login`, `/paywall`, `/privacy`, `/terms`, `/refund` and `/onboarding/*`
+- Hide pre-hydration / without token: returns null until auth store is hydrated and token present (avoids flash on unauth redirects)
+
+**Decisions made (no Chadi pause needed):**
+- backdrop-blur intensity: 12px (8px too subtle on warm cream, ~20px Apple-style too heavy)
+- Active state: 2px peach-deep underline, 6px below link
+- Dropdown: click-to-open + click-outside dismiss (touch-friendly)
+- Mobile breakpoint: 768px (Tailwind md default)
+
+### V-013b — /more page (Profile, Settings, Account, About)
+
+**Priority:** HIGH (V-013 mid-chain; was F-058 placeholder)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/more` showing all 4 sections (Profile / Settings / Account / About). Plus interaction trace: language toggle → page re-renders in selected language; sign out button → logout flows to /. F-225 interactive verification clause applies.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06 (FE-side, frontend commit pending)
+**Source:** V-013 spec — /more was F-058 placeholder
+**Dependencies:** V-012b (warm tokens); V-013b.lang-pref + V-013b.notifications + V-013b.password (BE follow-ups filed below)
+
+**Sections:**
+- **Profile**: avatar (initial in warm-peach + espresso), fullName + email; exam target row (TCF/TEF/DELF labels via EXAM_LABELS map); days-until-exam if set (Fraunces italic + warm-espresso accent)
+- **Settings**: language toggle EN/FR (local-only client update; V-013b.lang-pref needed for BE persist); notifications row (disabled placeholder, V-013b.notifications)
+- **Account**: change password (disabled placeholder, V-013b.password); sign out button (fp-error color; clears auth + onboarding + submitResponse stores, redirects to /)
+- **About**: version (`APP_VERSION = '0.1.0-soft-beta'`), support email, terms/privacy/refund links
+
+### V-013b.lang-pref — BE PATCH /api/users/me for interface_language
+
+**Priority:** MEDIUM (post-V-013b; language toggle currently client-only)
+**Status:** Queued (BE-side; lemethodic-backend ticket)
+**Filed:** 2026-05-06
+**Source:** V-013b /more language toggle — needed for cross-session persistence
+**Dependencies:** V-013b
+**Scope:** BE PATCH /api/users/me accepting partial body with `interface_language: "en" | "fr"`. Updates User row, returns updated user. FE then calls api.users.update() (new method) on toggle and refreshes auth store from response. Without this, /me re-fetches will reset to BE-stored value.
+**Owner:** Backend Engineering
+
+### V-013b.notifications — Notification preferences UI + BE plumbing
+
+**Priority:** LOW (post-launch UX)
+**Status:** Queued
+**Filed:** 2026-05-06
+**Source:** V-013b /more spec — notifications row currently disabled placeholder
+**Dependencies:** TBD BE notification system
+**Scope:** wire toggles for daily-streak-reminder, exam-countdown-warning, weekly-progress-summary. Needs BE notification store + dispatch system first. Out of soft-beta scope.
+**Owner:** Engineering (Chadi PM call on which categories)
+
+### V-013b.password — Change password flow
+
+**Priority:** MEDIUM (account hygiene)
+**Status:** Queued
+**Filed:** 2026-05-06
+**Source:** V-013b /more spec — change-password row currently disabled placeholder
+**Dependencies:** TBD BE POST /api/auth/change-password (current_password, new_password)
+**Scope:** route /more/change-password (or modal sheet); form with current_password + new_password fields, validation (min 8 chars), 422 error mapping. Uses ed-field utility + .ed-cta-warm-hover button. BE endpoint needed first.
+**Owner:** Engineering
+
+### V-013a — Wire /writing to F-224 (prompt picker, submission, history)
+
+**Priority:** HIGH (V-013 chain head; production launch dependency)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/writing` (prompt library showing T1/T2/T3 sections + filter chips), `/writing/[id]` (submission view with prompt body + textarea + word counter + submit button), `/writing/[id]` post-submit result view (couche scores + per-layer feedback + actions), and `/writing/history` (list view OR empty state if BE 404). EN + FR for both. Plus interaction trace: click prompt → /writing/[id] → type response → word counter color shifts → submit → result renders → click "Submit another" → returns to picker. F-225 interactive verification clause applies.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06 (FE-side, frontend commit pending)
+**Source:** V-013 spec — /writing was F-058 placeholder; F-224 BE live
+**Dependencies:** F-224 BE (writing prompts library + analysis pipeline); V-009 (couche brand labels reused in result view); V-012 (warm tokens + spring motion)
+
+**Routes:**
+- `/writing` → `WritingPromptPicker` (groups by Tâche level, level + topic filter chips)
+- `/writing/[prompt_id]` → `WritingSubmissionClient` state machine (idle → submitting → result), single page
+- `/writing/history` → `WritingHistoryClient` (BE 404 → empty state)
+
+**API + types added:**
+- `lib/types.ts`: WritingPrompt, WritingSubmissionResult, WritingHistoryItem
+- `lib/api.ts`: api.writing.{listPrompts, submit, history}
+
+**Submission UX:**
+- Prompt body preserves `\n\n` breaks via `white-space: pre-wrap`; parses `**bold**` for Tâche 3 multi-document separators
+- Live word counter color-gated: < min → fp-error; min..max-10% → warm-sage-deep; max-10%..max → warm-peach-deep; > max → fp-error
+- localStorage draft autosave (key `lemethodic:writing-draft:{prompt_id}`, 500ms debounce; cleared on successful submit)
+- Submit disabled until min_words reached; aria-busy during submit; result view replaces form on success
+
+**Result view:**
+- Score summary (overall_score + cefr_band, Fraunces italic + warm-espresso)
+- Optional narrative_summary in Source Serif italic
+- Per-couche breakdown using BRAND_LABEL (Range / Coherence / Accuracy / Fluency, lang-aware)
+- "Submit another" → /writing; "Try again" → reset state on same prompt
+
+### V-013a.history — BE /api/writing/history endpoint
+
+**Priority:** MEDIUM (post-V-013a; FE renders empty state in the meantime)
+**Status:** Queued (BE-side; lemethodic-backend ticket)
+**Filed:** 2026-05-06
+**Source:** V-013a spec — history surface ready, BE endpoint may not exist
+**Dependencies:** F-224 (writing_submissions table)
+**Scope:** GET /api/writing/history returning user's past submissions (ordered DESC by submitted_at). Each row carries id, prompt_id, prompt_title_fr, word_count, overall_score, cefr_band, submitted_at. FE detects 404 and renders empty state until this ships.
+**Owner:** Backend Engineering
+
 ### V-012c — Whitespace + bento variation (warmth refit phase 3)
 
 **Priority:** MEDIUM (V-012 chain tail; whitespace polish + bento exploration)
