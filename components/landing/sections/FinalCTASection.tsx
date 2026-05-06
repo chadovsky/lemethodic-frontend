@@ -37,8 +37,14 @@ export default function FinalCTASection({ lang }: { lang: Lang }) {
               lineHeight: LINE_HEIGHT.display,
               letterSpacing: LETTER_SPACING.display,
               color: ED.fg,
-              margin: 0,
+              margin: '0 auto',
               marginBottom: 'clamp(20px, 2.5vw, 28px)',
+              // V-011 — explicit center as a defensive belt-and-suspenders
+              // (parent already has textAlign:center but the H2 perception
+              // on production read off-center). margin:0 auto + maxWidth
+              // + textAlign:center together remove any inheritance gap.
+              textAlign: 'center',
+              maxWidth: 640,
             }}
           >
             {FINAL_CTA.heading[lang]}
@@ -46,7 +52,7 @@ export default function FinalCTASection({ lang }: { lang: Lang }) {
         </RevealOnScroll>
         <RevealOnScroll delay={0.1}>
           <p
-            className="text-pretty mx-auto"
+            className="text-pretty"
             style={{
               fontFamily: SANS_FONT,
               fontWeight: 400,
@@ -54,9 +60,10 @@ export default function FinalCTASection({ lang }: { lang: Lang }) {
               lineHeight: LINE_HEIGHT.body,
               letterSpacing: LETTER_SPACING.body,
               color: ED.muted,
-              margin: 0,
+              margin: '0 auto',
               marginBottom: 'clamp(32px, 4vw, 48px)',
               maxWidth: 600,
+              textAlign: 'center',
             }}
           >
             {FINAL_CTA.body[lang]}

@@ -2160,6 +2160,47 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-011 — FinalCTA centering fix
+
+**Priority:** HIGH (verification-found; visual reads off-center on production)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` (EN) + `/fr` (FR) FinalCTA showing headline + body + button + trust line all visually centered, plus the FR headline breaking at "deviner | ce qui bloque..." or similar (NOT leaving "ce" as a 2-char orphan on line 1). F-225 interactive verification clause does NOT apply — pure typography centering + line-break fix.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06 (FE-side, frontend commit pending)
+**Source:** V-011 production verification (Chadi 2026-05-06)
+**Dependencies:** V-005 (Switzer/Fraunces live)
+
+**Two centering fixes applied:**
+
+1. **Defensive explicit centering on H2 + body P.** Parent div already had `textAlign: 'center'`, but production reading suggested inheritance through framer-motion's `motion.div` (RevealOnScroll wrapper) wasn't always picked up the same way across browsers. Added belt-and-suspenders: H2 gains explicit `textAlign: 'center'` + `margin: '0 auto'` + `maxWidth: 640` (slightly narrower than parent 720 to give the H2 its own centered column rhythm). Body P loses the `mx-auto` className (Tailwind `margin-inline: auto`) and gains explicit `margin: '0 auto'` + `textAlign: 'center'` inline. No visible change for users who were already seeing it center; closes the loophole for those who weren't.
+
+2. **FR headline orphan glue via non-breaking space.** Original FR `'Arrêtez de deviner ce qui bloque votre B2.'` rendered with `text-balance` produced an awkward break leaving "ce" as a 2-char orphan at end of line 1. Inserted U+00A0 (NBSP) between "ce" and "qui" so the relative-pronoun pair stays bound. The natural break now lands cleanly between phrase units (e.g., after "deviner") rather than mid-pair. EN headline left untouched — `text-balance` produces clean breaks at typical viewports for the shorter EN string.
+
+**Files touched:**
+- `components/landing/sections/FinalCTASection.tsx` — H2 + body P explicit centering attributes
+- `components/landing/copy.ts` — FR FINAL_CTA.heading gains NBSP between "ce" and "qui"
+
+### V-011.color — FinalCTA color treatment refresh (PLAN-FIRST, awaiting Chadi pick)
+
+**Priority:** MEDIUM (verification-found; current treatment reads as flat per Chadi)
+**Status:** **Plan-first surfaced; awaiting Chadi color direction.** Three options proposed below.
+**Filed:** 2026-05-06
+**Source:** V-011 plan-first — "the colors that were used before in the website were much better" (Chadi 2026-05-06)
+**Dependencies:** F-200 (editorial system + pastel preservation rule); F-227.rhythm (FinalCTA bg currently locked at ed-bg)
+
+**Pre-F-200 history (git show db58577):** the M-101a-era FinalCTA used `--fp-peach` (#FFD8C2) as full section background, `INK` button with `boxShadow: '0 4px 16px rgba(0,0,0,0.12)'` for depth, 16px radius (softer than current 4px). The peach bracketed the hero (which was also peach pre-F-200) — warmth at both ends of the page. F-200 collapsed it to ed-bg cream + ed-accent navy button + 4px radius (current state). Chadi's "before was better" likely refers to the M-101a peach bracketing.
+
+**Three options proposed:**
+
+- **(A) Peach revival.** Restore section bg to `--fp-peach` (#FFD8C2) — the M-101a treatment exactly. Headline + body + button copy stay in current ed-* tokens. Adds full warmth chrome to the conversion moment + brackets the hero (currently ed-bg, but a hero peach restoration could land separately as V-011.hero). Tradeoff: breaks F-227.rhythm (FinalCTA was just flipped from paper to ed-bg in F-227.rhythm); section becomes pastel chrome rather than the F-200 "pastels are decorative chip layer only" rule. The most direct read of Chadi's feedback.
+
+- **(B) Soft peach wash + button hover warmth.** Section bg shifts to a desaturated peach blend (e.g., `#F5E6D8` or a 50% mix between ed-bg and fp-peach) — warmer than current ed-bg cream but not full M-101a peach. Button hover state gains a subtle warm-tone color shift (ed-accent navy → slightly warmer navy). Trust line color shifts from ed-muted to a peach-toned muted. Adds warmth without flooding chrome; respects F-200's restraint instinct while addressing flatness. Middle-ground.
+
+- **(C) Editorial accent strip + B2 highlight.** Section bg stays current ed-bg (preserves F-227.rhythm). Add a thin 4px × 120-200px accent strip in `--fp-peach-deep` (#E0A890 — already in palette as paywall radar accent) centered above the headline. Highlight the "B2" word in the headline with the same `--fp-peach-deep` color (warm accent on the moat-relevant term). Body + button stay current. Trust line could get a subtle warm shift. Adds editorial accent without changing chrome; closest to F-200 spirit; least change but also least warmth.
+
+**Recommendation if forced to pick:** (B) Soft peach wash. It addresses Chadi's "before was better" (warmth) without fully reverting F-200's chrome decision, and the button hover warmth gives an interactive payoff. (A) is the most literal read but undoes F-227.rhythm; (C) might still read as flat to Chadi.
+
+**Awaiting Chadi pick (or hybrid).** After direction lands, ship as the same V-011.color ticket (single PR), mark Awaiting Verification.
+
 ### V-010 — /ecole phase structure correction (3-button → 2-button)
 
 **Priority:** HIGH (methodology-content alignment)

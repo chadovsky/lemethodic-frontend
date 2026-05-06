@@ -446,8 +446,12 @@ export const FAQ = {
 
 export const FINAL_CTA = {
   heading: {
+    // V-011 — NBSP glues "ce qui" together so text-balance never
+    // leaves "ce" as a 2-char orphan at end of line 1. The natural
+    // break now lands at "deviner | ce qui bloque..." or before/after
+    // the bound pair, never inside it.
     en: "Stop guessing what's blocking your B2.",
-    fr: 'Arrêtez de deviner ce qui bloque votre B2.',
+    fr: 'Arrêtez de deviner ce qui bloque votre B2.',
   } satisfies I18nString,
   body: {
     en: 'Your French exam is in 4 weeks, or 8 weeks, or 6 months. Whatever your timeline, the first step is the same: 12 minutes of recording, an honest diagnostic, and a decision based on real information instead of anxiety.',
