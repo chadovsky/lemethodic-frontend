@@ -15,17 +15,18 @@ interface Milestone {
   maxLesson: number
 }
 
-// F-087 — milestones rebalanced to the 27-lesson curriculum:
-//   - Fondations (1-4): unchanged
-//   - Approfondissement (5-16): celebrates ENTERING Phase 2 (the
-//     "Approfondissement" curriculum phase begins at lesson 17, so the
-//     badge earned at lesson 16 marks the transition)
-//   - L'École Complète (17-27): full-curriculum completion
-// Earlier "Mécaniques" + "Raccourci Complet" splits replaced.
+// V-010 — milestones rebalanced to the locked 2-phase curriculum
+// (matches F-202 /ecole/intro Le parcours section + HomeScreen's Phase
+// 1/Phase 2 divider at lesson 16→17 boundary):
+//   - Fondations (1-16): the frames learners use every time they speak
+//   - Approfondissement (17-27): nuance, register, voice control
+// Earlier 3-tier split (Fondations 1-4 / Approfondissement 5-16 /
+// L'École Complète 17-27) collapsed; the F-087 interpretation was a
+// pre-curriculum-lock approximation. With 2 buttons + flex:1 each, they
+// split the row 50/50 — no layout call needed.
 const MILESTONES: Milestone[] = [
-  { label: 'Fondations',          range: 'Lessons 1–4',   minLesson: 1,  maxLesson: 4  },
-  { label: 'Approfondissement',   range: 'Lessons 5–16',  minLesson: 5,  maxLesson: 16 },
-  { label: "L'École Complète",    range: 'Lessons 17–27', minLesson: 17, maxLesson: 27 },
+  { label: 'Fondations',        range: 'Lessons 1–16',  minLesson: 1,  maxLesson: 16 },
+  { label: 'Approfondissement', range: 'Lessons 17–27', minLesson: 17, maxLesson: 27 },
 ]
 
 interface EcoleProgressProps {

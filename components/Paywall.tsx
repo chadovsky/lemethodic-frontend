@@ -14,11 +14,18 @@ import { DISPLAY_FONT, INK, INK_SOFT, INK_MUTED, PAPER } from './onboarding/Onbo
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
+// V-009 — radar swapped from 4-axis legacy backend labels (Content /
+// Structure / Grammar / English Habits) to 5-axis user-facing brand
+// labels matching the locked methodology (Range / Coherence / Accuracy /
+// Fluency / Voice). Order is methodology-canonical (Le Fond first,
+// La Voix last) per lib/coucheBrandLabels.ts COUCHE_ORDER. This is
+// decorative mock data — Paywall doesn't wire to the real BE diagnostic.
 const RADAR_DATA = [
-  { axis: 'Content', user: 3, target: 4 },
-  { axis: 'Structure', user: 2, target: 4 },
-  { axis: 'Grammar', user: 2, target: 4 },
-  { axis: 'English Habits', user: 2, target: 4 },
+  { axis: 'Range',     user: 3, target: 4 },
+  { axis: 'Coherence', user: 2, target: 4 },
+  { axis: 'Accuracy',  user: 2, target: 4 },
+  { axis: 'Fluency',   user: 2, target: 4 },
+  { axis: 'Voice',     user: 2, target: 4 },
 ]
 
 const VALUE_ROWS: string[] = [

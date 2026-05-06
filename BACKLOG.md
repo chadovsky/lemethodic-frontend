@@ -2160,6 +2160,70 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-010 — /ecole phase structure correction (3-button → 2-button)
+
+**Priority:** HIGH (methodology-content alignment)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/ecole` showing the 2-button milestone row (Fondations 1–16 / Approfondissement 17–27) below the 0/27 progress bar. F-225 interactive verification clause does NOT apply — pure content/structure change, button taps were never wired beyond visual milestone state.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06 (FE-side, frontend commit pending)
+**Source:** V-009/V-010 methodology-content batch — locked 2-phase curriculum + F-202 /ecole/intro Le parcours section
+**Dependencies:** F-087 (lesson curriculum); F-202 (locked curriculum split source)
+**Scope:** in `components/home/EcoleProgress.tsx`, MILESTONES array reduced from 3 entries (Fondations 1-4 / Approfondissement 5-16 / L'École Complète 17-27) to 2 entries (Fondations 1-16 / Approfondissement 17-27). Aligns with the locked F-202 curriculum split + HomeScreen's existing Phase 1→Phase 2 divider at lesson 16→17 boundary. The 3-tier split was a pre-curriculum-lock F-087 approximation.
+
+**Layout call (resolved without plan-first pause):** spec lean (a) — keep 2 buttons stretched to fill the same row width — confirmed sufficient. Existing `flex: 1` per badge naturally splits 50/50; no design call needed. Did NOT add a milestone-card replacement (option c) since spec said "lean (a) — simplest, no new content needed".
+
+**Out of scope (preserved per V-010 spec):**
+- TodayFocus card chrome (F-204.deep)
+- "Set your exam date" pill chrome (F-204.deep)
+- Streak / greeting / header chrome (F-204.deep)
+- Bottom nav (F-204.deep)
+- L'École Complète as a completion-state badge: not surfaced elsewhere in the codebase (grep confirmed only the deleted MILESTONES entry referenced it). If future ticket adds a "complete the École" celebration moment, that's a separate visual/copy task.
+
+**Files touched:**
+- `components/home/EcoleProgress.tsx` — MILESTONES 3-entry array → 2-entry array; ranges adjusted; comment block updated to V-010 reasoning.
+
+### V-009 — CouchesDiagnostic 5-axis + brand labels
+
+**Priority:** HIGH (methodology-content credibility — wrong axis count + legacy labels surfaced on /diagnostic + /paywall)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/diagnostic` (mock mode, then real-mode if a diagnostic is wired) showing 5 bars (4 scored + 1 unscored "Coming soon" Voix at bottom) plus `/paywall` showing the 5-axis radar with brand labels (Range / Coherence / Accuracy / Fluency / Voice). EN + FR for diagnostic; Paywall is EN-only. F-225 interactive verification clause does NOT apply — content-only change, no behavior change beyond the placeholder treatment for unscored Voix.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06 (FE-side, frontend commit pending)
+**Source:** V-009/V-010 methodology-content batch — locked 5-couche model (Couche 5 La Voix added 2026-05-05) + brand labels (Range/Coherence/Accuracy/Fluency/Voice EN, Étendue/Cohérence/Correction/Aisance/Voix FR)
+**Dependencies:** F-202 (locked methodology copy + 5-couche shift); V-009.be (BE-side la_voix scoring)
+
+**Findings (from plan-first audit):**
+- CouchesDiagnostic at `components/diagnostic/CouchesDiagnostic.tsx` is **horizontal bars**, not a radar (spec called "radar" but the actual radar is in Paywall). Used only in `/diagnostic`. Default mock had 4 FR-only brand-label rows.
+- Paywall radar at `components/Paywall.tsx` IS the Recharts RadarChart. Used at `/paywall`. Hardcoded 4 axes with **legacy backend labels** "Content / Structure / Grammar / English Habits" — NOT brand labels.
+- Both surfaces in scope per V-009 audit.
+- BE returns 4 couches today: `lib/types.ts:240` — `CoucheKey = 'le_fond' | 'les_moules_des_idees' | 'les_moules' | 'les_reflexes_anglais'`. La Voix (`la_voix`) is NOT in BE types. V-009.be filed.
+
+**FE approach:**
+- New shared constant `lib/coucheBrandLabels.ts` — `BRAND_LABEL` map (CoucheKey → {en, fr}) + `COUCHE_ORDER` methodology-canonical order. Single source of truth for FE-side brand labels overriding BE's legacy `displayLabelEn`/`displayLabelFr`.
+- **CouchesDiagnostic**: extended `CoucheRow` type with optional `unscored: boolean` flag. Unscored rows render the empty track (50% opacity) with no fill / no dot / no target band, plus a "Coming soon" badge in the right cell instead of score+CEFR. Default mock extended to 5 rows with Voix as the unscored entry. `aria-label` switches to "X: not yet scored" for unscored bars.
+- **`couchesToRows` in `app/diagnostic/page.tsx`**: now overrides BE's `displayLabel*` with `BRAND_LABEL[c.key][lang]` (falls back to BE label if a brand label is somehow missing); appends an unscored Voix row at the bottom (after the worst-first sort) so it doesn't poison the bottleneck callout ("Your bottleneck is the top row. Fix it first.").
+- **Paywall radar**: `RADAR_DATA` extended from 4 to 5 axes; legacy backend labels swapped for brand labels in EN (Paywall is EN-only — no `lang` prop).
+
+**Out of scope (preserved per V-009 spec):**
+- Card chrome on /paywall (rounded radius + shadow stay in F-203.paywall)
+- Fill color, outline style, card bg color (F-204.deep / F-205.deep)
+- Layout positioning
+
+**Files touched:**
+- `lib/coucheBrandLabels.ts` (NEW) — BRAND_LABEL + COUCHE_ORDER + ExtendedCoucheKey type
+- `components/diagnostic/CouchesDiagnostic.tsx` — CoucheRow.unscored support, default mock 4→5 with Voix unscored, conditional render of bar internals + right cell
+- `app/diagnostic/page.tsx` — couchesToRows uses BRAND_LABEL override, appends unscored Voix row
+- `components/Paywall.tsx` — RADAR_DATA 4 axes (legacy labels) → 5 axes (brand labels EN)
+
+### V-009.be — BE adds La Voix scoring
+
+**Priority:** HIGH (BE-side dependency for V-009 to render real Voice data instead of placeholder)
+**Status:** Queued (BE-side; lemethodic-backend ticket)
+**Filed:** 2026-05-06
+**Source:** V-009 ship — FE renders Voix as "Coming soon" placeholder until BE scoring lands
+**Dependencies:** V-009 (FE-side surface ready)
+**Scope:** BE-side. Add `la_voix` to `CoucheKey` enum + scoring pipeline in `analysis.py` (or wherever the 4 existing couches are scored). Update `app/services/couche_labels.py` to emit brand labels (`displayLabelEn: "Voice"`, `displayLabelFr: "Voix"` for la_voix; same brand-label override for the other 4 couches so FE can drop its `BRAND_LABEL` override eventually). Diagnostic API response should return 5 couche scores once la_voix scoring is wired. La Voix scoring source: pronunciation/vowel-quality/liaison/rhythm metrics from the audio analysis pipeline (the existing speech-to-text + audio features could feed it). Specific scoring algorithm needs Chadi pedagogical input on what dimensions to combine.
+**Owner:** Backend Engineering (algorithm needs Chadi pedagogical sign-off)
+
 ### V-008 — Card 2 interference example direction reversed
 
 **Priority:** HIGH (verification-found; wrong audience direction shipped)

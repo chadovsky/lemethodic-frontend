@@ -18,6 +18,7 @@ import LearnModuleSheet from '@/components/modules/LearnModuleSheet'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import { api, ApiError } from '@/lib/api'
 import { useInterfaceLanguage, type InterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
+import { BRAND_LABEL } from '@/lib/coucheBrandLabels'
 import { dimensionLabel, sidebarLabel } from '@/lib/rubric/dimensionLabels'
 import type {
   Couche,
@@ -97,23 +98,25 @@ function toPercent(rawScore: number): number {
 }
 
 // Map the shaped Diagnostic into the CoucheRow shape CouchesDiagnostic expects.
-// Sorted worst-first so the bottleneck is at the top of the chart.
+// Sorted worst-first so the bottleneck is at the top of the chart. The
+// unscored La Voix placeholder is appended at the bottom (V-009).
 //
-// F-088 — `name` reads from the F-088 backend display labels. EN/FR
-// are identical today (TCF criteria use the same French words across
-// language tracks); the parameter is here for forward compatibility
-// with a possible market-specific divergence.
+// V-009 — overrides BE's displayLabel* with FE-side brand labels until
+// V-009.be aligns BE. Voice is appended as an unscored "Coming soon" row
+// since BE doesn't score la_voix today.
 function couchesToRows(
   couches: Couche[],
   lang: InterfaceLanguage,
-): { name: string; score: number; cefr: string }[] {
-  return couches
+): { name: string; score: number; cefr: string; unscored?: boolean }[] {
+  const scored = couches
     .map((c) => {
       const pct = toPercent(c.score)
-      const name = lang === 'fr' ? c.displayLabelFr : c.displayLabelEn
-      return { name, score: pct, cefr: cefrBand(pct) }
+      const brandName = BRAND_LABEL[c.key]?.[lang] ?? (lang === 'fr' ? c.displayLabelFr : c.displayLabelEn)
+      return { name: brandName, score: pct, cefr: cefrBand(pct) }
     })
     .sort((a, b) => a.score - b.score)
+  const voixLabel = BRAND_LABEL.la_voix[lang]
+  return [...scored, { name: voixLabel, score: 0, cefr: '', unscored: true }]
 }
 
 // F-088 — section header copy keyed by interface language. Replaces
