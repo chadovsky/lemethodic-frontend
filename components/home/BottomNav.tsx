@@ -30,6 +30,9 @@ export default function BottomNav() {
   return (
     <nav
       aria-label="Main navigation"
+      // V-013c — mobile-only. Hidden above md (768px); the desktop
+      // surface gets <TopNav /> mounted in app/layout.tsx instead.
+      className="md:hidden"
       style={{
         position: 'fixed',
         bottom: 0,
@@ -42,7 +45,6 @@ export default function BottomNav() {
         display: 'flex',
         alignItems: 'stretch',
         zIndex: 50,
-        // center content within 440px max-width
       }}
     >
       <div

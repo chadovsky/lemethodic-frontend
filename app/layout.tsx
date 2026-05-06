@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Fraunces } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
+import TopNav from '@/components/nav/TopNav'
 
 // V-005 — font system upgrade. Switzer replaces Geist for sans/UI/body
 // (loaded via Fontshare CDN, defined as `--font-switzer` CSS variable
@@ -56,6 +57,9 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
+        {/* V-013c — desktop-only top nav. Returns null on marketing /
+            conversion / legal paths and below md breakpoint. */}
+        <TopNav />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
