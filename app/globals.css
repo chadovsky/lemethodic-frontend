@@ -440,6 +440,54 @@
   }
 }
 
+/* V-015 — responsive show/hide gates for surfaces that have separate
+   mobile and desktop renders (Speaking, Progress). md = 768, lg = 1024.
+   Inline display values in consumers should NOT use these properties
+   (would beat the cascade). */
+.fp-mobile-only { display: block; }
+.fp-desktop-only { display: none; }
+@media (min-width: 768px) {
+  .fp-mobile-only { display: none; }
+  .fp-desktop-only { display: block; }
+}
+
+/* V-015d — Progress bento grid. Apple iCloud-style asymmetric tiles.
+   md (≥768): 2-column variant. lg (≥1024): 4-column with the radar
+   spanning 2×2 and the today/bottleneck/streak filling the right two
+   columns. Per-couche row + recent activity span full width on both. */
+.fp-bento-grid {
+  grid-template-columns: 1fr;
+  grid-auto-rows: minmax(160px, auto);
+}
+.fp-bento-radar { grid-column: 1; grid-row: span 1; }
+.fp-bento-today { grid-column: 1; grid-row: span 1; }
+.fp-bento-bottleneck { grid-column: 1; grid-row: span 1; }
+.fp-bento-streak { grid-column: 1; grid-row: span 1; }
+.fp-bento-couches { grid-column: 1; grid-row: span 1; }
+.fp-bento-recent { grid-column: 1; grid-row: span 1; }
+@media (min-width: 768px) {
+  .fp-bento-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .fp-bento-radar { grid-column: 1; grid-row: span 2; }
+  .fp-bento-today { grid-column: 2; grid-row: span 1; }
+  .fp-bento-bottleneck { grid-column: 2; grid-row: span 1; }
+  .fp-bento-streak { grid-column: span 2; grid-row: span 1; }
+  .fp-bento-couches { grid-column: span 2; grid-row: span 1; }
+  .fp-bento-recent { grid-column: span 2; grid-row: span 1; }
+}
+@media (min-width: 1024px) {
+  .fp-bento-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .fp-bento-radar { grid-column: 1 / span 2; grid-row: span 2; }
+  .fp-bento-today { grid-column: 3 / span 2; grid-row: span 1; }
+  .fp-bento-bottleneck { grid-column: 3; grid-row: span 1; }
+  .fp-bento-streak { grid-column: 4; grid-row: span 1; }
+  .fp-bento-couches { grid-column: 1 / span 4; grid-row: span 1; }
+  .fp-bento-recent { grid-column: 1 / span 4; grid-row: span 1; }
+}
+
 /* V-012b — primary-CTA warm hover. Default bg stays ed-accent navy
    (premium signal); :hover shifts to warm-peach-deep via spring for
    the soft state warmth Chadi specified. Pair with .ed-btn-press for

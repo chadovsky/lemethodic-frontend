@@ -2160,6 +2160,88 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-015d — /progress desktop bento dashboard
+
+**Priority:** HIGH (V-015 chain tail; pre-launch desktop polish)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop screenshot of `/progress` showing radar (2×2 tile) + Today's Focus + Bottleneck + Streak/days-to-exam + per-couche row + recent activity. Verify bento collapses to 2-col at md and to single column at <md. F-225 interactive verification clause partially applies — Today's Focus CTA + Recent Activity have hover/click affordance.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06 (FE-side, frontend commit pending)
+**Source:** V-015 spec — /progress was mobile-stacked column on desktop
+**Dependencies:** V-009 (5-couche brand labels reused for radar + per-couche row); V-012 (warm tokens); BRAND_LABEL + COUCHE_ORDER from lib/coucheBrandLabels.ts
+
+**Bento layout (Apple iCloud restraint):**
+- Radar tile (2×2 at lg, 1×2 at md): 5-couche Recharts polar from latest recording. Voix axis present at user value 0 (unscored placeholder per V-009).
+- Today's Focus tile (2×1 at lg, 1×1 at md): warm-cream bg, action.kind → headline + CTA → /ecole.
+- Bottleneck tile (1×1): lowest-scoring scored couche from latest recording.
+- Streak slot (1×1): repurposed for days-until-exam (Fraunces italic count + warm-espresso) since BE has no streak field. Filed as **V-015d.streak** if/when BE streak ships.
+- Per-couche detail row (full width): 5 mini cards with auto-fit grid; Voix unscored (60% opacity + "Coming soon" label).
+- Recent activity (full width): RecordingSummary list, 3-column rows (Tâche label / date / CEFR band).
+
+**CSS:**
+- New `.fp-bento-grid` + `.fp-bento-{radar,today,bottleneck,streak,couches,recent}` classes in globals.css with @media gates at md/lg
+- Mobile <md: existing ProgressDashboard stacked layout via `.fp-mobile-only`
+
+**Out of scope (filed):**
+- **V-015d.trend** — BE `GET /api/diagnostic/trend?days=30` endpoint for the score-trend tile (skipped from v1 per Chadi pick)
+- **V-015d.streak** — proper streak counter (BE field needed)
+
+### V-015c — /speaking desktop tab-driven layout
+
+**Priority:** HIGH (V-015 chain mid; pre-launch desktop polish)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop screenshot of `/speaking` showing 3 tabs (Tâche 1/2/3) with peach-deep underline on Tâche 1 (default) + 60/40 detail panel showing format / tips / Start CTA + recent recordings. 375px mobile keeps existing 3-stacked-card layout. F-225 interactive verification clause applies — tab clicks should swap the detail panel + load tâche-filtered recordings.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06 (FE-side, frontend commit pending)
+**Source:** V-015 spec — /speaking was mobile-only 3-card layout on desktop
+**Dependencies:** V-013c TopNav (active-underline pattern reused); V-012 (warm tokens); api.recordings.list
+
+**Layout (Option A from V-015c plan-first):**
+- Top: 3 tabs (Tâche 1/2/3), peach-deep 2px underline on active, spring-eased color on hover
+- Default tab: Tâche 1 (no localStorage persist — keeps state simple)
+- 60/40 grid: detail panel left (intro / format / tips), right rail with primary CTA + recent recordings + score history placeholder
+- Bottom meta strip: duration + mode (small visual closure)
+
+**Copy:**
+- Tâche-specific format / tips / examples placeholder copy for v1 — Chadi-authored real copy filed as **V-015c.copy** for v2
+- 3 tips per tâche, EN + FR
+- Tips bullets use `--ed-warm-peach-deep` 6px dot
+
+**Right rail:**
+- Primary CTA → existing tâche route (`/speaking/tache-1/interview`, `/speaking/tache-2`, `/speaking/tache-3/environnement`)
+- Recent recordings: filtered to active tâche from api.recordings.list({ limit: 30 }), top 5
+- Score history: empty-state placeholder ("Score chart coming soon") — V-015d.trend covers BE side
+
+**Mobile <md:** existing SpeakingLanding stays unchanged via `.fp-mobile-only`.
+
+### V-015c.copy — Real format/tips/examples copy
+
+**Priority:** MEDIUM (post-V-015c v1)
+**Status:** Queued — Chadi authoring
+**Filed:** 2026-05-06
+**Source:** V-015c spec — placeholder stubs in v1
+**Dependencies:** V-015c
+**Scope:** replace the 3-tâche placeholder format / 3-tips arrays in `components/speaking/SpeakingDesktop.tsx` COPY constant with Chadi-authored real content. Add an "Examples" block per tâche if Chadi provides sample exchanges. EN + FR.
+**Owner:** Chadi (copy) + Engineering (wire-up)
+
+### V-015d.trend — BE diagnostic trend endpoint
+
+**Priority:** LOW (post-V-015d; FE has placeholder)
+**Status:** Queued (BE-side)
+**Filed:** 2026-05-06
+**Source:** V-015d + V-015c right-rail score history slot
+**Dependencies:** F-088 (couche scoring)
+**Scope:** BE `GET /api/diagnostic/trend?days=30` returning either per-couche or overall score time series. Shape suggestion: `{ couche_key | 'overall', points: [{ date: ISO, score: number }] }[]`. FE adds a Recharts line chart in the V-015d "Score trend" tile and the V-015c right-rail history slot once this lands.
+**Owner:** Backend Engineering
+
+### V-015d.streak — Streak counter (BE field + UI)
+
+**Priority:** LOW (post-launch UX)
+**Status:** Queued (BE-side first)
+**Filed:** 2026-05-06
+**Source:** V-015d spec — Streak tile currently repurposed for days-until-exam
+**Dependencies:** TBD BE streak tracking
+**Scope:** BE adds streak tracking on User (consecutive-day-with-recording counter). FE swaps the Streak bento tile from days-until-exam to actual streak count once BE field ships. Days-until-exam moves to a new dedicated tile or returns to /ecole header chip.
+**Owner:** Backend Engineering
+
 ### V-013c — Nav system overhaul (mobile BottomNav + desktop TopNav)
 
 **Priority:** HIGH (V-013 chain tail; pre-launch surface completeness)
