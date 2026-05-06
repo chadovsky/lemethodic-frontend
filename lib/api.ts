@@ -38,6 +38,9 @@ import type {
   UiLanguage,
   User,
   UserClusterStateResponse,
+  WritingPrompt,
+  WritingSubmissionResult,
+  WritingHistoryItem,
 } from './types'
 // `OnboardingData` is consumed by mapStoreToSubmitPayload below.
 // `TCFGoal` is no longer imported — the legacy goal-based exam_profile mapping
@@ -1132,6 +1135,37 @@ export const api = {
         )
       }
       return mapDiagnosticBlockToMoules(raw.id, raw.diagnostic)
+    },
+  },
+
+  // V-013a — Writing module wired to F-224 BE. Prompt library, submission,
+  // and history. listPrompts query params optional; BE filters server-side.
+  writing: {
+    async listPrompts(opts: {
+      level?: 'B1' | 'B2'
+      tache_level?: 1 | 2 | 3
+      topic_tag?: string
+    } = {}): Promise<WritingPrompt[]> {
+      return request<WritingPrompt[]>('/api/writing/prompts', {
+        query: {
+          ...(opts.level ? { level: opts.level } : {}),
+          ...(opts.tache_level ? { tache_level: opts.tache_level } : {}),
+          ...(opts.topic_tag ? { topic_tag: opts.topic_tag } : {}),
+        },
+      })
+    },
+
+    async submit(promptId: number, text: string): Promise<WritingSubmissionResult> {
+      return request<WritingSubmissionResult>('/api/writing/submit', {
+        method: 'POST',
+        body: { prompt_id: promptId, text },
+      })
+    },
+
+    // History endpoint may or may not exist on BE today — caller catches the
+    // 404 and renders empty state per V-013a.history follow-up plan.
+    async history(): Promise<WritingHistoryItem[]> {
+      return request<WritingHistoryItem[]>('/api/writing/history')
     },
   },
 }

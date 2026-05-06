@@ -610,3 +610,56 @@ export interface ApiErrorShape {
   message: string
   body: unknown
 }
+
+// ── Writing (V-013a / F-224) ─────────────────────────────────────────────────
+
+// GET /api/writing/prompts row shape. tache_level is 1|2|3 per TCF mapping;
+// level is CEFR ('B1' | 'B2'). prompt_text + prompt_type are legacy fields
+// preserved for backward compat but ignored by the V-013a UI (we read
+// prompt_fr / prompt_en + the structured metadata).
+export interface WritingPrompt {
+  id: number
+  tache_level: 1 | 2 | 3
+  level: 'B1' | 'B2'
+  title_fr: string
+  prompt_fr: string
+  prompt_en: string
+  min_words: number
+  max_words: number
+  time_limit_min: number
+  topic_tag: string
+  // Legacy fields (kept for shape parity with BE, not surfaced in UI):
+  prompt_text?: string
+  prompt_type?: string
+}
+
+// POST /api/writing/submit response. Mirrors the diagnostic 4-layer shape
+// with per-couche scores + feedback strings. La Voix is not yet scored on
+// writing (V-009.be); only 4 couches surface for now.
+export interface WritingSubmissionResult {
+  id: number
+  prompt_id: number
+  word_count: number
+  overall_score: number          // 0-100
+  cefr_band: string              // 'B1' | 'B2' | 'C1' etc.
+  couches: {
+    le_fond: { score: number; feedback: string }
+    les_moules_des_idees: { score: number; feedback: string }
+    les_moules: { score: number; feedback: string }
+    les_reflexes_anglais: { score: number; feedback: string }
+  }
+  // Optional Claude narrative summary if present.
+  narrative_summary?: string | null
+}
+
+// GET /api/writing/history row (BE may not have this endpoint yet — V-013a
+// runtime-detects 404 and renders empty state, files V-013a.history).
+export interface WritingHistoryItem {
+  id: number
+  prompt_id: number
+  prompt_title_fr: string
+  word_count: number
+  overall_score: number
+  cefr_band: string
+  submitted_at: string  // ISO datetime
+}
