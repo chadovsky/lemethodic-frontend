@@ -49,8 +49,19 @@ export default function RootLayout({
       <head>
         {/* V-005 — Switzer via Fontshare CDN. Fraunces is loaded via
             next/font above (Google Fonts). Cabinet Grotesk + Geist
-            CDN/Google links retired with V-005. */}
-        <link rel="preconnect" href="https://api.fontshare.com" />
+            CDN/Google links retired with V-005.
+            V-016e — added crossOrigin on preconnect (Fontshare's CSS
+            references font files on a different host) and a preload
+            link for the CSS itself so first-paint on landing doesn't
+            FOUT into system-sans before the @font-face declarations
+            arrive. */}
+        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="anonymous" />
+        <link
+          rel="preload"
+          as="style"
+          href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700,800&display=swap"
+        />
         <link
           href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700,800&display=swap"
           rel="stylesheet"

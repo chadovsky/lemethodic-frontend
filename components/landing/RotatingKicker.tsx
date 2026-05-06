@@ -5,16 +5,19 @@
 // Pauses on hover (gives users time to read). Honors prefers-reduced-
 // motion: shows static "TCF · TEF · DELF · DALF" instead.
 //
-// Structure: small caps, ed-muted color, Geist 500, letter-spacing 0.05em.
-// The prefix ("Prep for" EN / "Préparation" FR) is fixed; the rotating
-// word is what changes.
+// V-016d revisions:
+// - Font size bumped clamp(20-24) → clamp(24-32)
+// - Color split: prefix in ed-fg-soft, exam name in warm-peach-deep
+// - Spring-eased slide (200ms) replaces ED_EASE_CSS 600ms
+// - Continuous infinite loop preserved (useRotatingText cycles forever)
 
 import { useState } from 'react'
-import { useRotatingText, ED_DUR, ED_EASE_CSS } from '@/lib/motion'
+import { useRotatingText, ED_EASE_SPRING_CSS } from '@/lib/motion'
 import type { Lang } from './copy'
 
 const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
-const ED_MUTED = 'var(--ed-muted)'
+const ED_FG_SOFT = 'var(--ed-fg-soft)'
+const ED_WARM_PEACH_DEEP = 'var(--ed-warm-peach-deep)'
 
 const EXAMS = ['TCF', 'TEF', 'DELF', 'DALF'] as const
 
@@ -22,6 +25,12 @@ const PREFIX: Record<Lang, string> = {
   en: 'Prep for',
   fr: 'Préparation',
 }
+
+// V-016d — kicker sizing + spacing tokens, hoisted so reduced-motion
+// fallback and active branch share one source of truth.
+const KICKER_FONT_SIZE = 'clamp(24px, 2.5vw, 32px)'
+const KICKER_MARGIN_BOTTOM = 'clamp(20px, 2.4vw, 32px)'
+const KICKER_LETTER_SPACING = '0.06em'
 
 interface RotatingKickerProps {
   lang: Lang
@@ -35,24 +44,24 @@ export default function RotatingKicker({ lang }: RotatingKickerProps) {
     pause: hovered,
   })
 
-  // Reduced-motion: static "TCF · TEF · DELF · DALF" listing.
+  // Reduced-motion: static "TCF · TEF · DELF · DALF" listing. Prefix in
+  // ed-fg-soft + exam list in warm-peach-deep keeps the V-016d color
+  // split for accessibility users.
   if (reduced) {
     return (
       <p
         style={{
           fontFamily: SANS,
           fontWeight: 500,
-          // V-001 — bumped from clamp(13px, 1.2vw, 15px) to
-          // clamp(20px, 1.8vw, 24px). Tracking + color preserved.
-          fontSize: 'clamp(20px, 1.8vw, 24px)',
-          letterSpacing: '0.06em',
+          fontSize: KICKER_FONT_SIZE,
+          letterSpacing: KICKER_LETTER_SPACING,
           textTransform: 'uppercase',
-          color: ED_MUTED,
           margin: 0,
-          marginBottom: 'clamp(16px, 2vw, 28px)',
+          marginBottom: KICKER_MARGIN_BOTTOM,
         }}
       >
-        {PREFIX[lang]} TCF · TEF · DELF · DALF
+        <span style={{ color: ED_FG_SOFT }}>{PREFIX[lang]}</span>{' '}
+        <span style={{ color: ED_WARM_PEACH_DEEP }}>TCF · TEF · DELF · DALF</span>
       </p>
     )
   }
@@ -74,47 +83,36 @@ export default function RotatingKicker({ lang }: RotatingKickerProps) {
       style={{
         fontFamily: SANS,
         fontWeight: 500,
-        // V-001 — kicker bumped to clamp(20px, 1.8vw, 24px); marginBottom
-        // proportional. Earlier V-001 edit only caught the reduced-motion
-        // branch due to an indentation mismatch; V-006 brings the active
-        // branch into line.
-        fontSize: 'clamp(20px, 1.8vw, 24px)',
-        letterSpacing: '0.06em',
+        fontSize: KICKER_FONT_SIZE,
+        letterSpacing: KICKER_LETTER_SPACING,
         textTransform: 'uppercase',
-        color: ED_MUTED,
         margin: 0,
-        marginBottom: 'clamp(16px, 2vw, 28px)',
-        // Shape the rotating slot — fixed height so the H1 below doesn't
-        // shift when the word swaps.
+        marginBottom: KICKER_MARGIN_BOTTOM,
         display: 'inline-flex',
         alignItems: 'baseline',
-        gap: 6,
+        gap: 8,
         outline: 'none',
-        // No focus ring on the kicker itself — focus shouldn't dominate
-        // visually. Tab still moves through it for keyboard accessibility
-        // (pauses rotation while focused).
       }}
       aria-label={`${PREFIX[lang]} ${EXAMS.join(', ')}`}
     >
-      <span>{PREFIX[lang]}</span>
+      {/* V-016d — prefix in soft-warm-dark; exam name in warm-peach-deep. */}
+      <span style={{ color: ED_FG_SOFT }}>{PREFIX[lang]}</span>
       <span
         aria-hidden="true"
         style={{
-          // V-006 — width is locked by the invisible sizer (the widest
-          // exam name). Container always sizes to widest case so 4-char
-          // names never clip on right edge. textAlign:center keeps the
-          // 3-char names visually balanced inside the 4-char slot.
+          // V-006 — width locked by invisible sizer (widest exam name).
           position: 'relative',
           display: 'inline-block',
           height: '1.1em',
           overflow: 'hidden',
           textAlign: 'center',
+          color: ED_WARM_PEACH_DEEP,
         }}
       >
-        {/* Width sizer — invisible widest word locks container width. */}
         <span style={{ visibility: 'hidden' }}>{widestExam}</span>
-        {/* Visible animated word — absolute over the sizer. The keyed
-            remount triggers ed-kicker-slide on every word change. */}
+        {/* V-016d — keyed remount triggers ed-kicker-slide on every word
+            change. Spring-eased 200ms (replaces F-212's 600ms ed-ease)
+            for a tighter rotation rhythm per spec. */}
         <span
           key={current}
           style={{
@@ -123,13 +121,12 @@ export default function RotatingKicker({ lang }: RotatingKickerProps) {
             left: 0,
             right: 0,
             top: 0,
-            animation: `ed-kicker-slide ${ED_DUR.rotateWord}ms ${ED_EASE_CSS} both`,
+            animation: `ed-kicker-slide 200ms ${ED_EASE_SPRING_CSS} both`,
           }}
         >
           {current}
         </span>
       </span>
-      {/* keyframes ed-kicker-slide live in app/globals.css */}
     </p>
   )
 }

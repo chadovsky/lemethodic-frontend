@@ -333,40 +333,43 @@ export const METHODOLOGY = {
     en: "Five layers compose your French. We diagnose the one that's holding you back, and we treat it specifically.",
     fr: "Cinq couches composent votre français. On diagnostique celle qui vous freine, et on la traite précisément.",
   } satisfies I18nString,
+  // V-016b — descriptions revised to communicate value, not just label.
+  // Em-dash appositives stripped per V-002; colon separator is rendered
+  // by MethodologySection between name and description.
   couches: [
     {
       name: { en: 'Le Fond', fr: 'Le Fond' },
       description: {
-        en: 'Ideas, arguments, examples.',
-        fr: 'Les idées, les arguments, les exemples.',
+        en: 'Your ideas. Generic answers fail at B2. Specific examples score.',
+        fr: 'Vos idées. Les réponses génériques échouent au B2. Les exemples précis font la différence.',
       },
     },
     {
       name: { en: 'Les Moules des Idées', fr: 'Les Moules des Idées' },
       description: {
-        en: 'How thought is organized in French.',
-        fr: "Comment la pensée s'organise en français.",
+        en: 'The French way of organizing thought. Retraining unconscious English structures.',
+        fr: 'La manière dont le français organise la pensée. Réentraîner les structures anglaises inconscientes.',
       },
     },
     {
       name: { en: 'Les Moules', fr: 'Les Moules' },
       description: {
-        en: 'How sentences are built in French.',
-        fr: 'Comment les phrases se construisent en français.',
+        en: 'The grammar of French sentences. Not what a textbook teaches, how French actually works.',
+        fr: "La grammaire des phrases françaises. Pas ce qu'un manuel enseigne ; comment le français fonctionne vraiment.",
       },
     },
     {
       name: { en: 'Les Réflexes Anglais', fr: 'Les Réflexes Anglais' },
       description: {
-        en: 'The English habits that slip through unnoticed.',
-        fr: 'Les habitudes anglaises qui passent sans permission.',
+        en: 'The English habits that bleed into your French. We diagnose each one.',
+        fr: "Les habitudes anglaises qui s'infiltrent dans votre français. On en diagnostique chacune.",
       },
     },
     {
       name: { en: 'La Voix', fr: 'La Voix' },
       description: {
-        en: 'How it sounds: vowels, liaisons, rhythm.',
-        fr: 'Comment ça sonne : voyelles, liaisons, rythme.',
+        en: 'How French sounds. Vowels, liaisons, rhythm. The gap between intelligible and credible.',
+        fr: 'Comment le français sonne. Voyelles, liaisons, rythme. La différence entre intelligible et crédible.',
       },
     },
   ] as CoucheCopy[],

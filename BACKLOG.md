@@ -2160,6 +2160,84 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-016c — /ecole desktop layout (lesson-grid Option C)
+
+**Priority:** HIGH (V-016 chain mid; pre-launch desktop polish completes /ecole/speaking/progress trio)
+**Status:** Awaiting verification (1440px desktop screenshot of `/ecole` showing eyebrow + Fraunces italic title + progress strip + 2-phase lesson grid (auto-fill 220px columns) + right rail (Today's session warm-cream / days-until-exam / streak placeholder). Verify mobile <md keeps existing HomeScreen layout. F-225 interactive verification clause partially applies — Today's session CTA + lesson card click-throughs.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06
+**Source:** V-016 spec — /ecole was mobile-stacked column on desktop
+**Dependencies:** V-013c TopNav (desktop chrome); V-012 (warm tokens)
+
+**Layout (Option C — lesson-centric):**
+- Header: eyebrow + Fraunces italic page title + greeting + progress strip (peach-deep fill on warm-cream track)
+- Body: 2-column grid `1fr / 280-320px`
+  - Left: 2 phase sections (Fondations 1-16 / Approfondissement 17-27), each with auto-fill 220px lesson card grid. LessonCard shows lesson number (Fraunces italic), status icon + label (Lock/Play/Check), title, 2-line short description clamp.
+  - Right rail (sticky top:96): warm-cream Today's session card with CTA, days-until-exam tile (Fraunces italic count), streak placeholder, optional Recommended modules count
+- Locked lessons render at 60% opacity, no Link wrapper (not clickable)
+- In-progress + completed lessons wrap in `<Link>` to `/ecole/lesson/{n}`
+- Mobile <md: existing HomeScreen via `.fp-mobile-only`
+
+**Skipped from this rev:** the existing HomeScreen DailyActionCard pastels are NOT carried into desktop (warm token-based today card replaces). Recommended modules section reduced to a count chip.
+
+### V-016f — Differentiation Card 1 rebuild (text-anchored bottleneck)
+
+**Priority:** HIGH (V-016 chain; landing card 1 read as decorative not data)
+**Status:** Awaiting verification (1440px desktop + 375px mobile of `/` + `/fr` Differentiation section showing Card 1 with "Your bottleneck" eyebrow + Fraunces italic couche name in warm-peach-deep + tail line. Hover trace: cycles through 5 couches.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06
+**Source:** V-016 spec — Card 1 "5 horizontal bars" read as decoration
+**Dependencies:** V-004 (DifferentiationSection card chrome stays); V-012 (warm tokens)
+
+**Decision: Option B (text-anchored)** — bars rebuild dropped in favor of typographic bottleneck frame:
+- Eyebrow: "Your bottleneck" / "Votre goulet" — small uppercase ed-muted
+- Body: cycling couche name in Fraunces italic clamp(28-36px) warm-peach-deep
+- Tail: "is what's blocking your B2." / "freine votre B2." — Switzer 14px ed-fg
+- Hover advances index modulo 5 (Le Fond / Les Moules des Idées / Les Moules / Les Réflexes Anglais / La Voix). Default position: index 3 (Les Réflexes Anglais — most thematically resonant for anglophone audience).
+- Spring-eased fade-up on each cycle via `ed-pair-fade-in` keyframe (reused from V-004 InterferenceVisual). Reduced-motion users see end state instantly.
+- Card 1 file gains a `language` prop; Cards 2/3 remain prop-less; mount switched to per-index render in DifferentiationSection.
+
+### V-016e — Switzer font preload (landing FOUT fix)
+
+**Priority:** HIGH (V-016 chain; landing H1 fell back to system sans on first paint)
+**Status:** Awaiting verification (1440px desktop + 375px mobile of `/` + `/fr` H1 + body — verify Switzer renders, not system sans-serif. Network tab: confirm preload link fires before stylesheet link.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06
+**Source:** V-016 spec — V-005 Switzer was rendering as system fallback on landing
+**Dependencies:** V-005
+
+**Fix:** added `<link rel="preload" as="style">` for the Fontshare CSS URL ahead of the `<link rel="stylesheet">` declaration in `app/layout.tsx` `<head>`. Also added `crossOrigin="anonymous"` to the preconnect hints (Fontshare CSS references font files on `cdn.fontshare.com`, separate origin from `api.fontshare.com`) and a second `preconnect` for `cdn.fontshare.com`. This escalates fetch priority on the font CSS so first-paint H1 hits Switzer's @font-face rules instead of falling through the `-apple-system / Segoe UI / system-ui` chain.
+
+If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer via `next/font/local` with downloaded woff2 files. Filed as queued follow-up.
+
+### V-016d — Hero kicker amendment (size, color split, spring)
+
+**Priority:** MEDIUM (V-016 chain; landing hero polish)
+**Status:** Awaiting verification (1440px desktop + 375px mobile of `/` + `/fr` hero showing kicker at clamp(24-32px), prefix in ed-fg-soft, exam name in warm-peach-deep, continuous infinite cycle through TCF/TEF/DELF/DALF.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06
+**Source:** V-016 spec
+**Dependencies:** V-001 (kicker sizing baseline); V-006 (widest-word width sizer); V-012 (spring + warm-peach-deep)
+
+**Changes:**
+- Font size: `clamp(20px, 1.8vw, 24px) → clamp(24px, 2.5vw, 32px)`
+- Color split: prefix "Prep for" / "Préparation" → `var(--ed-fg-soft)`; exam name → `var(--ed-warm-peach-deep)`. Same split applied to reduced-motion fallback ("Prep for TCF · TEF · DELF · DALF").
+- Animation: keyframe `ed-kicker-slide` now runs at 200ms with `ED_EASE_SPRING_CSS` (was 600ms with ED_EASE_CSS). Tighter rotation rhythm.
+- Continuous infinite loop: `useRotatingText` already cycles forever via `setInterval`; no behavioral change needed. Hover-pause preserved (kicker pauses while focused / hovered for keyboard accessibility).
+
+### V-016b — La Méthode en Couches copy revision
+
+**Priority:** HIGH (V-016 chain; landing methodology copy didn't communicate value)
+**Status:** Awaiting verification (1440px desktop + 375px mobile of `/` + `/fr` methodology section showing the 5 couches with revised descriptions. EN: "Le Fond: Your ideas. Generic answers fail at B2. Specific examples score." etc. FR analogs.)
+**Filed:** 2026-05-06
+**Shipped:** 2026-05-06
+**Source:** V-016 spec
+**Dependencies:** V-002 (em-dash strip rule); F-227 (compressed methodology surface on landing)
+
+**Scope:** updated `METHODOLOGY.couches[*].description` in `components/landing/copy.ts` for all 5 couches (Le Fond / Les Moules des Idées / Les Moules / Les Réflexes Anglais / La Voix), EN + FR. Each description now communicates the layer's value proposition rather than just labeling it. Em-dash appositive markers stripped per V-002 — colon separator is rendered by `MethodologySection` JSX between name and description.
+
+**Out of scope:** EcoleIntro (`/ecole/intro` Section 2) keeps its longer methodology copy. The landing methodology is the compressed glance-form version; EcoleIntro is the deep version. V-016b applies only to the compressed copy on landing.
+
 ### V-015d — /progress desktop bento dashboard
 
 **Priority:** HIGH (V-015 chain tail; pre-launch desktop polish)

@@ -28,9 +28,14 @@ function useReducedMotion(): boolean {
   return reduced
 }
 
-// ── Card 1 — 5-couche stack with one bar illuminated ──────────────────────
+// ── Card 1 — text-anchored bottleneck cycle (V-016f Option B) ─────────────
+// V-016f rebuild — replaced the 5-bar decorative stack with a typographic
+// frame that names the bottleneck directly. Cycles through the 5 couches
+// on hover. Default focus on Les Réflexes Anglais (most thematically
+// resonant for an anglophone audience). The new layout reads as data
+// (a diagnosis), not as a pattern.
 
-const COUCHE_NAMES = [
+const COUCHE_NAMES_FR = [
   'Le Fond',
   'Les Moules des Idées',
   'Les Moules',
@@ -38,46 +43,74 @@ const COUCHE_NAMES = [
   'La Voix',
 ] as const
 
-function CoucheStackVisual() {
-  // Default goulet on Couche 4 (Les Réflexes Anglais — most thematically
-  // resonant for the anglophone audience). Hover shifts to next layer
-  // visualizing diagnostic re-scoring as bottlenecks unblock.
-  const [illuminated, setIlluminated] = useState(3)
+const BOTTLENECK_COPY = {
+  en: { eyebrow: 'Your bottleneck', tail: "is what's blocking your B2." },
+  fr: { eyebrow: 'Votre goulet', tail: 'freine votre B2.' },
+} as const
+
+function CoucheStackVisual({ language }: { language: 'en' | 'fr' }) {
+  // Default cycle position on Couche 4 (Les Réflexes Anglais). Hover →
+  // next couche, modulo 5 so the loop is endless. Reduced-motion users
+  // see the same end state without the spring transition.
+  const [active, setActive] = useState(3)
   const reduced = useReducedMotion()
+  const couche = COUCHE_NAMES_FR[active]
+  const copy = BOTTLENECK_COPY[language]
   return (
     <div
-      onMouseEnter={() => setIlluminated((i) => (i + 1) % 5)}
+      onMouseEnter={() => setActive((i) => (i + 1) % COUCHE_NAMES_FR.length)}
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 6,
         marginBottom: 28,
         height: 130,
+        display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
+        gap: 8,
       }}
-      aria-hidden="true"
+      aria-live="polite"
     >
-      {COUCHE_NAMES.map((_, i) => {
-        const active = i === illuminated
-        // V-012b — illuminated bar shifts from ed-accent navy to
-        // warm-peach-deep, matching FinalCTA "B2" highlight color.
-        return (
-          <div
-            key={i}
-            style={{
-              height: 14,
-              borderRadius: 2,
-              backgroundColor: active ? 'var(--ed-warm-peach-deep)' : 'transparent',
-              border: `1px solid ${active ? 'var(--ed-warm-peach-deep)' : ED.rule}`,
-              transform: !reduced && active ? 'scaleX(1.02)' : 'scaleX(1)',
-              transformOrigin: 'left',
-              transition: reduced
-                ? 'none'
-                : 'background-color 600ms var(--ease-spring), border-color 600ms var(--ease-spring), transform 600ms var(--ease-spring)',
-            }}
-          />
-        )
-      })}
+      <p
+        style={{
+          fontFamily: SANS_FONT,
+          fontWeight: 600,
+          fontSize: 11,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          color: ED.muted,
+          margin: 0,
+        }}
+      >
+        {copy.eyebrow}
+      </p>
+      <p
+        // Keyed remount triggers the spring fade-up on each hover advance.
+        key={active}
+        style={{
+          fontFamily: SERIF_FONT,
+          fontStyle: 'italic',
+          fontWeight: 400,
+          fontSize: 'clamp(28px, 3vw, 36px)',
+          lineHeight: 1.1,
+          letterSpacing: '-0.012em',
+          color: 'var(--ed-warm-peach-deep)',
+          margin: 0,
+          animation: reduced ? 'none' : 'ed-pair-fade-in 400ms var(--ease-spring) both',
+        }}
+      >
+        {couche}
+      </p>
+      <p
+        style={{
+          fontFamily: SANS_FONT,
+          fontWeight: 400,
+          fontSize: 14,
+          lineHeight: 1.45,
+          color: ED.fg,
+          margin: 0,
+        }}
+      >
+        {copy.tail}
+      </p>
     </div>
   )
 }
@@ -205,7 +238,15 @@ function WaveformVisual() {
 // ── Section ───────────────────────────────────────────────────────────────
 
 export default function DifferentiationSection({ lang }: { lang: Lang }) {
-  const visuals = [CoucheStackVisual, InterferenceVisual, WaveformVisual]
+  // V-016f — Card 1 visual now takes a language prop (bottleneck eyebrow
+  // + tail localised). Cards 2/3 remain prop-less. Map per-index inline
+  // instead of an array of components.
+  const renderVisual = (i: number) => {
+    if (i === 0) return <CoucheStackVisual language={lang} />
+    if (i === 1) return <InterferenceVisual />
+    if (i === 2) return <WaveformVisual />
+    return null
+  }
   return (
     <section
       className="w-full"
@@ -241,7 +282,6 @@ export default function DifferentiationSection({ lang }: { lang: Lang }) {
           }}
         >
           {DIFFERENTIATION.cards.map((card, i) => {
-            const Visual = visuals[i] ?? null
             return (
               <RevealOnScroll key={i} delay={i * 0.08}>
                 <div
@@ -256,7 +296,7 @@ export default function DifferentiationSection({ lang }: { lang: Lang }) {
                     flexDirection: 'column',
                   }}
                 >
-                  {Visual && <Visual />}
+                  {renderVisual(i)}
                   <h3
                     style={{
                       fontFamily: SANS_FONT,
