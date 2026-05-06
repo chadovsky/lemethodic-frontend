@@ -1155,10 +1155,12 @@ export const api = {
       })
     },
 
+    // V-015a — payload field renamed text → student_text per BE schema
+    // (V-014a triage 422 response).
     async submit(promptId: number, text: string): Promise<WritingSubmissionResult> {
       return request<WritingSubmissionResult>('/api/writing/submit', {
         method: 'POST',
-        body: { prompt_id: promptId, text },
+        body: { prompt_id: promptId, student_text: text },
       })
     },
 
