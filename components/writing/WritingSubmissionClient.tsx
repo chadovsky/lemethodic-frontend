@@ -35,7 +35,9 @@ const COPY = {
     placeholder: 'Start writing here…',
     wordCount: (n: number) => `${n} words`,
     submit: 'Submit for analysis',
-    submitDisabled: 'Reach the minimum word count to submit',
+    submitEmpty: 'Type a response to submit',
+    underMinWarning: 'Below recommended minimum. Your analysis may be limited.',
+    overMaxWarning: 'Over recommended maximum.',
     submitting: 'Analyzing…',
     submitError: "Couldn't submit. Try again in a moment.",
     promptError: "Couldn't load this prompt. Retry?",
@@ -57,7 +59,9 @@ const COPY = {
     placeholder: 'Commencez à écrire ici…',
     wordCount: (n: number) => `${n} mots`,
     submit: 'Soumettre pour analyse',
-    submitDisabled: 'Atteignez le minimum de mots pour soumettre',
+    submitEmpty: 'Écrivez une réponse pour soumettre',
+    underMinWarning: 'Sous le minimum recommandé. Votre analyse pourra être limitée.',
+    overMaxWarning: 'Au-dessus du maximum recommandé.',
     submitting: 'Analyse en cours…',
     submitError: 'Impossible de soumettre. Réessayez dans un instant.',
     promptError: 'Impossible de charger ce sujet. Réessayer ?',
@@ -161,18 +165,27 @@ export default function WritingSubmissionClient({ promptId }: Props) {
   const count = useMemo(() => wordCount(text), [text])
   const minWords = prompt?.min_words ?? 0
   const maxWords = prompt?.max_words ?? 0
-  const approachingMax = maxWords > 0 ? Math.floor(maxWords * 0.9) : 0
+  // V-015b — word count is a guideline, not a hard requirement. Three
+  // states: under min (red, advisory), in range (green), over max
+  // (yellow, advisory). All three permit submission.
+  const wordRangeState: 'under' | 'in_range' | 'over' | 'unknown' = !prompt
+    ? 'unknown'
+    : count < minWords
+      ? 'under'
+      : count > maxWords
+        ? 'over'
+        : 'in_range'
   const counterColor =
-    !prompt
+    wordRangeState === 'unknown'
       ? ED_MUTED
-      : count < minWords
+      : wordRangeState === 'under'
         ? 'var(--fp-error)'
-        : count > maxWords
-          ? 'var(--fp-error)'
-          : count > approachingMax
-            ? 'var(--ed-warm-peach-deep)'
-            : 'var(--ed-warm-sage-deep)'
-  const canSubmit = prompt != null && count >= minWords && count <= maxWords
+        : wordRangeState === 'over'
+          ? 'var(--ed-warm-peach-deep)'
+          : 'var(--ed-warm-sage-deep)'
+  // V-015b — submit gated only on non-empty text + active prompt + not
+  // mid-submit. Word count thresholds no longer block.
+  const canSubmit = prompt != null && count > 0
 
   async function handleSubmit() {
     if (!prompt || !canSubmit || submission.kind === 'submitting') return
@@ -264,6 +277,7 @@ export default function WritingSubmissionClient({ promptId }: Props) {
             text={text}
             count={count}
             counterColor={counterColor}
+            wordRangeState={wordRangeState}
             canSubmit={canSubmit}
             isSubmitting={submission.kind === 'submitting'}
             errorMessage={submission.kind === 'submitError' ? submission.message : null}
@@ -287,6 +301,7 @@ interface SubmissionFormProps {
   text: string
   count: number
   counterColor: string
+  wordRangeState: 'under' | 'in_range' | 'over' | 'unknown'
   canSubmit: boolean
   isSubmitting: boolean
   errorMessage: string | null
@@ -303,6 +318,7 @@ function SubmissionForm({
   text,
   count,
   counterColor,
+  wordRangeState,
   canSubmit,
   isSubmitting,
   errorMessage,
@@ -494,21 +510,40 @@ function SubmissionForm({
           {isSubmitting ? copy.submitting : copy.submit}
         </button>
       </div>
-      {!canSubmit && !isSubmitting && (
-        <p
-          style={{
-            fontFamily: SANS,
-            fontSize: 12,
-            color: ED_MUTED,
-            marginTop: 8,
-            margin: 0,
-            paddingTop: 8,
-            textAlign: 'right',
-          }}
-        >
-          {copy.submitDisabled}
-        </p>
-      )}
+      {/* V-015b — state-aware advisory below the action row. Empty
+          state shows submitEmpty; under/over states show advisory but
+          do NOT block submit. In-range shows nothing. */}
+      {(() => {
+        const advisory =
+          !canSubmit && !isSubmitting
+            ? copy.submitEmpty
+            : wordRangeState === 'under'
+              ? copy.underMinWarning
+              : wordRangeState === 'over'
+                ? copy.overMaxWarning
+                : null
+        if (!advisory) return null
+        return (
+          <p
+            style={{
+              fontFamily: SANS,
+              fontSize: 12,
+              color:
+                wordRangeState === 'under'
+                  ? 'var(--fp-error)'
+                  : wordRangeState === 'over'
+                    ? 'var(--ed-warm-peach-deep)'
+                    : ED_MUTED,
+              fontWeight: 500,
+              margin: 0,
+              paddingTop: 8,
+              textAlign: 'right',
+            }}
+          >
+            {advisory}
+          </p>
+        )
+      })()}
       {errorMessage && (
         <p
           role="alert"
