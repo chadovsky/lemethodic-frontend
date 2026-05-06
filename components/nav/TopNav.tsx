@@ -33,7 +33,14 @@ const EXCLUDED_PREFIXES = [
   '/refund',
 ] as const
 
-const EXCLUDED_EXACT: ReadonlySet<string> = new Set(['/', '/fr'])
+// F-300b — /exam-prep + /fr/exam-prep are the migrated funnel landings;
+// they keep marketing chrome (no in-product TopNav).
+const EXCLUDED_EXACT: ReadonlySet<string> = new Set([
+  '/',
+  '/fr',
+  '/exam-prep',
+  '/fr/exam-prep',
+])
 
 function shouldHideOn(pathname: string): boolean {
   if (EXCLUDED_EXACT.has(pathname)) return true
