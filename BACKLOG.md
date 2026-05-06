@@ -2160,6 +2160,75 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### F-300a — Platform-level / landing redesign
+
+**Priority:** HIGH (strategic surface restructure; depends on F-300b having stabilized /exam-prep)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend pushed; production deploy on auto from main merge. 1440px desktop + 375px mobile screenshots of `/` (EN) + `/fr` (FR) end-to-end: hero with new H1 + sub + kicker + 2 CTAs (peach-deep button + ghost link), product cards (Option B layout — Exam Prep featured 2/3 + Library + Free Diagnostic stacked 1/3 at lg, 2-col at md, 1-col <md), compressed methodology (5 couches listed, attribution + see-full link), final CTA + footer with Exam Prep + Library nav links.)
+**Filed:** 2026-05-07
+**Shipped:** 2026-05-07 (FE-side, frontend commit pushed)
+**Source:** F-300 strategic recalibration — LeMethodic repositions from "TCF speaking exam prep" to "French learning platform with multiple products"
+**Dependencies:** F-300b (preserves exam-prep funnel at /exam-prep); V-003 (atmospheric glyphs); V-012 (warm tokens); V-013c (TopNav exclusion list); V-016d (kicker treatment); V-016f (bottleneck cycle visual reused for Exam Prep card)
+
+**Locked content:**
+- Hero H1: "Stop translating. Start producing French." / FR: "Arrêtez de traduire. Commencez à produire en français."
+- Hero sub: "The method, the exams, the books — built for English speakers." / FR analog
+- Kicker subtitle (V-016d kicker + new line): "Built for the exams that change visa outcomes."
+- Primary CTA: "Start free diagnostic" → /onboarding (peach-deep bg, warm-cream text, height 64)
+- Secondary CTA: "Browse the library" → /library (text underline, ed-muted)
+- 3 product cards (Option B layout per F-300a plan-first):
+  - **Exam Prep (featured)**: visual = bottleneck cycle (V-016f Card 1 reused, hover-cycles 5 couches), copy "Diagnostic-driven path. AI examiner feedback under exam pressure." → /exam-prep
+  - **Library**: visual = book-stack (3 typographic blocks in peach-deep / sage-deep / espresso), copy "Method books, exam prep PDFs, free resources for English speakers learning French." → /library (404 today; F-300c)
+  - **Free Diagnostic**: visual = mini SVG radar (sage-deep dashed pentagon + peach fill) → /onboarding
+- Compressed methodology section: heading + 1-line sub + 5 couche names (no descriptions; "See full methodology →" links to /exam-prep) + attribution line "Built on 7,000+ hours…"
+- Final CTA: "Stop guessing what's blocking your French." + body + peach-deep button + trust line
+- Footer: existing + new Exam Prep + Library links
+
+**Skipped per plan-first:**
+- **Social proof section** in v1 — methodology section's attribution line carries enough atmosphere; full testimonial section deferred. Filed as **F-300a.proof** for follow-up.
+
+**New CSS:** `.fp-platform-cards` grid with breakpoint cascade (1col → 2col at md → 2fr/1fr at lg with featured spanning rows).
+
+**Files touched:**
+- `app/page.tsx`, `app/fr/page.tsx` — render PlatformLanding instead of LandingPage; new platform-level metadata title + description
+- `components/landing/PlatformLanding.tsx` (NEW) — full platform landing with hero, ProductCards, methodology, FinalCTA. Reuses HeroAtmosphere, RotatingKicker, RevealOnScroll, LandingHeader, LandingFooter
+- `components/landing/LandingFooter.tsx` — footer nav extended with Exam Prep + Library links (lang-aware /exam-prep vs /fr/exam-prep)
+- `app/globals.css` — .fp-platform-cards grid + breakpoint rules
+
+### F-300a.proof — Platform landing social proof section
+
+**Priority:** LOW (post-launch UX polish)
+**Status:** Queued
+**Filed:** 2026-05-07
+**Source:** F-300a plan-first — skipped from v1
+**Dependencies:** F-300a; testimonial copy (Chadi authoring)
+**Scope:** add a "voices from English speakers" testimonial section between the product cards and the methodology section on platform landing. Pattern from current /exam-prep TestimonialCard component. 3 testimonials minimum, attribution + exam context + outcome quote. Needs Chadi-authored or Chadi-curated testimonials (real users where possible).
+**Owner:** Chadi (copy) + Engineering (wire-up)
+
+### F-300b — Move current landing to /exam-prep
+
+**Priority:** HIGH (F-300 chain head; preserves existing funnel before / pivots)
+**Status:** Awaiting verification (FE-side, frontend commit pushed; production deploy on auto. 1440px desktop + 375px mobile of `/exam-prep` + `/fr/exam-prep` showing identical content to pre-F-300 / + /fr.)
+**Filed:** 2026-05-07
+**Shipped:** 2026-05-07
+**Source:** F-300 strategic recalibration — preserve before disrupt
+**Dependencies:** none (mechanical route copy)
+**Scope:** new `/exam-prep` and `/fr/exam-prep` routes render the existing LandingPage component verbatim. Canonical + hreflang metadata point at the new URLs. TopNav `EXCLUDED_EXACT` set extended to suppress in-product nav on the funnel landing surface.
+
+**Files touched:**
+- `app/exam-prep/page.tsx` (NEW) — renders LandingPage with lang="en"
+- `app/fr/exam-prep/page.tsx` (NEW) — renders LandingPage with lang="fr"
+- `components/nav/TopNav.tsx` — EXCLUDED_EXACT extended
+
+### F-300c — Library route + content
+
+**Priority:** MEDIUM (post-F-300a; /library currently 404)
+**Status:** Queued
+**Filed:** 2026-05-07
+**Source:** F-300a — Library product card links to /library which doesn't exist yet
+**Dependencies:** F-300a; library inventory (Chadi authoring book covers + listings + free resources)
+**Scope:** new `/library` and `/fr/library` routes with a books / resources catalog. Cards per book (cover image + title + format + buy/download CTA + free-resource flag). Filter or category navigation TBD. Visual continuity with platform landing — V-012 warm tokens, ed-paper book cards, peach-deep CTAs.
+**Owner:** Engineering (build) + Chadi (inventory + copy)
+
 ### V-016a.fe — Writing submit polling consumer
 
 **Priority:** HIGH (parallel to BE V-016a; FE ready before BE ships contract)

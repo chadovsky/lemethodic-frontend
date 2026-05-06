@@ -16,12 +16,16 @@ interface LandingFooterProps {
 
 const COPY = {
   en: {
+    examPrep: 'Exam Prep',
+    library: 'Library',
     privacy: 'Privacy',
     terms: 'Terms',
     refund: 'Refund',
     rights: '© 2026 LeMethodic',
   },
   fr: {
+    examPrep: 'Préparation aux examens',
+    library: 'Bibliothèque',
     privacy: 'Confidentialité',
     terms: 'Conditions',
     refund: 'Remboursement',
@@ -66,10 +70,13 @@ export default function LandingFooter({ lang }: LandingFooterProps) {
             {BRAND}
           </span>
           <nav
-            aria-label={lang === 'fr' ? 'Pages légales' : 'Legal'}
+            aria-label={lang === 'fr' ? 'Navigation pied de page' : 'Footer navigation'}
             style={{ display: 'flex', flexWrap: 'wrap', gap: 28 }}
           >
             {[
+              // F-300a — product surface links added ahead of legal.
+              { href: lang === 'fr' ? '/fr/exam-prep' : '/exam-prep', label: copy.examPrep },
+              { href: '/library', label: copy.library },
               { href: '/privacy', label: copy.privacy },
               { href: '/terms', label: copy.terms },
               { href: '/refund', label: copy.refund },

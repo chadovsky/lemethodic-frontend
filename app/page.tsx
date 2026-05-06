@@ -1,15 +1,13 @@
-// M-101a — root route is the English landing page. Auth check + redirect to
-// /ecole live inside <LandingPage /> so the same component handles both
-// app/page.tsx (lang=en) and app/fr/page.tsx (lang=fr). Onboarding moved to
-// /onboarding (a dedicated route that already existed as a duplicate entry).
+// F-300a — root route is now the platform-level landing. The previous
+// TCF/TEF/DELF funnel content moved to /exam-prep in F-300b.
 
-import LandingPage from '@/components/landing/LandingPage'
-import { META } from '@/components/landing/copy'
+import PlatformLanding from '@/components/landing/PlatformLanding'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: META.en.title,
-  description: META.en.description,
+  title: 'LeMethodic | French learning platform for English speakers',
+  description:
+    'The method, the exams, the books — built for English speakers. Diagnostic-driven path on TCF · TEF · DELF · DALF, plus a growing library of method books and free resources.',
   alternates: {
     canonical: '/',
     languages: {
@@ -20,5 +18,5 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  return <LandingPage lang="en" />
+  return <PlatformLanding lang="en" />
 }
