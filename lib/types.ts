@@ -652,6 +652,21 @@ export interface WritingSubmissionResult {
   narrative_summary?: string | null
 }
 
+// V-016a.fe — async job contract. POST /api/writing/submit no longer
+// returns the analysis result inline; it returns a job handle that the
+// FE polls via GET /api/writing/jobs/{job_id}. The job's `result` is a
+// WritingSubmissionResult once status flips to 'completed'.
+export type WritingJobStatus = 'pending' | 'processing' | 'completed' | 'failed'
+
+export interface WritingJob {
+  job_id: string
+  status: WritingJobStatus
+  result?: WritingSubmissionResult | null
+  error?: { message: string; code?: string } | null
+  created_at: string
+  completed_at?: string | null
+}
+
 // GET /api/writing/history row (BE may not have this endpoint yet — V-013a
 // runtime-detects 404 and renders empty state, files V-013a.history).
 export interface WritingHistoryItem {

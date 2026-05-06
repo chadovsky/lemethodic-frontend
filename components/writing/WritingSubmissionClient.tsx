@@ -12,6 +12,7 @@ import { ChevronLeft } from 'lucide-react'
 import { api, ApiError } from '@/lib/api'
 import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 import { BRAND_LABEL } from '@/lib/coucheBrandLabels'
+import { usePollJob } from '@/lib/polling'
 import type { WritingPrompt, WritingSubmissionResult } from '@/lib/types'
 
 const ED_BG = 'var(--ed-bg)'
@@ -48,6 +49,17 @@ const COPY = {
     resultScore: 'Overall score',
     submitAnother: 'Submit another',
     tryAgain: 'Try the same prompt again',
+    // V-016a.fe — async-job state copy.
+    analyzingTitle: 'Analyzing your writing',
+    analyzingPhase: {
+      initial: 'This may take 30-90 seconds.',
+      still: 'Still analyzing.',
+      almost: 'Almost done.',
+    },
+    analyzingCancel: 'Cancel',
+    failedTitle: 'Analysis failed',
+    abandonedTitle: 'Analysis is taking longer than expected',
+    abandonedBody: 'Try again in a moment. Your draft is saved.',
   },
   fr: {
     backToLibrary: 'Retour aux sujets',
@@ -72,6 +84,16 @@ const COPY = {
     resultScore: 'Note globale',
     submitAnother: 'Soumettre un autre',
     tryAgain: 'Refaire le même sujet',
+    analyzingTitle: 'Analyse en cours',
+    analyzingPhase: {
+      initial: "Cela peut prendre 30 à 90 secondes.",
+      still: 'Analyse toujours en cours.',
+      almost: 'Presque terminé.',
+    },
+    analyzingCancel: 'Annuler',
+    failedTitle: 'Analyse échouée',
+    abandonedTitle: "L'analyse prend plus de temps que prévu",
+    abandonedBody: 'Réessayez dans un instant. Votre brouillon est sauvegardé.',
   },
 } as const
 
@@ -84,10 +106,23 @@ function wordCount(text: string): number {
   return trimmed.split(/\s+/).length
 }
 
+// V-016a.fe — extended state machine for async-job analysis.
+//   idle         → form is open, text in flight is the user's draft
+//   submitting   → POST /api/writing/submit in flight (brief, ~1-2s)
+//   polling      → have job_id, polling /api/writing/jobs/{id} until
+//                  status flips to completed / failed / abandoned
+//   result       → final analysis result rendered
+//   failed       → BE returned status=failed OR a poll lost the server
+//   abandoned    → 100 polls (~5min) elapsed without completion
+//   submitError  → transport error during the initial POST (not a job
+//                  failure — never had a job_id)
 type SubmissionState =
   | { kind: 'idle'; text: string }
   | { kind: 'submitting'; text: string }
+  | { kind: 'polling'; text: string; jobId: string }
   | { kind: 'result'; text: string; result: WritingSubmissionResult }
+  | { kind: 'failed'; text: string; message: string }
+  | { kind: 'abandoned'; text: string }
   | { kind: 'submitError'; text: string; message: string }
 
 interface Props {
@@ -104,6 +139,35 @@ export default function WritingSubmissionClient({ promptId }: Props) {
   const [submission, setSubmission] = useState<SubmissionState>({ kind: 'idle', text: '' })
 
   const draftKey = promptId != null ? `lemethodic:writing-draft:${promptId}` : null
+
+  // V-016a.fe — drive the polling loop from submission state. usePollJob
+  // is a no-op when jobId is null (idle / submitting / result / etc.);
+  // it kicks off the recursive setTimeout chain when submission flips to
+  // 'polling' with a job_id.
+  const activeJobId = submission.kind === 'polling' ? submission.jobId : null
+  const pollState = usePollJob({
+    jobId: activeJobId,
+    fetcher: api.writing.getJob,
+  })
+
+  // Sync poll state → submission state. Only fires while the submission
+  // is in the 'polling' phase, so a stale completed/failed result from a
+  // previous job can't bleed into a new attempt.
+  useEffect(() => {
+    if (submission.kind !== 'polling') return
+    if (pollState.kind === 'completed') {
+      setSubmission({ kind: 'result', text: submission.text, result: pollState.result })
+      if (draftKey) {
+        try {
+          window.localStorage.removeItem(draftKey)
+        } catch {}
+      }
+    } else if (pollState.kind === 'failed') {
+      setSubmission({ kind: 'failed', text: submission.text, message: pollState.message })
+    } else if (pollState.kind === 'abandoned') {
+      setSubmission({ kind: 'abandoned', text: submission.text })
+    }
+  }, [pollState, submission, draftKey])
 
   // Load prompt on mount. listPrompts returns the full library; pick by id.
   // Could be optimized with GET /api/writing/prompts/{id} when BE adds it.
@@ -188,22 +252,41 @@ export default function WritingSubmissionClient({ promptId }: Props) {
   const canSubmit = prompt != null && count > 0
 
   async function handleSubmit() {
-    if (!prompt || !canSubmit || submission.kind === 'submitting') return
+    if (!prompt) return
+    if (submission.kind === 'submitting' || submission.kind === 'polling') return
+    if (!canSubmit) return
     const sendText = text
     setSubmission({ kind: 'submitting', text: sendText })
     try {
-      const result = await api.writing.submit(prompt.id, sendText)
-      setSubmission({ kind: 'result', text: sendText, result })
-      // Clear draft on successful submit.
-      if (draftKey) {
-        try {
-          window.localStorage.removeItem(draftKey)
-        } catch {}
+      // V-016a.fe — POST returns a WritingJob handle; usePollJob takes
+      // over from here. BE may return a terminal status synchronously
+      // (cached / instant analyses) — we still handle that path so we
+      // don't bounce through the polling loop unnecessarily.
+      const job = await api.writing.submit(prompt.id, sendText)
+      if (job.status === 'completed' && job.result) {
+        setSubmission({ kind: 'result', text: sendText, result: job.result })
+        if (draftKey) {
+          try {
+            window.localStorage.removeItem(draftKey)
+          } catch {}
+        }
+        return
       }
+      if (job.status === 'failed') {
+        setSubmission({
+          kind: 'failed',
+          text: sendText,
+          message: job.error?.message ?? copy.submitError,
+        })
+        return
+      }
+      // Pending or processing → flip to polling phase, hook drives loop.
+      setSubmission({ kind: 'polling', text: sendText, jobId: job.job_id })
     } catch (err) {
       // V-014a — surface BE response details so production triage can
-      // see the failure cause directly. Generic "Couldn't submit" was
-      // masking 422 / 500 / auth status codes.
+      // see the failure cause directly. Distinct from 'failed' (which
+      // means BE accepted the job and then errored): submitError is the
+      // initial-POST transport / validation error.
       // eslint-disable-next-line no-console
       console.error('Writing submit failed', err)
       let detail: string = copy.submitError
@@ -220,6 +303,20 @@ export default function WritingSubmissionClient({ promptId }: Props) {
       }
       setSubmission({ kind: 'submitError', text: sendText, message: detail })
     }
+  }
+
+  // V-016a.fe — user-initiated cancel during polling. Reverts to the
+  // idle form with text preserved (jobId nulled so usePollJob's effect
+  // tears down the in-flight loop on next render).
+  function handleCancelPolling() {
+    if (submission.kind !== 'polling') return
+    setSubmission({ kind: 'idle', text: submission.text })
+  }
+
+  // V-016a.fe — retry path from failed / abandoned. Resets to idle with
+  // the user's text preserved so they can hit Submit again.
+  function handleRetryFromFailed() {
+    setSubmission({ kind: 'idle', text })
   }
 
   function handleReset() {
@@ -262,6 +359,26 @@ export default function WritingSubmissionClient({ promptId }: Props) {
           <NetworkError message={copy.promptError} retryLabel={copy.retry} onRetry={() => setRetryKey((k) => k + 1)} />
         ) : !prompt ? (
           <LoadingSkeleton />
+        ) : submission.kind === 'polling' ? (
+          <AnalyzingPanel
+            pollCount={pollState.kind === 'polling' ? pollState.pollCount : 0}
+            copy={copy}
+            onCancel={handleCancelPolling}
+          />
+        ) : submission.kind === 'failed' ? (
+          <FailedPanel
+            title={copy.failedTitle}
+            message={submission.message}
+            retryLabel={copy.retry}
+            onRetry={handleRetryFromFailed}
+          />
+        ) : submission.kind === 'abandoned' ? (
+          <FailedPanel
+            title={copy.abandonedTitle}
+            message={copy.abandonedBody}
+            retryLabel={copy.retry}
+            onRetry={handleRetryFromFailed}
+          />
         ) : submission.kind === 'result' ? (
           <ResultView
             prompt={prompt}
@@ -762,6 +879,166 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
         </button>
       </div>
     </>
+  )
+}
+
+// ── V-016a.fe — analyzing / failed panels ─────────────────────────────────
+
+interface AnalyzingPanelProps {
+  pollCount: number
+  copy: typeof COPY[keyof typeof COPY]
+  onCancel: () => void
+}
+
+function AnalyzingPanel({ pollCount, copy, onCancel }: AnalyzingPanelProps) {
+  // Phase derived from pollCount × 3s. Threshold ~10 polls (30s) and
+  // ~20 polls (60s) per spec — gives users a quiet sense of progress
+  // without making timing claims we can't honor.
+  const phaseCopy =
+    pollCount >= 20
+      ? copy.analyzingPhase.almost
+      : pollCount >= 10
+        ? copy.analyzingPhase.still
+        : copy.analyzingPhase.initial
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        // Warm-cream panel with sage accent — V-012 calm-pride tone.
+        backgroundColor: 'var(--ed-warm-cream)',
+        border: `1px solid ${ED_RULE}`,
+        borderRadius: 4,
+        padding: 'clamp(48px, 8vw, 96px) clamp(24px, 4vw, 48px)',
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 20,
+      }}
+    >
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }} aria-hidden="true">
+        <span className="ed-spinner-dot ed-spinner-dot-1" />
+        <span className="ed-spinner-dot ed-spinner-dot-2" />
+        <span className="ed-spinner-dot ed-spinner-dot-3" />
+      </div>
+      <h2
+        style={{
+          fontFamily: SERIF,
+          fontStyle: 'italic',
+          fontWeight: 400,
+          fontSize: 'clamp(22px, 2.6vw, 30px)',
+          lineHeight: 1.2,
+          color: 'var(--ed-warm-espresso)',
+          margin: 0,
+        }}
+      >
+        {copy.analyzingTitle}
+      </h2>
+      <p
+        style={{
+          fontFamily: SANS,
+          fontWeight: 500,
+          fontSize: 14,
+          color: ED_MUTED,
+          margin: 0,
+          maxWidth: 420,
+        }}
+      >
+        {phaseCopy}
+      </p>
+      <button
+        type="button"
+        onClick={onCancel}
+        className="ed-btn-press"
+        style={{
+          marginTop: 8,
+          fontFamily: SANS,
+          fontWeight: 500,
+          fontSize: 13,
+          color: ED_FG_SOFT,
+          backgroundColor: 'transparent',
+          border: `1px solid ${ED_RULE}`,
+          padding: '8px 18px',
+          borderRadius: 4,
+          cursor: 'pointer',
+        }}
+      >
+        {copy.analyzingCancel}
+      </button>
+    </div>
+  )
+}
+
+interface FailedPanelProps {
+  title: string
+  message: string
+  retryLabel: string
+  onRetry: () => void
+}
+
+function FailedPanel({ title, message, retryLabel, onRetry }: FailedPanelProps) {
+  return (
+    <div
+      role="alert"
+      style={{
+        backgroundColor: ED_PAPER,
+        border: `1px solid ${ED_RULE}`,
+        borderRadius: 4,
+        padding: 'clamp(40px, 6vw, 72px) clamp(24px, 4vw, 48px)',
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 14,
+      }}
+    >
+      <h2
+        style={{
+          fontFamily: SERIF,
+          fontStyle: 'italic',
+          fontWeight: 400,
+          fontSize: 'clamp(22px, 2.6vw, 30px)',
+          lineHeight: 1.2,
+          color: ED_FG,
+          margin: 0,
+          maxWidth: 480,
+        }}
+      >
+        {title}
+      </h2>
+      <p
+        style={{
+          fontFamily: SANS,
+          fontWeight: 500,
+          fontSize: 14,
+          color: ED_MUTED,
+          margin: 0,
+          maxWidth: 420,
+        }}
+      >
+        {message}
+      </p>
+      <button
+        type="button"
+        onClick={onRetry}
+        className="ed-cta-warm-hover ed-btn-press"
+        style={{
+          marginTop: 8,
+          fontFamily: SANS,
+          fontWeight: 600,
+          fontSize: 14,
+          color: '#FFFFFF',
+          backgroundColor: ED_ACCENT,
+          padding: '10px 20px',
+          borderRadius: 4,
+          border: 'none',
+          cursor: 'pointer',
+        }}
+      >
+        {retryLabel}
+      </button>
+    </div>
   )
 }
 

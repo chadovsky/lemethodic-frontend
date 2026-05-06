@@ -38,6 +38,7 @@ import type {
   UiLanguage,
   User,
   UserClusterStateResponse,
+  WritingJob,
   WritingPrompt,
   WritingSubmissionResult,
   WritingHistoryItem,
@@ -1155,13 +1156,22 @@ export const api = {
       })
     },
 
-    // V-015a — payload field renamed text → student_text per BE schema
-    // (V-014a triage 422 response).
-    async submit(promptId: number, text: string): Promise<WritingSubmissionResult> {
-      return request<WritingSubmissionResult>('/api/writing/submit', {
+    // V-015a — payload field renamed text → student_text per BE schema.
+    // V-016a.fe — POST now returns a WritingJob handle, not the inline
+    // analysis. Caller polls api.writing.getJob(job_id) until status
+    // flips to 'completed' or 'failed'.
+    async submit(promptId: number, text: string): Promise<WritingJob> {
+      return request<WritingJob>('/api/writing/submit', {
         method: 'POST',
         body: { prompt_id: promptId, student_text: text },
       })
+    },
+
+    // V-016a.fe — async job poll. Caller hits this every ~3s until the
+    // job's status leaves 'pending' / 'processing'. The completed result
+    // is a WritingSubmissionResult (per pre-V-016a shape) inside `result`.
+    async getJob(jobId: string): Promise<WritingJob> {
+      return request<WritingJob>(`/api/writing/jobs/${jobId}`)
     },
 
     // History endpoint may or may not exist on BE today — caller catches the

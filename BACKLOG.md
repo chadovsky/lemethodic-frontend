@@ -2160,6 +2160,49 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-016a.fe — Writing submit polling consumer
+
+**Priority:** HIGH (parallel to BE V-016a; FE ready before BE ships contract)
+**Status:** Active LC (FE-side, lemethodic-frontend pushed; production deploy on auto from main merge but the POST /api/writing/submit endpoint will return the OLD synchronous shape until BE V-016a goes live, which will surface as a poll loop with `jobId=undefined` followed by a `failed` panel. Production functional verification deferred until BE V-016a is live on prod and Chadi can capture: 1440px desktop + 375px mobile of `/writing/[id]` showing AnalyzingPanel during poll, then result panel after completion. Plus failed-state and abandoned-state captures if achievable.)
+**Filed:** 2026-05-06
+**Pushed:** 2026-05-07 (FE-side, frontend commit pending merge); BE deploy unblocks live verification
+**Type:** FE async pattern
+**Source:** V-016 chain — strategic Claude locked async-job contract for writing analysis
+**Dependencies:** BE V-016a (POST /api/writing/submit returns WritingJob handle; GET /api/writing/jobs/{id} polls job status)
+
+**Contract (locked):**
+```ts
+type WritingJobStatus = 'pending' | 'processing' | 'completed' | 'failed'
+
+interface WritingJob {
+  job_id: string
+  status: WritingJobStatus
+  result?: WritingSubmissionResult | null
+  error?: { message: string; code?: string } | null
+  created_at: string
+  completed_at?: string | null
+}
+```
+
+**Files touched:**
+- `lib/types.ts` — `WritingJobStatus` + `WritingJob` types
+- `lib/api.ts` — `api.writing.submit(promptId, text): Promise<WritingJob>` (return shape changed); new `api.writing.getJob(jobId): Promise<WritingJob>`
+- `lib/polling.ts` (NEW) — `usePollJob<T>` hook; recursive setTimeout loop, configurable interval (default 3s) + maxPolls (default 100). Returns discriminated `PollJobState<T>`. Cancels via useRef on cleanup, on jobId change, on terminal states.
+- `app/globals.css` — `ed-spinner-dot` keyframes + `.ed-spinner-dot-{1,2,3}` staggered delays. Reduced-motion: static dots at 0.85 opacity.
+- `components/writing/WritingSubmissionClient.tsx` — extended SubmissionState (added `polling`, `failed`, `abandoned`), wired `usePollJob` driven by `submission.kind === 'polling'`, sync poll-state → submission via useEffect on `pollState`. New AnalyzingPanel (warm-cream bg + sage-deep dots + Fraunces italic title + phased copy + Cancel) and FailedPanel (paper bg + ed-fg headline + ed-muted body + Retry CTA). EN+FR copy added: `analyzingTitle`, `analyzingPhase` (initial/still/almost), `analyzingCancel`, `failedTitle`, `abandonedTitle`, `abandonedBody`. handleSubmit now branches on synchronous-completed vs synchronous-failed vs pending/processing; new `handleCancelPolling` (user-initiated abandon) + `handleRetryFromFailed` (text preserved).
+
+**Polling UX (decisions made in plan-first):**
+- 3s interval, 100-poll max (= 5 min total). After abandon, AbandonedPanel surfaces a Retry button — user can resubmit the same draft (preserved in submission.text and localStorage).
+- Phased copy by elapsed time:
+  - 0-30s (pollCount < 10): "This may take 30-90 seconds." / FR: "Cela peut prendre 30 à 90 secondes."
+  - 30-60s (pollCount < 20): "Still analyzing." / "Analyse toujours en cours."
+  - 60s+ (pollCount >= 20): "Almost done." / "Presque terminé."
+- Cancel button: ghost (transparent + ed-rule border, ed-fg-soft text). User-initiated abandon flips submission to `idle` with text preserved; usePollJob's effect cleanup drops the in-flight poll loop.
+- Network error during a poll → fail state with "Lost connection to server." Caller decides whether to retry; we don't auto-retry silently.
+
+**Hold notes:**
+- Pushing the FE code now per Chadi resume direction. Auto-deploy to Vercel will happen but will fail live (writing surface non-functional) until BE V-016a contract is on prod. The user explicitly accepted this risk: "Commit + push (don't deploy until BE V-016a contract live)" — interpreted as FE deploy is OK, BE is still being shipped.
+
 ### V-016c — /ecole desktop layout (lesson-grid Option C)
 
 **Priority:** HIGH (V-016 chain mid; pre-launch desktop polish completes /ecole/speaking/progress trio)

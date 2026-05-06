@@ -427,6 +427,28 @@
   transform: scale(0.97);
 }
 
+/* V-016a.fe — analysis spinner dots. 3 dots staggered via per-instance
+   animation-delay, opacity + scale pulse. Reduced-motion: dots stay
+   static at full opacity (still readable as a visual indicator). */
+@keyframes ed-spinner-dot {
+  0%, 80%, 100% { opacity: 0.4; transform: scale(1); }
+  40% { opacity: 1; transform: scale(1.18); }
+}
+.ed-spinner-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--ed-warm-sage-deep);
+  animation: ed-spinner-dot 1200ms var(--ease-spring) infinite both;
+}
+.ed-spinner-dot-1 { animation-delay: 0ms; }
+.ed-spinner-dot-2 { animation-delay: 160ms; }
+.ed-spinner-dot-3 { animation-delay: 320ms; }
+@media (prefers-reduced-motion: reduce) {
+  .ed-spinner-dot { animation: none; opacity: 0.85; transform: none; }
+}
+
 /* V-014b — bottom nav gating. The mobile-only BottomNav previously
    set display:flex inline (which beat Tailwind md:hidden on cascade),
    leaking the bar onto desktop. Owns layout from CSS now: shows as
