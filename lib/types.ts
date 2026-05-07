@@ -633,21 +633,43 @@ export interface WritingPrompt {
   prompt_type?: string
 }
 
-// POST /api/writing/submit response. Mirrors the diagnostic 4-layer shape
-// with per-couche scores + feedback strings. La Voix is not yet scored on
-// writing (V-009.be); only 4 couches surface for now.
+// POST /api/writing/submit (via job result) response shape. V-016a.fix —
+// `couches` is the BE-canonical Couche[] array (matches diagnostic
+// recordings, lib/types.ts:227 — BE has been array-shaped throughout
+// V-009/V-010). Original V-013a declaration as a record-by-key was
+// the outlier and caused the prod crash when the array shape arrived.
+//
+// Each Couche carries `analyse` as the per-layer feedback string. La Voix
+// may or may not appear in the array depending on V-009.be progress.
+//
+// Optional fields preserved as `?` so a partially-populated job result
+// still renders without crashing — the consumer is expected to fall back
+// to "Analysis pending" or skip the section per-couche.
+export interface WritingCoucheFeedback {
+  // ExtendedCoucheKey ('le_fond' | ... | 'la_voix') lives in
+  // lib/coucheBrandLabels.ts; inlined here to avoid a circular-import
+  // smell since coucheBrandLabels already imports from this file.
+  key: CoucheKey | 'la_voix'
+  score: number
+  // Per-couche feedback. BE may emit it under either `analyse` (matches
+  // diagnostic Couche convention) or `feedback` (writing-specific).
+  // Consumers should read both and fall back gracefully.
+  analyse?: string | null
+  feedback?: string | null
+  displayLabelEn?: string
+  displayLabelFr?: string
+}
+
 export interface WritingSubmissionResult {
   id: number
   prompt_id: number
   word_count: number
-  overall_score: number          // 0-100
-  cefr_band: string              // 'B1' | 'B2' | 'C1' etc.
-  couches: {
-    le_fond: { score: number; feedback: string }
-    les_moules_des_idees: { score: number; feedback: string }
-    les_moules: { score: number; feedback: string }
-    les_reflexes_anglais: { score: number; feedback: string }
-  }
+  overall_score?: number          // 0-100; optional in case BE omits
+  cefr_band?: string              // 'B1' | 'B2' | 'C1' etc.; optional
+  // V-016a.fix — array of per-couche entries; missing couches are NOT
+  // present (consumer renders "Coming soon" placeholder for any expected
+  // couche absent from the array).
+  couches?: WritingCoucheFeedback[]
   // Optional Claude narrative summary if present.
   narrative_summary?: string | null
 }

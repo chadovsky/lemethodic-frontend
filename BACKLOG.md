@@ -2160,6 +2160,54 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
+### V-016a.fix — Writing result rendering crash (couches shape mismatch)
+
+**Priority:** CRITICAL (production blocker — completed analyses crashed the result view)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend pushed; production deploy on auto. Reproduce: submit a writing → wait for completion → result view should render with all 5 couche tiles, no React error boundary. If a couche is missing from BE response, that tile shows "Coming soon" instead of crashing.)
+**Filed:** 2026-05-07
+**Shipped:** 2026-05-07
+**Source:** Production console diagnostic — `Uncaught TypeError: Cannot read properties of undefined (reading 'le_fond')` after successful writing analysis on `/writing/9`
+**Dependencies:** V-013a (writing surface), V-016a (BE async job pattern), V-016a.fe (polling consumer); V-009 (BRAND_LABEL + COUCHE_ORDER + array-shaped Couche convention)
+
+**Cause:** V-013a declared `WritingSubmissionResult.couches` as a record-by-key (`{ le_fond: { score, feedback }, ... }`); BE actually returns the canonical `Couche[]` array shape used everywhere else in the diagnostic stack (`lib/types.ts:227 couches: Couche[]`). When the array arrived where an object was expected, `result.couches.le_fond` was `undefined.le_fond` → TypeError → React error boundary caught → Next.js "page couldn't load" overlay.
+
+**Fix:**
+- `WritingSubmissionResult.couches` retyped to `WritingCoucheFeedback[]` (matches BE array convention; new local interface accepts both `analyse` (canonical Couche field) and `feedback` (writing-specific) for the per-layer text)
+- Made `overall_score`, `cefr_band`, `couches` all optional on `WritingSubmissionResult` so a partially-populated job result still renders without crashing
+- ResultView refactored to look up couches by key from a Map built off the array; renders all 5 expected couches (Le Fond / Les Moules des Idées / Les Moules / Les Réflexes Anglais / La Voix), with "Coming soon" placeholder + 60% opacity for any couche absent from the response (incl. Voix until BE V-009.be ships scoring)
+- Score rendered as `score ?? '—'`; missing-feedback case renders an italic muted "No feedback for this layer." line; `Array.isArray(result.couches)` guard before iteration
+
+**Files touched:**
+- `lib/types.ts` — `WritingCoucheFeedback` interface; `WritingSubmissionResult` shape relaxed (couches → optional array; overall_score + cefr_band → optional)
+- `components/writing/WritingSubmissionClient.tsx` — ResultView refactored: array→Map lookup, defensive guards, "Coming soon" placeholder per missing couche
+
+### V-016g — /library prefetch 404 cleanup (stub page)
+
+**Priority:** MEDIUM (production console noise; UX gap when users click directly)
+**Status:** Awaiting verification (FE-side, lemethodic-frontend pushed; production deploy on auto. Verify on prod: `/library` and `/fr/library` return 200, render stub hero + email-notify form. Confirm no `/library?_rsc=...` 404 in DevTools network tab when loading `/`.)
+**Filed:** 2026-05-07
+**Shipped:** 2026-05-07
+**Source:** Production console — `GET /library?_rsc=... → 404` from Next.js link prefetch on platform landing
+**Dependencies:** F-300a (Library product card links to /library); V-012 (warm tokens); F-300c (real catalog, queued)
+
+**Scope:** new `/library` and `/fr/library` routes serve a stub hero page until F-300c lands the real catalog. Visual continuity with PlatformLanding — `linear-gradient(--ed-bg → --ed-warm-sand)` hero bg, peach-deep accent eyebrow, ed-paper notify-form card. Email signup is local-only (writes to localStorage `lemethodic:library-notify-email`); BE-side capture endpoint filed as **V-016g.notify**.
+
+**Files touched:**
+- `app/library/page.tsx` (NEW) — renders LibraryStub lang="en" with English meta
+- `app/fr/library/page.tsx` (NEW) — same with FR meta
+- `components/library/LibraryStub.tsx` (NEW) — hero + sub + notify form (email validation + success state) + back-to-home link
+- `components/nav/TopNav.tsx` — EXCLUDED_EXACT extended to `/library`, `/fr/library` so the marketing chrome stays consistent (no in-product TopNav)
+
+### V-016g.notify — BE library-notify email capture
+
+**Priority:** LOW (post-launch; FE has localStorage stash today)
+**Status:** Queued (BE-side; lemethodic-backend ticket)
+**Filed:** 2026-05-07
+**Source:** V-016g — FE captures email locally; needs BE persistence for actual launch notification
+**Dependencies:** TBD BE notification system (likely shares plumbing with V-013b.notifications)
+**Scope:** BE `POST /api/library/notify` accepting `{ email }`, persisting to a notify list. FE swaps localStorage write to API call once the endpoint ships. When F-300c launches the real catalog, BE batch-sends launch notification to the captured list.
+**Owner:** Backend Engineering
+
 ### F-300a — Platform-level / landing redesign
 
 **Priority:** HIGH (strategic surface restructure; depends on F-300b having stabilized /exam-prep)

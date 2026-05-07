@@ -35,11 +35,14 @@ const EXCLUDED_PREFIXES = [
 
 // F-300b — /exam-prep + /fr/exam-prep are the migrated funnel landings;
 // they keep marketing chrome (no in-product TopNav).
+// V-016g — /library + /fr/library stubs are also marketing surfaces.
 const EXCLUDED_EXACT: ReadonlySet<string> = new Set([
   '/',
   '/fr',
   '/exam-prep',
   '/fr/exam-prep',
+  '/library',
+  '/fr/library',
 ])
 
 function shouldHideOn(pathname: string): boolean {

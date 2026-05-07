@@ -717,12 +717,28 @@ interface ResultViewProps {
 }
 
 function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: ResultViewProps) {
-  const couches: { key: 'le_fond' | 'les_moules_des_idees' | 'les_moules' | 'les_reflexes_anglais'; data: { score: number; feedback: string } }[] = [
-    { key: 'le_fond', data: result.couches.le_fond },
-    { key: 'les_moules_des_idees', data: result.couches.les_moules_des_idees },
-    { key: 'les_moules', data: result.couches.les_moules },
-    { key: 'les_reflexes_anglais', data: result.couches.les_reflexes_anglais },
-  ]
+  // V-016a.fix — BE returns `couches` as a Couche[] array (matches the
+  // diagnostic recordings convention; lib/types.ts:227). The original
+  // V-013a code treated it as a record-by-key, which crashed in prod
+  // ("Cannot read properties of undefined (reading 'le_fond')") when
+  // the array shape arrived. Look each couche up by key, fall back to
+  // null when missing, and render a "Coming soon" placeholder for any
+  // expected couche absent from the response (incl. Voix until BE V-009.be).
+  const coucheArray = Array.isArray(result.couches) ? result.couches : []
+  const coucheByKey = new Map<string, (typeof coucheArray)[number]>()
+  for (const c of coucheArray) coucheByKey.set(c.key, c)
+  const expectedKeys = ['le_fond', 'les_moules_des_idees', 'les_moules', 'les_reflexes_anglais', 'la_voix'] as const
+  const couches = expectedKeys.map((key) => {
+    const entry = coucheByKey.get(key) ?? null
+    return {
+      key,
+      score: entry?.score ?? null,
+      // BE may emit per-couche feedback under `analyse` (canonical Couche
+      // convention) or `feedback` (writing-specific). Read both.
+      feedback: entry?.analyse ?? entry?.feedback ?? null,
+      missing: entry === null,
+    }
+  })
   return (
     <>
       <p
@@ -773,7 +789,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
             {copy.resultScore}
           </p>
           <p style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: 'italic', fontSize: 36, color: 'var(--ed-warm-espresso)', margin: 0 }}>
-            {result.overall_score}
+            {result.overall_score ?? '—'}
           </p>
         </div>
         <div style={{ textAlign: 'right' }}>
@@ -781,7 +797,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
             {copy.resultBand}
           </p>
           <p style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: 'italic', fontSize: 36, color: 'var(--ed-warm-espresso)', margin: 0 }}>
-            {result.cefr_band}
+            {result.cefr_band ?? '—'}
           </p>
         </div>
       </div>
@@ -804,9 +820,12 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
         </p>
       )}
 
-      {/* Per-couche breakdown */}
+      {/* Per-couche breakdown — V-016a.fix renders all 5 expected couches.
+          Missing entries (e.g. Voix when BE V-009.be hasn't shipped, or a
+          partial response) render a "Coming soon" placeholder rather than
+          crashing. */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
-        {couches.map(({ key, data }) => (
+        {couches.map(({ key, score, feedback, missing }) => (
           <div
             key={key}
             style={{
@@ -814,6 +833,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
               border: `1px solid ${ED_RULE}`,
               borderRadius: 4,
               padding: '16px 20px',
+              opacity: missing ? 0.6 : 1,
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
@@ -828,13 +848,25 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
               >
                 {BRAND_LABEL[key][language]}
               </h3>
-              <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 16, color: 'var(--ed-warm-peach-deep)' }}>
-                {data.score}
-              </span>
+              {score != null ? (
+                <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 16, color: 'var(--ed-warm-peach-deep)' }}>
+                  {score}
+                </span>
+              ) : (
+                <span style={{ fontFamily: SANS, fontWeight: 500, fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', color: ED_MUTED }}>
+                  {language === 'fr' ? 'Bientôt' : 'Coming soon'}
+                </span>
+              )}
             </div>
-            <p style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: ED_FG_SOFT, margin: 0 }}>
-              {data.feedback}
-            </p>
+            {feedback ? (
+              <p style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: ED_FG_SOFT, margin: 0 }}>
+                {feedback}
+              </p>
+            ) : missing ? null : (
+              <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.5, color: ED_MUTED, margin: 0, fontStyle: 'italic' }}>
+                {language === 'fr' ? 'Pas de commentaire pour cette couche.' : 'No feedback for this layer.'}
+              </p>
+            )}
           </div>
         ))}
       </div>
