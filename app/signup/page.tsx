@@ -3,11 +3,13 @@
 import { Suspense, useEffect, useState, type KeyboardEvent } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { api, ApiError } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
 import { useOnboardingStore } from '@/lib/onboarding'
 import { useSubmitResponseStore } from '@/lib/submitResponse'
 import { mapStoreToSubmitPayload } from '@/lib/api'
+import { resolveHcaptchaSitekey } from '@/lib/hcaptcha'
 import {
   INK,
   INK_SOFT,
@@ -15,6 +17,12 @@ import {
   CTA_DISABLED,
   DISPLAY_FONT,
 } from '@/components/onboarding/OnboardingScreen'
+
+// F-310.fe.captcha — hCaptcha widget. Dynamic-imported so the package's
+// window access doesn't run during SSR prerender.
+const HCaptcha = dynamic(() => import('@hcaptcha/react-hcaptcha'), {
+  ssr: false,
+})
 
 // F-203 — bg migrated from peach pastel to editorial system warm off-white.
 // /login + /paywall migrated in same ticket.
@@ -84,6 +92,11 @@ function SignupInner() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // F-310.fe.captcha — hCaptcha token. Set on widget onVerify, cleared on
+  // expire. Sent as `null` when the widget hasn't been completed; BE
+  // schema permits null during the rollout window.
+  const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null)
+  const hcaptchaSitekey = resolveHcaptchaSitekey()
 
   // Rehydrate on mount + bounce an already-authenticated user away from
   // the signup form — no point creating a second account. Stays on /ecole
@@ -114,6 +127,7 @@ function SignupInner() {
         email.trim(),
         password,
         fullName.trim(),
+        hcaptchaToken,
       )
       useAuthStore.getState().setAuth(token, user)
 
@@ -383,6 +397,19 @@ function SignupInner() {
               outline: 'none',
               transition: 'border-color var(--ed-duration-hover) var(--ease-spring)',
             }}
+          />
+        </div>
+
+        {/* F-310.fe.captcha — hCaptcha widget. Renders below password,
+            above submit. Token sent to BE on register; null during the
+            sitekey-rollout window is accepted per BE schema. */}
+        <div style={{ marginTop: 20, minHeight: 78 }}>
+          <HCaptcha
+            sitekey={hcaptchaSitekey}
+            onVerify={(token) => setHcaptchaToken(token)}
+            onExpire={() => setHcaptchaToken(null)}
+            onError={() => setHcaptchaToken(null)}
+            theme="light"
           />
         </div>
 
