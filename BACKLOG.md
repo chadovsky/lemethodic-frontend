@@ -2163,7 +2163,10 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 ### V-016a.fix — Writing result rendering crash (couches shape mismatch)
 
 **Priority:** CRITICAL (production blocker — completed analyses crashed the result view)
-**Status:** Awaiting verification (FE-side, lemethodic-frontend pushed; production deploy on auto. Reproduce: submit a writing → wait for completion → result view should render with all 5 couche tiles, no React error boundary. If a couche is missing from BE response, that tile shows "Coming soon" instead of crashing.)
+**Status:** ✅ Shipped (non-visual sweep verified 2026-05-12; visual verification routed to TARS — separate commit)
+**Verification:**
+- Non-visual sweep (FE-Claude, 2026-05-12): `/writing` returns 200 in production runtime logs; zero 4xx/5xx across the writing surface in the last 24h on deployment `dpl_6F3XFD6zxcDD95bccinNedUtTtzA`.
+- Visual + interactive verification (1440px desktop + 375px mobile + submit→poll→result render with 5 couche tiles, Voix "Coming soon" + 60% opacity): routed to TARS — separate verification commit.
 **Filed:** 2026-05-07
 **Shipped:** 2026-05-07
 **Source:** Production console diagnostic — `Uncaught TypeError: Cannot read properties of undefined (reading 'le_fond')` after successful writing analysis on `/writing/9`
@@ -2184,7 +2187,10 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 ### V-016g — /library prefetch 404 cleanup (stub page)
 
 **Priority:** MEDIUM (production console noise; UX gap when users click directly)
-**Status:** Awaiting verification (FE-side, lemethodic-frontend pushed; production deploy on auto. Verify on prod: `/library` and `/fr/library` return 200, render stub hero + email-notify form. Confirm no `/library?_rsc=...` 404 in DevTools network tab when loading `/`.)
+**Status:** ✅ Shipped (non-visual sweep verified 2026-05-12; visual verification routed to TARS — separate commit)
+**Verification:**
+- Non-visual sweep (FE-Claude, 2026-05-12): `/library` and `/fr/library` both return 200 with correct hero copy + notify form rendered server-side. 24h Vercel runtime log sweep on `dpl_6F3XFD6zxcDD95bccinNedUtTtzA` shows zero 404s across the project — the `/library?_rsc=…` prefetch regression is gone.
+- Visual + interactive verification (1440px desktop + 375px mobile on `/library` and `/fr/library` + email-submit success state + localStorage entry write + DevTools network confirmation): routed to TARS — separate verification commit.
 **Filed:** 2026-05-07
 **Shipped:** 2026-05-07
 **Source:** Production console — `GET /library?_rsc=... → 404` from Next.js link prefetch on platform landing
@@ -3002,6 +3008,16 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 **Scope:** every FE ticket gets `Shipped` status only after attaching (a) 1440px desktop screenshot of every affected route on production and (b) 375px mobile screenshot of every affected route on production. Non-visual tickets note `non-visual change — verification skipped` instead. F-225.5 amendment (2026-05-04, surfaced during F-222 root-cause): for tickets that change interactive behavior (handlers, navigation, form submission, state mutation), verification additionally requires (c) a recorded interaction trace — Loom link / screen recording / written test plan with pass/fail outcomes. See `CLAUDE.md` "Shipping verification protocol" section for the canonical rule.
 **Owner:** Engineering (process)
 **Note:** Tickets shipped before 2026-05-04 (P-220, P-222, B-102, P-230, P-234, etc.) are grandfathered. The rule applies prospectively. Until F-225's doc commit landed, no other ticket could be marked `Shipped` — F-223, F-222, and any other in-flight FE work waited.
+
+### F-225.constraint — F-225 amendment: split visual vs non-visual verification
+
+**Priority:** LOW (doc-only; refines existing protocol)
+**Status:** Queued
+**Filed:** 2026-05-12
+**Source:** 2026-05-12 verification session — FE-Claude has no browser-automation/screenshot tool in this toolchain, so visual + interactive verification is owner-routed (Chadi / TARS). FE-Claude can do the non-visual sweep portion (HTTP status on affected routes + Vercel runtime log sweep + BACKLOG staging) in parallel.
+**Dependencies:** F-225
+**Scope:** amend `CLAUDE.md` "Shipping verification protocol" section to formalize the split. The 1440px/375px screenshots and interaction traces remain mandatory, owner-attached or TARS-attached. FE-Claude's documented contribution: (a) HTTP status sweep on affected routes against production, (b) Vercel runtime log sweep (errors + 4xx/5xx) on the deployment under verification for the affected routes over a 24h window, (c) BACKLOG entry staging with verification block. Both halves attach to the BACKLOG entry; ticket flips to ✅ Shipped only when both halves are present (or the non-visual exemption already in F-225 is noted).
+**Owner:** Engineering (doc commit only — no code)
 
 ---
 
