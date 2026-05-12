@@ -247,6 +247,36 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
         useAuthStore.getState().clearAuth()
       }
     }
+    if (res.status === 403 && typeof window !== 'undefined') {
+      // F-310.fe.coldreload — project-wide email_not_verified routing.
+      // BE returns 403 + { detail: { code: "email_not_verified" } } on
+      // any protected call for a user whose email_verified_at IS NULL.
+      // Without this branch, cold-tab landings on /ecole, /writing,
+      // /progress, /profile, etc. surfaced a generic "Something went
+      // wrong." instead of routing to /verify-email. The signup path
+      // had its own check; this promotes that to the shared layer.
+      //
+      // Guards prevent loops:
+      //   - already on /verify-email                  → no redirect
+      //   - path is the verify-email API itself      → no redirect
+      //     (defensive; BE shouldn't emit this code there, but if it
+      //     ever did we'd loop the user navigation indefinitely)
+      // ?next= captures the original target so the post-confirm flow
+      // in /verify-email can route the user back to where they tried
+      // to go (in-tab only — the BE-built email link doesn't preserve
+      // this param across the cross-tab click).
+      const tmpErr = new ApiError(res.status, '', parsed)
+      if (isEmailNotVerifiedError(tmpErr)) {
+        const onVerifyRoute = window.location.pathname === '/verify-email'
+        const isVerifyApi = path.startsWith('/api/auth/verify-email')
+        if (!onVerifyRoute && !isVerifyApi) {
+          const currentPath = window.location.pathname + window.location.search
+          window.location.assign(
+            `/verify-email?next=${encodeURIComponent(currentPath)}`,
+          )
+        }
+      }
+    }
     const message =
       (parsed && typeof parsed === 'object' && 'detail' in parsed && typeof (parsed as { detail: unknown }).detail === 'string'
         ? (parsed as { detail: string }).detail

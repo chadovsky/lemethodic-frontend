@@ -24,10 +24,33 @@ type ConfirmState =
   | { kind: 'confirmed' }
   | { kind: 'failed'; message: string }
 
+// F-310.fe.coldreload — validate the ?next= param. The interceptor in
+// lib/api.ts writes it as the user's pre-redirect path + search. Only
+// honor same-origin local paths to close open-redirect (//evil.com),
+// protocol-absolute (https://…), and self-loop (back to /verify-email)
+// variants. Anything else falls back to /login — matches pre-ticket
+// behavior, so the change can only ADD a useful redirect, never break
+// the existing path.
+function safeNextPath(raw: string | null): string {
+  if (!raw) return '/login'
+  let decoded: string
+  try {
+    decoded = decodeURIComponent(raw)
+  } catch {
+    return '/login'
+  }
+  if (!decoded.startsWith('/')) return '/login'
+  if (decoded.startsWith('//')) return '/login'
+  if (decoded.includes('://')) return '/login'
+  if (decoded.startsWith('/verify-email')) return '/login'
+  return decoded
+}
+
 function VerifyEmailInner() {
   const router = useRouter()
   const params = useSearchParams()
   const token = params.get('token')
+  const nextParam = params.get('next')
 
   const [confirmState, setConfirmState] = useState<ConfirmState>({ kind: 'idle' })
   const [resendState, setResendState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
@@ -38,10 +61,13 @@ function VerifyEmailInner() {
     try {
       await api.auth.verifyEmail(tok)
       setConfirmState({ kind: 'confirmed' })
-      // Give the user 2s to read the success state, then route to /ecole
-      // (already-authed users land in product) or /login (cold link click).
+      // Give the user 2s to read the success state, then route to the
+      // captured ?next= (validated as a same-origin path) or fall back
+      // to /login. The cold-link click (BE email URL has no ?next=)
+      // continues to land on /login as before.
+      const target = safeNextPath(nextParam)
       const timer = setTimeout(() => {
-        router.push('/login')
+        router.push(target)
       }, 2000)
       return () => clearTimeout(timer)
     } catch (err) {
@@ -53,7 +79,7 @@ function VerifyEmailInner() {
           : "Couldn't reach the server. Check your connection."
       setConfirmState({ kind: 'failed', message })
     }
-  }, [router])
+  }, [router, nextParam])
 
   useEffect(() => {
     if (token && confirmState.kind === 'idle') {

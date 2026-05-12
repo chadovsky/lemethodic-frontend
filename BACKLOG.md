@@ -3171,34 +3171,41 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 ### F-310.fe.coldreload — Route email_not_verified 403 from any protected page
 
 **Priority:** MEDIUM (cold-tab reload edge case; affects users who don't verify email immediately after register. Not blocking soft beta if verification is quick.)
-**Status:** Queued
+**Status:** Awaiting verification (F-225 — interactive change; needs 1440px + 375px screenshots of `/verify-email` empty state landed from a cold-tab `/ecole` hit + interaction trace per runbook below)
 **Filed:** 2026-05-12
 **Source:** F-310.fe out-of-scope flag (2026-05-12 plan-first + end-of-ticket report). A user who signs up, closes the tab, returns later still unverified hits protected routes → BE returns 403 + `{detail:{code:"email_not_verified"}}` → currently only the signup path catches this and routes to /verify-email. Every other entry point (cold tab on /ecole, /writing, /progress, etc.) surfaces it as a generic "Something went wrong."
 **Dependencies:** F-310.fe (`isEmailNotVerifiedError` helper already in `lib/api.ts`)
 
 **Scope:**
-Promote the `email_not_verified` 403 handling from the signup path to a project-wide interceptor. Two implementation options to evaluate during the ticket:
+Promote the `email_not_verified` 403 handling from the signup path to a project-wide interceptor. Two implementation options evaluated during the ticket:
 
 1. **`lib/api.ts:request()` interceptor** — extend the existing 401-refresh path with a parallel 403 branch: on `isEmailNotVerifiedError(err)`, route the browser to `/verify-email` via a hard `window.location.assign('/verify-email')` (lib/api has no router instance available). Single point of fix; covers every API path.
 2. **`hooks/useVerifyAuth.ts`** — in the catch branch of the `/me` probe on mount, detect `isEmailNotVerifiedError` and call `router.replace('/verify-email')`. Only catches the cold-mount path, not in-session 403s; cleaner separation of concerns.
 
-Likely pick: **option 1** (single interceptor covers all surfaces). Risk: a hard `window.location` redirect during an in-flight API call may interrupt UI state mid-action. Trade-off acceptable for the gate — unverified users shouldn't be doing anything on protected pages anyway.
+**Shipped option 1** — single interceptor covers cold-mount + in-session surfaces. Documented trade-off: a hard `window.location.assign` interrupts in-flight optimistic UI on writing/diagnostic surfaces, but unverified users shouldn't be acting on protected pages anyway.
 
-Edge cases to handle in the ticket:
-- Don't redirect when already on `/verify-email` (would cause a navigation loop)
-- Don't redirect when the 403 hits during the verify-email resend itself (already on the right page)
-- Preserve the user's original target via `?next=...` so a post-verification redirect can route them back
+Edge cases handled:
+- Already on `/verify-email` → no redirect (loop-guard via `window.location.pathname === '/verify-email'`)
+- `path.startsWith('/api/auth/verify-email')` → no redirect (defensive; BE shouldn't emit `email_not_verified` on the verify-email endpoint itself, but the guard closes the loop if it ever does)
+- `?next=...` written into the `/verify-email` URL with the original `pathname + search`, decoded + validated by the verify-email page post-confirm (rejects `//`, `://`, and `/verify-email` to close open-redirect / self-loop holes; falls back to `/login`)
 
-**Files touched (planned):**
-- `lib/api.ts` — extend `request()` 403 branch with `isEmailNotVerifiedError` → `window.location.assign('/verify-email')` guard; skip when `path.startsWith('/api/auth/verify-email')` or `window.location.pathname === '/verify-email'`
-- Optionally `hooks/useVerifyAuth.ts` — explicit `email_not_verified` detection (option 2 only if option 1 proves insufficient)
-- `app/verify-email/page.tsx` — read `?next=` and route there post-verification instead of always `/login`
+**Files touched (shipped):**
+- `lib/api.ts` (+33): 403 branch in `request()` alongside the existing 401 block. Builds a transient `ApiError`, runs it through the existing `isEmailNotVerifiedError` helper (single source of truth), guards on pathname + path, then `window.location.assign('/verify-email?next=<encoded>')`.
+- `app/verify-email/page.tsx` (+25/-3): new `safeNextPath()` helper, reads `?next=` from search params, swaps the hard-coded `router.push('/login')` post-confirm for `router.push(safeNextPath(nextParam))`. Validation blocks protocol-relative, protocol-absolute, and `/verify-email` self-loop. Falls back to `/login` on missing/invalid — matches pre-ticket behavior, so the change can only ADD a useful redirect.
 
 **Operating-contract block (2026-05-12 contract):**
-- CONFIDENCE: HIGH on the scope; the fix surface is small (single function in `lib/api.ts`) and `isEmailNotVerifiedError` already exists from F-310.fe.client.
+- CONFIDENCE: HIGH. Single-function fix in `lib/api.ts`, helper already shipped in F-310.fe, validated by tsc --noEmit + `pnpm build` (no warnings, no type errors, 36 routes compiled clean).
 - WHY: Documented out-of-scope flag during F-310.fe; small, well-bounded, doesn't gate anything else.
-- UNCERTAINTY: Whether the hard `window.location.assign` interferes with any in-flight optimistic UI state on the diagnostic / writing surfaces. If it does, fallback is option 2 (useVerifyAuth only) with the silent-403 wall accepted on non-cold-mount surfaces.
-- VERIFICATION: Sign up, get the access token, **do NOT verify the email**, close the tab. Open `lemethodic.com/ecole` directly in a fresh tab. Expected: route resolves to `/verify-email` (not "Something went wrong"). Same test on `/writing`, `/progress`, `/profile`. Verify a user already on `/verify-email` doesn't get redirected in a loop.
+- UNCERTAINTY: `window.location.assign` is a hard navigation. A 403 hitting a writing async-job poll or conversation upload mid-action tears down in-flight UI state. Acceptable per ticket. `?next=` does NOT persist across the BE-built email-link cross-tab round-trip (no localStorage shim — kept the change scoped); cross-tab degrades cleanly to `/login`. Forward-compat if BE ever embeds `next` in the verification email URL.
+- VERIFICATION RUNBOOK (Chadi):
+  1. Sign up a fresh test account on `lemethodic.com/signup`. Capture the access token in DevTools localStorage (`lemethodic_token`).
+  2. **Do NOT verify the email.** Close the tab.
+  3. **Cold-tab `/ecole`** — open `lemethodic.com/ecole` directly in a new tab. Expected: redirected to `lemethodic.com/verify-email?next=%2Fecole` (the empty-state "Check your inbox" card renders; no "Something went wrong"). Screenshot at 1440px + 375px.
+  4. **Repeat for `/writing`, `/progress`, `/profile`** — same expectation; `?next=` mirrors the path each time.
+  5. **Loop guard** — refresh on `/verify-email?next=/ecole`. Expected: no second redirect, URL stable.
+  6. **Post-confirm next** — while on the empty-state page, capture the URL. Open DevTools console and run `await fetch('/api/auth/verify-email', { method: 'POST', body: JSON.stringify({ token: '<from your email>' }), headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + localStorage.lemethodic_token } })`. (Or just click the link in the email if you're on the same tab and `?next=` survives — unlikely with BE-built URLs.) After the 2s success state, expected: `router.push('/ecole')` (when `?next=/ecole` was preserved) or `/login` (when it wasn't — the email cross-tab case, which is fine).
+  7. **In-session 403** — log in as the unverified user, manually call a protected endpoint from the console (e.g., `fetch('/api/users/me/today', { headers: { Authorization: 'Bearer ' + localStorage.lemethodic_token }, credentials: 'include' })`). Expected: page hard-navigates to `/verify-email?next=<current path>`.
+  8. **Open-redirect safety** — manually visit `/verify-email?token=<any>&next=//evil.com` and `?next=https://evil.com`. Expected: post-confirm routes to `/login`, not the evil host.
 
 ### F-311 — Token control (Redis rate limiter + model routing + prompt caching)
 
