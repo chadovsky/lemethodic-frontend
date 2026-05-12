@@ -1,6 +1,6 @@
-# FluentPath Backlog
+# LeMethodic Backlog
 
-**Source of truth** for FluentPath sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
+**Source of truth** for LeMethodic sprint work. Maintained in the frontend repo because most active work is here, but covers both frontend and backend.
 
 **Last updated:** 2026-05-01 (P-100 / P-100.5 superseded by P-230 + Phase 1 Architecture Rework from LEMETHODIC-CURRICULUM v0.2 — 33 tickets P-200 through P-269 filed; P-115 + P-104 + P-100.5 still shipped as production state until P-230 implementation lands)
 **Sprint window:** April 21 – May 4, 2026
@@ -1798,7 +1798,7 @@ Previously called "F-060 launch prep" umbrella. Split into discrete tickets here
 - Frontend: /forgot-password screen, /reset-password/[token] screen
 - Email sending: SendGrid or Resend
 
-**F-072** 📋 JWT expiry + refresh token handling
+**F-072** ⏸ Superseded by F-310 (auth hardening umbrella) — JWT expiry + refresh token handling. F-310 absorbs the original scope (15-min access + 7-day refresh, rotation, revocation, /auth rate limiting, email verification, hCaptcha, Stripe webhook HMAC, tier check). See F-310 body for the canonical task list. Original bullets preserved below for diff history:
 - Backend: shorten JWT to 1 hour, issue refresh tokens (7 days) on login/register
 - Backend: POST /api/auth/refresh endpoint
 - Frontend: api.ts intercepts 401, tries refresh, retries original call
@@ -1988,7 +1988,6 @@ _(F-091.0 shipped 2026-04-27 — see entry under "Shipped — Week 2 (April 27)"
 - Authoring + reseed cycle is well-trodden post-F-080a; engineering work is zero per module unless a new content_ref type or detection prompt class surfaces.
 - No fixed estimate; ongoing track. Filed 2026-04-27.
 
-⏸ **Stripe integration** — deferred per explicit decision. Backend first, revenue later.
 ⏸ **Test-drive recording before paywall** — post-launch A/B test for conversion optimization
 ⏸ **Writing module (Expression Écrite)** — full TCF coverage beyond Expression Orale
 ⏸ **Exam Simulation mode** — distinct from Learning Mode (current default)
@@ -2814,8 +2813,8 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 **Filed:** 2026-05-06
 **Source:** V-009 ship — FE renders Voix as "Coming soon" placeholder until BE scoring lands
 **Dependencies:** V-009 (FE-side surface ready)
-**Scope:** BE-side. Add `la_voix` to `CoucheKey` enum + scoring pipeline in `analysis.py` (or wherever the 4 existing couches are scored). Update `app/services/couche_labels.py` to emit brand labels (`displayLabelEn: "Voice"`, `displayLabelFr: "Voix"` for la_voix; same brand-label override for the other 4 couches so FE can drop its `BRAND_LABEL` override eventually). Diagnostic API response should return 5 couche scores once la_voix scoring is wired. La Voix scoring source: pronunciation/vowel-quality/liaison/rhythm metrics from the audio analysis pipeline (the existing speech-to-text + audio features could feed it). Specific scoring algorithm needs Chadi pedagogical input on what dimensions to combine.
-**Owner:** Backend Engineering (algorithm needs Chadi pedagogical sign-off)
+**Scope:** BE-side. Add `la_voix` to `CoucheKey` enum + scoring pipeline in `analysis.py` (or wherever the 4 existing couches are scored). Update `app/services/couche_labels.py` to emit brand labels (`displayLabelEn: "Voice"`, `displayLabelFr: "Voix"` for la_voix; same brand-label override for the other 4 couches so FE can drop its `BRAND_LABEL` override eventually). Diagnostic API response should return 5 couche scores once la_voix scoring is wired. La Voix scoring source: pronunciation/vowel-quality/liaison/rhythm metrics from the audio analysis pipeline (the existing speech-to-text + audio features could feed it). Scoring algorithm dimensions are a BE pedagogical pick — **no blocking owner input pending** (the 4 pedagogical decisions previously associated with V-009.be belonged to V-016a writing path; those shipped 2026-05-12 under V-016a + V-016a.fix).
+**Owner:** Backend Engineering
 
 ### V-008 — Card 2 interference example direction reversed
 
@@ -3018,6 +3017,139 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 **Dependencies:** F-225
 **Scope:** amend `CLAUDE.md` "Shipping verification protocol" section to formalize the split. The 1440px/375px screenshots and interaction traces remain mandatory, owner-attached or TARS-attached. FE-Claude's documented contribution: (a) HTTP status sweep on affected routes against production, (b) Vercel runtime log sweep (errors + 4xx/5xx) on the deployment under verification for the affected routes over a 24h window, (c) BACKLOG entry staging with verification block. Both halves attach to the BACKLOG entry; ticket flips to ✅ Shipped only when both halves are present (or the non-visual exemption already in F-225 is noted).
 **Owner:** Engineering (doc commit only — no code)
+
+## Strategic queue — 2026-05-12 session
+
+### F-310 — Auth hardening (umbrella; supersedes F-072)
+
+**Priority:** HIGH (pre-launch blocker per Decision 4)
+**Status:** Queued
+**Filed:** 2026-05-12
+**Source:** 2026-05-12 strategic session — Decision 4 (token control + auth hardening as pre-launch existential cost/security issues, not nice-to-haves; uncapped abuse blows up API costs before revenue catches up at 5,000+ users Y1)
+**Dependencies:** F-072 (absorbed); P-105 (subscription-tier source; F-310 ships with `tier=free` placeholder, tier-check layered when P-105 lands — auth hardening does not block on payment infrastructure)
+**Supersedes:** F-072
+**Scope:** umbrella replacing F-072's narrower JWT-refresh focus. Sub-items:
+- JWT: 15-min access token + 7-day refresh, httpOnly cookie, rotation on every refresh, Redis revocation list
+- /auth endpoint rate limiting: 5 attempts per IP per 15 min, exponential backoff, 10-attempt lockout
+- Email verification required before any API access. **Grandfather existing soft-beta accounts as verified** (one-off migration setting `email_verified=true` for all pre-F-310-ship rows); hard gate on all new registrations from F-310 ship date forward.
+- hCaptcha on registration and password reset
+- Stripe webhook HMAC signature verification before any DB mutation (BE)
+- Subscription-tier check via FastAPI dependency injection on every protected route; tier=free placeholder until P-105
+**Files touched (planned):** BE auth router, BE main, BE user model migration (`email_verified` column), FE login/signup forms (hCaptcha integration), FE `api.ts` (401 → refresh interceptor carried from F-072 plan).
+**Owner:** Engineering (BE + FE)
+
+### F-311 — Token control (Redis rate limiter + model routing + prompt caching)
+
+**Priority:** HIGH (pre-launch blocker per Decision 4 — at 5,000+ users Y1, uncapped diagnostic abuse blows API costs before revenue catches up)
+**Status:** Queued
+**Filed:** 2026-05-12
+**Source:** 2026-05-12 strategic session — Decision 4
+**Dependencies:** F-310 (subscription-tier hook for per-tier limits)
+**Scope:**
+- Redis-backed rate limiter keyed by `user_id`, scoped by subscription tier
+- Tier limits: Free=5 diagnostic sessions/day · $29/mo=30/day · $199 Sprint=60/day · $499 Premium=unlimited
+- Model routing: `claude-haiku-4-5` for vocab exercises + lookups; `claude-sonnet-4-6` reserved for diagnostic scoring
+- Anthropic prompt caching on system prompts (target 90% cost reduction on repeat)
+- Hard cap: `max_tokens=800` output per diagnostic response
+- Prompt injection detection layer — reject system-override patterns before the Claude call
+**Owner:** Backend Engineering
+
+### F-312.0 — RAG corpus licensing pre-flight (HARD GATE)
+
+**Priority:** CRITICAL (hard gate per Chadi 2026-05-12 push-back — no RAG schema work commits until this returns legal-clear)
+**Status:** Queued
+**Filed:** 2026-05-12
+**Source:** 2026-05-12 strategic session — Decision 2; pre-flight gate added in Chadi's reconciliation response
+**Dependencies:** none
+**Scope:** read OQLF ToS (`oqlf.gouv.qc.ca/conditions_utilisation.html`) and Académie française terms. Confirm or deny redistribution + reuse rights for corpus chunks in commercial product context. Document conclusion with quoted ToS language and recommended legal posture. **Fallback if redistribution not permitted:** fair-use snippet + link-only citation (cite the source, link to the source page, don't store the full text).
+**Gate:** F-312, F-320, F-321 all blocked until F-312.0 completes with a legal-clear answer or a documented fallback strategy. "Better to know now than after building."
+**Owner:** Engineering (legal-adjacent; Chadi reviews conclusion)
+
+### F-312 — OQLF + Académie française RAG retrieval layer
+
+**Priority:** HIGH (Decision 2 — diagnostic credibility through authoritative grounding; replaces "the AI thinks this is wrong" with "according to the OQLF, this is an anglicism")
+**Status:** Blocked on F-312.0
+**Filed:** 2026-05-12
+**Source:** 2026-05-12 strategic session — Decision 2
+**Dependencies:** F-312.0 (licensing), F-320 (LV DB schema — corpus rows may share table)
+**Scope:** scrape OQLF Banque de dépannage linguistique + Académie française "Dire et ne pas dire" into structured Postgres rows (`chunk` + `correction` + `error_type` + `source` + `register` + `exam_tag`). Before each Claude diagnostic call, query the table for chunks matching the student's text; inject 5–15 relevant entries into the prompt as authoritative context. Diagnostic output cites the source by name. Sources:
+- OQLF Banque de dépannage linguistique (`bdl.oqlf.gouv.qc.ca`) — Quebec French authority, structured by error type, CC license (pending F-312.0 confirmation)
+- Académie française "Dire et ne pas dire" (`academie-francaise.fr`) — ~500 entries, "don't say X, say Y" format
+**Owner:** Backend Engineering
+
+### F-319 — Le Vocabulaire (system; parent ticket)
+
+**Priority:** HIGH (Decision 3 — Le Méthodic shifts from exam-prep-only to general-French + exam platform; one engine, two audiences)
+**Status:** Queued — MVP via F-320–F-323; V2 sub-tickets visible but deferred
+**Filed:** 2026-05-12
+**Source:** 2026-05-12 strategic session — Decision 3 (Lexogoth-equivalent web system, distinct from L'École and Le Diagnostic)
+**Dependencies:** F-312.0 (corpus licensing for sourced content)
+**Scope:** full Lexogoth-equivalent web system for chunk-based French vocabulary learning. Free + exam-tagged topic libraries, multiple exercise types, practice + test + tutor modes. Source content from OQLF/BDL/Académie corpus pending F-312.0.
+
+**MVP (active queue — Sprint 1/2):**
+- F-320 — DB schema (chunk, translation, topic, source, register, exam_tag, cefr_level)
+- F-321 — Seed Phase 1: 3 topic sets, 500–800 entries from OQLF BDL
+- F-322 — Practice UI (hide/reveal, self-grade, personal lists scaffold)
+- F-323 — Test UI (MCQ, matching, dropdown, exact completion — Lexogoth Toolbox-style)
+
+**V2 deferred (filed for visibility; sub-tickets to land when V2 starts):**
+- Tutor mode (teachers build custom databases, assign to students)
+- Personal lists with SRS (spaced repetition surface; V1 has localStorage stash only)
+- Topic library partition (free general-French set vs exam-specific sets — TCF/DELF/TEF by task type)
+- Exercise authoring admin tooling
+
+**Why this matters:** without Le Vocabulaire, Le Méthodic is exam-prep only. With it, the product serves both general French learners and exam candidates — one engine, two audiences.
+**Owner:** Engineering (BE + FE; child tickets are layer-specific)
+
+### F-320 — Le Vocabulaire DB schema
+
+**Priority:** HIGH (F-319 MVP foundation)
+**Status:** Blocked on F-312.0 if corpus rows share table
+**Filed:** 2026-05-12
+**Source:** F-319 / Decision 3
+**Dependencies:** F-312.0 (licensing clearance)
+**Scope:** Postgres schema for Vocabulaire: `chunk` (FR) + `translation` (EN) + `topic` + `source` (OQLF / Académie / custom) + `register` (familier / standard / soutenu) + `exam_tag` (TCF / DELF / TEF / null) + `cefr_level`. Migration script. Consider shared table with F-312 RAG corpus if licensing permits — chunks have overlapping shape.
+**Owner:** Backend Engineering
+
+### F-321 — Le Vocabulaire seed Phase 1 (3 topic sets, 500–800 entries from OQLF BDL)
+
+**Priority:** HIGH (F-319 MVP content)
+**Status:** Blocked on F-312.0 + F-320
+**Filed:** 2026-05-12
+**Source:** F-319 / Decision 3
+**Dependencies:** F-312.0 (licensing), F-320 (schema)
+**Scope:** ETL pipeline from OQLF BDL → Vocabulaire rows. Three Phase-1 topic sets curated for general French (e.g., arts, loisirs, voyages, société — Vocabulaire-progressif style; final pick per Chadi pedagogical signal). 500–800 entries total. Idempotent re-runnable seed script.
+**Owner:** Backend Engineering (Chadi pedagogical topic pick)
+
+### F-322 — Le Vocabulaire practice UI
+
+**Priority:** MEDIUM (Sprint 2 — F-319 MVP FE-side)
+**Status:** Queued
+**Filed:** 2026-05-12
+**Source:** F-319 / Decision 3
+**Dependencies:** F-320, F-321
+**Scope:** `/vocabulaire` surface — practice mode: hide/reveal one language (FR or EN), self-grade pass/fail, build personal lists (V1: localStorage stash; V2 ticket promotes to user-scoped server lists with SRS). Topic picker. Mobile + desktop responsive per F-225.
+**Owner:** Frontend Engineering
+
+### F-323 — Le Vocabulaire test UI
+
+**Priority:** MEDIUM (Sprint 2 — F-319 MVP FE-side)
+**Status:** Queued
+**Filed:** 2026-05-12
+**Source:** F-319 / Decision 3
+**Dependencies:** F-320, F-321, F-322 (shared topic picker + chunk model)
+**Scope:** `/vocabulaire` test mode — MCQ, matching, dropdown, exact completion (Lexogoth Toolbox-style). Score + per-question feedback. Mobile + desktop responsive per F-225.
+**Owner:** Frontend Engineering
+
+### F-324 — Diagnostic ↔ Vocabulaire linking (auto-suggest vocab topics from flagged errors)
+
+**Priority:** MEDIUM (Sprint 2 — connects Le Diagnostic to Le Vocabulaire)
+**Status:** Queued
+**Filed:** 2026-05-12
+**Source:** 2026-05-12 strategic session — Section 2 row 8
+**Dependencies:** F-319 (Vocabulaire MVP shipped), F-312 (RAG retrieval — error_type tags drive topic suggestions)
+**Scope:** when a diagnostic surfaces an error tagged with a vocabulary register/topic mismatch, FE renders a "Practice this in Le Vocabulaire" callout linking to the relevant topic set. BE: extend diagnostic response with `suggested_vocab_topics: string[]`. FE: render callout block in ResultView + diagnostic page.
+**Owner:** Engineering (BE + FE)
 
 ---
 
