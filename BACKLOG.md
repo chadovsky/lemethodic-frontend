@@ -1825,7 +1825,7 @@ _(F-076 shipped 2026-04-27 — see entry under "Shipped — Week 2 (April 27)" a
 - Chrome throttles setInterval in hidden tabs, timer drifts
 - Fix: use Date.now() deltas (already pattern in useAudioRecorder)
 
-**F-077** 📋 Production environment config
+**F-077** ✅ Production environment config — Shipped 2026-05-12. FE confirmed via Chadi Vercel inspection: `NEXT_PUBLIC_API_URL=https://seal-app-75fiu.ondigitalocean.app` set on `lemethodic-frontend` project, scoped to Production. BE deployed to DigitalOcean App Platform; FE deployed to Vercel at lemethodic.com. CORS allow_origins production domain set (verified via successful authenticated calls from prod FE → prod BE).
 - Backend: production .env with real secrets
 - Backend: CORS allow_origins updated to production domain (remove localhost)
 - Frontend: NEXT_PUBLIC_API_URL for production
