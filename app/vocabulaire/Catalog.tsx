@@ -12,10 +12,12 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
 import { vocabCopy } from '@/lib/vocab-copy'
+import { useUserTier } from '@/hooks/useUserTier'
 import type { CorpusPartition, VocabularyTopic } from '@/lib/types'
 
 // Chip-surfaced partitions only — the fourth (third_party_publisher_…)
@@ -29,6 +31,7 @@ const SURFACED_PARTITIONS: CorpusPartition[] = [
 export default function Catalog() {
   const user = useAuthStore((s) => s.user)
   const copy = vocabCopy(user?.interfaceLanguage)
+  const { tier } = useUserTier()
 
   const [activePartitions, setActivePartitions] = useState<CorpusPartition[]>([])
 
@@ -121,9 +124,20 @@ export default function Catalog() {
             <EmptyCorpusState copy={copy} />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
-              {topicsQuery.data.map((t) => (
-                <TopicCard key={t.slug} topic={t} copy={copy} />
-              ))}
+              {topicsQuery.data.map((t) => {
+                // F-325 A5 — locked-card surfaces when (a) tier is
+                // 'free' AND (b) topic is exam-tagged (exam_tags
+                // non-empty). 'unknown' (default until F-311.fe ships)
+                // falls through to unlocked so the surface degrades
+                // gracefully.
+                const isExamTagged = t.examTags.length > 0
+                const locked = tier === 'free' && isExamTagged
+                return locked ? (
+                  <TopicCardLocked key={t.slug} topic={t} copy={copy} />
+                ) : (
+                  <TopicCard key={t.slug} topic={t} copy={copy} />
+                )
+              })}
             </div>
           )}
         </section>
@@ -250,6 +264,95 @@ function TopicCard({
         </div>
       )}
     </Link>
+  )
+}
+
+function TopicCardLocked({
+  topic,
+  copy,
+}: {
+  topic: VocabularyTopic
+  copy: ReturnType<typeof vocabCopy>
+}) {
+  const router = useRouter()
+  const range = copy.topic.cefrRangeLabel(topic.cefrRange.min, topic.cefrRange.max)
+  return (
+    <div
+      className="ed-card-lift"
+      style={{
+        backgroundColor: 'var(--ed-paper)',
+        border: '1px solid var(--ed-rule)',
+        borderRadius: 4,
+        padding: '20px 22px',
+        position: 'relative',
+      }}
+    >
+      <div
+        className="text-[12px] uppercase tracking-[0.12em] font-semibold mb-2"
+        style={{ color: 'var(--ed-muted)' }}
+      >
+        {copy.topic.chunkCountLabel(topic.chunkCount)} · {range}
+      </div>
+      <h2
+        style={{
+          fontFamily: 'var(--font-fraunces), Georgia, serif',
+          fontWeight: 500,
+          fontSize: 'clamp(20px, 1.8vw, 24px)',
+          lineHeight: 1.2,
+          letterSpacing: '-0.01em',
+          color: 'var(--ed-fg)',
+          margin: 0,
+          marginBottom: 8,
+        }}
+      >
+        {topic.title}
+      </h2>
+      <p
+        style={{
+          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontWeight: 500,
+          fontSize: 13,
+          lineHeight: 1.5,
+          color: 'var(--ed-fg)',
+          margin: 0,
+          marginBottom: 4,
+        }}
+      >
+        {copy.locked.title}
+      </p>
+      <p
+        style={{
+          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontWeight: 400,
+          fontSize: 13,
+          lineHeight: 1.5,
+          color: 'var(--ed-muted)',
+          margin: 0,
+          marginBottom: 14,
+        }}
+      >
+        {copy.locked.body}
+      </p>
+      <button
+        type="button"
+        onClick={() => router.push('/paywall')}
+        className="ed-btn-press"
+        style={{
+          height: 40,
+          padding: '0 18px',
+          borderRadius: 4,
+          border: 'none',
+          backgroundColor: 'var(--ed-accent)',
+          color: '#FFFFFF',
+          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontWeight: 600,
+          fontSize: 13,
+          cursor: 'pointer',
+        }}
+      >
+        {copy.locked.cta}
+      </button>
+    </div>
   )
 }
 
