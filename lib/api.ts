@@ -42,6 +42,13 @@ import type {
   WritingPrompt,
   WritingSubmissionResult,
   WritingHistoryItem,
+  CefrLevel,
+  CorpusPartition,
+  ExamTag,
+  Register,
+  VocabularyChunk,
+  VocabularyChunksPage,
+  VocabularyTopic,
 } from './types'
 // `OnboardingData` is consumed by mapStoreToSubmitPayload below.
 // `TCFGoal` is no longer imported — the legacy goal-based exam_profile mapping
@@ -72,7 +79,10 @@ export class ApiError extends Error implements ApiErrorShape {
 interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   body?: unknown
-  query?: Record<string, string | number | undefined>
+  // F-325 — array values produce repeated query params
+  // (e.g., corpus_partition=A&corpus_partition=B). Single values keep
+  // the prior set() behavior, so existing callers are unaffected.
+  query?: Record<string, string | number | string[] | undefined>
   // Set when sending FormData — skip the JSON content-type header.
   formData?: FormData
   // F-310.fe — internal flag: when true, this call is already a retry
@@ -177,7 +187,12 @@ function buildUrl(path: string, query?: RequestOptions['query']): string {
   const url = new URL(path.startsWith('http') ? path : `${BASE_URL}${path}`)
   if (query) {
     for (const [k, v] of Object.entries(query)) {
-      if (v !== undefined && v !== null) url.searchParams.set(k, String(v))
+      if (v === undefined || v === null) continue
+      if (Array.isArray(v)) {
+        for (const item of v) url.searchParams.append(k, String(item))
+      } else {
+        url.searchParams.set(k, String(v))
+      }
     }
   }
   return url.toString()
@@ -1381,6 +1396,120 @@ export const api = {
       return request<WritingHistoryItem[]>('/api/writing/history')
     },
   },
+
+  // F-325 — Le Vocabulaire browse surface. BE F-325 contract locked on
+  // commit 0543642. Auth-gated via Bearer token (same as the rest of the
+  // app). Tier-lock returns 403 + tier_insufficient detail body and is
+  // surfaced through the global request() interceptor (lib/api.ts), not
+  // a special path here. third_party_publisher_DO_NOT_EXTRACT rows are
+  // silently filtered BE-side (Decision D4); FE never receives them.
+  vocab: {
+    async listTopics(opts: { corpusPartition?: CorpusPartition[] } = {}): Promise<VocabularyTopic[]> {
+      const raw = await request<RawVocabularyTopic[]>('/api/vocab/topics', {
+        query: opts.corpusPartition && opts.corpusPartition.length
+          ? { corpus_partition: opts.corpusPartition as string[] }
+          : undefined,
+      })
+      return raw.map(mapVocabularyTopic)
+    },
+
+    // Offset-based pagination per BE F-325 (corrected from cursor in the
+    // FE plan). useInfiniteQuery's getNextPageParam computes the next
+    // offset from total/limit/offset; FE caller passes opaque cursor =
+    // offset across pages.
+    async listChunks(
+      slug: string,
+      opts: {
+        cefrLevel?: CefrLevel[]
+        examTag?: ExamTag[]
+        register?: Register[]
+        offset?: number
+        limit?: number
+      } = {},
+    ): Promise<VocabularyChunksPage> {
+      const raw = await request<RawVocabularyChunksPage>(
+        `/api/vocab/topics/${encodeURIComponent(slug)}/chunks`,
+        {
+          query: {
+            ...(opts.cefrLevel && opts.cefrLevel.length
+              ? { cefr_level: opts.cefrLevel as string[] }
+              : {}),
+            ...(opts.examTag && opts.examTag.length
+              ? { exam_tag: opts.examTag as string[] }
+              : {}),
+            ...(opts.register && opts.register.length
+              ? { register: opts.register as string[] }
+              : {}),
+            ...(opts.offset !== undefined ? { offset: opts.offset } : {}),
+            ...(opts.limit !== undefined ? { limit: opts.limit } : {}),
+          },
+        },
+      )
+      return mapVocabularyChunksPage(raw)
+    },
+  },
+}
+
+// ── Le Vocabulaire (F-325) mappers ───────────────────────────────────────────
+
+interface RawVocabularyTopic {
+  slug: string
+  title: string
+  corpus_partition: CorpusPartition
+  source: string
+  chunk_count: number
+  exam_tags: ExamTag[]
+  cefr_range: { min: CefrLevel; max: CefrLevel }
+}
+
+function mapVocabularyTopic(raw: RawVocabularyTopic): VocabularyTopic {
+  return {
+    slug: raw.slug,
+    title: raw.title,
+    corpusPartition: raw.corpus_partition,
+    source: raw.source,
+    chunkCount: raw.chunk_count,
+    examTags: raw.exam_tags ?? [],
+    cefrRange: raw.cefr_range,
+  }
+}
+
+interface RawVocabularyChunk {
+  id: number
+  chunk_fr: string
+  translation_en: string
+  cefr_level: CefrLevel
+  exam_tag: ExamTag | null
+  register: Register
+  source: string
+}
+
+function mapVocabularyChunk(raw: RawVocabularyChunk): VocabularyChunk {
+  return {
+    id: raw.id,
+    chunkFr: raw.chunk_fr,
+    translationEn: raw.translation_en,
+    cefrLevel: raw.cefr_level,
+    examTag: raw.exam_tag,
+    register: raw.register,
+    source: raw.source,
+  }
+}
+
+interface RawVocabularyChunksPage {
+  chunks: RawVocabularyChunk[]
+  total: number
+  limit: number
+  offset: number
+}
+
+function mapVocabularyChunksPage(raw: RawVocabularyChunksPage): VocabularyChunksPage {
+  return {
+    chunks: raw.chunks.map(mapVocabularyChunk),
+    total: raw.total,
+    limit: raw.limit,
+    offset: raw.offset,
+  }
 }
 
 export type Api = typeof api

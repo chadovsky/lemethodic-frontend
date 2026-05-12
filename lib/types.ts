@@ -775,3 +775,61 @@ export interface WritingHistoryItem {
   cefr_band: string
   submitted_at: string  // ISO datetime
 }
+
+// ── Le Vocabulaire (F-325 browse UI) ────────────────────────────────────────
+
+// Canonical four-value enum per BE F-320 commit 0a7cc4b (supersedes the
+// stale oqlf|academie|curated triple in BACKLOG.md:3274 — see BACKLOG-
+// HYGIENE-001 follow-up). third_party_publisher_DO_NOT_EXTRACT exists in
+// the BE schema but is silently filtered at the query layer (BE F-325
+// Decision D4) — the FE never receives rows in that partition, so it
+// stays in the enum for type completeness but is never surfaced as a
+// filter chip or badge.
+export type CorpusPartition =
+  | 'CC_corpus'
+  | 'chadi_authored'
+  | 'book_lab'
+  | 'third_party_publisher_DO_NOT_EXTRACT'
+
+// Canonical CEFR set per F-320 schema. Chunks carry one band; topics
+// carry a {min, max} range.
+export type CefrLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2'
+
+// F-320 schema. null on a chunk = untagged (general-French). Topic-level
+// exam_tags is an array because a topic can be relevant to multiple
+// exam profiles (e.g., a B1-formal-register topic tags both TCF and DELF).
+export type ExamTag = 'TCF' | 'DELF' | 'TEF'
+
+// F-320 schema — sociolinguistic register. Drives the filter chip group
+// on /vocabulaire/[topic-slug].
+export type Register = 'familier' | 'standard' | 'soutenu'
+
+export interface VocabularyTopic {
+  slug: string
+  title: string
+  corpusPartition: CorpusPartition
+  source: string
+  chunkCount: number
+  examTags: ExamTag[]
+  cefrRange: { min: CefrLevel; max: CefrLevel }
+}
+
+export interface VocabularyChunk {
+  id: number
+  chunkFr: string
+  translationEn: string
+  cefrLevel: CefrLevel
+  examTag: ExamTag | null
+  register: Register
+  source: string
+}
+
+// Paginated response per BE F-325 offset-based contract. `next` is
+// computed FE-side from total/limit/offset in the TQ infinite-query
+// getNextPageParam (see app/vocabulaire/[topic-slug]).
+export interface VocabularyChunksPage {
+  chunks: VocabularyChunk[]
+  total: number
+  limit: number
+  offset: number
+}
