@@ -3323,7 +3323,7 @@ Edge cases handled:
 ### F-325 — Le Vocabulaire browse UI (FE) — topic catalog + chunk detail
 
 **Priority:** MEDIUM (Sprint 2 — corpus exploration surface; complements F-322 practice UI and F-323 test UI)
-**Status:** Plan locked, BE F-325 API live on commit 0543642; FE phases A0–A6 in flight
+**Status:** Awaiting verification (F-225 — interactive change; needs 1440px + 375px screenshots of /vocabulaire catalog + /vocabulaire/[slug] topic detail + locked-card variant via ?tier=free + interaction trace per runbook below)
 **Filed:** 2026-05-12
 **Source:** 2026-05-12 strategic session — Decision 3 (Le Vocabulaire system); F-322 push-back resolved with new ticket number per Chadi.
 **Dependencies:** BE F-325 API (commit 0543642 — SHIPPED), F-320 (DB schema), F-321 (seed Phase 1 — not yet seeded; empty-state mode until then). Tier-gate live wiring deferred to F-311.fe.
@@ -3353,20 +3353,43 @@ Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split).
 - `hooks/useUserTier.ts` returns `'unknown'` until F-311.fe lands.
 - `TopicCardLocked` variant renders when tier === `'free'` AND `topic.corpus_partition` is exam-tagged. Currently `'unknown'` always falls through to unlocked. F-225 screenshot of the locked state captured via dev-mode override.
 
-**Phase plan (one commit per phase, build + typecheck clean per commit):**
-- **A0** (this commit): file F-325 + BACKLOG-HYGIENE-001 entries. Docs only.
-- **A1**: install `@tanstack/react-query` + `@tanstack/react-query-devtools`; mount provider at `app/layout.tsx`.
-- **A2**: types + `api.vocab.{listTopics, listChunks}` in `lib/api.ts` / `lib/types.ts`.
-- **A3**: `/vocabulaire` catalog route (mobile + desktop + empty-state + TQ-wired).
-- **A4**: `/vocabulaire/[topic-slug]` topic detail (filters + offset infinite-query pagination + empty-state).
-- **A5**: `useUserTier` stub + `TopicCardLocked` wired into TopicCard.
-- **A6**: F-225 verification block (runbook + status flip to Awaiting verification).
+**Phases shipped (one commit per phase, build + typecheck clean per commit):**
+- **A0** (d73d2ca): F-325 + BACKLOG-HYGIENE-001 entries.
+- **A1** (58d52a8): `@tanstack/react-query` + devtools installed; `components/QueryProvider.tsx` mounted at `app/layout.tsx`.
+- **A2** (e5a1f3d): `lib/types.ts` + `lib/api.ts` — CorpusPartition / CefrLevel / ExamTag / Register / VocabularyTopic / VocabularyChunk / VocabularyChunksPage types; `api.vocab.{listTopics, listChunks}` with snake_case→camelCase mappers. `buildUrl` extended to accept `string[]` query values via `.append()` (backward-compatible with all existing call sites).
+- **A3** (a5c09fc): `/vocabulaire` catalog route (auth-gated). `lib/vocab-copy.ts` EN+FR copy. Catalog client component with three partition chips, responsive grid (1/2/3 cols), TQ-wired `listTopics`, EmptyCorpusState, ed-skeleton loading, retry-on-error.
+- **A4** (b4569e0): `/vocabulaire/[slug]` topic detail. TQ `useInfiniteQuery` with offset pagination. Three filter chip groups (cefr_level / exam_tag / register), ChunkRow with FR+EN+chips, EmptyFilteredState vs EmptyCorpusInTopicState branch, "Load more" pagination button. Topic title falls back to humanized slug (BE contract doesn't return topic title on chunks endpoint — refinement follow-up if a dedicated topic endpoint is added).
+- **A5** (93e4f4b): `hooks/useUserTier.ts` stub returns `'unknown'`; `?tier=free` URL override for F-225 capture. Catalog branches at render time: `tier === 'free' && topic.examTags.length > 0` → `TopicCardLocked` (locked.title + locked.body + CTA to `/paywall`).
+- **A6** (this commit): F-225 verification block + status flip to "Awaiting verification".
+
+**Files touched (shipped):**
+- `BACKLOG.md` — F-325 + BACKLOG-HYGIENE-001 entries (A0); status + runbook (A6).
+- `package.json` + `pnpm-lock.yaml` — `@tanstack/react-query@5.100.10` + devtools (A1).
+- `components/QueryProvider.tsx` — NEW (A1).
+- `app/layout.tsx` — QueryProvider wraps children (A1).
+- `lib/types.ts` — F-325 type block at file tail (A2).
+- `lib/api.ts` — `api.vocab.*`, vocab mappers, `buildUrl` array-value support (A2).
+- `lib/vocab-copy.ts` — NEW; EN+FR copy (A3).
+- `app/vocabulaire/page.tsx` — NEW; ProtectedRoute wrap (A3).
+- `app/vocabulaire/Catalog.tsx` — NEW (A3); locked-card branch (A5).
+- `app/vocabulaire/[slug]/page.tsx` — NEW (A4).
+- `app/vocabulaire/[slug]/TopicDetail.tsx` — NEW (A4).
+- `hooks/useUserTier.ts` — NEW (A5).
 
 **Operating-contract block (2026-05-12 contract):**
-- CONFIDENCE: HIGH on the FE plan. BE contract is locked (commit 0543642). Scope is bounded; the only meaningful unknown is TanStack Query's behavior under the existing fetch patterns — conservative defaults mitigate.
+- CONFIDENCE: HIGH. Build + typecheck clean at every phase commit. BE F-325 contract locked (commit 0543642). All A-phase commits verified via `pnpm exec tsc --noEmit` (silent) + `pnpm build` (37 routes compile, /vocabulaire static + /vocabulaire/[slug] dynamic, 0 warnings).
 - WHY: Sprint 2 surface; Decision 3 dependency for the general-French audience; complements practice (F-322) and test (F-323) UIs.
-- UNCERTAINTY: Tier-gate stub returns `'unknown'`; live wiring blocks on F-311.fe. F-225 locked-card screenshot requires manual dev override until then.
-- VERIFICATION: see Phase A6 runbook (filed at A6 commit).
+- UNCERTAINTY: (1) Tier-gate stub returns 'unknown' — live wiring blocks on F-311.fe. The `?tier=free` override covers the F-225 locked-card screenshot path. (2) Topic title on `/vocabulaire/[slug]` falls back to a humanized slug because the BE F-325 chunks endpoint doesn't return parent-topic metadata. Filed as a follow-up if a dedicated `GET /api/vocab/topics/{slug}` endpoint exists or is added BE-side. (3) BE response casing assumed snake_case per the existing FE convention; mappers no-op if BE emits camelCase directly. First live call against `/api/vocab/topics` confirms.
+- VERIFICATION RUNBOOK (Chadi, post-deploy on lemethodic.com):
+  1. **Auth flow** — sign in as an existing user. Verify `/vocabulaire` and `/vocabulaire/[any-slug]` redirect to `/` when unauthenticated (ProtectedRoute).
+  2. **Catalog empty** — `/vocabulaire` with empty corpus (current state until F-321 seeds) shows the "Le Vocabulaire is coming." EmptyCorpusState card. 1440px + 375px screenshots.
+  3. **Catalog populated** — once F-321 seeds, verify topic cards render with title + source + chunk count + CEFR range + exam-tag chips. Test the three partition chips (CC_corpus / chadi_authored / book_lab) toggle and filter the list. 1440px + 375px.
+  4. **Topic detail** — click any topic card → `/vocabulaire/[slug]`. Verify chunks render (FR top + EN translation + three chip triple), "Load more" pagination appends, three filter chip groups work. 1440px + 375px.
+  5. **Filtered-to-empty** — apply a filter combination that yields 0 chunks. Verify "No chunks match these filters." copy renders.
+  6. **Locked-card variant** — visit `/vocabulaire?tier=free`. Verify any topic with `exam_tags.length > 0` renders the locked-card variant (locked.title + CTA to /paywall). Clicking the CTA navigates to `/paywall`. 1440px + 375px.
+  7. **i18n** — change `interface_language` to `fr` (via /onboarding or directly in the user record). Refresh `/vocabulaire`. Verify all copy switches to French.
+  8. **403 email_not_verified flow** — log in as an unverified user (or simulate by clearing email_verified_at BE-side). Visit `/vocabulaire`. Verify hard-nav to `/verify-email?next=/vocabulaire` (F-310.fe.coldreload interceptor still works on this new surface).
+  9. **Runtime log sweep** — Vercel runtime logs for the F-325 deploy: 0 errors / 0 5xx in a 1h window after smoke.
 
 ### BACKLOG-HYGIENE-001 — F-320 stale corpus_partition enum line (BACKLOG.md:3274)
 
