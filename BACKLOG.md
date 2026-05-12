@@ -2345,6 +2345,37 @@ interface WritingJob {
 
 **Skipped from this rev:** the existing HomeScreen DailyActionCard pastels are NOT carried into desktop (warm token-based today card replaces). Recommended modules section reduced to a count chip.
 
+### V-016c.fix — /ecole desktop empty Fondations + Approfondissement (phase-filter regression)
+
+**Priority:** HIGH (production regression on V-016c desktop layout — visual verification on V-016c was blocked because the grids rendered with zero cards)
+**Status:** ✅ Shipped 2026-05-12 (non-visual sweep verified; visual verification routed to TARS — separate commit)
+**Verification:**
+- Non-visual sweep (FE-Claude, 2026-05-12): deployment `dpl_GDqpPYB6XSU6obqVzuedVHFQunYr` READY in ~30s (Turbopack); `lemethodic.com/ecole` returns 200 from the new deployment (cache HIT on prerender shell, fresh chunk hashes confirm new bundle); zero error/warning/fatal entries across project runtime logs in last 1h.
+- Visual + interactive verification (1440px desktop + 375px mobile of `/ecole` showing both phase grids populated with lessons; click-through on a Fondations card → `/ecole/lesson/{n}`; click-through on an Approfondissement card → `/ecole/lesson/{n}`): routed to TARS — separate verification commit.
+**Filed:** 2026-05-12
+**Shipped:** 2026-05-12 (commit `da534dc`)
+**Source:** Chadi 2026-05-12 — /ecole desktop renders empty Fondations + Approfondissement sections
+**Dependencies:** V-016c (original desktop layout); F-087 (curriculum split invariant 1-16 / 17-27)
+
+**Cause:** `EcoleDesktop` filtered lessons with `lessons.filter((l) => l.phase === 1)` and `l.phase === 2`. The `mapLesson` mapper in `lib/api.ts` defaulted any missing/non-numeric `phase` value to 1 (`raw.phase === 2 ? 2 : 1`). When the backend response omitted `phase`, or serialized it as a string/null, all 27 lessons collapsed to phase=1 — Fondations rendered the full list, Approfondissement rendered empty. (HomeScreen mobile masked the regression because it renders a flat list with an inline phase divider — the divider silently failed to trigger but the lessons themselves still rendered.)
+
+**Fix:**
+- `components/home/EcoleDesktop.tsx` — switched the desktop phase filter from the BE `phase` field to `lessonNumber` directly (`≤16` = Fondations, `≥17` = Approfondissement). The 1-16 / 17-27 boundary is a locked curriculum invariant per F-087 and is more reliable than the BE field.
+- `lib/api.ts` `mapLesson` — when BE returns a clean numeric `1` or `2`, that wins. Otherwise the mapper falls back to deriving phase from `lesson_number ≥ 17`. Keeps HomeScreen's PhaseDivider correct even with a misbehaving BE field.
+- `components/home/EcoleDesktop.tsx` — added top-level empty-state if `lessons.length === 0`. Prior path silently rendered two empty phase grids; now an `ErrorRetry` surfaces so a future "no data" failure mode is visible instead of mistaken for the V-016c bug.
+
+**Files touched:**
+- `components/home/EcoleDesktop.tsx` — filter swap + empty-state branch (+13 lines)
+- `lib/api.ts` — mapLesson phase fallback (+5 / -3 lines)
+
+**Tests:** `pnpm build` clean. `npx tsc --noEmit` clean. No test runner configured in this repo.
+
+**Operating-contract block (2026-05-12 contract):**
+- CONFIDENCE: MEDIUM
+- WHY: Fix removes the dependency on the brittle BE `phase` field by using the locked F-087 lesson-number invariant, which is verified clean by build/typecheck and confirmed deploying on prod. MEDIUM not HIGH because I could not reproduce the empty-grid behavior locally (would have required prod auth + a logged-in account showing the bug) — the fix is theory-driven from the code path, not from observing the bug in action.
+- UNCERTAINTY: Have not yet seen the populated phase grids render on prod with a real authenticated session. If the original bug was actually `lessons.length === 0` from BE (rather than the phase-field regression I diagnosed), the new empty-state will at least make that visible — but the underlying BE data issue would still need a separate fix.
+- VERIFICATION: Chadi/TARS hit `https://lemethodic.com/ecole` at 1440px desktop on an authenticated session; both Fondations (1-16) and Approfondissement (17-27) should render populated lesson card grids. Click a card in each phase to confirm `/ecole/lesson/{n}` navigation. On 375px mobile, HomeScreen still works — Phase 2 divider should now render between lessons 16 and 17 (it used to silently fail when BE phase was wrong; that's a side-benefit of the mapper hardening).
+
 ### V-016f — Differentiation Card 1 rebuild (text-anchored bottleneck)
 
 **Priority:** HIGH (V-016 chain; landing card 1 read as decorative not data)
