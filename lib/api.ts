@@ -75,6 +75,11 @@ interface RequestOptions {
   query?: Record<string, string | number | undefined>
   // Set when sending FormData — skip the JSON content-type header.
   formData?: FormData
+  // F-310.fe — internal flag: when true, this call is already a retry
+  // that ran after a refresh-on-401. A second 401 on the retry must NOT
+  // attempt another refresh (prevents infinite retry loops). Callers never
+  // set this; the refresh interceptor sets it before re-invoking request().
+  _isRefreshedRetry?: boolean
 }
 
 function readToken(): string | null {
@@ -84,6 +89,88 @@ function readToken(): string | null {
   } catch {
     return null
   }
+}
+
+// F-310.fe — refresh-on-401 plumbing.
+// /api/auth/refresh has no request body; the long-lived refresh token rides
+// on the httpOnly cookie BE set during login (SameSite=None; Secure). FE
+// just hits the endpoint with `credentials: 'include'` and reads the new
+// access_token from the response. Refresh is exempt from the interceptor
+// itself (a 401 on /refresh means the refresh cookie is dead; we surface
+// it and clear auth, no further retry). Login/register are also exempt —
+// a 401 there is a real auth failure (bad creds), not a token expiry.
+const REFRESH_EXEMPT_PATHS = new Set<string>([
+  '/api/auth/refresh',
+  '/api/auth/login',
+  '/api/auth/register',
+])
+
+// Module-level dedupe: if N concurrent requests all get 401 at once, only
+// one refresh fires; the rest await the same promise. Resolves to true on
+// successful refresh, false otherwise.
+let pendingRefresh: Promise<boolean> | null = null
+
+async function attemptRefresh(): Promise<boolean> {
+  if (pendingRefresh) return pendingRefresh
+  pendingRefresh = (async (): Promise<boolean> => {
+    try {
+      // Direct fetch (NOT through request()) so this call bypasses the
+      // interceptor — a 401 here must not recurse into another refresh.
+      const res = await fetch(buildUrl('/api/auth/refresh'), {
+        method: 'POST',
+        credentials: 'include',
+      })
+      if (!res.ok) return false
+      const data = (await res.json().catch(() => null)) as
+        | { access_token?: string; token?: string }
+        | null
+      // Default to access_token per FE convention; tolerate `token` as
+      // fallback. If BE returns a different field, end-of-ticket runbook
+      // flags it (refresh will appear to succeed but token won't write).
+      const newToken = data?.access_token ?? data?.token ?? null
+      if (!newToken) {
+        // eslint-disable-next-line no-console
+        console.error('F-310.fe refresh: response missing access_token/token field', data)
+        return false
+      }
+      const state = useAuthStore.getState()
+      if (state.user) {
+        // Preserve current user shape; just rotate the access token.
+        state.setAuth(newToken, state.user)
+      } else if (typeof window !== 'undefined') {
+        // No user in store (e.g. cold tab with localStorage token only).
+        // Write the new token directly; next /me call will repopulate.
+        try {
+          window.localStorage.setItem(TOKEN_KEY, newToken)
+        } catch {
+          // localStorage quota / privacy mode — token won't persist but
+          // request() reads via readToken() each call, so in-memory works.
+        }
+      }
+      return true
+    } catch {
+      return false
+    } finally {
+      pendingRefresh = null
+    }
+  })()
+  return pendingRefresh
+}
+
+// F-310.fe — typed detector for the BE's email-verification gate.
+// Per F-310 BE contract: any protected route hit by a user with
+// email_verified_at IS NULL returns 403 with body
+// { detail: { code: "email_not_verified" } }. Consumers in /signup, /login,
+// /verify-email use this to route to the verify-email empty-state instead
+// of surfacing a generic error.
+export function isEmailNotVerifiedError(err: unknown): boolean {
+  if (!(err instanceof ApiError)) return false
+  if (err.status !== 403) return false
+  const body = err.body
+  if (!body || typeof body !== 'object') return false
+  const detail = (body as { detail?: unknown }).detail
+  if (!detail || typeof detail !== 'object') return false
+  return (detail as { code?: unknown }).code === 'email_not_verified'
 }
 
 function buildUrl(path: string, query?: RequestOptions['query']): string {
@@ -103,7 +190,7 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   // body" when paired with any BodyInit. This regressed createRecording and
   // uploadAudio (both pass only { formData }); login/register/etc. were
   // fine because they pass method:'POST' explicitly.
-  const { body, query, formData } = opts
+  const { body, query, formData, _isRefreshedRetry } = opts
   const method = opts.method ?? (body !== undefined || formData ? 'POST' : 'GET')
   const headers: Record<string, string> = {}
   const token = readToken()
@@ -121,6 +208,10 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
     method,
     headers,
     body: payload,
+    // F-310.fe — send the BE-set httpOnly refresh cookie on /api/auth/refresh
+    // and any other authenticated cross-origin call. BE CORS must echo
+    // Access-Control-Allow-Credentials: true and a specific origin (not *).
+    credentials: 'include',
   })
 
   const text = await res.text()
@@ -132,14 +223,27 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   }
 
   if (!res.ok) {
-    // Stale/expired/orphaned token: wipe auth so the next render cycle
-    // reroutes the user to onboarding. Guarded on (a) being in the browser
-    // (server-rendered requests should never touch the store) and (b) us
-    // actually holding a token — a 401 on a login-failure call must not
-    // clobber state for an already-logged-in user who is e.g. retrying.
     if (res.status === 401 && typeof window !== 'undefined') {
-      const current = useAuthStore.getState().token
-      if (current) {
+      // F-310.fe — refresh-on-401 interceptor. Three guards:
+      //   1. Exempt-path: /refresh, /login, /register — a 401 here is a real
+      //      auth failure, not a token expiry. Don't loop into refresh.
+      //   2. Retry-loop: if this call IS the retry-after-refresh, a second
+      //      401 means the refresh issued a token the BE still rejects.
+      //      Clear auth, surface the error.
+      //   3. Concurrency: attemptRefresh() dedupes parallel 401s into a
+      //      single refresh call (module-level pendingRefresh promise).
+      const isExempt = REFRESH_EXEMPT_PATHS.has(path)
+      const hadToken = !!readToken()
+      if (!isExempt && !_isRefreshedRetry && hadToken) {
+        const refreshed = await attemptRefresh()
+        if (refreshed) {
+          return request<T>(path, { ...opts, _isRefreshedRetry: true })
+        }
+      }
+      // Refresh exempt, refresh failed, or retry already exhausted.
+      // Same behavior as pre-F-310.fe: clear auth on a token we actually had.
+      const stillHasToken = useAuthStore.getState().token
+      if (stillHasToken) {
         useAuthStore.getState().clearAuth()
       }
     }
@@ -704,13 +808,21 @@ export const api = {
 
     // Backend register requires full_name; derive from the email local-part
     // when the frontend doesn't collect it explicitly (F-060 may formalize this).
-    async register(email: string, password: string, fullName?: string): Promise<{ token: string; user: User }> {
+    // F-310.fe — hcaptcha_token is now part of the contract; BE schema marks
+    // it nullable so we send `null` (not omit it) when no token captured.
+    async register(
+      email: string,
+      password: string,
+      fullName?: string,
+      hcaptchaToken: string | null = null,
+    ): Promise<{ token: string; user: User }> {
       const raw = await request<{ access_token: string; user: RawUser }>('/api/auth/register', {
         method: 'POST',
         body: {
           email,
           password,
           full_name: fullName ?? email.split('@')[0],
+          hcaptcha_token: hcaptchaToken,
         },
       })
       return { token: raw.access_token, user: mapUser(raw.user) }
@@ -718,6 +830,63 @@ export const api = {
 
     async logout(): Promise<void> {
       await request<{ message: string }>('/api/auth/logout', { method: 'POST' })
+    },
+
+    // F-310.fe — manual refresh trigger (UI usually doesn't call this; the
+    // request() interceptor handles it on 401). Exposed for completeness +
+    // for explicit "refresh now" affordances that may surface later.
+    async refresh(): Promise<{ access_token: string } | null> {
+      try {
+        const data = await request<{ access_token?: string; token?: string }>(
+          '/api/auth/refresh',
+          { method: 'POST' },
+        )
+        const access_token = data?.access_token ?? data?.token ?? null
+        return access_token ? { access_token } : null
+      } catch {
+        return null
+      }
+    },
+
+    // F-310.fe — confirm an email-verification token (link from BE-sent email).
+    async verifyEmail(token: string): Promise<{ message?: string }> {
+      return request<{ message?: string }>('/api/auth/verify-email', {
+        method: 'POST',
+        body: { token },
+      })
+    },
+
+    // F-310.fe — resend verification email. Requires an authenticated
+    // session (Authorization header) — the verify-email page can call this
+    // if the user is logged in but unverified.
+    async resendVerification(): Promise<{ message?: string }> {
+      return request<{ message?: string }>('/api/auth/verify-email/resend', {
+        method: 'POST',
+      })
+    },
+
+    // F-310.fe — start the password-reset flow. BE sends an email with a
+    // tokenized link to /password-reset?token=XXX. hcaptcha_token is part
+    // of the BE schema and is nullable during the rollout window.
+    async passwordResetRequest(
+      email: string,
+      hcaptchaToken: string | null = null,
+    ): Promise<{ message?: string }> {
+      return request<{ message?: string }>('/api/auth/password-reset/request', {
+        method: 'POST',
+        body: { email, hcaptcha_token: hcaptchaToken },
+      })
+    },
+
+    // F-310.fe — complete the password-reset flow using the tokenized link.
+    async passwordResetConfirm(
+      token: string,
+      newPassword: string,
+    ): Promise<{ message?: string }> {
+      return request<{ message?: string }>('/api/auth/password-reset/confirm', {
+        method: 'POST',
+        body: { token, new_password: newPassword },
+      })
     },
   },
 
