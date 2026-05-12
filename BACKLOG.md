@@ -1798,7 +1798,7 @@ Previously called "F-060 launch prep" umbrella. Split into discrete tickets here
 - Frontend: /forgot-password screen, /reset-password/[token] screen
 - Email sending: SendGrid or Resend
 
-**F-072** ⏸ Superseded by F-310 (auth hardening umbrella) — JWT expiry + refresh token handling. F-310 absorbs the original scope (15-min access + 7-day refresh, rotation, revocation, /auth rate limiting, email verification, hCaptcha, Stripe webhook HMAC, tier check). See F-310 body for the canonical task list. Original bullets preserved below for diff history:
+**F-072** ✅ Shipped via F-310 (BE 4bb44fb..043167f, 2026-05-12) + F-310.fe (FE 2fef9b7..b8f91ee, 2026-05-12). Original scope fully absorbed: 15-min access + 7-day refresh JWT rotation with httpOnly cookie + Redis revocation; /api/auth/refresh BE endpoint live; FE refresh-on-401 interceptor with retry-loop guard + concurrency dedupe; clearAuth on refresh failure. Plus everything else F-310 added (email verification, hCaptcha, /auth rate limiting, Stripe webhook HMAC, tier-check hook). Original bullets preserved below for diff history:
 - Backend: shorten JWT to 1 hour, issue refresh tokens (7 days) on login/register
 - Backend: POST /api/auth/refresh endpoint
 - Frontend: api.ts intercepts 401, tries refresh, retries original call
@@ -3096,7 +3096,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 ### F-310 — Auth hardening (umbrella; supersedes F-072)
 
 **Priority:** HIGH (pre-launch blocker per Decision 4)
-**Status:** Queued
+**Status:** ✅ Shipped 2026-05-12 — BE half live (commits 4bb44fb..043167f on tcf-oral-tool); FE half in F-310.fe (commits 2fef9b7..b8f91ee on lemethodic-frontend). Production /openapi.json confirms 9 auth endpoints live, 5 new since F-072 plan (refresh, verify-email, verify-email/resend, password-reset/request, password-reset/confirm).
 **Filed:** 2026-05-12
 **Source:** 2026-05-12 strategic session — Decision 4 (token control + auth hardening as pre-launch existential cost/security issues, not nice-to-haves; uncapped abuse blows up API costs before revenue catches up at 5,000+ users Y1)
 **Dependencies:** F-072 (absorbed); P-105 (subscription-tier source; F-310 ships with `tier=free` placeholder, tier-check layered when P-105 lands — auth hardening does not block on payment infrastructure)
@@ -3108,8 +3108,65 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 - hCaptcha on registration and password reset
 - Stripe webhook HMAC signature verification before any DB mutation (BE)
 - Subscription-tier check via FastAPI dependency injection on every protected route; tier=free placeholder until P-105
-**Files touched (planned):** BE auth router, BE main, BE user model migration (`email_verified` column), FE login/signup forms (hCaptcha integration), FE `api.ts` (401 → refresh interceptor carried from F-072 plan).
+**Files touched:** BE auth router + main + user model migration (`email_verified` column); FE see F-310.fe entry below.
 **Owner:** Engineering (BE + FE)
+**Related:** F-310.fe (FE half — entry below)
+
+### F-310.fe — Auth hardening FE activation (5-commit chain)
+
+**Priority:** HIGH (FE half of F-310; gates the soft-beta hard cutoff + hCaptcha + email-verification + refresh-on-401)
+**Status:** ✅ Shipped 2026-05-12 (FE-side; commits 2fef9b7..b8f91ee on lemethodic-frontend; visual + interactive verification pending Chadi manual browser check per runbook below)
+**Filed:** 2026-05-12
+**Shipped:** 2026-05-12
+**Source:** F-310 BE shipped commits 4bb44fb..043167f with 5 new auth endpoints live in production `/openapi.json`; FE work needed to fully activate the surface
+**Dependencies:** F-310 (BE contracts); V-009 / F-225 / F-225.constraint (verification protocol)
+
+**Phases (one commit each):**
+- **Phase 1 — F-310.fe.client** (commit `2fef9b7`): `lib/api.ts` adds the 5 new `api.auth.*` methods (`refresh`, `verifyEmail`, `resendVerification`, `passwordResetRequest`, `passwordResetConfirm`); extends `register()` with optional `hcaptcha_token` param (defaults to null per BE schema). Adds the refresh-on-401 interceptor inside `request()` with three guards: REFRESH_EXEMPT_PATHS set (skip refresh on `/refresh` `/login` `/register` 401s), `_isRefreshedRetry` option flag (one retry max), and `pendingRefresh` module-level promise (concurrency dedupe — N parallel 401s fire ONE refresh). `credentials: 'include'` on all requests so the BE-set httpOnly refresh cookie rides on `/api/auth/refresh`. New `isEmailNotVerifiedError(err)` helper for the 403 + `{detail:{code:"email_not_verified"}}` BE contract.
+- **Phase 2 — F-310.fe.captcha** (commit `7e91953`): adds `@hcaptcha/react-hcaptcha@2.0.2` dep. New `lib/hcaptcha.ts` sitekey resolver — reads `NEXT_PUBLIC_HCAPTCHA_SITEKEY` env when present, falls back to hCaptcha public test sitekey `10000000-ffff-ffff-ffff-000000000001` for the rollout window (test key always passes verification so dev flows work without a real account). Signup adds the widget below password field via `next/dynamic({ssr:false})`; token passes to register call as 4th positional arg. Submit not gated on captcha completion (BE accepts null token per schema during rollout).
+- **Phase 3 — F-310.fe.verify** (commit `4a17437`): NEW `app/verify-email/page.tsx` — two flows on one route. `/verify-email` (no query) renders "Check your inbox" with Resend CTA hitting POST /api/auth/verify-email/resend. `/verify-email?token=XXX` auto-fires the confirm endpoint on mount; success routes to /login after 2s; 400/422 surfaces "link is invalid or has expired." Signup catches `isEmailNotVerifiedError` post-register (or post-onboarding-flush) and routes to /verify-email. Login gets the "Forgot password?" link pointing at /password-reset.
+- **Phase 4 — F-310.fe.reset** (commit `b8f91ee`): NEW `app/password-reset/page.tsx` — single route, branches on `?token=`. `/password-reset` renders RequestForm (email + hCaptcha → POST /api/auth/password-reset/request, anti-enumeration success state). `/password-reset?token=XXX` renders ConfirmForm (new password ≥8 chars + matching confirm → POST /api/auth/password-reset/confirm, success routes to /login after 2s, 400/422 surfaces "invalid or expired"). Same editorial styling as /signup + /verify-email.
+- **Phase 5 — F-310.fe docs** (this commit): BACKLOG entry + F-072 status flip from "Superseded by F-310" to "✅ Shipped via F-310 + F-310.fe."
+
+**Architectural decisions (locked from plan approval, 2026-05-12):**
+- Refresh-token storage: **cookie-only** (matches BE's no-body /refresh contract; FE never sees the refresh token).
+- hCaptcha SDK: **@hcaptcha/react-hcaptcha** (official, ~10KB, test-sitekey fallback for dev/rollout window).
+- Interceptor placement: **inline in `lib/api.ts:request()`** with module-level `pendingRefresh` for concurrency dedupe + `_isRefreshedRetry` flag for loop guard + REFRESH_EXEMPT_PATHS for surgical exemption.
+- Email-verification gating: **BE-owned** (returns 403 + `{detail:{code:"email_not_verified"}}` per F-310 BE report); FE only handles the detection + routing.
+- Password-reset routing: **single `/password-reset` route**, branches on `?token=` presence (request form vs confirm form).
+
+**Files touched:**
+- `lib/api.ts` (+178/-9): 5 new auth methods, refresh interceptor, credentials:'include', isEmailNotVerifiedError helper, register hcaptcha_token param
+- `lib/hcaptcha.ts` (NEW, +22): sitekey resolver
+- `package.json` + `pnpm-lock.yaml`: `@hcaptcha/react-hcaptcha@2.0.2`
+- `app/signup/page.tsx` (+30/-1): hCaptcha widget + token state + isEmailNotVerifiedError routing
+- `app/login/page.tsx` (+23): Forgot password? link
+- `app/verify-email/page.tsx` (NEW, +307): /verify-email landing + ConfirmFlow + EmptyState + Resend
+- `app/password-reset/page.tsx` (NEW, +454): /password-reset RequestForm + ConfirmForm + branching
+- `BACKLOG.md` (this commit): F-310 status → ✅ Shipped, F-072 status → ✅ Shipped via F-310 + F-310.fe, F-310.fe entry filed
+
+**Tests:** `pnpm build` clean on every phase. `npx tsc --noEmit` clean on every phase. No test runner configured in this repo (CLAUDE.md confirms).
+
+**Out of scope (filed implicitly as follow-ups):**
+- `useVerifyAuth` handling of `email_not_verified` on cold tab reload (currently treats non-401 errors optimistically). A user who closes the tab between register and verification will hit a silent 403 wall on /ecole. Acceptable risk for the rollout window; surface as a separate ticket if it bites a real user.
+- Captcha-gated submit (Chadi explicitly chose graceful-degradation rollout: BE accepts `null` token per schema; FE doesn't gate). Flip to gated when BE flips schema to require-token.
+
+**Operating-contract block (2026-05-12 contract):**
+- **CONFIDENCE:** HIGH on the BE-contract-mirroring layer (Phase 1 + the route bodies are pure mirrors of openapi.json). MEDIUM on the visual polish — hCaptcha iframe + form spacing wasn't visually verified post-deploy by FE-Claude (TARS retired, Chadi manual browser check is the verification mode).
+- **WHY:** Every phase commit ran `pnpm build` + `tsc --noEmit` clean; the BE contracts are the only spec we needed and they're locked in production /openapi.json. The interceptor's three guards (exempt-paths, retry-loop flag, concurrency dedupe) cover the obvious failure modes.
+- **UNCERTAINTY:**
+  - BE refresh response field name — FE defaults to `access_token`, falls back to `token`. If BE returns a third field name, refresh will appear to succeed but the new token won't write. The runbook step 4 catches this on first prod 401.
+  - hCaptcha widget visual fit inside the 440px ed-paper card on <360px viewports. Widget is ~304px wide; should fit but might feel cramped.
+  - `useVerifyAuth` doesn't currently route unverified users to `/verify-email` on cold tab reload (only the signup path does). Out of scope per above; will need a follow-up if real users hit it.
+- **VERIFICATION RUNBOOK (manual, Chadi, after deploy):**
+  1. **Sign up flow (hCaptcha):** Open lemethodic.com/signup in a fresh incognito window. Form should render with the hCaptcha checkbox between Password and Submit. Solve the test challenge (auto-passes on test sitekey). Submit → BE returns 201 → routed somewhere (either /ecole/intro if email pre-verified by BE rollout config, OR /verify-email if BE flipped to require-verify).
+  2. **Verify-email empty state:** Visit /verify-email (no query) while signed in. Should render "Check your inbox" + Resend button. Click Resend → BE returns 200 → button updates to "Sent — check your inbox." Verify in DevTools Network that POST /api/auth/verify-email/resend fired with Authorization header.
+  3. **Verify-email token confirm:** From a real BE-sent email, click the verification link → lands on /verify-email?token=XXX → page renders "Confirming your email…" briefly → flips to "Email verified." → redirects to /login after 2s. Sign in with the verified account works.
+  4. **Refresh-on-401:** Sign in. Open DevTools → Application → Local Storage. The lemethodic_token is the access token (JWT). Open DevTools → Application → Cookies — there should be a BE-set httpOnly refresh cookie scoped to seal-app-75fiu.ondigitalocean.app. Wait 15+ min for the access token to expire (or edit it to garbage in localStorage). Navigate to /ecole. DevTools Network: should see POST /api/auth/refresh fire FIRST → 200 with new token → original /me or /lessons retry → 200. Confirm lemethodic_token is replaced in localStorage.
+  5. **Refresh failure → clearAuth:** Delete the refresh cookie from DevTools. Force a 401 again (edit access token). Navigate to /ecole → /refresh fails → auth clears → router lands /login. Sign-in works after.
+  6. **Forgot password:** From /login, click "Forgot password?" → /password-reset request form. Enter your email → solve hCaptcha → Submit. Success state "If that email is on file, you'll receive a link…" (anti-enumeration copy). Check inbox for the BE-sent email; click link → /password-reset?token=XXX confirm form. Enter new password ≥8 chars + matching confirm → Submit → "Password updated." → redirects to /login. Sign in with the new password works.
+  7. **Bad reset token:** Visit /password-reset?token=BAD. Enter passwords + submit. Should surface "This reset link is invalid or has expired. Request a new one."
+  8. **Field-name sanity (only if step 4 refresh appears to silently fail):** Open the /refresh response in DevTools Network → Preview. Confirm the new access token comes back under `access_token` (FE default) or `token` (FE fallback). If it's a third field name, surface to FE-Claude as a follow-up — the interceptor needs that field name added.
 
 ### F-311 — Token control (Redis rate limiter + model routing + prompt caching)
 
