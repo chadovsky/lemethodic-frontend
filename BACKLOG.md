@@ -3168,6 +3168,38 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
   7. **Bad reset token:** Visit /password-reset?token=BAD. Enter passwords + submit. Should surface "This reset link is invalid or has expired. Request a new one."
   8. **Field-name sanity (only if step 4 refresh appears to silently fail):** Open the /refresh response in DevTools Network → Preview. Confirm the new access token comes back under `access_token` (FE default) or `token` (FE fallback). If it's a third field name, surface to FE-Claude as a follow-up — the interceptor needs that field name added.
 
+### F-310.fe.coldreload — Route email_not_verified 403 from any protected page
+
+**Priority:** MEDIUM (cold-tab reload edge case; affects users who don't verify email immediately after register. Not blocking soft beta if verification is quick.)
+**Status:** Queued
+**Filed:** 2026-05-12
+**Source:** F-310.fe out-of-scope flag (2026-05-12 plan-first + end-of-ticket report). A user who signs up, closes the tab, returns later still unverified hits protected routes → BE returns 403 + `{detail:{code:"email_not_verified"}}` → currently only the signup path catches this and routes to /verify-email. Every other entry point (cold tab on /ecole, /writing, /progress, etc.) surfaces it as a generic "Something went wrong."
+**Dependencies:** F-310.fe (`isEmailNotVerifiedError` helper already in `lib/api.ts`)
+
+**Scope:**
+Promote the `email_not_verified` 403 handling from the signup path to a project-wide interceptor. Two implementation options to evaluate during the ticket:
+
+1. **`lib/api.ts:request()` interceptor** — extend the existing 401-refresh path with a parallel 403 branch: on `isEmailNotVerifiedError(err)`, route the browser to `/verify-email` via a hard `window.location.assign('/verify-email')` (lib/api has no router instance available). Single point of fix; covers every API path.
+2. **`hooks/useVerifyAuth.ts`** — in the catch branch of the `/me` probe on mount, detect `isEmailNotVerifiedError` and call `router.replace('/verify-email')`. Only catches the cold-mount path, not in-session 403s; cleaner separation of concerns.
+
+Likely pick: **option 1** (single interceptor covers all surfaces). Risk: a hard `window.location` redirect during an in-flight API call may interrupt UI state mid-action. Trade-off acceptable for the gate — unverified users shouldn't be doing anything on protected pages anyway.
+
+Edge cases to handle in the ticket:
+- Don't redirect when already on `/verify-email` (would cause a navigation loop)
+- Don't redirect when the 403 hits during the verify-email resend itself (already on the right page)
+- Preserve the user's original target via `?next=...` so a post-verification redirect can route them back
+
+**Files touched (planned):**
+- `lib/api.ts` — extend `request()` 403 branch with `isEmailNotVerifiedError` → `window.location.assign('/verify-email')` guard; skip when `path.startsWith('/api/auth/verify-email')` or `window.location.pathname === '/verify-email'`
+- Optionally `hooks/useVerifyAuth.ts` — explicit `email_not_verified` detection (option 2 only if option 1 proves insufficient)
+- `app/verify-email/page.tsx` — read `?next=` and route there post-verification instead of always `/login`
+
+**Operating-contract block (2026-05-12 contract):**
+- CONFIDENCE: HIGH on the scope; the fix surface is small (single function in `lib/api.ts`) and `isEmailNotVerifiedError` already exists from F-310.fe.client.
+- WHY: Documented out-of-scope flag during F-310.fe; small, well-bounded, doesn't gate anything else.
+- UNCERTAINTY: Whether the hard `window.location.assign` interferes with any in-flight optimistic UI state on the diagnostic / writing surfaces. If it does, fallback is option 2 (useVerifyAuth only) with the silent-403 wall accepted on non-cold-mount surfaces.
+- VERIFICATION: Sign up, get the access token, **do NOT verify the email**, close the tab. Open `lemethodic.com/ecole` directly in a fresh tab. Expected: route resolves to `/verify-email` (not "Something went wrong"). Same test on `/writing`, `/progress`, `/profile`. Verify a user already on `/verify-email` doesn't get redirected in a loop.
+
 ### F-311 — Token control (Redis rate limiter + model routing + prompt caching)
 
 **Priority:** HIGH (pre-launch blocker per Decision 4 — at 5,000+ users Y1, uncapped diagnostic abuse blows API costs before revenue catches up)
