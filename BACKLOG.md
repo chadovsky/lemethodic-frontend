@@ -2183,6 +2183,48 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - `lib/types.ts` — `WritingCoucheFeedback` interface; `WritingSubmissionResult` shape relaxed (couches → optional array; overall_score + cefr_band → optional)
 - `components/writing/WritingSubmissionClient.tsx` — ResultView refactored: array→Map lookup, defensive guards, "Coming soon" placeholder per missing couche
 
+### V-016a.dashboard — Render BE rich feedback envelope on /writing dashboard
+
+**Priority:** HIGH (production: dashboard hid every per-layer feedback field BE returned; em-dashes for overall_score + CEFR; "No feedback" everywhere despite BE populating examiner remarks, coaching, transformations, and a full TCF rubric breakdown)
+**Status:** ✅ Shipped 2026-05-12 (non-visual sweep verified; visual verification routed to TARS — separate commit)
+**Verification:**
+- Non-visual sweep (FE-Claude, 2026-05-12): deployment `dpl_FVz6abPFGt4wpcbBpi2ysqm97nrh` READY; `lemethodic.com/writing` returns 200 (prerender HIT) and `/writing/10` returns 200 from the new lambda (MISS → lambda evaluated); `/ecole` regression check returns 200 (V-016c.fix unaffected). Zero error/warning/fatal entries in project runtime logs over the last 1h.
+- Visual + interactive verification (1440px desktop + 375px mobile of `/writing/10` post-submission result view; confirm: numeric per-couche scores incl. 0; examiner remark in French serif italic per couche; Coaching block with EN primary + FR secondary; "Try this" transformation sub-card; TCF rubric breakdown accordion expanding to show per-criterion label/score/max/remark/coaching): routed to TARS — separate verification commit.
+**Filed:** 2026-05-12
+**Shipped:** 2026-05-12 (commit `f6393fe`)
+**Source:** Chadi 2026-05-12 — writing analysis dashboard hides BE-populated fields; root-cause hypothesis: V-016a synchronization gap (BE rewrote response shape to 5-couche; FE rendering layer only absorbed the flat back-compat shape, not the rich envelope)
+**Dependencies:** V-016a.fix (flat couches[] back-compat reader stays as fallback); BE V-016a (rewrote response shape to add `feedback.*` envelope with `methode_en_couches`, `exam_profile.criteria_breakdown`, `teacher_coaching`, `tcf_canada_evaluation`); V-009 (BRAND_LABEL); F-225 (verification protocol)
+
+**Cause:** BE response carries TWO parallel shapes — a flat `result.couches[]` array (which V-016a.fix's reader still consumes) AND a rich nested envelope at `result.feedback.*` carrying the methodology-voice examiner remarks, the bilingual teacher coaching, the action-step transformations, and the full exam-profile + TCF-rubric criteria breakdown. V-016a.fix only consumed the flat shape — every field under `result.feedback.*` went unrendered. The FE consequently fell into all its defensive empty-state branches: `result.overall_score` → undefined → em-dash; `result.cefr_band` → undefined → em-dash; per-couche scores still rendered (from the flat array, value `0` when BE scored it zero) but the feedback paragraph slot defaulted to "No feedback for this layer" because the flat shape carries no examiner remark when the rich shape is present.
+
+**Fix:**
+- `lib/types.ts` adds the rich envelope types in front of the existing back-compat ones: `WritingTeacherCoaching` (coaching_en/coaching_fr/transformation), `WritingMethodeCoucheRich` (score + examiner_remark_fr + teacher_coaching), `WritingCriterionBreakdown` (display-ready per-criterion shape with localized labels + max_score + score + observation + coaching), `WritingExamProfile` (overall_score + cefr_level + criteria_breakdown[] + secondary_framework_{label,value}), `WritingAnalysisFeedback` (the full envelope keyed by `methode_en_couches: Partial<Record<ExtendedCoucheKey, ...>>`). `WritingSubmissionResult` extended with `feedback?: WritingAnalysisFeedback` — flat fields preserved for back-compat with older BE responses.
+- `components/writing/WritingSubmissionClient.tsx` ResultView reads with rich-first / flat-fallback precedence:
+  - Top-card `overall_score` ← `result.feedback?.exam_profile?.overall_score ?? result.overall_score ?? null`; CEFR ← `result.feedback?.exam_profile?.cefr_level ?? result.cefr_band ?? null`. **Score `0` displays as `0`** — em-dash is reserved for null/undefined (the bug was treating a real zero as "missing data").
+  - Conditional secondary-framework row renders when `exam_profile.secondary_framework_value` is non-null (e.g. CLB equivalence for TCF Canada). Skipped on null.
+  - Per-couche cards: precedence `result.feedback?.methode_en_couches?.[key]` rich → flat `result.couches[].find(c => c.key === key)` fallback → `missing`. Score merges (rich wins, flat next). New body layers stacked vertically:
+    - Examiner remark (serif italic, the methodology voice in French; reads `examiner_remark_fr`)
+    - Coaching block (sans, "Coaching" eyebrow → `coaching_en` 14px ed-fg primary → `coaching_fr` 13px italic ed-fg-soft with small `FR` tag — EN primary, FR secondary, both visible, no toggle per Chadi design call)
+    - Transformation sub-card (warm-cream bg, "Try this" / "Essayez ceci" eyebrow in peach-deep, `transformation` body in espresso)
+    - Empty-state "No feedback for this layer" only renders when none of remark / coaching / transformation are present and the couche is not `missing`.
+  - New TCF rubric breakdown accordion via native `<details><summary>` (no JS state, accessible by default). Renders **only** `exam_profile.criteria_breakdown[]` — `tcf_canada_evaluation.criteria[]` is the raw scoring source and per Chadi design call is intentionally not surfaced (one accordion only). Per criterion: localized label (`label_en_student` / `label_fr_student` per UI language) + `score / max_score` (e.g. "0 / 20") + examiner remark + coaching block + transformation sub-card. Sub-cards reuse the warm-cream + peach-deep eyebrow treatment from the per-couche transformation block.
+
+**Bilingual coaching default:** English primary, French secondary, both visible side-stacked. Matches the user persona (English speaker preparing French exam) — EN reads first as the meta-language explaining the issue, FR reinforces the target language pattern. No toggle (would add state + interaction cost without pedagogical gain for this audience).
+
+**Score handling:** 0 is data, not absence. Em-dash only on null/undefined.
+
+**Files touched:**
+- `lib/types.ts` — +75 lines (5 new interfaces + extension to `WritingSubmissionResult`)
+- `components/writing/WritingSubmissionClient.tsx` — +287/-62 lines (COPY additions for new strings, ResultView destructure refactor, per-couche body rewrite, criteria accordion)
+
+**Tests:** `pnpm build` clean. `npx tsc --noEmit` clean. No test runner configured (CLAUDE.md confirms).
+
+**Operating-contract block (2026-05-12 contract):**
+- CONFIDENCE: HIGH
+- WHY: FE types now mirror the verified production payload exactly (Chadi-supplied top-level keys, criteria_breakdown entry shape, exam_profile envelope). Back-compat preserved via dual-shape reader. Build + typecheck + deploy clean.
+- UNCERTAINTY: Visual density on a long /writing/{id} result with all four sub-blocks (examiner remark + coaching + transformation + criteria accordion) — may need a polish pass on spacing/typography after TARS captures the screenshots. Correctness is not at risk; polish is.
+- VERIFICATION: Hit `/writing/10` on prod with an authenticated session, submit a fresh response, wait for analysis. Per-couche cards should show numeric score (incl. `0` as `0`), examiner remark in serif italic French, Coaching block with EN primary + FR secondary, and a "Try this" sub-card. TCF rubric accordion appears below the couche stack — expand to see per-criterion label, `score / max_score`, examiner remark, and coaching. Top-card scores read from `exam_profile`; secondary-framework row renders only if BE supplies a non-null CLB-equivalent value. Regression: `/ecole` still renders both phase grids populated (V-016c.fix unaffected).
+
 ### V-016g — /library prefetch 404 cleanup (stub page)
 
 **Priority:** MEDIUM (production console noise; UX gap when users click directly)
