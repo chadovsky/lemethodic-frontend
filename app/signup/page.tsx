@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState, type KeyboardEvent } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { api, ApiError } from '@/lib/api'
+import { api, ApiError, isEmailNotVerifiedError } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
 import { useOnboardingStore } from '@/lib/onboarding'
 import { useSubmitResponseStore } from '@/lib/submitResponse'
@@ -182,6 +182,15 @@ function SignupInner() {
           }
           useOnboardingStore.getState().reset()
         } catch (flushErr) {
+          // F-310.fe.verify — BE returns 403 + { detail: { code:
+          // "email_not_verified" } } on any protected call for a user
+          // whose email_verified_at IS NULL. Route to /verify-email
+          // empty-state so the user can resend / check their inbox
+          // instead of landing on a half-broken /ecole.
+          if (isEmailNotVerifiedError(flushErr)) {
+            router.push('/verify-email')
+            return
+          }
           // eslint-disable-next-line no-console
           console.error('Onboarding flush failed — routing to /ecole anyway', flushErr)
         }
@@ -189,6 +198,12 @@ function SignupInner() {
 
       router.push(nextRoute)
     } catch (err) {
+      // F-310.fe.verify — register itself can't return email_not_verified
+      // (it CREATES the unverified row), but defensive: catch any case.
+      if (isEmailNotVerifiedError(err)) {
+        router.push('/verify-email')
+        return
+      }
       if (err instanceof ApiError) {
         setError(mapRegisterError(err))
       } else {

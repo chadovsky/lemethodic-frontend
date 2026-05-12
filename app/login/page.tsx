@@ -290,6 +290,30 @@ export default function LoginPage() {
             {error}
           </p>
         )}
+
+        {/* F-310.fe.verify — Forgot password link. Lands on /password-reset
+            (request form when no token; confirm form when ?token= present). */}
+        <p
+          style={{
+            marginTop: 16,
+            fontSize: 13,
+            lineHeight: '18px',
+            color: INK_SOFT,
+            textAlign: 'center',
+          }}
+        >
+          <Link
+            href="/password-reset"
+            style={{
+              color: INK_SOFT,
+              fontWeight: 500,
+              textDecoration: 'underline',
+              textUnderlineOffset: 2,
+            }}
+          >
+            Forgot password?
+          </Link>
+        </p>
       </div>
 
       {/* Below the card */}
