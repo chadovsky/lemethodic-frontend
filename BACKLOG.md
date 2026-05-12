@@ -3320,6 +3320,64 @@ Edge cases handled:
 **Scope:** when a diagnostic surfaces an error tagged with a vocabulary register/topic mismatch, FE renders a "Practice this in Le Vocabulaire" callout linking to the relevant topic set. BE: extend diagnostic response with `suggested_vocab_topics: string[]`. FE: render callout block in ResultView + diagnostic page.
 **Owner:** Engineering (BE + FE)
 
+### F-325 — Le Vocabulaire browse UI (FE) — topic catalog + chunk detail
+
+**Priority:** MEDIUM (Sprint 2 — corpus exploration surface; complements F-322 practice UI and F-323 test UI)
+**Status:** Plan locked, BE F-325 API live on commit 0543642; FE phases A0–A6 in flight
+**Filed:** 2026-05-12
+**Source:** 2026-05-12 strategic session — Decision 3 (Le Vocabulaire system); F-322 push-back resolved with new ticket number per Chadi.
+**Dependencies:** BE F-325 API (commit 0543642 — SHIPPED), F-320 (DB schema), F-321 (seed Phase 1 — not yet seeded; empty-state mode until then). Tier-gate live wiring deferred to F-311.fe.
+
+**Scope:**
+Two-route browse surface complementing F-322 (practice) and F-323 (test):
+- `/vocabulaire` — topic catalog with `corpus_partition` filter (three chips: `CC_corpus` / `chadi_authored` / `book_lab`). The fourth canonical partition `third_party_publisher_DO_NOT_EXTRACT` is silently filtered at the BE query layer (BE Decision D4) and is invisible to FE — no chip, no badge.
+- `/vocabulaire/[topic-slug]` — paginated chunk list inside a topic, with three filter chip groups: `cefr_level` (A1–C2), `exam_tag` (TCF / DELF / TEF; null=untagged), `register` (familier / standard / soutenu).
+
+Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split). Auth-gated via `ProtectedRoute` (no public/SEO surface — public marketing is Sprint A post-launch territory).
+
+**Canonical BE contract (locked 2026-05-12):**
+- `corpus_partition` enum: `CC_corpus | chadi_authored | book_lab | third_party_publisher_DO_NOT_EXTRACT` (per BE F-320 commit 0a7cc4b; supersedes the stale `oqlf|academie|curated` line at BACKLOG.md:3274 — see BACKLOG-HYGIENE-001 follow-up).
+- `GET /api/vocab/topics?corpus_partition=…` → `Topic[]` (camelCase mapper at FE boundary).
+- `GET /api/vocab/topics/{slug}/chunks?cefr_level=…&exam_tag=…&register=…&offset=…&limit=20` → `{ chunks: Chunk[]; total: number; limit: number; offset: number }`. **Offset-based pagination** (not cursor — BE F-325 confirmed).
+- Auth: Bearer token, same as the rest of the app.
+- Tier-lock: 403 + `tier_insufficient` detail body (consistent with F-310 contract). Surfaces through `lib/api.ts:request()` like any other 403; FE does not invent a special 200-with-flag path.
+
+**Empty-state copy (EN+FR; ES deferred to F-326 placeholder):**
+- Corpus empty: EN "Le Vocabulaire is coming." / FR « Le Vocabulaire arrive. »
+- Topic filtered to zero: EN "No chunks match these filters." / FR « Aucun chunk ne correspond à ces filtres. »
+- Locked-card (free user + exam_tagged_*): EN "Exam-tagged corpus is for paid plans." → /paywall.
+
+**State management:** TanStack Query (new project pattern). Conservative defaults: `staleTime: 60_000`, `refetchOnWindowFocus: false`. `QueryClientProvider` mounted at `app/layout.tsx`. Query keys structured for filter composability.
+
+**Tier-gate (deferred stub):**
+- `hooks/useUserTier.ts` returns `'unknown'` until F-311.fe lands.
+- `TopicCardLocked` variant renders when tier === `'free'` AND `topic.corpus_partition` is exam-tagged. Currently `'unknown'` always falls through to unlocked. F-225 screenshot of the locked state captured via dev-mode override.
+
+**Phase plan (one commit per phase, build + typecheck clean per commit):**
+- **A0** (this commit): file F-325 + BACKLOG-HYGIENE-001 entries. Docs only.
+- **A1**: install `@tanstack/react-query` + `@tanstack/react-query-devtools`; mount provider at `app/layout.tsx`.
+- **A2**: types + `api.vocab.{listTopics, listChunks}` in `lib/api.ts` / `lib/types.ts`.
+- **A3**: `/vocabulaire` catalog route (mobile + desktop + empty-state + TQ-wired).
+- **A4**: `/vocabulaire/[topic-slug]` topic detail (filters + offset infinite-query pagination + empty-state).
+- **A5**: `useUserTier` stub + `TopicCardLocked` wired into TopicCard.
+- **A6**: F-225 verification block (runbook + status flip to Awaiting verification).
+
+**Operating-contract block (2026-05-12 contract):**
+- CONFIDENCE: HIGH on the FE plan. BE contract is locked (commit 0543642). Scope is bounded; the only meaningful unknown is TanStack Query's behavior under the existing fetch patterns — conservative defaults mitigate.
+- WHY: Sprint 2 surface; Decision 3 dependency for the general-French audience; complements practice (F-322) and test (F-323) UIs.
+- UNCERTAINTY: Tier-gate stub returns `'unknown'`; live wiring blocks on F-311.fe. F-225 locked-card screenshot requires manual dev override until then.
+- VERIFICATION: see Phase A6 runbook (filed at A6 commit).
+
+### BACKLOG-HYGIENE-001 — F-320 stale corpus_partition enum line (BACKLOG.md:3274)
+
+**Priority:** LOW (docs-only; doesn't affect shipped behavior)
+**Status:** Queued
+**Filed:** 2026-05-12
+**Source:** F-325 Phase A0 — surfaced during plan investigation. BACKLOG.md:3274 (F-320 scope) describes corpus partitions as `oqlf|academie|curated`. The canonical enum per BE F-320 commit 0a7cc4b is `CC_corpus | chadi_authored | book_lab | third_party_publisher_DO_NOT_EXTRACT`. F-325 entry above uses the canonical enum; the F-320 line is stale and contradicts.
+**Dependencies:** none
+**Scope:** edit BACKLOG.md:3274 (F-320 scope description) to replace the `oqlf|academie|curated` triple with the canonical four-value enum. Single-line docs change; no code touched. Kept out of the F-325 BACKLOG filing commit to preserve commit-scope discipline.
+**Owner:** Frontend Engineering (docs)
+
 ---
 
 ## Working protocol reminder
