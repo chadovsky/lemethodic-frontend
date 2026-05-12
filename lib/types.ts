@@ -672,6 +672,81 @@ export interface WritingSubmissionResult {
   couches?: WritingCoucheFeedback[]
   // Optional Claude narrative summary if present.
   narrative_summary?: string | null
+  // V-016a.dashboard — rich nested envelope returned alongside the flat
+  // fields above. When `feedback` is present, the dashboard prefers values
+  // from feedback.* (per-couche examiner remark + teacher coaching,
+  // exam-profile criteria breakdown) and falls back to flat fields only
+  // for back-compat with older BE responses.
+  feedback?: WritingAnalysisFeedback
+}
+
+// V-016a.dashboard — pedagogical coaching block emitted per couche and
+// per TCF criterion. coaching_en is primary copy; coaching_fr is the
+// French analog; transformation is the action-step rewrite ("try this").
+export interface WritingTeacherCoaching {
+  coaching_en?: string | null
+  coaching_fr?: string | null
+  transformation?: string | null
+}
+
+// V-016a.dashboard — rich per-couche payload under
+// `feedback.methode_en_couches.<key>`. Scores share the 0-20 scale used
+// in the flat WritingCoucheFeedback array.
+export interface WritingMethodeCoucheRich {
+  score?: number | null
+  examiner_remark_fr?: string | null
+  teacher_coaching?: WritingTeacherCoaching | null
+}
+
+// V-016a.dashboard — single criterion from
+// `feedback.exam_profile.criteria_breakdown[]`. This is the display-ready
+// dataset (carries localized labels + max_score); the parallel raw
+// `feedback.tcf_canada_evaluation.criteria[]` is the scoring source and
+// is intentionally NOT rendered (one accordion only — see V-016a.dashboard).
+export interface WritingCriterionBreakdown {
+  criterion_key: string
+  label_fr_technical?: string
+  label_fr_student?: string
+  label_en_student?: string
+  label_es_student?: string
+  max_score: number
+  score: number
+  feedback?: string | null
+  examiner_remark_fr?: string | null
+  teacher_coaching?: WritingTeacherCoaching | null
+}
+
+// V-016a.dashboard — `feedback.exam_profile` envelope. The dashboard reads
+// overall_score + cefr_level from here in preference to the flat
+// WritingSubmissionResult.overall_score / cefr_band; the secondary_framework
+// pair (e.g. CLB, when targeting TCF Canada) renders only when value is
+// non-null.
+export interface WritingExamProfile {
+  overall_score?: number | null
+  cefr_level?: string | null
+  criteria_breakdown?: WritingCriterionBreakdown[]
+  secondary_framework_label?: string | null
+  secondary_framework_value?: string | number | null
+}
+
+// V-016a.dashboard — full rich feedback envelope. `methode_en_couches` is
+// the rich per-couche map (consumer reads keys via ExtendedCoucheKey via
+// coucheBrandLabels.ts); `exam_profile` carries the TCF rubric breakdown
+// and overall scoring. The narrative side-fields (summary, errors,
+// strengths, next_steps, next_step, tcf_canada_evaluation) are present
+// in the BE payload but not surfaced by the V-016a.dashboard UI pass —
+// kept here so a future iteration can render them without re-typing.
+export interface WritingAnalysisFeedback {
+  overall_score?: number | null
+  word_count?: number
+  summary?: string | null
+  errors?: unknown
+  strengths?: unknown
+  next_steps?: unknown
+  next_step?: unknown
+  methode_en_couches?: Partial<Record<CoucheKey | 'la_voix', WritingMethodeCoucheRich>>
+  exam_profile?: WritingExamProfile
+  tcf_canada_evaluation?: unknown
 }
 
 // V-016a.fe — async job contract. POST /api/writing/submit no longer

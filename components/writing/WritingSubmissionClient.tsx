@@ -49,6 +49,16 @@ const COPY = {
     resultScore: 'Overall score',
     submitAnother: 'Submit another',
     tryAgain: 'Try the same prompt again',
+    // V-016a.dashboard — coaching / transformation / TCF rubric accordion
+    resultCoachingLabel: 'Coaching',
+    resultCoachingFrLabel: 'FR',
+    resultTransformationLabel: 'Try this',
+    resultRubricLabel: 'TCF rubric breakdown',
+    resultRubricSubline: 'Per-criterion score, examiner remark, and coaching.',
+    resultRubricExpand: 'Show details',
+    resultRubricCollapse: 'Hide details',
+    resultExaminerLabel: 'Examiner remark',
+    resultScoreSlash: (n: number, max: number) => `${n} / ${max}`,
     // V-016a.fe — async-job state copy.
     analyzingTitle: 'Analyzing your writing',
     analyzingPhase: {
@@ -84,6 +94,16 @@ const COPY = {
     resultScore: 'Note globale',
     submitAnother: 'Soumettre un autre',
     tryAgain: 'Refaire le même sujet',
+    // V-016a.dashboard — coaching / transformation / TCF rubric accordion
+    resultCoachingLabel: 'Coaching',
+    resultCoachingFrLabel: 'FR',
+    resultTransformationLabel: 'Essayez ceci',
+    resultRubricLabel: 'Détail du barème TCF',
+    resultRubricSubline: 'Score, remarque et coaching par critère.',
+    resultRubricExpand: 'Afficher le détail',
+    resultRubricCollapse: 'Masquer le détail',
+    resultExaminerLabel: "Remarque de l'examinateur",
+    resultScoreSlash: (n: number, max: number) => `${n} / ${max}`,
     analyzingTitle: 'Analyse en cours',
     analyzingPhase: {
       initial: "Cela peut prendre 30 à 90 secondes.",
@@ -717,28 +737,39 @@ interface ResultViewProps {
 }
 
 function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: ResultViewProps) {
-  // V-016a.fix — BE returns `couches` as a Couche[] array (matches the
-  // diagnostic recordings convention; lib/types.ts:227). The original
-  // V-013a code treated it as a record-by-key, which crashed in prod
-  // ("Cannot read properties of undefined (reading 'le_fond')") when
-  // the array shape arrived. Look each couche up by key, fall back to
-  // null when missing, and render a "Coming soon" placeholder for any
-  // expected couche absent from the response (incl. Voix until BE V-009.be).
+  // V-016a.dashboard — read the rich nested envelope
+  // (result.feedback.methode_en_couches.<key>) first; fall back to the flat
+  // result.couches[] array preserved by V-016a.fix for back-compat. Score
+  // and remark merge across both shapes; coaching only exists in the rich
+  // shape.
+  const methodeRich = result.feedback?.methode_en_couches
   const coucheArray = Array.isArray(result.couches) ? result.couches : []
   const coucheByKey = new Map<string, (typeof coucheArray)[number]>()
   for (const c of coucheArray) coucheByKey.set(c.key, c)
   const expectedKeys = ['le_fond', 'les_moules_des_idees', 'les_moules', 'les_reflexes_anglais', 'la_voix'] as const
   const couches = expectedKeys.map((key) => {
-    const entry = coucheByKey.get(key) ?? null
+    const rich = methodeRich?.[key] ?? null
+    const flat = coucheByKey.get(key) ?? null
     return {
       key,
-      score: entry?.score ?? null,
-      // BE may emit per-couche feedback under `analyse` (canonical Couche
-      // convention) or `feedback` (writing-specific). Read both.
-      feedback: entry?.analyse ?? entry?.feedback ?? null,
-      missing: entry === null,
+      score: rich?.score ?? flat?.score ?? null,
+      // Per-couche prose: rich shape's examiner remark wins (the
+      // methodology voice); falls back to flat shape's analyse/feedback
+      // for older BE responses.
+      remark: rich?.examiner_remark_fr ?? flat?.analyse ?? flat?.feedback ?? null,
+      coaching: rich?.teacher_coaching ?? null,
+      missing: rich === null && flat === null,
     }
   })
+
+  // V-016a.dashboard — top-card scoring prefers the rich exam_profile;
+  // falls back to the flat overall_score / cefr_band if BE omits feedback.*.
+  const examProfile = result.feedback?.exam_profile
+  const overallScore = examProfile?.overall_score ?? result.overall_score ?? null
+  const cefrBand = examProfile?.cefr_level ?? result.cefr_band ?? null
+  const secondaryLabel = examProfile?.secondary_framework_label ?? null
+  const secondaryValue = examProfile?.secondary_framework_value ?? null
+  const criteriaBreakdown = examProfile?.criteria_breakdown ?? []
   return (
     <>
       <p
@@ -771,14 +802,16 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
         {copy.resultTitle}
       </h1>
 
-      {/* Score summary card */}
+      {/* V-016a.dashboard — Score summary card. overallScore/cefrBand may
+          legitimately be 0 / "A1 not achieved" — em-dash is reserved for
+          null/undefined (BE didn't score it), never for a real zero. */}
       <div
         style={{
           backgroundColor: ED_PAPER,
           border: `1px solid ${ED_RULE}`,
           borderRadius: 4,
           padding: 'clamp(20px, 3vw, 32px)',
-          marginBottom: 24,
+          marginBottom: secondaryValue != null ? 12 : 24,
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           gap: 16,
@@ -789,7 +822,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
             {copy.resultScore}
           </p>
           <p style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: 'italic', fontSize: 36, color: 'var(--ed-warm-espresso)', margin: 0 }}>
-            {result.overall_score ?? '—'}
+            {overallScore != null ? overallScore : '—'}
           </p>
         </div>
         <div style={{ textAlign: 'right' }}>
@@ -797,10 +830,36 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
             {copy.resultBand}
           </p>
           <p style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: 'italic', fontSize: 36, color: 'var(--ed-warm-espresso)', margin: 0 }}>
-            {result.cefr_band ?? '—'}
+            {cefrBand != null ? cefrBand : '—'}
           </p>
         </div>
       </div>
+
+      {/* V-016a.dashboard — secondary framework row (e.g. CLB equivalence
+          when targeting TCF Canada). Only renders when BE provides a
+          non-null value. */}
+      {secondaryValue != null && (
+        <div
+          style={{
+            backgroundColor: ED_PAPER,
+            border: `1px solid ${ED_RULE}`,
+            borderRadius: 4,
+            padding: '14px clamp(20px, 3vw, 32px)',
+            marginBottom: 24,
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: 16,
+          }}
+        >
+          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: ED_MUTED, margin: 0 }}>
+            {secondaryLabel ?? ''}
+          </p>
+          <p style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: 'italic', fontSize: 22, color: 'var(--ed-warm-espresso)', margin: 0 }}>
+            {secondaryValue}
+          </p>
+        </div>
+      )}
 
       {/* Narrative summary if BE provides it */}
       {result.narrative_summary && (
@@ -820,56 +879,222 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
         </p>
       )}
 
-      {/* Per-couche breakdown — V-016a.fix renders all 5 expected couches.
-          Missing entries (e.g. Voix when BE V-009.be hasn't shipped, or a
-          partial response) render a "Coming soon" placeholder rather than
-          crashing. */}
+      {/* V-016a.dashboard — per-couche breakdown. Each card renders:
+          - score (numeric; 0 displays as 0, "Coming soon" only when null)
+          - examiner remark (serif italic, the methodology voice in French)
+          - coaching block (EN primary + FR secondary, sans-serif tutor voice)
+          - transformation sub-card ("Try this" action step)
+          Missing entries render "Coming soon" badge with reduced opacity. */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
-        {couches.map(({ key, score, feedback, missing }) => (
-          <div
-            key={key}
-            style={{
-              backgroundColor: ED_PAPER,
-              border: `1px solid ${ED_RULE}`,
-              borderRadius: 4,
-              padding: '16px 20px',
-              opacity: missing ? 0.6 : 1,
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
-              <h3
-                style={{
-                  fontFamily: SANS,
-                  fontWeight: 600,
-                  fontSize: 15,
-                  color: ED_FG,
-                  margin: 0,
-                }}
-              >
-                {BRAND_LABEL[key][language]}
-              </h3>
-              {score != null ? (
-                <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 16, color: 'var(--ed-warm-peach-deep)' }}>
-                  {score}
-                </span>
-              ) : (
-                <span style={{ fontFamily: SANS, fontWeight: 500, fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', color: ED_MUTED }}>
-                  {language === 'fr' ? 'Bientôt' : 'Coming soon'}
-                </span>
+        {couches.map(({ key, score, remark, coaching, missing }) => {
+          const hasCoachingProse = !!(coaching?.coaching_en || coaching?.coaching_fr)
+          const hasTransformation = !!coaching?.transformation
+          const hasAnyBody = !!remark || hasCoachingProse || hasTransformation
+          return (
+            <div
+              key={key}
+              style={{
+                backgroundColor: ED_PAPER,
+                border: `1px solid ${ED_RULE}`,
+                borderRadius: 4,
+                padding: '16px 20px',
+                opacity: missing ? 0.6 : 1,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 12,
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
+                <h3
+                  style={{
+                    fontFamily: SANS,
+                    fontWeight: 600,
+                    fontSize: 15,
+                    color: ED_FG,
+                    margin: 0,
+                  }}
+                >
+                  {BRAND_LABEL[key][language]}
+                </h3>
+                {score != null ? (
+                  <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 16, color: 'var(--ed-warm-peach-deep)' }}>
+                    {score}
+                  </span>
+                ) : (
+                  <span style={{ fontFamily: SANS, fontWeight: 500, fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', color: ED_MUTED }}>
+                    {language === 'fr' ? 'Bientôt' : 'Coming soon'}
+                  </span>
+                )}
+              </div>
+              {remark && (
+                <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 15, lineHeight: 1.6, color: ED_FG, margin: 0 }}>
+                  {remark}
+                </p>
+              )}
+              {hasCoachingProse && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: ED_MUTED, margin: 0 }}>
+                    {copy.resultCoachingLabel}
+                  </p>
+                  {coaching?.coaching_en && (
+                    <p style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.55, color: ED_FG, margin: 0 }}>
+                      {coaching.coaching_en}
+                    </p>
+                  )}
+                  {coaching?.coaching_fr && (
+                    <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.5, color: ED_FG_SOFT, margin: 0, fontStyle: 'italic' }}>
+                      <span style={{ fontStyle: 'normal', fontWeight: 600, fontSize: 10, letterSpacing: '0.08em', color: ED_MUTED, marginRight: 6 }}>
+                        {copy.resultCoachingFrLabel}
+                      </span>
+                      {coaching.coaching_fr}
+                    </p>
+                  )}
+                </div>
+              )}
+              {hasTransformation && (
+                <div
+                  style={{
+                    backgroundColor: 'var(--ed-warm-cream)',
+                    border: `1px solid ${ED_RULE}`,
+                    borderRadius: 4,
+                    padding: '12px 14px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                  }}
+                >
+                  <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ed-warm-peach-deep)', margin: 0 }}>
+                    {copy.resultTransformationLabel}
+                  </p>
+                  <p style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.55, color: 'var(--ed-warm-espresso)', margin: 0 }}>
+                    {coaching!.transformation}
+                  </p>
+                </div>
+              )}
+              {!hasAnyBody && !missing && (
+                <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.5, color: ED_MUTED, margin: 0, fontStyle: 'italic' }}>
+                  {language === 'fr' ? 'Pas de commentaire pour cette couche.' : 'No feedback for this layer.'}
+                </p>
               )}
             </div>
-            {feedback ? (
-              <p style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: ED_FG_SOFT, margin: 0 }}>
-                {feedback}
-              </p>
-            ) : missing ? null : (
-              <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.5, color: ED_MUTED, margin: 0, fontStyle: 'italic' }}>
-                {language === 'fr' ? 'Pas de commentaire pour cette couche.' : 'No feedback for this layer.'}
-              </p>
-            )}
-          </div>
-        ))}
+          )
+        })}
       </div>
+
+      {/* V-016a.dashboard — TCF rubric breakdown accordion. Renders the
+          exam_profile.criteria_breakdown[] dataset (display-ready with
+          localized labels + max_score). tcf_canada_evaluation.criteria[]
+          is the raw scoring source and is intentionally NOT rendered —
+          one accordion only per Chadi design call. Native <details> for
+          accessibility + no JS state. */}
+      {criteriaBreakdown.length > 0 && (
+        <details
+          style={{
+            backgroundColor: ED_PAPER,
+            border: `1px solid ${ED_RULE}`,
+            borderRadius: 4,
+            padding: '14px clamp(16px, 3vw, 24px)',
+            marginBottom: 32,
+          }}
+        >
+          <summary
+            style={{
+              cursor: 'pointer',
+              listStyle: 'none',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 4,
+              outline: 'none',
+            }}
+          >
+            <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--ed-warm-peach-deep)', margin: 0 }}>
+              {copy.resultRubricLabel}
+            </p>
+            <p style={{ fontFamily: SANS, fontSize: 13, color: ED_FG_SOFT, margin: 0 }}>
+              {copy.resultRubricSubline}
+            </p>
+          </summary>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
+            {criteriaBreakdown.map((criterion) => {
+              const label =
+                language === 'fr'
+                  ? criterion.label_fr_student ?? criterion.label_fr_technical ?? criterion.criterion_key
+                  : criterion.label_en_student ?? criterion.label_fr_student ?? criterion.criterion_key
+              const observation = criterion.examiner_remark_fr ?? criterion.feedback ?? null
+              const coach = criterion.teacher_coaching ?? null
+              const cHasProse = !!(coach?.coaching_en || coach?.coaching_fr)
+              const cHasTransformation = !!coach?.transformation
+              return (
+                <div
+                  key={criterion.criterion_key}
+                  style={{
+                    border: `1px solid ${ED_RULE}`,
+                    borderRadius: 4,
+                    padding: '14px 16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 10,
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
+                    <h4 style={{ fontFamily: SANS, fontWeight: 600, fontSize: 14, color: ED_FG, margin: 0 }}>
+                      {label}
+                    </h4>
+                    <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 14, color: 'var(--ed-warm-peach-deep)' }}>
+                      {copy.resultScoreSlash(criterion.score, criterion.max_score)}
+                    </span>
+                  </div>
+                  {observation && (
+                    <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 14, lineHeight: 1.55, color: ED_FG, margin: 0 }}>
+                      {observation}
+                    </p>
+                  )}
+                  {cHasProse && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: ED_MUTED, margin: 0 }}>
+                        {copy.resultCoachingLabel}
+                      </p>
+                      {coach?.coaching_en && (
+                        <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.55, color: ED_FG, margin: 0 }}>
+                          {coach.coaching_en}
+                        </p>
+                      )}
+                      {coach?.coaching_fr && (
+                        <p style={{ fontFamily: SANS, fontSize: 12, lineHeight: 1.5, color: ED_FG_SOFT, margin: 0, fontStyle: 'italic' }}>
+                          <span style={{ fontStyle: 'normal', fontWeight: 600, fontSize: 10, letterSpacing: '0.08em', color: ED_MUTED, marginRight: 6 }}>
+                            {copy.resultCoachingFrLabel}
+                          </span>
+                          {coach.coaching_fr}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  {cHasTransformation && (
+                    <div
+                      style={{
+                        backgroundColor: 'var(--ed-warm-cream)',
+                        border: `1px solid ${ED_RULE}`,
+                        borderRadius: 4,
+                        padding: '10px 12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 4,
+                      }}
+                    >
+                      <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ed-warm-peach-deep)', margin: 0 }}>
+                        {copy.resultTransformationLabel}
+                      </p>
+                      <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.55, color: 'var(--ed-warm-espresso)', margin: 0 }}>
+                        {coach!.transformation}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </details>
+      )}
 
       {/* Actions */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
