@@ -3293,11 +3293,41 @@ Edge cases handled:
 ### F-322 — Le Vocabulaire practice UI
 
 **Priority:** MEDIUM (Sprint 2 — F-319 MVP FE-side)
-**Status:** Queued
+**Status:** Plan locked 2026-05-13; B0 in flight (B1-B4 follow)
 **Filed:** 2026-05-12
+**Plan-approved:** 2026-05-13 (Chadi — answered the 4 open questions HIGH-confidence)
 **Source:** F-319 / Decision 3
-**Dependencies:** F-320, F-321
-**Scope:** `/vocabulaire` surface — practice mode: hide/reveal one language (FR or EN), self-grade pass/fail, build personal lists (V1: localStorage stash; V2 ticket promotes to user-scoped server lists with SRS). Topic picker. Mobile + desktop responsive per F-225.
+**Dependencies:** F-321 (seed — empty-state until then), F-325 (shipped — chunks API + TanStack Query provider + locked-card visual frame reused here)
+
+**Scope locked:**
+- **Route**: `/vocabulaire/[slug]/practice` (nested under topic detail; deep-linkable; keeps F-325 components untouched). `?mode=practice` rejected.
+- **Direction**: read order URL `?direction=fr|en` → localStorage pref → `'fr'` default. `'fr'` = show FR / reveal EN (comprehension). `'en'` = show EN / reveal FR (recall).
+- **Session length**: picker 10 / 20 / all; default 20 (attention-curve MVP cap; deeper sessions filed as F-322.deeper-sessions follow-up if user feedback demands).
+- **Self-grade**: binary pass/fail (V1). V2 SRS adds 4-level scale (Again/Hard/Good/Easy).
+- **Personal lists V1**: localStorage stash only. Per-chunk grade history. No Review-queue UI in V1 — failed chunks ARE the implicit review queue; V2 SRS layers a dedicated surface on top of the same storage shape.
+- **Tier-gate**: BE 403 + `tier_insufficient` body on exam_tagged topics. New `isTierInsufficientError(err)` helper parallel to `isEmailNotVerifiedError`. Surface-specific render (locked-card in place, no global interceptor — unlike email_not_verified which always hard-navs).
+- **F-225 capture for tier-locked**: dev-only `?devLock=tier` URL flag, gated behind `process.env.NODE_ENV !== 'production'`. Cheaper than waiting for a real free-tier test account; F-311 supersedes when shipped.
+- **Cache keys**: practice's TQ chunks query uses empty-filter key, separate from browse's user-filter key. No cache collision; warm-from-browse only when user had no filters active.
+
+**Component breakdown (all inline in PracticeClient.tsx):**
+- `PracticeClient` — top-level state machine: `phase: 'config' | 'session' | 'end' | 'tier-locked' | 'error' | 'empty'`. Owns shuffled `sessionChunks`, `currentIndex`, `revealed`.
+- `SessionConfigCard` — pre-session screen. Direction toggle + session-length picker + Start.
+- `FlashcardView` — one chunk at a time. Front (shown language) + Reveal button → back (hidden language) + Got it / Need review.
+- `SessionEndCard` — N got / N needs review / % accuracy. Practice again / Back to topic / Browse the corpus.
+- `TierLockedCard` — locked copy + CTA to /paywall (reuses F-325 catalog locked visual frame).
+- `PracticeError` / `PracticeEmpty` / `PracticeSkeleton` — ed-* primitive mirrors.
+
+**State management:**
+- `useInfiniteQuery` reusing F-325 query-key shape `['vocab', 'chunks', slug, '']` (empty filter segment). First page only (limit 20).
+- `lib/practice-state.ts` localStorage helpers — `Record<chunkId, { lastGrade, lastGradedAt, attempts }>` + direction-pref store. All wrapped in try/catch (soft-fail to in-memory on private-browsing).
+
+**Phase plan (one commit per phase, build + typecheck clean per commit):**
+- **B0** (this commit): F-322 BACKLOG entry locked with the plan above. Docs only.
+- **B1**: `lib/practice-state.ts` + `isTierInsufficientError` helper in `lib/api.ts` + new keys in `lib/storage-keys.ts`.
+- **B2**: `/vocabulaire/[slug]/practice` route + `PracticeClient.tsx` with all sub-components inline + dev-only `?devLock=tier` flag.
+- **B3**: Wire "Start practice" CTA into existing `app/vocabulaire/[slug]/TopicDetail.tsx`.
+- **B4**: F-225 verification runbook + status flip to "Awaiting verification".
+
 **Owner:** Frontend Engineering
 
 ### F-323 — Le Vocabulaire test UI
