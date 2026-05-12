@@ -121,6 +121,33 @@ export default function TopicDetail({ slug }: { slug: string }) {
           )}
         </header>
 
+        {/* F-322 — primary entry into the practice surface. Only
+            surfaced when there's actually something to practice
+            (chunks loaded, count > 0). */}
+        {!chunksQuery.isLoading && total > 0 && (
+          <div className="mb-7 md:mb-9 ed-hero-rise ed-hero-rise-delay-1">
+            <Link
+              href={`/vocabulaire/${encodeURIComponent(slug)}/practice`}
+              className="ed-btn-press inline-flex items-center justify-center"
+              style={{
+                height: 48,
+                padding: '0 22px',
+                borderRadius: 4,
+                border: 'none',
+                backgroundColor: 'var(--ed-accent)',
+                color: '#FFFFFF',
+                fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+                fontWeight: 600,
+                fontSize: 14,
+                letterSpacing: '0.01em',
+                textDecoration: 'none',
+              }}
+            >
+              {copy.practice.startCta}
+            </Link>
+          </div>
+        )}
+
         <FilterRow
           label={copy.filters.cefrLevel}
           values={CEFR_VALUES}
