@@ -3293,7 +3293,7 @@ Edge cases handled:
 ### F-322 — Le Vocabulaire practice UI
 
 **Priority:** MEDIUM (Sprint 2 — F-319 MVP FE-side)
-**Status:** Plan locked 2026-05-13; B0 in flight (B1-B4 follow)
+**Status:** Awaiting verification (F-225 — interactive change; needs 1440px + 375px screenshots of SessionConfigCard / FlashcardView pre-reveal / FlashcardView post-reveal / SessionEndCard / TierLockedCard (via dev `?devLock=tier`) + interaction trace per runbook below)
 **Filed:** 2026-05-12
 **Plan-approved:** 2026-05-13 (Chadi — answered the 4 open questions HIGH-confidence)
 **Source:** F-319 / Decision 3
@@ -3321,12 +3321,41 @@ Edge cases handled:
 - `useInfiniteQuery` reusing F-325 query-key shape `['vocab', 'chunks', slug, '']` (empty filter segment). First page only (limit 20).
 - `lib/practice-state.ts` localStorage helpers — `Record<chunkId, { lastGrade, lastGradedAt, attempts }>` + direction-pref store. All wrapped in try/catch (soft-fail to in-memory on private-browsing).
 
-**Phase plan (one commit per phase, build + typecheck clean per commit):**
-- **B0** (this commit): F-322 BACKLOG entry locked with the plan above. Docs only.
-- **B1**: `lib/practice-state.ts` + `isTierInsufficientError` helper in `lib/api.ts` + new keys in `lib/storage-keys.ts`.
-- **B2**: `/vocabulaire/[slug]/practice` route + `PracticeClient.tsx` with all sub-components inline + dev-only `?devLock=tier` flag.
-- **B3**: Wire "Start practice" CTA into existing `app/vocabulaire/[slug]/TopicDetail.tsx`.
-- **B4**: F-225 verification runbook + status flip to "Awaiting verification".
+**Phases shipped (one commit per phase, build + typecheck clean per commit):**
+- **B0** (8e72296): F-322 BACKLOG entry locked with the plan.
+- **B1** (cf7f215): `lib/practice-state.ts` (read/record/clearGrades + direction-pref helpers; try/catch wrapped for private-browsing); `isTierInsufficientError(err)` helper in `lib/api.ts` parallel to `isEmailNotVerifiedError`; new `VOCAB_PRACTICE_STATE_KEY` + `VOCAB_PRACTICE_PREF_KEY` in `lib/storage-keys.ts`.
+- **B2** (7ba9c00): `/vocabulaire/[slug]/practice` route. `PracticeClient.tsx` state machine (`config` / `session` / `end` views on top of TQ status). Sub-components inline: `SessionConfigCard`, `FlashcardView`, `SessionEndCard`, `TierLockedCard`, `ErrorCard`, `EmptyCard`, `PracticeSkeleton`. Fisher-Yates shuffle, reusing F-325 chunks query-key family with empty filter segment (no cache collision with browse's user-filter key). Dev-only `?devLock=tier` URL flag gated behind `process.env.NODE_ENV !== 'production'` for F-225 capture. `lib/vocab-copy.ts` extended with EN+FR `practice` block.
+- **B3** (93a8841): "Start practice" CTA wired into `app/vocabulaire/[slug]/TopicDetail.tsx`. Single conditional `<Link>` insertion at the top of the page (surfaces only when chunks > 0; uses `copy.practice.startCta` and the editorial-system primary-CTA visual).
+- **B4** (this commit): F-225 verification runbook + status flip.
+
+**Files touched (shipped):**
+- `BACKLOG.md` — F-322 entry locked (B0); status + runbook (B4).
+- `lib/storage-keys.ts` — two new keys (B1).
+- `lib/practice-state.ts` — NEW; localStorage helpers (B1).
+- `lib/api.ts` — `isTierInsufficientError(err)` helper (B1).
+- `lib/vocab-copy.ts` — `practice` block in EN+FR + `startCta` (B2).
+- `app/vocabulaire/[slug]/practice/page.tsx` — NEW; ProtectedRoute wrap (B2).
+- `app/vocabulaire/[slug]/practice/PracticeClient.tsx` — NEW; state machine + all sub-components (B2).
+- `app/vocabulaire/[slug]/TopicDetail.tsx` — "Start practice" CTA (B3).
+
+**Operating-contract block (2026-05-12 contract):**
+- CONFIDENCE: HIGH. Plan-first → all 4 open questions answered HIGH-confidence before B0 → 5 discrete commits, each `pnpm exec tsc --noEmit` silent + `pnpm build` green (38 routes, /vocabulaire static + /vocabulaire/[slug] + /vocabulaire/[slug]/practice dynamic, 0 warnings).
+- WHY: F-319 MVP completes the Vocabulaire surface trio: browse (F-325 ✅) + practice (F-322 — this) + test (F-323 queued).
+- UNCERTAINTY: (1) `'all'` session-length on topics with >20 chunks still practices the first 20 (BE F-325 returns first page; deeper sessions filed as F-322.deeper-sessions follow-up per plan R1). (2) Tier-lock screen capture path uses a dev-only URL flag (`?devLock=tier`) — F-311 supersedes when the live tier-read lands; the override is dead code in prod builds. (3) Personal-list V1 has no Review-queue UI; failed chunks ARE the implicit review queue persisted in localStorage; V2 SRS exposes a dedicated surface on the same storage shape.
+- VERIFICATION RUNBOOK (Chadi, post-deploy on lemethodic.com):
+  1. **Auth gate** — visit `/vocabulaire/<any>/practice` unauthenticated. Expect redirect to `/` via ProtectedRoute.
+  2. **Empty-state** — sign in. While F-321 hasn't seeded, navigating to `/vocabulaire/<any>/practice` either lands on EmptyCard (zero chunks) or ErrorCard (BE 404). Screenshot the actual outcome.
+  3. **CTA discovery** — once F-321 seeds, visit `/vocabulaire/<topic-slug>`. Verify the "Start practice" CTA appears below the chunk-count line and routes to `/vocabulaire/<topic-slug>/practice` on click. 1440px + 375px.
+  4. **Config card** — on the practice route, verify direction toggle (Show FR · reveal EN / Show EN · reveal FR) and length picker (10 / 20 / All). Toggle direction, refresh — localStorage persists the choice. 1440px + 375px.
+  5. **Flashcard pre-reveal** — Start session. Verify card shows only the front (per direction) with Reveal CTA. Progress label reads "Card 1 of 20". 1440px + 375px.
+  6. **Flashcard post-reveal** — click Reveal. Both languages now visible (back appears below a hairline rule). Got it / Need review buttons replace Reveal. 1440px + 375px.
+  7. **Grade + advance** — click Got it. Card index advances, revealed resets. Repeat for ~3 cards, including one Need review.
+  8. **localStorage trace** — DevTools → Application → Local Storage. Verify `lemethodic_vocab_practice_state` carries `{ "<chunkId>": { lastGrade, lastGradedAt, attempts } }` entries; `lemethodic_vocab_practice_pref` carries `{ direction }`.
+  9. **End card** — walk through the session to completion. Verify "Session complete." with N got · N needs review · % accuracy stats. Three CTAs: Practice again (reshuffles, returns to session), Back to topic, Browse the corpus. 1440px + 375px.
+  10. **Tier-lock capture (dev only)** — open the Vercel preview / local dev server (`pnpm dev`); visit `/vocabulaire/<any>/practice?devLock=tier`. Verify TierLockedCard renders with the "DEV: simulated tier lock" dashed badge + locked.title + locked.body + CTA → /paywall. 1440px + 375px. (Production refuses the flag — `process.env.NODE_ENV !== 'production'` gate.)
+  11. **i18n** — flip `interface_language` to `fr` (via /onboarding or BE record). Refresh `/vocabulaire/<slug>/practice`. Verify all practice copy switches to French.
+  12. **F-310 interceptor on practice** — log in as an unverified user; visit `/vocabulaire/<slug>/practice`. Expect hard-nav to `/verify-email?next=/vocabulaire/<slug>/practice` (F-310.fe.coldreload interceptor still works on this new surface).
+  13. **Runtime log sweep** — Vercel runtime logs for the F-322 deploy: 0 errors / 0 5xx in a 1h window after smoke.
 
 **Owner:** Frontend Engineering
 
