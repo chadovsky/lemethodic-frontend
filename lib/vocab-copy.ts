@@ -54,6 +54,33 @@ export interface VocabularyCopy {
     body: string
     retry: string
   }
+  practice: {
+    startCta: string                          // CTA on topic detail
+    configTitle: string                       // SessionConfigCard heading
+    configSubtitle: string
+    directionLabel: string
+    directionFrLabel: string                  // "Show FR, reveal EN"
+    directionEnLabel: string                  // "Show EN, reveal FR"
+    sessionLengthLabel: string
+    sessionLengthAll: string                  // "All in topic"
+    startSession: string
+    progressLabel: (i: number, n: number) => string  // "Card 3 of 20"
+    reveal: string
+    gotIt: string
+    needReview: string
+    endTitle: string
+    endStat: (got: number, total: number) => string  // "12 of 20 — 60%"
+    endNeedReview: (n: number) => string
+    practiceAgain: string
+    backToTopic: string
+    browseCorpus: string
+    emptyTitle: string
+    emptyBody: string
+    tierLockedTitle: string                    // copy uses copy.locked.* but
+                                               // surface needs page-level
+                                               // strings around it
+    devLockBadge: string                       // dev-only flag indicator
+  }
 }
 
 const EN: VocabularyCopy = {
@@ -103,6 +130,33 @@ const EN: VocabularyCopy = {
     body: 'Check your connection and try again.',
     retry: 'Retry',
   },
+  practice: {
+    startCta: 'Start practice',
+    configTitle: 'Practice this topic',
+    configSubtitle: 'Pick a direction and a session length. Chunks are shuffled per session.',
+    directionLabel: 'Direction',
+    directionFrLabel: 'Show FR · reveal EN',
+    directionEnLabel: 'Show EN · reveal FR',
+    sessionLengthLabel: 'Session length',
+    sessionLengthAll: 'All in topic',
+    startSession: 'Start session',
+    progressLabel: (i, n) => `Card ${i} of ${n}`,
+    reveal: 'Reveal',
+    gotIt: 'Got it',
+    needReview: 'Need review',
+    endTitle: 'Session complete.',
+    endStat: (got, total) =>
+      `${got} of ${total} — ${total === 0 ? 0 : Math.round((got / total) * 100)}%`,
+    endNeedReview: (n) =>
+      `${n} ${n === 1 ? 'chunk' : 'chunks'} for review`,
+    practiceAgain: 'Practice again',
+    backToTopic: 'Back to topic',
+    browseCorpus: 'Browse the corpus',
+    emptyTitle: 'Nothing to practice yet.',
+    emptyBody: 'This topic has no chunks. Check back once the corpus is seeded.',
+    tierLockedTitle: 'This topic is exam-tagged.',
+    devLockBadge: 'DEV: simulated tier lock',
+  },
 }
 
 const FR: VocabularyCopy = {
@@ -151,6 +205,33 @@ const FR: VocabularyCopy = {
     title: 'Impossible de charger.',
     body: 'Vérifiez votre connexion et réessayez.',
     retry: 'Réessayer',
+  },
+  practice: {
+    startCta: 'Commencer la pratique',
+    configTitle: 'Pratiquer ce thème',
+    configSubtitle: 'Choisissez une direction et une durée de session. Les chunks sont mélangés à chaque session.',
+    directionLabel: 'Direction',
+    directionFrLabel: 'Afficher FR · dévoiler EN',
+    directionEnLabel: 'Afficher EN · dévoiler FR',
+    sessionLengthLabel: 'Durée de session',
+    sessionLengthAll: 'Tous les chunks du thème',
+    startSession: 'Lancer la session',
+    progressLabel: (i, n) => `Carte ${i} sur ${n}`,
+    reveal: 'Dévoiler',
+    gotIt: 'Acquis',
+    needReview: 'À revoir',
+    endTitle: 'Session terminée.',
+    endStat: (got, total) =>
+      `${got} sur ${total} — ${total === 0 ? 0 : Math.round((got / total) * 100)} %`,
+    endNeedReview: (n) =>
+      `${n} chunk${n === 1 ? '' : 's'} à revoir`,
+    practiceAgain: 'Pratiquer encore',
+    backToTopic: 'Retour au thème',
+    browseCorpus: 'Parcourir le corpus',
+    emptyTitle: 'Rien à pratiquer pour le moment.',
+    emptyBody: 'Ce thème ne contient aucun chunk. Revenez quand le corpus sera prêt.',
+    tierLockedTitle: 'Ce thème est tagué examen.',
+    devLockBadge: 'DEV : verrou de palier simulé',
   },
 }
 
