@@ -183,6 +183,24 @@ export function isEmailNotVerifiedError(err: unknown): boolean {
   return (detail as { code?: unknown }).code === 'email_not_verified'
 }
 
+// F-322 — typed detector for the BE tier-gate (F-325 BE contract).
+// exam_tagged_* topics return 403 + body { detail: { code:
+// "tier_insufficient" } } for users on the free tier. Unlike
+// isEmailNotVerifiedError (the global request() interceptor converts
+// that one into a hard /verify-email redirect on every surface), the
+// tier-insufficient signal is surface-specific: practice / catalog
+// render a locked-card upsell IN PLACE rather than hard-navigating.
+// Callers check this themselves after catching the ApiError.
+export function isTierInsufficientError(err: unknown): boolean {
+  if (!(err instanceof ApiError)) return false
+  if (err.status !== 403) return false
+  const body = err.body
+  if (!body || typeof body !== 'object') return false
+  const detail = (body as { detail?: unknown }).detail
+  if (!detail || typeof detail !== 'object') return false
+  return (detail as { code?: unknown }).code === 'tier_insufficient'
+}
+
 function buildUrl(path: string, query?: RequestOptions['query']): string {
   const url = new URL(path.startsWith('http') ? path : `${BASE_URL}${path}`)
   if (query) {
