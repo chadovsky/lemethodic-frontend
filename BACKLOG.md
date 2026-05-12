@@ -2162,10 +2162,10 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 ### V-016a.fix — Writing result rendering crash (couches shape mismatch)
 
 **Priority:** CRITICAL (production blocker — completed analyses crashed the result view)
-**Status:** ✅ Shipped (non-visual sweep verified 2026-05-12; visual verification routed to TARS — separate commit)
+**Status:** ✅ Shipped + verified 2026-05-12
 **Verification:**
 - Non-visual sweep (FE-Claude, 2026-05-12): `/writing` returns 200 in production runtime logs; zero 4xx/5xx across the writing surface in the last 24h on deployment `dpl_6F3XFD6zxcDD95bccinNedUtTtzA`.
-- Visual + interactive verification (1440px desktop + 375px mobile + submit→poll→result render with 5 couche tiles, Voix "Coming soon" + 60% opacity): routed to TARS — separate verification commit.
+- Visual + interactive verification (Chadi, 2026-05-12, manual post-deploy hard-refresh on prod): result view renders all 5 couche tiles without crash; submit → poll → result loop functional end-to-end. Initial broken state during V-016a.dashboard verification was browser cache (old bundle pre-deploy); hard refresh resolved.
 **Filed:** 2026-05-07
 **Shipped:** 2026-05-07
 **Source:** Production console diagnostic — `Uncaught TypeError: Cannot read properties of undefined (reading 'le_fond')` after successful writing analysis on `/writing/9`
@@ -2186,10 +2186,10 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 ### V-016a.dashboard — Render BE rich feedback envelope on /writing dashboard
 
 **Priority:** HIGH (production: dashboard hid every per-layer feedback field BE returned; em-dashes for overall_score + CEFR; "No feedback" everywhere despite BE populating examiner remarks, coaching, transformations, and a full TCF rubric breakdown)
-**Status:** ✅ Shipped 2026-05-12 (non-visual sweep verified; visual verification routed to TARS — separate commit)
+**Status:** ✅ Shipped + verified 2026-05-12
 **Verification:**
 - Non-visual sweep (FE-Claude, 2026-05-12): deployment `dpl_FVz6abPFGt4wpcbBpi2ysqm97nrh` READY; `lemethodic.com/writing` returns 200 (prerender HIT) and `/writing/10` returns 200 from the new lambda (MISS → lambda evaluated); `/ecole` regression check returns 200 (V-016c.fix unaffected). Zero error/warning/fatal entries in project runtime logs over the last 1h.
-- Visual + interactive verification (1440px desktop + 375px mobile of `/writing/10` post-submission result view; confirm: numeric per-couche scores incl. 0; examiner remark in French serif italic per couche; Coaching block with EN primary + FR secondary; "Try this" transformation sub-card; TCF rubric breakdown accordion expanding to show per-criterion label/score/max/remark/coaching): routed to TARS — separate verification commit.
+- Visual + interactive verification (Chadi, 2026-05-12, manual post-deploy hard-refresh on prod): overall_score renders numeric (0 not em-dash); CEFR band renders ("A1 not achieved"); examiner remark in serif italic French; Coaching block EN primary + FR secondary with `FR` label; "Try this" transformation card; all 5 couches present. Initial broken state was browser cache (old bundle pre-deploy) — hard refresh resolved; no code action needed.
 **Filed:** 2026-05-12
 **Shipped:** 2026-05-12 (commit `f6393fe`)
 **Source:** Chadi 2026-05-12 — writing analysis dashboard hides BE-populated fields; root-cause hypothesis: V-016a synchronization gap (BE rewrote response shape to 5-couche; FE rendering layer only absorbed the flat back-compat shape, not the rich envelope)
@@ -2327,7 +2327,7 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 ### V-016a.fe — Writing submit polling consumer
 
 **Priority:** HIGH (parallel to BE V-016a; FE ready before BE ships contract)
-**Status:** Active LC (FE-side, lemethodic-frontend pushed; production deploy on auto from main merge but the POST /api/writing/submit endpoint will return the OLD synchronous shape until BE V-016a goes live, which will surface as a poll loop with `jobId=undefined` followed by a `failed` panel. Production functional verification deferred until BE V-016a is live on prod and Chadi can capture: 1440px desktop + 375px mobile of `/writing/[id]` showing AnalyzingPanel during poll, then result panel after completion. Plus failed-state and abandoned-state captures if achievable.)
+**Status:** ✅ Shipped + verified 2026-05-12 — BE V-016a contract live on prod; FE polling consumer functional end-to-end (Chadi, 2026-05-12, manual post-deploy on `/writing/10`): submit fires, AnalyzingPanel renders during poll, result panel renders on completion with the full V-016a.dashboard rich envelope. Initial broken state during dashboard verification was browser cache (old bundle pre-deploy); hard refresh resolved.
 **Filed:** 2026-05-06
 **Pushed:** 2026-05-07 (FE-side, frontend commit pending merge); BE deploy unblocks live verification
 **Type:** FE async pattern
