@@ -133,6 +133,13 @@ export default function EcoleDesktop() {
   const completedCount = lessons?.filter((l) => l.status === 'completed').length ?? 0
   const progressPct = Math.round((completedCount / TOTAL_LESSONS) * 100)
   const nextLesson = lessons ? pickNextLesson(lessons) : null
+  // V-016c.fix — split by lessonNumber instead of the BE phase field. The
+  // curriculum boundary is locked at 1-16 / 17-27 per F-087, and the BE
+  // phase field was unreliable in prod (missing / wrong type) which sank
+  // every lesson into Fondations and left Approfondissement empty.
+  const fondations = lessons?.filter((l) => l.lessonNumber <= 16) ?? []
+  const approfondissement = lessons?.filter((l) => l.lessonNumber >= 17) ?? []
+  const lessonsEmpty = lessons !== null && lessons.length === 0
   const examDays = daysUntilExam(storeUser?.examDate ?? null)
   const greeting =
     firstName
@@ -232,6 +239,8 @@ export default function EcoleDesktop() {
           <ErrorRetry message={error} retryLabel={copy.retry} onRetry={() => setRetryKey((k) => k + 1)} />
         ) : !lessons ? (
           <LoadingSkeleton />
+        ) : lessonsEmpty ? (
+          <ErrorRetry message={copy.loadError} retryLabel={copy.retry} onRetry={() => setRetryKey((k) => k + 1)} />
         ) : (
           <div
             style={{
@@ -245,7 +254,7 @@ export default function EcoleDesktop() {
               <PhaseSection
                 title={copy.phaseFond}
                 rangeLabel={copy.phaseFondRange}
-                lessons={lessons.filter((l) => l.phase === 1)}
+                lessons={fondations}
                 language={language}
                 copy={copy}
               />
@@ -253,7 +262,7 @@ export default function EcoleDesktop() {
               <PhaseSection
                 title={copy.phaseApprof}
                 rangeLabel={copy.phaseApprofRange}
-                lessons={lessons.filter((l) => l.phase === 2)}
+                lessons={approfondissement}
                 language={language}
                 copy={copy}
               />

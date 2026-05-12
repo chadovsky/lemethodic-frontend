@@ -219,10 +219,12 @@ function mapLesson(raw: RawLesson): Lesson {
     completedAt: raw.completed_at,
     estimatedDurationMinutes: raw.estimated_duration_minutes,
     prerequisiteLessonNumber: raw.prerequisite_lesson_number,
-    // F-087: default to 1 (Fondations) on missing/unknown to keep
-    // legacy rows landing in the first phase. Anything other than the
-    // documented values 1 or 2 collapses to 1.
-    phase: raw.phase === 2 ? 2 : 1,
+    // F-087 / V-016c.fix: prefer BE phase when it's a clean 1 or 2.
+    // Fall back to lesson_number split (1-16 = Fondations, 17-27 =
+    // Approfondissement) when BE phase is missing, null, or sent as a
+    // non-number — that fallback was the silent failure mode that hid
+    // 11 lessons in EcoleDesktop on prod.
+    phase: raw.phase === 2 ? 2 : raw.phase === 1 ? 1 : (raw.lesson_number >= 17 ? 2 : 1),
     sublineEn: raw.subline_en ?? null,
   }
 }
