@@ -7,9 +7,18 @@
 // (a) '#FFFFFF' for button text (universal contrast color, kept),
 // (b) '#1A1A1A04/08/0D/33' alpha overlays (decorative, kept). No
 // further source edits needed for the paywall surface.
+//
+// F-VISUAL-001 X.4.1 — motion injection. Outer wrapper gets ed-page-
+// enter for the soft fade-up on route entry. Radar chart block wraps
+// in a Framer Motion <motion.div> that animates opacity + y on
+// viewport entry (one-shot via viewport={{ once: true }}). useReducedMotion
+// honored — Framer Motion respects the user's prefers-reduced-motion
+// preference automatically.
 
 import { useState, useCallback } from 'react'
+import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import { duration, ease } from '@/lib/motion'
 import {
   RadarChart,
   PolarGrid,
@@ -139,11 +148,12 @@ export default function Paywall() {
 
   return (
     <div
-      className="min-h-screen w-full flex flex-col items-center"
+      className="min-h-screen w-full flex flex-col items-center ed-page-enter"
       // F-203 — bg migrated from --fp-canvas (#FAFAF7) to --ed-bg (#FAF7F2).
       // Visually near-identical (both warm off-white), but unifies under the
       // editorial system. Full editorial typography pass tracked as
       // F-203.paywall (Recharts radar + comparison table styling needs care).
+      // F-VISUAL-001 X.4.1 — ed-page-enter class added for soft route-entry fade.
       style={{ backgroundColor: 'var(--ed-warm-cream)' }}
     >
       <div
@@ -185,8 +195,14 @@ export default function Paywall() {
           Here&apos;s where you stand against your target score.
         </p>
 
-        {/* Radar chart */}
-        <div
+        {/* Radar chart — F-VISUAL-001 X.4.1 wraps in <motion.div> for
+            scroll-reveal on viewport entry. One-shot (viewport once: true).
+            Framer Motion respects prefers-reduced-motion automatically. */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: duration.slow, ease: ease.out }}
           style={{
             width: '100%',
             height: 240,
@@ -246,7 +262,7 @@ export default function Paywall() {
               />
             </RadarChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
 
         {/* Legend */}
         <div className="flex items-center gap-5 mt-3 justify-center">
