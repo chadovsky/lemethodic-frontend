@@ -1,5 +1,11 @@
 'use client'
 
+// F-VISUAL-001 X.3.4 — vocabulaire surface audit (catalog + topic
+// detail + practice + test). All four surfaces consume var(--ed-*)
+// throughout — X.1 alias chain redirects to the new canonical palette
+// automatically. Only remaining hex literals are '#FFFFFF' button-
+// text (universal contrast, kept). No source edits required.
+
 // F-325 — Le Vocabulaire catalog client. Topic listing + corpus_partition
 // filter chip group. Mobile-first with responsive grid on desktop. Auth
 // is enforced by the wrapping ProtectedRoute in page.tsx; this component
