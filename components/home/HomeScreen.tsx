@@ -135,8 +135,30 @@ export default function HomeScreen({
       // elsewhere); its failure must not block lesson rendering.
       // F-080d: recurring_modules added to the parallel fetch — its failure
       // is non-fatal (section just stays hidden).
+      // F-BUGS-001-FE-A: lessons.list() also wrapped in .catch so a
+      // non-2xx (token expired, 5xx, etc.) doesn't reject Promise.all
+      // and kill the whole page. Failure routes to the existing local
+      // fetchError display inside the lesson list (line 509+); page
+      // chrome (greeting, recurring modules, TÂCHE 2 card) keeps
+      // rendering. In dev the inner detail is surfaced too.
       const [lessonList, me, recurring] = await Promise.all([
-        api.lessons.list(),
+        api.lessons.list().catch((e: unknown) => {
+          // eslint-disable-next-line no-console
+          console.error('F-BUGS-001-FE-A lessons load failed', e)
+          const detail =
+            e instanceof ApiError
+              ? `${e.status} ${e.message}`
+              : e instanceof Error
+                ? e.message
+                : String(e)
+          const friendly = "Couldn't load your path."
+          setFetchError(
+            process.env.NODE_ENV !== 'production'
+              ? `${friendly} (${detail})`
+              : friendly,
+          )
+          return [] as Lesson[]
+        }),
         api.users.getMe().catch(() => null),
         api.users.getRecurringModules().catch(() => ({ recurring_modules: [] })),
       ])
@@ -147,6 +169,9 @@ export default function HomeScreen({
         if (token) useAuthStore.getState().setAuth(token, me)
       }
     } catch (err) {
+      // Outer catch retained as a safety net for unforeseen synchronous
+      // throws. lessons-specific failures land in the .catch above and
+      // don't reach this branch.
       if (err instanceof ApiError) {
         setFetchError("Couldn't load your path.")
       } else {

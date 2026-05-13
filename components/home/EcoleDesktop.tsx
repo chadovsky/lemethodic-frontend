@@ -104,13 +104,35 @@ export default function EcoleDesktop() {
   const [lessons, setLessons] = useState<Lesson[] | null>(null)
   const [recurring, setRecurring] = useState<RecurringModule[]>([])
   const [error, setError] = useState<string | null>(null)
+  // F-BUGS-001-FE-A — lessons-specific error captured separately so the
+  // page chrome (greeting, right rail with TODAY, recurring modules)
+  // keeps rendering even when /api/ecole/lessons fails. Surfaced in the
+  // lesson grid only. In dev, the inner detail is surfaced too so future
+  // bug repros are 1-click; in prod the surface is the friendly copy.
+  const [lessonsErrorDetail, setLessonsErrorDetail] = useState<string | null>(null)
   const [retryKey, setRetryKey] = useState(0)
 
   const load = useCallback(async () => {
     setError(null)
+    setLessonsErrorDetail(null)
     try {
       const [lessonList, me, recurringRes] = await Promise.all([
-        api.lessons.list(),
+        // F-BUGS-001-FE-A — wrap in .catch so a non-2xx from
+        // /api/ecole/lessons doesn't reject the whole Promise.all and
+        // kill the page. Failure surfaces as an empty lesson grid +
+        // local retry; the right rail + recurring modules still render.
+        api.lessons.list().catch((e: unknown) => {
+          // eslint-disable-next-line no-console
+          console.error('F-BUGS-001-FE-A lessons load failed', e)
+          const detail =
+            e instanceof ApiError
+              ? `${e.status} ${e.message}`
+              : e instanceof Error
+                ? e.message
+                : String(e)
+          setLessonsErrorDetail(detail)
+          return [] as Lesson[]
+        }),
         api.users.getMe().catch(() => null),
         api.users.getRecurringModules().catch(() => ({ recurring_modules: [] })),
       ])
@@ -121,6 +143,9 @@ export default function EcoleDesktop() {
         if (token) useAuthStore.getState().setAuth(token, me)
       }
     } catch (err) {
+      // Outer catch retained as a safety net for unforeseen synchronous
+      // throws. lessons-specific failures land in lessonsErrorDetail above
+      // and don't reach this branch.
       if (err instanceof ApiError) setError(copy.loadError)
       else setError(copy.loadError)
     }
@@ -234,13 +259,16 @@ export default function EcoleDesktop() {
           </div>
         </header>
 
-        {/* Body grid: lesson grid (left) + right rail */}
+        {/* Body grid: lesson grid (left) + right rail.
+            F-BUGS-001-FE-A — when /api/ecole/lessons fails, the lesson
+            grid renders a local error card but the right rail (today's
+            session, exam countdown, streak) keeps rendering against
+            whatever data was loaded. Full-page outer-error guard stays
+            for unforeseen synchronous throws. */}
         {error ? (
           <ErrorRetry message={error} retryLabel={copy.retry} onRetry={() => setRetryKey((k) => k + 1)} />
         ) : !lessons ? (
           <LoadingSkeleton />
-        ) : lessonsEmpty ? (
-          <ErrorRetry message={copy.loadError} retryLabel={copy.retry} onRetry={() => setRetryKey((k) => k + 1)} />
         ) : (
           <div
             style={{
@@ -249,8 +277,17 @@ export default function EcoleDesktop() {
               gap: 'clamp(24px, 3vw, 40px)',
             }}
           >
-            {/* LEFT — lesson grid by phase */}
+            {/* LEFT — lesson grid by phase (or local error / empty) */}
             <main>
+              {lessonsEmpty ? (
+                <LessonGridError
+                  message={copy.loadError}
+                  retryLabel={copy.retry}
+                  detail={lessonsErrorDetail}
+                  onRetry={() => setRetryKey((k) => k + 1)}
+                />
+              ) : (
+                <>
               <PhaseSection
                 title={copy.phaseFond}
                 rangeLabel={copy.phaseFondRange}
@@ -266,6 +303,8 @@ export default function EcoleDesktop() {
                 language={language}
                 copy={copy}
               />
+                </>
+              )}
             </main>
 
             {/* RIGHT rail — daily recommendation + countdown + streak */}
@@ -599,6 +638,77 @@ function ErrorRetry({ message, retryLabel, onRetry }: { message: string; retryLa
         onClick={onRetry}
         className="ed-btn-press"
         style={{
+          fontFamily: SANS,
+          fontWeight: 600,
+          fontSize: 14,
+          color: '#FFFFFF',
+          backgroundColor: ED_ACCENT,
+          padding: '8px 18px',
+          borderRadius: 4,
+          border: 'none',
+          cursor: 'pointer',
+        }}
+      >
+        {retryLabel}
+      </button>
+    </div>
+  )
+}
+
+// F-BUGS-001-FE-A — local lesson-grid error surface. Renders inside the
+// main column when /api/ecole/lessons fails; the right rail keeps
+// rendering against whatever else loaded. In dev, the raw error detail
+// (status + message) is surfaced so future bug repros are 1-click.
+function LessonGridError({
+  message,
+  retryLabel,
+  detail,
+  onRetry,
+}: {
+  message: string
+  retryLabel: string
+  detail: string | null
+  onRetry: () => void
+}) {
+  const showDetail = process.env.NODE_ENV !== 'production' && detail
+  return (
+    <div
+      role="alert"
+      style={{
+        padding: '40px 24px',
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 12,
+        backgroundColor: 'var(--bg-elevated)',
+        border: '1px solid var(--rule-default)',
+        borderRadius: 4,
+      }}
+    >
+      <p style={{ fontFamily: SANS, fontWeight: 500, fontSize: 15, color: ED_FG, margin: 0 }}>{message}</p>
+      {showDetail && (
+        <code
+          style={{
+            fontFamily: 'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+            fontSize: 12,
+            color: ED_MUTED,
+            backgroundColor: 'var(--bg-subtle)',
+            padding: '6px 10px',
+            borderRadius: 3,
+            maxWidth: '100%',
+            wordBreak: 'break-word',
+          }}
+        >
+          {detail}
+        </code>
+      )}
+      <button
+        type="button"
+        onClick={onRetry}
+        className="ed-btn-press"
+        style={{
+          marginTop: 4,
           fontFamily: SANS,
           fontWeight: 600,
           fontSize: 14,
