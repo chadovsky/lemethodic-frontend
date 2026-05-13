@@ -1,5 +1,14 @@
 'use client'
 
+// F-VISUAL-001 X.4.3 — flashcard 3D flip motion added to FlashcardView
+// below. perspective wrapper + transform-style: preserve-3d on the card
+// + backfaceVisibility: hidden on each face. Framer Motion animates
+// rotateY 0 -> 180 on reveal; useReducedMotion swaps to opacity cross-
+// fade for users with the OS preference set. iOS Safari has known
+// transform-style: preserve-3d quirks on older versions; Chadi runbook
+// includes an explicit iOS Safari test per C4 (real device or
+// BrowserStack).
+
 // F-322 — Le Vocabulaire practice client.
 //
 // State machine has three view states (config / session / end) on top
@@ -16,7 +25,9 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { motion, useReducedMotion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
+import { duration, ease } from '@/lib/motion'
 import { api, isTierInsufficientError } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
 import { vocabCopy } from '@/lib/vocab-copy'
@@ -392,49 +403,7 @@ function FlashcardView({
         {copy.practice.progressLabel(i, n)}
       </div>
 
-      <div
-        style={{
-          backgroundColor: 'var(--ed-paper)',
-          border: '1px solid var(--ed-rule)',
-          borderRadius: 4,
-          padding: 'clamp(32px, 4vw, 56px) clamp(24px, 3vw, 40px)',
-          minHeight: 220,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          textAlign: 'center',
-        }}
-      >
-        <p
-          style={{
-            fontFamily: 'var(--font-fraunces), Georgia, serif',
-            fontWeight: 500,
-            fontSize: 'clamp(22px, 3vw, 30px)',
-            lineHeight: 1.3,
-            color: 'var(--ed-fg)',
-            margin: 0,
-            marginBottom: revealed ? 18 : 0,
-          }}
-        >
-          {front}
-        </p>
-        {revealed && (
-          <p
-            style={{
-              fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
-              fontWeight: 400,
-              fontSize: 'clamp(15px, 1.6vw, 17px)',
-              lineHeight: 1.5,
-              color: 'var(--ed-muted)',
-              margin: 0,
-              paddingTop: 18,
-              borderTop: '1px solid var(--ed-rule)',
-            }}
-          >
-            {back}
-          </p>
-        )}
-      </div>
+      <Flashcard3D front={front} back={back} revealed={revealed} />
 
       {!revealed ? (
         <button
@@ -498,6 +467,125 @@ function FlashcardView({
       )}
     </div>
   )
+}
+
+// F-VISUAL-001 X.4.3 — 3D card flip on reveal. perspective ancestor +
+// transform-style: preserve-3d on the rotating layer + backface-
+// visibility: hidden on each face. Framer Motion drives the rotateY
+// transition; useReducedMotion swaps to a no-rotation opacity cross-
+// fade so users with prefers-reduced-motion don't get the flip.
+// iOS Safari: explicit real-device test in F-225 Batch 3 (per C4).
+function Flashcard3D({
+  front,
+  back,
+  revealed,
+}: {
+  front: string
+  back: string
+  revealed: boolean
+}) {
+  const reduce = useReducedMotion()
+  if (reduce) {
+    // Reduced-motion fallback: opacity cross-fade, no rotation.
+    return (
+      <FlashcardSurface>
+        <p
+          style={{
+            ...flashcardFrontStyle,
+            opacity: revealed ? 0.55 : 1,
+            transition: 'opacity 250ms ease',
+          }}
+        >
+          {front}
+        </p>
+        {revealed && (
+          <p
+            style={{
+              ...flashcardBackStyle,
+              paddingTop: 18,
+              borderTop: '1px solid var(--ed-rule)',
+            }}
+          >
+            {back}
+          </p>
+        )}
+      </FlashcardSurface>
+    )
+  }
+  return (
+    <div style={{ perspective: '1200px' }}>
+      <motion.div
+        animate={{ rotateY: revealed ? 180 : 0 }}
+        transition={{ duration: duration.medium, ease: ease.spring }}
+        style={{
+          position: 'relative',
+          minHeight: 220,
+          transformStyle: 'preserve-3d',
+        }}
+      >
+        {/* Front face */}
+        <div
+          style={{
+            ...flashcardSurfaceStyle,
+            position: 'absolute',
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+          }}
+        >
+          <p style={flashcardFrontStyle}>{front}</p>
+        </div>
+        {/* Back face — pre-rotated 180deg so it appears when wrapper
+            rotates to 180. */}
+        <div
+          style={{
+            ...flashcardSurfaceStyle,
+            position: 'absolute',
+            inset: 0,
+            transform: 'rotateY(180deg)',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+          }}
+        >
+          <p style={flashcardBackStyle}>{back}</p>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+function FlashcardSurface({ children }: { children: React.ReactNode }) {
+  return <div style={flashcardSurfaceStyle}>{children}</div>
+}
+
+const flashcardSurfaceStyle: React.CSSProperties = {
+  backgroundColor: 'var(--ed-paper)',
+  border: '1px solid var(--ed-rule)',
+  borderRadius: 4,
+  padding: 'clamp(32px, 4vw, 56px) clamp(24px, 3vw, 40px)',
+  minHeight: 220,
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  textAlign: 'center',
+}
+
+const flashcardFrontStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-fraunces), Georgia, serif',
+  fontWeight: 500,
+  fontSize: 'clamp(22px, 3vw, 30px)',
+  lineHeight: 1.3,
+  color: 'var(--ed-fg)',
+  margin: 0,
+}
+
+const flashcardBackStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+  fontWeight: 400,
+  fontSize: 'clamp(15px, 1.6vw, 17px)',
+  lineHeight: 1.5,
+  color: 'var(--ed-muted)',
+  margin: 0,
 }
 
 function SessionEndCard({
