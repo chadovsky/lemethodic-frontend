@@ -531,6 +531,16 @@ export default function HomeScreen({
             />
 
             <div style={{ marginTop: 16 }}>
+              {/* F-BUGS-001-FE-C — four-way state machine for the lesson list:
+                  1. fetchError set        → /api/ecole/lessons rejected,
+                                             surface the existing Retry UI.
+                  2. lessons === null      → still loading, shimmer skeleton.
+                  3. empty + no exam_date  → ask user to set their exam date.
+                  4. empty + exam_date set → ask user to finish the diagnostic.
+                  5. non-empty             → render the lesson rows.
+                  Cases 3 & 4 previously rendered an empty <div> (a 200 with
+                  zero lessons looked identical to a successful fetch with no
+                  rows visible — silent dead-end). */}
               {fetchError ? (
                 <div
                   role="alert"
@@ -584,6 +594,8 @@ export default function HomeScreen({
                     }}
                   />
                 ))
+              ) : lessons.length === 0 ? (
+                <LessonListEmpty hasExamDate={!!storeUser?.examDate} />
               ) : (
                 lessons.map((lesson, idx) => {
                   const prev = idx > 0 ? lessons[idx - 1] : null
@@ -633,6 +645,82 @@ export default function HomeScreen({
           onClose={() => setPickerModule(null)}
         />
       )}
+    </div>
+  )
+}
+
+// F-BUGS-001-FE-C — 200-empty empty state for the L'École journey list.
+// NOT an error: the fetch succeeded, the user just isn't enrolled in a
+// path yet. Two sub-states by exam_date presence; CTA routes accordingly.
+function LessonListEmpty({ hasExamDate }: { hasExamDate: boolean }) {
+  const title = hasExamDate
+    ? 'Complete your diagnostic to enroll.'
+    : 'Set your exam date to start your path.'
+  const body = hasExamDate
+    ? 'The diagnostic takes a few minutes and unlocks the lesson sequence calibrated to your level.'
+    : "Tell us when you sit the TCF and we'll calibrate the 27-lesson sequence to your timeline."
+  const ctaLabel = hasExamDate ? 'Start diagnostic' : 'Set exam date'
+  const ctaHref = hasExamDate ? '/diagnostic' : '/profile'
+  return (
+    <div
+      style={{
+        padding: '32px 20px',
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 10,
+        backgroundColor: 'var(--ed-paper)',
+        border: '1px solid var(--ed-rule)',
+        borderRadius: 4,
+      }}
+    >
+      <p
+        style={{
+          fontFamily: DISPLAY_FONT,
+          fontWeight: 700,
+          fontSize: 18,
+          lineHeight: 1.3,
+          color: INK,
+          margin: 0,
+          maxWidth: 360,
+        }}
+      >
+        {title}
+      </p>
+      <p
+        style={{
+          fontFamily: DISPLAY_FONT,
+          fontWeight: 500,
+          fontSize: 13,
+          lineHeight: 1.5,
+          color: INK_SOFT,
+          margin: 0,
+          maxWidth: 360,
+        }}
+      >
+        {body}
+      </p>
+      <Link
+        href={ctaHref}
+        style={{
+          marginTop: 6,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '10px 18px',
+          borderRadius: 12,
+          backgroundColor: INK,
+          color: '#FFFFFF',
+          fontFamily: DISPLAY_FONT,
+          fontWeight: 700,
+          fontSize: 14,
+          textDecoration: 'none',
+          WebkitTapHighlightColor: 'transparent',
+        }}
+      >
+        {ctaLabel}
+      </Link>
     </div>
   )
 }
