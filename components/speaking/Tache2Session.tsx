@@ -43,6 +43,20 @@ import {
 import { useAudioRecorder } from '@/hooks/useAudioRecorder'
 import { api, ApiError } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
+import { briefLangKey } from '@/lib/storage-keys'
+
+// F-BUGS-001-FE-D — French-prep tool, so B1+ defaults to the FR brief
+// (immersion) and A1/A2 defaults to EN (comprehension safety). Unknown
+// or 'not_sure' falls through to FR since the rest of the FE defaults
+// target_level to B2 (see startConversation below).
+type BriefLang = 'fr' | 'en'
+
+function defaultBriefLangFromLevel(level: string | null | undefined): BriefLang {
+  if (!level) return 'fr'
+  const normalized = level.trim().toUpperCase()
+  if (normalized.startsWith('A1') || normalized.startsWith('A2')) return 'en'
+  return 'fr'
+}
 
 const INK          = 'var(--text-primary)'
 const INK_SOFT     = 'var(--text-secondary)'
@@ -87,8 +101,13 @@ interface ScenarioBrief {
    *  this field is the source of truth for what /start accepts. */
   backendCode: string
   title: string
-  roleBody: string
-  infoTargets: string[]
+  /** F-BUGS-001-FE-D — FR/EN variants of the candidate brief. These mirror
+   *  the BE seeder's `candidate_brief_fr` / `candidate_brief_en` columns
+   *  (per F-BUGS-001-BE-A.content, placeholders still rough — language
+   *  switching is mechanical here, copy quality lands when the BE seed
+   *  ships). Picked at render time by the active BriefLang. */
+  roleBody: Record<BriefLang, string>
+  infoTargets: Record<BriefLang, string[]>
   bg: string
   counterpartLabel: string
   register: string
@@ -106,17 +125,30 @@ const SCENARIO_BRIEFS: Record<string, ScenarioBrief> = {
   'agence-voyages': {
     backendCode: 'agence_voyages',
     title: "L'agence de voyages",
-    roleBody:
-      'You want to plan a vacation to a French-speaking country. Ask the agent everything you need to choose the perfect destination.',
-    infoTargets: [
-      'Destination options',
-      'Price range',
-      'Duration of stay',
-      'Type of accommodation',
-      'Included activities',
-      'Weather forecast',
-      'Visa requirements',
-    ],
+    roleBody: {
+      fr: "Vous souhaitez organiser des vacances dans un pays francophone. Posez à l'agent toutes les questions nécessaires pour choisir la destination idéale.",
+      en: 'You want to plan a vacation to a French-speaking country. Ask the agent everything you need to choose the perfect destination.',
+    },
+    infoTargets: {
+      fr: [
+        'Options de destination',
+        'Fourchette de prix',
+        'Durée du séjour',
+        "Type d'hébergement",
+        'Activités incluses',
+        'Prévisions météo',
+        'Conditions de visa',
+      ],
+      en: [
+        'Destination options',
+        'Price range',
+        'Duration of stay',
+        'Type of accommodation',
+        'Included activities',
+        'Weather forecast',
+        'Visa requirements',
+      ],
+    },
     bg: SAGE,
     counterpartLabel: 'travel agent',
     register: 'Formel',
@@ -124,16 +156,28 @@ const SCENARIO_BRIEFS: Record<string, ScenarioBrief> = {
   'ami-demenage': {
     backendCode: 'ami_demenagement',
     title: "L'ami qui déménage",
-    roleBody:
-      'Your friend is moving to another city. Ask the questions a good friend would ask.',
-    infoTargets: [
-      'Where they are moving',
-      'When they leave',
-      'Why they are leaving',
-      'New job or studies',
-      'New living situation',
-      'When you can visit',
-    ],
+    roleBody: {
+      fr: "Ton ami déménage dans une autre ville. Pose-lui les questions qu'un bon ami poserait.",
+      en: 'Your friend is moving to another city. Ask the questions a good friend would ask.',
+    },
+    infoTargets: {
+      fr: [
+        'Où il/elle déménage',
+        'Quand il/elle part',
+        'Pourquoi il/elle part',
+        'Nouveau travail ou études',
+        'Nouvelle situation de logement',
+        'Quand tu peux lui rendre visite',
+      ],
+      en: [
+        'Where they are moving',
+        'When they leave',
+        'Why they are leaving',
+        'New job or studies',
+        'New living situation',
+        'When you can visit',
+      ],
+    },
     bg: PEACH,
     counterpartLabel: 'your friend',
     register: 'Informel',
@@ -141,16 +185,28 @@ const SCENARIO_BRIEFS: Record<string, ScenarioBrief> = {
   'bibliotheque': {
     backendCode: 'bibliotheque',
     title: 'La bibliothèque',
-    roleBody:
-      'You need a book at the library and want to know the rules. Ask the librarian.',
-    infoTargets: [
-      'How to borrow a book',
-      'Loan duration',
-      'Late fees',
-      'Renewing a loan',
-      'Quiet-room hours',
-      'Membership cost',
-    ],
+    roleBody: {
+      fr: "Vous avez besoin d'un livre à la bibliothèque et vous voulez connaître les règles. Posez vos questions au bibliothécaire.",
+      en: 'You need a book at the library and want to know the rules. Ask the librarian.',
+    },
+    infoTargets: {
+      fr: [
+        'Comment emprunter un livre',
+        'Durée du prêt',
+        'Frais de retard',
+        'Renouvellement du prêt',
+        'Horaires de la salle de lecture',
+        "Coût de l'abonnement",
+      ],
+      en: [
+        'How to borrow a book',
+        'Loan duration',
+        'Late fees',
+        'Renewing a loan',
+        'Quiet-room hours',
+        'Membership cost',
+      ],
+    },
     bg: BUTTER,
     counterpartLabel: 'the librarian',
     register: 'Semi-formel',
@@ -163,8 +219,11 @@ const SCENARIO_BRIEFS: Record<string, ScenarioBrief> = {
 // and the error overlay will surface the detail.
 const FALLBACK_BRIEF: Omit<ScenarioBrief, 'backendCode'> = {
   title: 'Role-play',
-  roleBody: 'Ask questions to gather the information you need.',
-  infoTargets: [],
+  roleBody: {
+    fr: "Posez des questions pour obtenir les informations dont vous avez besoin.",
+    en: 'Ask questions to gather the information you need.',
+  },
+  infoTargets: { fr: [], en: [] },
   bg: SAGE,
   counterpartLabel: 'your counterpart',
   register: 'Formel',
@@ -202,6 +261,12 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
   const [muted, setMuted] = useState(false)
   const [briefExpanded, setBriefExpanded] = useState(false)
   const [autoplayBlocked, setAutoplayBlocked] = useState(false)
+  // F-BUGS-001-FE-D — default from user.targetLevel (B1+ → fr, A1/A2 → en).
+  // Hydrated from localStorage once conversationId is known if a saved
+  // value exists for that conversation; subsequent toggles persist back.
+  const [briefLang, setBriefLang] = useState<BriefLang>(() =>
+    defaultBriefLangFromLevel(user?.targetLevel),
+  )
 
   const recorder = useAudioRecorder()
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -238,6 +303,39 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
       }
     }
   }, [])
+
+  // F-BUGS-001-FE-D — once /start hands back a conversationId, hydrate the
+  // brief language from localStorage if a saved value exists for THIS
+  // conversation. If nothing is saved (fresh conversation), keep whatever
+  // briefLang currently holds — that's either the targetLevel-derived
+  // default or the user's manual choice made during the briefing screen,
+  // and the persistence effect below will write it back.
+  useEffect(() => {
+    if (!conversationId) return
+    try {
+      const saved = window.localStorage.getItem(briefLangKey(conversationId))
+      if (saved === 'fr' || saved === 'en') {
+        setBriefLang(saved)
+      }
+    } catch {
+      // localStorage unavailable (private mode, quota, etc.) — silently
+      // fall back to the in-memory default. Toggle still works for the
+      // current session.
+    }
+  }, [conversationId])
+
+  // F-BUGS-001-FE-D — persist briefLang whenever it changes, but only once
+  // we have a conversationId to scope the key. Toggles made on the
+  // pre-/start briefing screen are held in component state until /start
+  // resolves, at which point this effect writes them.
+  useEffect(() => {
+    if (!conversationId) return
+    try {
+      window.localStorage.setItem(briefLangKey(conversationId), briefLang)
+    } catch {
+      // See above — non-fatal.
+    }
+  }, [conversationId, briefLang])
 
   // ── Backend calls ────────────────────────────────────────────────────────
 
@@ -658,12 +756,16 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
         {phase === 'briefing' ? (
           <BriefingPanel
             brief={brief}
+            briefLang={briefLang}
+            onBriefLangChange={setBriefLang}
             onStart={startConversation}
           />
         ) : (
           <>
             <BriefChip
               brief={brief}
+              briefLang={briefLang}
+              onBriefLangChange={setBriefLang}
               expanded={briefExpanded}
               onToggle={() => setBriefExpanded((v) => !v)}
             />
@@ -835,73 +937,90 @@ function Header({
   )
 }
 
-function BriefingPanel({ brief, onStart }: { brief: ScenarioBrief; onStart: () => void }) {
+function BriefingPanel({
+  brief,
+  briefLang,
+  onBriefLangChange,
+  onStart,
+}: {
+  brief: ScenarioBrief
+  briefLang: BriefLang
+  onBriefLangChange: (lang: BriefLang) => void
+  onStart: () => void
+}) {
+  const labels = BRIEF_LABELS[briefLang]
+  const targets = brief.infoTargets[briefLang]
   return (
-    <div
-      style={{
-        margin: '12px 20px 0',
-        backgroundColor: brief.bg,
-        borderRadius: 20,
-        overflow: 'hidden',
-      }}
-    >
-      <div style={{ padding: '16px 18px' }}>
-        <p
-          style={{
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 700,
-            fontSize: 10,
-            letterSpacing: '0.10em',
-            textTransform: 'uppercase',
-            color: INK_MUTED,
-            margin: '0 0 6px',
-          }}
-        >
-          Your role
-        </p>
-        <p style={{ fontWeight: 500, fontSize: 14, lineHeight: '21px', color: INK, margin: '0 0 12px' }}>
-          {brief.roleBody}
-        </p>
-        {brief.infoTargets.length > 0 && (
-          <>
-            <p
-              style={{
-                fontFamily: DISPLAY_FONT,
-                fontWeight: 700,
-                fontSize: 10,
-                letterSpacing: '0.10em',
-                textTransform: 'uppercase',
-                color: INK_MUTED,
-                margin: '0 0 6px',
-              }}
-            >
-              Info to gather:
-            </p>
-            <ul style={{ margin: '0 0 16px', paddingLeft: 18 }}>
-              {brief.infoTargets.map((t) => (
-                <li key={t} style={{ fontWeight: 500, fontSize: 13, lineHeight: '21px', color: INK_SOFT }}>{t}</li>
-              ))}
-            </ul>
-          </>
-        )}
-        <button
-          onClick={onStart}
-          style={{
-            width: '100%',
-            height: 48,
-            borderRadius: 14,
-            backgroundColor: INK,
-            color: '#FFFFFF',
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 700,
-            fontSize: 15,
-            border: 'none',
-            cursor: 'pointer',
-            outline: 'none',
-          }}
-        >
-          Start conversation
-        </button>
+    <div style={{ margin: '12px 20px 0' }}>
+      {/* F-BUGS-001-FE-D — toggle sits above the brief card so users can
+          swap before they start reading. */}
+      <BriefLanguageToggle value={briefLang} onChange={onBriefLangChange} />
+      <div
+        style={{
+          marginTop: 10,
+          backgroundColor: brief.bg,
+          borderRadius: 20,
+          overflow: 'hidden',
+        }}
+      >
+        <div style={{ padding: '16px 18px' }}>
+          <p
+            style={{
+              fontFamily: DISPLAY_FONT,
+              fontWeight: 700,
+              fontSize: 10,
+              letterSpacing: '0.10em',
+              textTransform: 'uppercase',
+              color: INK_MUTED,
+              margin: '0 0 6px',
+            }}
+          >
+            {labels.yourRole}
+          </p>
+          <p style={{ fontWeight: 500, fontSize: 14, lineHeight: '21px', color: INK, margin: '0 0 12px' }}>
+            {brief.roleBody[briefLang]}
+          </p>
+          {targets.length > 0 && (
+            <>
+              <p
+                style={{
+                  fontFamily: DISPLAY_FONT,
+                  fontWeight: 700,
+                  fontSize: 10,
+                  letterSpacing: '0.10em',
+                  textTransform: 'uppercase',
+                  color: INK_MUTED,
+                  margin: '0 0 6px',
+                }}
+              >
+                {labels.infoToGather}
+              </p>
+              <ul style={{ margin: '0 0 16px', paddingLeft: 18 }}>
+                {targets.map((t) => (
+                  <li key={t} style={{ fontWeight: 500, fontSize: 13, lineHeight: '21px', color: INK_SOFT }}>{t}</li>
+                ))}
+              </ul>
+            </>
+          )}
+          <button
+            onClick={onStart}
+            style={{
+              width: '100%',
+              height: 48,
+              borderRadius: 14,
+              backgroundColor: INK,
+              color: '#FFFFFF',
+              fontFamily: DISPLAY_FONT,
+              fontWeight: 700,
+              fontSize: 15,
+              border: 'none',
+              cursor: 'pointer',
+              outline: 'none',
+            }}
+          >
+            {labels.startConversation}
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -909,35 +1028,46 @@ function BriefingPanel({ brief, onStart }: { brief: ScenarioBrief; onStart: () =
 
 function BriefChip({
   brief,
+  briefLang,
+  onBriefLangChange,
   expanded,
   onToggle,
 }: {
   brief: ScenarioBrief
+  briefLang: BriefLang
+  onBriefLangChange: (lang: BriefLang) => void
   expanded: boolean
   onToggle: () => void
 }) {
+  const labels = BRIEF_LABELS[briefLang]
   return (
     <div style={{ margin: '8px 20px 0', flexShrink: 0 }}>
-      <button
-        onClick={onToggle}
-        style={{
-          background: brief.bg,
-          border: 'none',
-          borderRadius: 100,
-          padding: '6px 14px',
-          fontFamily: DISPLAY_FONT,
-          fontWeight: 600,
-          fontSize: 12,
-          color: INK_SOFT,
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
-        }}
-      >
-        View your role
-        {expanded ? <ChevronUp size={12} strokeWidth={2} /> : <ChevronDown size={12} strokeWidth={2} />}
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <button
+          onClick={onToggle}
+          style={{
+            background: brief.bg,
+            border: 'none',
+            borderRadius: 100,
+            padding: '6px 14px',
+            fontFamily: DISPLAY_FONT,
+            fontWeight: 600,
+            fontSize: 12,
+            color: INK_SOFT,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+          }}
+        >
+          {labels.viewYourRole}
+          {expanded ? <ChevronUp size={12} strokeWidth={2} /> : <ChevronDown size={12} strokeWidth={2} />}
+        </button>
+        {/* F-BUGS-001-FE-D — toggle stays accessible mid-conversation so a
+            user who started in FR but hit a comprehension wall (or vice
+            versa) can swap without leaving the session. */}
+        <BriefLanguageToggle value={briefLang} onChange={onBriefLangChange} />
+      </div>
       {expanded && (
         <div
           style={{
@@ -948,10 +1078,88 @@ function BriefChip({
           }}
         >
           <p style={{ fontWeight: 500, fontSize: 13, lineHeight: '19px', color: INK, margin: 0 }}>
-            {brief.roleBody}
+            {brief.roleBody[briefLang]}
           </p>
         </div>
       )}
+    </div>
+  )
+}
+
+// F-BUGS-001-FE-D — UI chrome strings shown around the brief content. These
+// are tiny and don't justify pulling in an i18n framework; co-locate them
+// with the only surface that uses them.
+const BRIEF_LABELS: Record<BriefLang, {
+  yourRole: string
+  infoToGather: string
+  startConversation: string
+  viewYourRole: string
+  ariaLabel: string
+}> = {
+  fr: {
+    yourRole: 'Votre rôle',
+    infoToGather: 'Infos à recueillir :',
+    startConversation: 'Démarrer la conversation',
+    viewYourRole: 'Voir votre rôle',
+    ariaLabel: 'Langue du brief',
+  },
+  en: {
+    yourRole: 'Your role',
+    infoToGather: 'Info to gather:',
+    startConversation: 'Start conversation',
+    viewYourRole: 'View your role',
+    ariaLabel: 'Brief language',
+  },
+}
+
+function BriefLanguageToggle({
+  value,
+  onChange,
+}: {
+  value: BriefLang
+  onChange: (lang: BriefLang) => void
+}) {
+  return (
+    <div
+      role="group"
+      aria-label={BRIEF_LABELS[value].ariaLabel}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        backgroundColor: '#1A1A1A0A',
+        borderRadius: 100,
+        padding: 2,
+        gap: 0,
+      }}
+    >
+      {(['fr', 'en'] as const).map((lang) => {
+        const active = value === lang
+        return (
+          <button
+            key={lang}
+            type="button"
+            onClick={() => onChange(lang)}
+            aria-pressed={active}
+            style={{
+              fontFamily: DISPLAY_FONT,
+              fontWeight: 700,
+              fontSize: 11,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: active ? '#FFFFFF' : INK_SOFT,
+              backgroundColor: active ? INK : 'transparent',
+              border: 'none',
+              borderRadius: 100,
+              padding: '4px 12px',
+              cursor: 'pointer',
+              outline: 'none',
+              transition: 'background-color 120ms ease, color 120ms ease',
+            }}
+          >
+            {lang.toUpperCase()}
+          </button>
+        )
+      })}
     </div>
   )
 }
