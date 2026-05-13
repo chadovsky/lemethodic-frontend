@@ -182,25 +182,30 @@
   --ed-duration-state: 600ms;
   --ed-duration-reveal: 700ms;
 
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  /* F-VISUAL-001 X.2 — shadcn token rewire. components/ui/* sources
+     unchanged (per Q4); the rewire happens at the token level here so
+     <Button variant="default"> / <Card> / <Input> / etc. inherit the
+     editorial palette automatically. Reversible: revert this block to
+     re-detach shadcn from the design system. */
+  --background: var(--bg-canvas);
+  --foreground: var(--text-primary);
+  --card: var(--bg-elevated);
+  --card-foreground: var(--text-primary);
+  --popover: var(--bg-elevated);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--cta-primary);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: var(--accent-primary-soft);
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--bg-subtle);
+  --muted-foreground: var(--text-muted);
+  --accent: var(--accent-primary);
+  --accent-foreground: hsl(0 0% 100%);
+  --destructive: var(--error);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: var(--rule-default);
+  --input: var(--rule-default);
+  --ring: var(--accent-primary);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
