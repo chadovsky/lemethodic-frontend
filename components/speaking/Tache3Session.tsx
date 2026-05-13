@@ -17,10 +17,10 @@ import {
   recordingDonePulseDuration,
 } from '@/lib/motion'
 
-const INK          = '#1A1A1A'
-const INK_SOFT     = '#1A1A1AB3'
-const INK_MUTED    = '#1A1A1A66'
-const LAVENDER     = '#E0D4F0'
+const INK          = 'var(--text-primary)'
+const INK_SOFT     = 'var(--text-secondary)'
+const INK_MUTED    = 'var(--text-muted)'
+const LAVENDER     = 'var(--fp-lavender)'
 const BG           = 'var(--fp-canvas)'
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 

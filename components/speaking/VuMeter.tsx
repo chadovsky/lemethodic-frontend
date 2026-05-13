@@ -27,7 +27,7 @@ interface VuMeterProps {
   color?: string
 }
 
-export default function VuMeter({ stream, active, color = '#1A1A1A' }: VuMeterProps) {
+export default function VuMeter({ stream, active, color = 'var(--text-primary)' }: VuMeterProps) {
   const [levels, setLevels] = useState<number[]>(() =>
     Array(BAR_COUNT).fill(MIN_BAR_H),
   )

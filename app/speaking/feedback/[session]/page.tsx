@@ -2,8 +2,8 @@ import Link from 'next/link'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
-const INK          = '#1A1A1A'
-const INK_MUTED    = '#1A1A1A66'
+const INK          = 'var(--text-primary)'
+const INK_MUTED    = 'var(--text-muted)'
 const BG           = 'var(--fp-canvas)'
 
 export default function FeedbackPlaceholderPage() {
