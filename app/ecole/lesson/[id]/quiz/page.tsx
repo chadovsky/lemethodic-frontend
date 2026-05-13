@@ -5,7 +5,7 @@ import BottomNav from '@/components/home/BottomNav'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
-const INK = '#1A1A1A'
+const INK = 'var(--text-primary)'
 const BG  = 'var(--fp-canvas)'
 
 interface Props {

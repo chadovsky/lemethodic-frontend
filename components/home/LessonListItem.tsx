@@ -13,10 +13,10 @@ import {
 } from '@/lib/motion'
 
 // ─── design tokens ───────────────────────────────────────────────────────────
-const INK         = '#1A1A1A'
-const INK_SOFT    = '#1A1A1AB3'
-const INK_MUTED   = '#1A1A1A66'
-const CTA_BG      = '#1A1A1A'
+const INK         = 'var(--text-primary)'
+const INK_SOFT    = 'var(--text-secondary)'
+const INK_MUTED   = 'var(--text-muted)'
+const CTA_BG      = 'var(--text-primary)'
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 export type LessonStatus = 'complete' | 'in-progress' | 'locked'

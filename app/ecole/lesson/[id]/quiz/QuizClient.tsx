@@ -13,11 +13,11 @@ import Link from 'next/link'
 const UNLOCK_STORAGE_KEY = 'lemethodic:unlocked-lesson'
 
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
-const INK        = '#1A1A1A'
-const INK_MUTED  = '#1A1A1A66'
-const CTA_BG     = '#1A1A1A'
-const SAGE       = '#D4E4D0'
-const BLUSH      = '#F5D6D6'
+const INK        = 'var(--text-primary)'
+const INK_MUTED  = 'var(--text-muted)'
+const CTA_BG     = 'var(--text-primary)'
+const SAGE       = 'var(--fp-sage)'
+const BLUSH      = 'var(--fp-blush)'
 const BG         = 'var(--fp-canvas)'
 
 interface Question {

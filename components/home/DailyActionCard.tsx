@@ -5,8 +5,8 @@ import Image from 'next/image'
 import { Clock, Mic, LockOpen } from 'lucide-react'
 
 // ─── design tokens ───────────────────────────────────────────────────────────
-const INK        = '#1A1A1A'
-const INK_MUTED  = '#1A1A1A66'
+const INK        = 'var(--text-primary)'
+const INK_MUTED  = 'var(--text-muted)'
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 type MetaItem = {
