@@ -4,6 +4,90 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* ──────────────────────────────────────────────────────────────────────
+     F-VISUAL-001 — design system tokens (canonical from 2026-05-13).
+     Source of truth. Legacy --fp-* and --ed-* tokens below are kept as
+     aliases through X.1-X.5 to avoid surface churn; X.6 drops them
+     after F-225 Batch 3 verification passes.
+
+     Two-greens rule:
+       --accent-primary  #8FA279 sage — decoration only, NEVER body-text
+                          background. Used for icon fills, status pills
+                          with dark text, underline accents, divider
+                          tints. White text on --accent-primary fails
+                          WCAG AA (2.7:1); use --text-primary for all
+                          text on sage surfaces (~5.0:1, passes AA).
+       --success         #44794F deeper sage — state signal only (pass/
+                          done microcopy badges). NOT brand.
+
+     One-accent rule:
+       Sage is the only accent in the system. No secondary brand color.
+       Visual variety comes from typography contrast + spacing rhythm
+       + Fraunces italic moments. Documented here to resist the
+       temptation of adding a second hue later.
+
+     Editorial h2 evaluation point (per C3):
+       Fraunces italic on display-1/display-2/h1 is locked editorial.
+       h2 across every card may over-rotate to italic serif — F-225
+       Batch 2 (paywall + ecole) is the natural decision point. If
+       h2-italic-serif feels mannered, swap h2 to Figtree weight 600
+       via a single edit in lib/typography.ts TYPE_SCALE.
+     ────────────────────────────────────────────────────────────────────── */
+
+  /* Surfaces */
+  --bg-canvas:       hsl(38 25% 96%);   /* #F8F4ED warm cream */
+  --bg-elevated:     hsl(0  0% 100%);   /* #FFFFFF cards */
+  --bg-subtle:       hsl(38 18% 92%);   /* #ECE7DE muted band */
+
+  /* Text */
+  --text-primary:    hsl(30 18% 14%);   /* #2A2520 warm near-black */
+  --text-secondary:  hsl(30 10% 28%);   /* #4A4540 */
+  --text-muted:      hsl(30  5% 42%);   /* #6F6B66 — AA on canvas (4.7:1) */
+  --text-disabled:   hsl(30  5% 60%);   /* #9F9C97 */
+
+  /* Accent — sage (decoration only; see two-greens rule above) */
+  --accent-primary:        hsl(80 18% 58%);   /* #8FA279 */
+  --accent-primary-hover:  hsl(80 18% 48%);   /* #7A8C66 — icon/large-text hover only */
+  --accent-primary-soft:   hsl(80 22% 88%);   /* #E8EDDE — bg fills, paired with dark text */
+
+  /* CTA — editorial navy (primary action color) */
+  --cta-primary:        hsl(220 40% 21%);  /* #1F2D4A */
+  --cta-primary-hover:  hsl(220 40% 14%);  /* darker on hover */
+
+  /* Rules / borders */
+  --rule-default:    hsl(38 18% 88%);   /* #E5E0D8 warm divider */
+  --rule-strong:     hsl(38 15% 78%);
+
+  /* Status (semantic; distinct from --accent-primary per two-greens rule) */
+  --success:  hsl(140 30% 38%);   /* #44794F state-signal sage */
+  --warning:  hsl(35  60% 50%);   /* #C28A33 warm amber */
+  --error:    hsl(8   45% 55%);   /* #C57764 muted red */
+
+  /* Neutral scale (chrome only — Tailwind-compatible 50-950) */
+  --neutral-50:  hsl(38 25% 97%);
+  --neutral-100: hsl(38 20% 94%);
+  --neutral-200: hsl(38 18% 88%);
+  --neutral-300: hsl(38 15% 78%);
+  --neutral-400: hsl(30 10% 62%);
+  --neutral-500: hsl(30  8% 48%);
+  --neutral-600: hsl(30 10% 36%);
+  --neutral-700: hsl(30 12% 26%);
+  --neutral-800: hsl(30 15% 18%);
+  --neutral-900: hsl(30 18% 12%);
+  --neutral-950: hsl(30 20%  6%);
+
+  /* F-VISUAL-001 — Figtree replaces Switzer; the --font-figtree CSS
+     variable is set on <html> by next/font in app/layout.tsx. The
+     fallback chain below mirrors what was on --font-switzer for
+     parity during the transition. */
+  --font-figtree: 'Figtree', -apple-system, "Segoe UI", system-ui, sans-serif;
+
+  /* ──────────────────────────────────────────────────────────────────────
+     Legacy aliases (kept through X.1-X.5; X.6 cleanup drops them).
+     Editorial chrome tokens point at the new canonical set above so
+     every existing consumer keeps resolving without an explicit edit.
+     ────────────────────────────────────────────────────────────────────── */
+
   /* LeMethodic onboarding pastel palette */
   --fp-peach: #FFD8C2;
   --fp-sage: #D4E4D0;
@@ -13,28 +97,28 @@
   --fp-blush: #F5D6D6;
 
   /* LeMethodic neutrals */
-  --fp-ink: #1A1A1A;
-  --fp-ink-soft: #1A1A1AB3;
-  --fp-ink-muted: #1A1A1A66;
+  --fp-ink: var(--text-primary);
+  --fp-ink-soft: var(--text-secondary);
+  --fp-ink-muted: var(--text-muted);
   --fp-paper: #FFFFFFCC;
   --fp-paper-solid: #FFFFFF;
 
   /* LeMethodic CTA */
-  --fp-cta-bg: #1A1A1A;
+  --fp-cta-bg: var(--cta-primary);
   --fp-cta-text: #FFFFFF;
   --fp-cta-disabled: #1A1A1A4D;
 
   /* LeMethodic promoted tokens (formerly inline one-offs, promoted 2026-05-01) */
-  --fp-canvas: #FAFAF7;       /* off-white page background */
+  --fp-canvas: var(--bg-canvas);   /* aliased to F-VISUAL-001 warm cream */
   --fp-track: #E8E8E5;        /* empty bar / progress-track surface */
   --fp-peach-deep: #E0A890;   /* saturated peach — paywall radar only */
-  --fp-sage-deep: #2D8B55;    /* saturated green — "win" microcopy badges */
+  --fp-sage-deep: var(--success);  /* "win" microcopy badges — aliased to success state-signal */
   /* Alpha variants — naming convention "<token>-NN" where NN is the alpha % */
   --fp-sage-deep-25: #2D8B5540;  /* 25% alpha — free-tier check icon background */
 
   /* LeMethodic error — gentle redirect, not system failure
      (decision log #2, 2026-05-01) */
-  --fp-error: #D08272;
+  --fp-error: var(--error);  /* aliased to F-VISUAL-001 muted red */
 
   /* LeMethodic safe-area passthroughs — apply via inline style or CSS class
      wherever a fixed/sticky element touches a viewport edge. */
@@ -47,7 +131,7 @@
      Defining `--font-switzer` here makes it parallel to next/font's
      auto-injected `--font-fraunces`, so component code can reference both
      uniformly via `var(--font-switzer)` / `var(--font-fraunces)`. */
-  --font-switzer: 'Switzer', -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font-switzer: var(--font-figtree);  /* legacy alias — X.6 drops */
 
   /* LeMethodic motion language (companion to lib/motion.ts) */
   --fp-ease-fp-default: cubic-bezier(0, 0, 0.2, 1);
@@ -67,13 +151,13 @@
      snap. The --fp-* pastel palette is unchanged; --ed-warm-* tokens
      overlap some hex values but namespace separation reflects role
      (--fp-* = decorative chip layer per F-200; --ed-warm-* = chrome). */
-  --ed-bg: #FBF8F4;          /* V-012a — warmer cream (was #FAF7F2) */
-  --ed-fg: #2A2520;          /* V-012a — warm dark (was #1A1A1A near-black) */
-  --ed-fg-soft: #4A4540;     /* V-012a — softer secondary text */
-  --ed-accent: #1F2D4A;      /* deep editorial navy — credibility + premium */
-  --ed-muted: #6B6B6B;       /* warm gray, secondary text */
-  --ed-rule: #E5E0D8;        /* subtle dividers */
-  --ed-paper: #FFFFFF;       /* cards / elevated surfaces — pops against bg */
+  --ed-bg: var(--bg-canvas);          /* F-VISUAL-001 alias */
+  --ed-fg: var(--text-primary);       /* F-VISUAL-001 alias */
+  --ed-fg-soft: var(--text-secondary);  /* F-VISUAL-001 alias */
+  --ed-accent: var(--cta-primary);      /* F-VISUAL-001 alias — editorial navy */
+  --ed-muted: var(--text-muted);        /* F-VISUAL-001 alias */
+  --ed-rule: var(--rule-default);       /* F-VISUAL-001 alias */
+  --ed-paper: var(--bg-elevated);       /* F-VISUAL-001 alias */
 
   /* V-012a — Editorial Luxury palette additions. Per-surface chrome-level
      warmth, distinct from --fp-* decorative chips. Consumers in V-012b
@@ -82,7 +166,7 @@
   --ed-warm-peach: #FFD8C2;
   --ed-warm-peach-deep: #E0A890;
   --ed-warm-sage: #B8C4A8;
-  --ed-warm-sage-deep: #8FA279;
+  --ed-warm-sage-deep: var(--accent-primary);  /* F-VISUAL-001 — promoted to accent-primary (Q1) */
   --ed-warm-espresso: #4A3528;
   --ed-warm-cream: #FDFBF7;
   --ed-warm-sand: #F5E6D8;
@@ -169,15 +253,48 @@
 }
 
 @theme inline {
-  /* V-005 — Switzer (sans) + Fraunces (display/serif) replace Geist +
-     Cabinet Grotesk + Source Serif 4. --font-switzer is defined in :root
-     below (Fontshare CDN load); --font-fraunces is set on <html> by
-     next/font in app/layout.tsx. */
-  --font-sans: var(--font-switzer);
+  /* F-VISUAL-001 — Figtree (sans) + Fraunces (display/serif). Both set
+     on <html> by next/font in app/layout.tsx. Switzer retired (was
+     Fontshare CDN load; --font-switzer remains as legacy alias only). */
+  --font-sans: var(--font-figtree);
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   --font-display: var(--font-fraunces);
 
-  /* LeMethodic design tokens */
+  /* F-VISUAL-001 — canonical token surface exposed as Tailwind
+     utilities (bg-bg-canvas, text-text-primary, border-rule-default,
+     etc.). Legacy --color-fp-* and --color-ed-* below resolve through
+     the var() chain to the same values. */
+  --color-bg-canvas: var(--bg-canvas);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-disabled: var(--text-disabled);
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-primary-hover: var(--accent-primary-hover);
+  --color-accent-primary-soft: var(--accent-primary-soft);
+  --color-cta-primary: var(--cta-primary);
+  --color-cta-primary-hover: var(--cta-primary-hover);
+  --color-rule-default: var(--rule-default);
+  --color-rule-strong: var(--rule-strong);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-neutral-50: var(--neutral-50);
+  --color-neutral-100: var(--neutral-100);
+  --color-neutral-200: var(--neutral-200);
+  --color-neutral-300: var(--neutral-300);
+  --color-neutral-400: var(--neutral-400);
+  --color-neutral-500: var(--neutral-500);
+  --color-neutral-600: var(--neutral-600);
+  --color-neutral-700: var(--neutral-700);
+  --color-neutral-800: var(--neutral-800);
+  --color-neutral-900: var(--neutral-900);
+  --color-neutral-950: var(--neutral-950);
+
+  /* LeMethodic legacy design tokens (kept as Tailwind utilities through
+     X.1-X.5; X.6 cleanup drops these in lockstep with the :root aliases) */
   --color-fp-peach: var(--fp-peach);
   --color-fp-sage: var(--fp-sage);
   --color-fp-butter: var(--fp-butter);

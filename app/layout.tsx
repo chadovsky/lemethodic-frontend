@@ -1,20 +1,38 @@
 import type { Metadata, Viewport } from 'next'
-import { Fraunces } from 'next/font/google'
+import { Figtree, Fraunces } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import TopNav from '@/components/nav/TopNav'
 import QueryProvider from '@/components/QueryProvider'
 
-// V-005 — font system upgrade. Switzer replaces Geist for sans/UI/body
-// (loaded via Fontshare CDN, defined as `--font-switzer` CSS variable
-// in globals.css :root). Fraunces replaces Source Serif 4 for display +
-// serif accents (variable axes: opsz + SOFT + wght). The previous
-// per-surface DISPLAY_FONT constants pointing at Cabinet Grotesk /
-// Geist were rewritten to `var(--font-switzer)` in this same ticket.
+// F-VISUAL-001 X.1 — font system pivot. Figtree replaces Switzer for
+// sans/UI/body (next/font/google self-hosts at build, removing the
+// Fontshare CDN third-party uptime dependency that V-005 introduced).
+// Fraunces stays for display + serif accents (variable axes: opsz +
+// SOFT + wght).
+//
+// Subset coverage for French (CRITICAL — per C2 callout):
+//   - 'latin' covers U+0000-00FF (Basic Latin + Latin-1 Supplement),
+//     which includes the accented letters é è à â ç î ô û ï ù ë and
+//     the French guillemets « ».
+//   - 'latin-ext' covers U+0100-024F (Latin Extended-A + Extended-B),
+//     which carries œ Œ (U+0153 / U+0152) — common French ligature
+//     in words like cœur, œuvre, sœur, bœuf. Without latin-ext, those
+//     glyphs would fall back to the system font and render with a
+//     visible style mismatch on a French-learning product.
+// Both fonts subset to 'latin' + 'latin-ext' so French content renders
+// in the brand typeface across all surfaces.
+const figtree = Figtree({
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-figtree',
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+})
 const fraunces = Fraunces({
-  subsets: ['latin'],
+  subsets: ['latin', 'latin-ext'],
   variable: '--font-fraunces',
   axes: ['SOFT', 'opsz'],
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -32,7 +50,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#FAF7F2', // F-200: warm off-white editorial bg
+  themeColor: '#F8F4ED', // F-VISUAL-001 — warm cream --bg-canvas
   width: 'device-width',
   initialScale: 1,
   // userScalable defaults to true — explicitly omitted per WCAG 2.1
@@ -46,28 +64,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={fraunces.variable}>
-      <head>
-        {/* V-005 — Switzer via Fontshare CDN. Fraunces is loaded via
-            next/font above (Google Fonts). Cabinet Grotesk + Geist
-            CDN/Google links retired with V-005.
-            V-016e — added crossOrigin on preconnect (Fontshare's CSS
-            references font files on a different host) and a preload
-            link for the CSS itself so first-paint on landing doesn't
-            FOUT into system-sans before the @font-face declarations
-            arrive. */}
-        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="anonymous" />
-        <link
-          rel="preload"
-          as="style"
-          href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700,800&display=swap"
-        />
-        <link
-          href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700,800&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="en" className={`${figtree.variable} ${fraunces.variable}`}>
       <body className="font-sans antialiased">
         <QueryProvider>
           {/* V-013c — desktop-only top nav. Returns null on marketing /

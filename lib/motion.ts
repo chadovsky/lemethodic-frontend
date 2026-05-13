@@ -1,6 +1,43 @@
 // LeMethodic motion language.
 // All values sourced from LEMETHODIC-DESIGN.md §9 (Agent Prompt Guide → Motion).
 // Do not hand-edit values without updating the DESIGN.md decision log.
+//
+// F-VISUAL-001 X.1 — canonical `ease` and `duration` exports added
+// below as the design-system primary surface. Existing easeFp* /
+// durationFast/Base/Slow stay as aliases for back-compat; new
+// consumers reference ease.* / duration.* directly.
+
+// F-VISUAL-001 — canonical easing curves (numeric form for Framer Motion).
+export const ease = {
+  /** Entry — strong ease-out-expo (route enters, modals open, hero rise).
+   *  Aliased by ED_EASE_CUBIC + easeFpEnter below. */
+  out: [0.16, 1, 0.3, 1] as const,
+  /** State change — symmetric in-out for non-spring transitions
+   *  (used when spring would be too soft / for synced animations). NEW. */
+  inOut: [0.65, 0, 0.35, 1] as const,
+  /** Soft state — Apple-system-feel spring. Cards hover-lift, color/bg
+   *  shifts, V-012a chrome warmth. Aliased by ED_EASE_SPRING_CUBIC. */
+  spring: [0.32, 0.72, 0, 1] as const,
+  /** Exit / dismissal — slightly slower decay than `out`. Aliased by
+   *  easeFpExit below. */
+  snap: [0.33, 0, 0.67, 1] as const,
+} as const
+
+// F-VISUAL-001 — canonical durations (seconds, Framer Motion format).
+export const duration = {
+  /** 150ms — button press, hover micro (V-012a tactile snap). */
+  fast: 0.15,
+  /** 300ms — state changes, card lift, selection, dropdown open. */
+  medium: 0.3,
+  /** 500ms — section reveals, modal open, larger transitions. */
+  slow: 0.5,
+  /** 700ms — diagnostic bar fill (existing). 4-row × 75ms stagger +
+   *  700ms bar = ~925ms total reveal; midpoint of the 600-800ms spec. */
+  deliberate: 0.7,
+  /** 800ms — first-paint hero rise. Slower so the editorial atmosphere
+   *  reads as deliberate, not snappy. */
+  hero: 0.8,
+} as const
 
 // ── Easing curves ───────────────────────────────────────────────────────────
 // Use as: transition={{ ease: easeFpEnter, duration: durationBase }}
