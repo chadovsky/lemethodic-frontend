@@ -36,11 +36,11 @@ import type {
 // accent layer per F-200 rule. Full editorial migration of the dense
 // diagnostic surface tracked as F-205.deep.
 const INK          = 'var(--ed-fg)'
-const INK_SOFT     = '#1A1A1AB3'
-const INK_MUTED    = '#1A1A1A66'
-const SAGE         = '#D4E4D0'
-const BUTTER       = '#FFF0C2'
-const PEACH        = '#FFD8C2'
+const INK_SOFT     = 'var(--text-secondary)'
+const INK_MUTED    = 'var(--text-muted)'
+const SAGE         = 'var(--fp-sage)'
+const BUTTER       = 'var(--fp-butter)'
+const PEACH        = 'var(--fp-peach)'
 const BG           = 'var(--ed-bg)'
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
@@ -174,9 +174,9 @@ function pickTop3Dimensions(dims: TacheRubricDimension[]): {
 // alarm bells; mid scores stay neutral. 0-1 = warning tint, 2-3 =
 // neutral, 4-5 = success tint.
 function dimensionScoreTint(score: number): { bg: string; fg: string } {
-  if (score <= 1) return { bg: '#F5D6D6', fg: '#8A2A2A' } // soft blush
-  if (score >= 4) return { bg: '#D4E4D0', fg: '#2D5A38' } // soft sage
-  return { bg: '#1A1A1A0F', fg: '#1A1A1A' }                // neutral
+  if (score <= 1) return { bg: 'var(--fp-blush)', fg: '#8A2A2A' } // soft blush
+  if (score >= 4) return { bg: 'var(--fp-sage)', fg: '#2D5A38' } // soft sage
+  return { bg: '#1A1A1A0F', fg: 'var(--text-primary)' }                // neutral
 }
 
 // ─── sub-components ──────────────────────────────────────────────────────────

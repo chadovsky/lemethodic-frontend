@@ -9,9 +9,9 @@ import ReactMarkdown from 'react-markdown'
 import type { ModuleContentRef } from '@/lib/types'
 import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 
-const INK          = '#1A1A1A'
-const INK_SOFT     = '#1A1A1AB3'
-const INK_MUTED    = '#1A1A1A66'
+const INK          = 'var(--text-primary)'
+const INK_SOFT     = 'var(--text-secondary)'
+const INK_MUTED    = 'var(--text-muted)'
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface Props {

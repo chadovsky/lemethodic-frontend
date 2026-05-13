@@ -12,8 +12,8 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import type { ClusterLesson } from '@/lib/types'
 
-const INK = '#1A1A1A'
-const INK_MUTED = '#1A1A1A66'
+const INK = 'var(--text-primary)'
+const INK_MUTED = 'var(--text-muted)'
 const PAPER = '#FFFFFFCC'
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 

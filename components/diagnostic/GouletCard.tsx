@@ -1,9 +1,9 @@
 'use client'
 
-const INK          = '#1A1A1A'
-const INK_SOFT     = '#1A1A1AB3'
-const INK_MUTED    = '#1A1A1A66'
-const PEACH        = '#FFD8C2'
+const INK          = 'var(--text-primary)'
+const INK_SOFT     = 'var(--text-secondary)'
+const INK_MUTED    = 'var(--text-muted)'
+const PEACH        = 'var(--fp-peach)'
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface Props {

@@ -14,21 +14,21 @@ import type {
 import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 import ModuleExamples from './ModuleExamples'
 
-const INK          = '#1A1A1A'
-const INK_SOFT     = '#1A1A1AB3'
-const INK_MUTED    = '#1A1A1A66'
+const INK          = 'var(--text-primary)'
+const INK_SOFT     = 'var(--text-secondary)'
+const INK_MUTED    = 'var(--text-muted)'
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // FluentPath pastels (mirrored from globals.css). One per category so the
 // badge becomes a visual cue. Pre-launch this is decorative; if/when the
 // library grows past 8 categories we'd switch to a hash-based palette.
 const CATEGORY_BG: Record<ModuleCategory, string> = {
-  vocab_calque:        '#FFD8C2', // peach
-  discourse_structure: '#E0D4F0', // lavender
-  grammar_interference:'#FFF0C2', // butter
+  vocab_calque:        'var(--fp-peach)', // peach
+  discourse_structure: 'var(--fp-lavender)', // lavender
+  grammar_interference:'var(--fp-butter)', // butter
   pronunciation:       '#C7DFEA', // sky
-  register_mismatch:   '#F4CFD8', // blush
-  word_order:          '#D4E4D0', // sage
+  register_mismatch:   'var(--fp-blush)', // blush
+  word_order:          'var(--fp-sage)', // sage
   verb_aspect:         '#E8E4D8', // warm gray
   other:               '#1A1A1A0F',
 }

@@ -9,9 +9,9 @@ import {
 } from '@/lib/motion'
 
 // ─── design tokens (self-contained) ─────────────────────────────────────────
-const INK          = '#1A1A1A'
-const INK_MUTED    = '#1A1A1A66'
-const SAGE         = '#D4E4D0'
+const INK          = 'var(--text-primary)'
+const INK_MUTED    = 'var(--text-muted)'
+const SAGE         = 'var(--fp-sage)'
 const TRACK        = 'var(--fp-track)'
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 

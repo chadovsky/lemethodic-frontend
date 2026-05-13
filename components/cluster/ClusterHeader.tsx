@@ -18,15 +18,15 @@ import type {
 } from '@/lib/types'
 import type { InterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 
-const INK = '#1A1A1A'
-const INK_SOFT = '#1A1A1AB3'
-const INK_MUTED = '#1A1A1A66'
+const INK = 'var(--text-primary)'
+const INK_SOFT = 'var(--text-secondary)'
+const INK_MUTED = 'var(--text-muted)'
 const PAPER = '#FFFFFFCC'
-const SAGE = '#D4E4D0'
-const PEACH = '#FFD8C2'
-const BUTTER = '#FFF0C2'
-const LAVENDER = '#E0D4F0'
-const BLUSH = '#F5D6D6'
+const SAGE = 'var(--fp-sage)'
+const PEACH = 'var(--fp-peach)'
+const BUTTER = 'var(--fp-butter)'
+const LAVENDER = 'var(--fp-lavender)'
+const BLUSH = 'var(--fp-blush)'
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface ClusterHeaderProps {
@@ -78,7 +78,7 @@ const DETECTION_LABEL: Record<Detection, string> = {
 const DETECTION_DOT: Record<Detection, string> = {
   clean: '#2D8B55',
   wobble: '#D9A441',
-  fail: '#D08272',
+  fail: 'var(--error)',
   not_observed: INK_MUTED,
 }
 

@@ -9,21 +9,21 @@
 import type { ModuleCategory, RecurringModule } from '@/lib/types'
 import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 
-const INK          = '#1A1A1A'
-const INK_SOFT     = '#1A1A1AB3'
-const INK_MUTED    = '#1A1A1A66'
+const INK          = 'var(--text-primary)'
+const INK_SOFT     = 'var(--text-secondary)'
+const INK_MUTED    = 'var(--text-muted)'
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // Mirror of CATEGORY_BG in components/diagnostic/DetectedModuleCard.tsx.
 // Kept in sync manually — pre-launch the palette is small enough that
 // hoisting into a shared constants file isn't worth the import churn.
 const CATEGORY_BG: Record<ModuleCategory, string> = {
-  vocab_calque:        '#FFD8C2',
-  discourse_structure: '#E0D4F0',
-  grammar_interference:'#FFF0C2',
+  vocab_calque:        'var(--fp-peach)',
+  discourse_structure: 'var(--fp-lavender)',
+  grammar_interference:'var(--fp-butter)',
   pronunciation:       '#C7DFEA',
-  register_mismatch:   '#F4CFD8',
-  word_order:          '#D4E4D0',
+  register_mismatch:   'var(--fp-blush)',
+  word_order:          'var(--fp-sage)',
   verb_aspect:         '#E8E4D8',
   other:               '#1A1A1A0F',
 }
