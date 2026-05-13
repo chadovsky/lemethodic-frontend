@@ -3522,6 +3522,56 @@ Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split).
   8. **403 email_not_verified flow** — log in as an unverified user (or simulate by clearing email_verified_at BE-side). Visit `/vocabulaire`. Verify hard-nav to `/verify-email?next=/vocabulaire` (F-310.fe.coldreload interceptor still works on this new surface).
   9. **Runtime log sweep** — Vercel runtime logs for the F-325 deploy: 0 errors / 0 5xx in a 1h window after smoke.
 
+### F-VISUAL-001 — design system audit + Wispr Flow benchmark rollout
+
+**Priority:** HIGH (cross-cutting design refresh — touches every surface; the editorial system bones are in place but the palette/typography pair/motion conventions need consolidation against the Wispr Flow benchmark)
+**Status:** Plan locked 2026-05-13; X.0 in flight (X.1-X.6 follow; X.6 is post-F-225 cleanup)
+**Filed:** 2026-05-13
+**Plan-approved:** 2026-05-13 (Chadi — Q1-Q5 locked; sections 3-5 surface in X.0 status report for final review before X.1)
+**Source:** Chadi design directive 2026-05-13 — visual benchmark Wispr Flow (wisprflow.ai): quiet luxury, editorial design, soft neutrals + restrained green accent, typography contrast, motion as core design element.
+**Dependencies:** none (purely FE token + chrome work; no BE contract changes)
+
+**Pre-locked decisions (Chadi 2026-05-13):**
+- **Typography pair**: **Figtree** (sans, next/font/google) + **Fraunces** (serif, already shipped via next/font/google). Switzer retires (was shipped via Fontshare CDN — third-party uptime dependency removed). Override candidate considered: Inter (rejected — Figtree's humanist warmth is closer to Wispr Flow direction).
+- **Accent green (Q1)**: **`#8FA279`** — the existing `--ed-warm-sage-deep` value, promoted from scattered usage (spinner dots + success accent) to the design-system accent-primary. Re-using a known-good in-production value beats introducing a new value or guessing. Refines via single CSS-var swap if post-mega-phase review surfaces a tone mismatch.
+- **Success-state green stays distinct**: `--fp-sage-deep` `#2D8B55` remains as the success-state token, NOT the accent. Two distinct greens by role — accent (sage, restrained, decorative) vs success (deeper, state-signal).
+- **F-225 verification (Q2)**: **BATCHED — 3 checkpoints**. Auth + onboarding (10 screens) → product surfaces 1 (paywall + home + ecole, 14 screens) → product surfaces 2 (vocabulaire + diagnostic + writing, 24 screens). Single commit chain unified; verification has natural pause points.
+- **Legacy alias retention (Q3)**: Keep `--fp-*` and `--ed-*` aliases through X.1-X.4. Drop in X.6 cleanup commit (separate dispatch after F-225 batched verification passes).
+- **shadcn rewire (Q4)**: Leave `components/ui/*` source untouched. Rewire via `--primary` / `--destructive` etc. token redirects in `globals.css`. Reversible.
+- **Warm-luxury sub-palette (Q5)**: Keep `--ed-warm-{peach, peach-deep, sage, sage-deep, espresso, cream, sand}` as named tokens. Used by V-012b; no churn.
+- **Motion library**: **Framer Motion 12.38** (already installed; bundle cost already paid).
+- **Asset strategy**: Chadi generates imagery via Nanobanana (Google Gemini image gen). X.5 ships a slot manifest with suggested prompts; existing `/public/illustration-*.{jpg,png}` files stay until replaced.
+- **Implementation scope**: FULL design system rollout, single mega-phase chain. Touches all surfaces.
+
+**Pre-flight push-backs surfaced before X.0 (resolved):**
+- PB-1: Original prompt described codebase as "v0-cloned, default Tailwind/shadcn tokens, no motion library." Investigation: framer-motion 12.38 installed, ~800 lines of design tokens across three palettes already in `globals.css`, Switzer+Fraunces typography pair already shipped, motion language defined in `lib/motion.ts`. Reframed as **token consolidation + recolor + font swap on an existing editorial system**, not a from-zero rollout.
+- PB-2: Figtree vs Switzer typography conflict (Switzer currently shipped). Resolved — Figtree replaces Switzer (next/font/google removes Fontshare CDN dependency as a side benefit).
+- PB-3: WebFetch couldn't extract Wispr Flow's actual CSS (Webflow CSS-in-JS obfuscation). Resolved per Q1 — use existing `#8FA279` as accent green; refine via screenshot post-mega-phase only if needed.
+- PB-4: F-225 verification load (~50 screenshots one-shot). Resolved per Q2 — batched 3 checkpoints.
+- PB-5: `frontend-design` skill was not loaded at planning time. Now available after `/reload-plugins`. Used from X.1 forward when actual code lands.
+
+**Phase plan (one commit per phase, build + typecheck clean per commit):**
+- **X.0** (this commit): BACKLOG entry locked + Sections 3-5 surface in the status report for Chadi final-review checkpoint. Docs only.
+- **X.1** (Chadi green-light gates this commit): Token foundation + Figtree swap. `app/layout.tsx` Figtree via next/font/google; `app/globals.css` new HSL tokens under `:root` and `@theme inline` with `--fp-*` and `--ed-*` legacy aliases preserved; `lib/typography.ts` SANS_FONT switches to `var(--font-figtree)`, extends TYPE_SCALE with display-1 / display-2 / h1-h3 / body-lg / body / body-sm / eyebrow; `lib/motion.ts` adds `ease.{out, inOut, spring, snap}` + `duration` object as canonical exports (existing names become aliases).
+- **X.2**: Tailwind `@theme inline` block + shadcn rewire. Update `@theme inline` to expose new tokens as Tailwind utilities; rewire `--primary` / `--destructive` / `--secondary` / `--muted` / `--accent` etc. (oklch greyscale) to point at new HSL semantic tokens. `<Button variant="default">` now lands on `--cta-primary`.
+- **X.3** (8 commits, one per surface): /paywall → / (onboarding) → /ecole + intro + lesson/quiz → /vocabulaire + [slug] + practice + test → /diagnostic → /writing + [prompt_id] + history → /profile + /progress → auth (/login + /signup + /verify-email + /password-reset). Each commit: grep hardcoded hex → replace with `var(--*)`; convert inline `style` color values to design-token references. No layout / copy / behavior changes.
+- **X.4** (4 commits, one per high-impact surface): Paywall hero stagger + scroll-reveal on radar. Home daily-action attention-pulse. Vocabulaire flashcard 3D flip (with Safari fallback to opacity cross-fade). Diagnostic results stagger after bar-fill.
+- **X.5** (1 commit, docs only): `docs/nanobanana-asset-slots.md` — full slot manifest with suggested prompts. ~12-18 slots catalog.
+- **X.6** (1 commit, separate dispatch — fires only after F-225 batched verification passes): Drop `--fp-*` and `--ed-*` legacy aliases from `globals.css` once X.3 confirms zero references via grep. Pure deletion + commit-message reference to F-225 pass.
+
+**F-225 verification (batched per Q2):**
+- **Batch 1** (after X.3 commits 6 and 7 land, before X.4): auth + onboarding. 10 screens × 2 viewports.
+- **Batch 2** (after X.3 commits 1, 2, 3 land + X.4 paywall + home commits): paywall + home + ecole. 14 screens × 2 viewports.
+- **Batch 3** (after X.3 commits 4, 5 + remaining X.4 commits land): vocabulaire + diagnostic + writing. 24 screens × 2 viewports.
+
+**Operating-contract block (2026-05-12 contract):**
+- CONFIDENCE: HIGH on the plan. Scope is bounded (token swap + restraint pass, not from-zero rebuild). Per-surface commits in X.3 keep rollback granularity tight. No new BE contract; no migration risk.
+- WHY: Visual quality is the conversion lever before launch; current `--ed-*` system is partially built but inconsistent across surfaces (three coexisting palettes; many inline hardcoded hex). Wispr Flow is the right north star for the editorial-luxury target.
+- UNCERTAINTY: (1) Accent green `#8FA279` may read too muted against `--bg-canvas` warm cream at small sizes — verifiable in X.3 paywall commit (highest-impact surface; first to ship). (2) 3D flashcard flip on Safari iOS — known transform-style: preserve-3d quirks; fallback to opacity cross-fade if visible flicker. (3) Color-contrast `--text-muted #6F6B66` on `--bg-canvas` is ~4.3:1 (passes WCAG AA for normal text; would need `#605C57` to hit AAA on body). Contrast audit fires per surface in X.3.
+- VERIFICATION: Per Q2 batched runbook — F-225 captures at 3 natural checkpoints. End-of-ticket report fires after Batch 3 passes, before X.6 dispatches.
+
+**Owner:** Frontend Engineering
+
 ### BACKLOG-HYGIENE-001 — F-320 stale corpus_partition enum line (BACKLOG.md:3274)
 
 **Priority:** LOW (docs-only; doesn't affect shipped behavior)
