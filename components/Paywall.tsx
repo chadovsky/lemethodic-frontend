@@ -1,5 +1,13 @@
 'use client'
 
+// F-VISUAL-001 X.3.1 — paywall audit. All chrome (text, bg, rule,
+// CTA) was already consuming var(--ed-*) tokens, which X.1 aliased
+// to the new canonical palette (--bg-canvas, --text-primary,
+// --cta-primary, --rule-default). Remaining hex literals here are
+// (a) '#FFFFFF' for button text (universal contrast color, kept),
+// (b) '#1A1A1A04/08/0D/33' alpha overlays (decorative, kept). No
+// further source edits needed for the paywall surface.
+
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import {
