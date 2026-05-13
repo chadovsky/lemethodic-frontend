@@ -3582,6 +3582,39 @@ Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split).
 **Scope:** edit BACKLOG.md:3274 (F-320 scope description) to replace the `oqlf|academie|curated` triple with the canonical four-value enum. Single-line docs change; no code touched. Kept out of the F-325 BACKLOG filing commit to preserve commit-scope discipline.
 **Owner:** Frontend Engineering (docs)
 
+### F-BUGS-001-FE-A — Lessons load graceful degradation
+
+**Priority:** HIGH (production dead-end on lessons API failure)
+**Status:** Shipped 2026-05-13 (commit `ba86e95`). **F-225 verification deferred — Chadi capture pending per 3-batch plan; screenshots + interaction trace to be attached retroactively (same batch as FE-B).**
+**Filed:** 2026-05-13 (filed at merge-time; ticket worked under informal tracking, formalized for shipped-state record)
+**Source:** Bug 1 of F-BUGS-001-FE — desktop `/ecole` rendered full-page "Couldn't load your path. Retry" when `/api/ecole/lessons` returned non-2xx (401 token expired, 5xx server error, malformed response, etc.); chrome (greeting, exam date strip, recurring modules section, daily TÂCHE 2 card) was dead-ended despite the other API calls succeeding via their existing `.catch` wrappers.
+**Scope:**
+1. Wrap `api.lessons.list()` in `.catch((e) => { console.error(...); return [] })` so `Promise.all` resolves even on lessons failure.
+2. Lesson grid renders local empty-state error contained to its column rather than full-page dead-end.
+3. Dev-mode error detail surfaced inline (`process.env.NODE_ENV !== 'production'` gate) for debugging without leaking to prod users.
+**Files:** `components/home/EcoleDesktop.tsx`, `components/home/HomeScreen.tsx`
+**Dependencies:** none (pure FE).
+**F-225 verification status:** ⚠️ Pending. Per CLAUDE.md F-225 protocol, Shipped normally gates on (a) 1440px + 375px screenshots of each affected route AND (b) interaction trace (this is a behavior change — failure-path rendering — so interaction trace applies). Chadi to capture per 3-batch plan and attach to this entry. **Until that's attached, this entry is "Shipped on code, awaiting F-225 evidence."**
+**Owner:** Frontend Engineering
+
+### F-BUGS-001-FE-B — Auth-flow 5-surface fix (completed-onboarding users on logged-out chrome)
+
+**Priority:** HIGH (broken user-state routing — affected every returning authed user)
+**Status:** Shipped 2026-05-13 (merge `c896587`, push `ba86e95..c896587 main -> main`). **F-225 verification deferred — Chadi capture pending per 3-batch plan; screenshots + interaction trace to be attached retroactively.**
+**Filed:** 2026-05-13 (filed at merge-time; ticket worked under informal tracking, formalized for shipped-state record)
+**Source:** Bug 3 of F-BUGS-001-FE — completed-onboarding authed users were landing on logged-out marketing chrome or being routed back through `/onboarding` instead of straight to `/ecole`. Five surfaces audited and patched. Hybrid decision on Paywall (Chadi, 2026-05-13): ship pessimistic redirect now, file F-326 for branched authed UX when BE adds `subscriptionStatus`.
+**Scope (5 commits on the merged branch):**
+1. **B.1 — `components/landing/PlatformLanding.tsx`** (8f3298d): pre-paint loader + onboarding-aware redirect. Authed users with `targetLevel` → `/ecole`; authed without → `/onboarding`. Prevents marketing-chrome flash.
+2. **B.2 — `components/onboarding/OnboardingFlow.tsx`** (026703e): auth gate at the top of the flow redirects completed users to `/ecole` before any step renders.
+3. **B.3 — `components/onboarding/OnboardingFlow.tsx`** (d0ae84a): `EcoleReveal` CTA branches by auth state — authed → `/ecole`, unauth → `/paywall`.
+4. **B.4 — `components/Paywall.tsx`** (7bbaa0e): pessimistic redirect for any token-bearing user → `/ecole`; neutral loader while hydrating. Filed F-326 (this file:3618) for the proper authed-no-sub branched-paywall flow once BE ships `subscriptionStatus`.
+5. **B.5 — `app/login/page.tsx`** (5b0007f): suppress login-form flash before redirect when an already-authed user lands on `/login`.
+**Dependencies:** none (pure FE).
+**Smoke (prod, post-deploy):** `/`, `/onboarding`, `/paywall`, `/login`, `/ecole` all 200.
+**F-225 verification status:** ⚠️ Pending. Per CLAUDE.md F-225 protocol, Shipped normally gates on (a) 1440px + 375px screenshots of each affected route AND (b) interaction trace (handlers/navigation/state changes were modified, so this counts as interactive). Chadi to capture per 3-batch plan and attach to this entry. **Until that's attached, this entry is "Shipped on code, awaiting F-225 evidence."**
+**Follow-up:** F-326 (this file:3618) — BE adds `subscriptionStatus` to `User`/`/api/auth/me`, then B.4's pessimistic redirect is replaced with a branched authed-paywall UX.
+**Owner:** Frontend Engineering
+
 ### F-326 — subscriptionStatus on User (BE follow-up to F-BUGS-001-FE-B B.4)
 
 **Priority:** MEDIUM (unblocks proper authed paywall UX)
