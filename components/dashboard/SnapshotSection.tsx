@@ -21,13 +21,13 @@ import type {
   TacheCoverage,
 } from '@/lib/types'
 
-const INK = '#1A1A1A'
-const INK_SOFT = '#1A1A1AB3'
-const INK_MUTED = '#1A1A1A66'
+const INK = 'var(--text-primary)'
+const INK_SOFT = 'var(--text-secondary)'
+const INK_MUTED = 'var(--text-muted)'
 const PAPER = '#FFFFFFCC'
-const LAVENDER = '#E0D4F0'
-const PEACH = '#FFD8C2'
-const SAGE = '#D4E4D0'
+const LAVENDER = 'var(--fp-lavender)'
+const PEACH = 'var(--fp-peach)'
+const SAGE = 'var(--fp-sage)'
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface SnapshotSectionProps {

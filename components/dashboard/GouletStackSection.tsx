@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation'
 import RecurringModuleCard from '@/components/modules/RecurringModuleCard'
 import type { RecurringModule } from '@/lib/types'
 
-const INK_MUTED = '#1A1A1A66'
+const INK_MUTED = 'var(--text-muted)'
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface GouletStackSectionProps {
