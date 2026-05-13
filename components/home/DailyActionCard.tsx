@@ -2,12 +2,25 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { motion } from 'framer-motion'
 import { Clock, Mic, LockOpen } from 'lucide-react'
+import {
+  attentionPulseScale,
+  attentionPulseDuration,
+  attentionPulseRepeatDelay,
+} from '@/lib/motion'
 
 // ─── design tokens ───────────────────────────────────────────────────────────
 const INK        = 'var(--text-primary)'
 const INK_MUTED  = 'var(--text-muted)'
 const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+
+// F-VISUAL-001 X.4.2 — daily-action card gets the attention-pulse loop
+// from lib/motion (scale 1 -> 1.02 -> 1, 1.5s active + 1.5s gap). This
+// is the primary "next action" CTA on the home/ecole entry screen;
+// pulsing the card draws the eye to the next lesson without the
+// celebratory feel of a tutorial-app animation. Framer Motion respects
+// prefers-reduced-motion automatically.
 
 type MetaItem = {
   icon: 'clock' | 'mic' | 'lock-open'
@@ -48,6 +61,16 @@ export default function DailyActionCard({
   href,
 }: DailyActionCardProps) {
   return (
+    <motion.div
+      animate={{ scale: attentionPulseScale }}
+      transition={{
+        duration: attentionPulseDuration,
+        repeat: Infinity,
+        repeatDelay: attentionPulseRepeatDelay,
+        ease: 'easeInOut',
+      }}
+      style={{ borderRadius: 20 }}
+    >
     <Link
       href={href}
       style={{
@@ -193,5 +216,6 @@ export default function DailyActionCard({
         ))}
       </div>
     </Link>
+    </motion.div>
   )
 }
