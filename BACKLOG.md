@@ -3362,11 +3362,54 @@ Edge cases handled:
 ### F-323 — Le Vocabulaire test UI
 
 **Priority:** MEDIUM (Sprint 2 — F-319 MVP FE-side)
-**Status:** Queued
+**Status:** Plan locked 2026-05-13; B0 in flight (B1-B4 follow)
 **Filed:** 2026-05-12
+**Plan-approved:** 2026-05-13 (Chadi — 5 open questions answered HIGH-confidence)
 **Source:** F-319 / Decision 3
-**Dependencies:** F-320, F-321, F-322 (shared topic picker + chunk model)
-**Scope:** `/vocabulaire` test mode — MCQ, matching, dropdown, exact completion (Lexogoth Toolbox-style). Score + per-question feedback. Mobile + desktop responsive per F-225.
+**Dependencies:** F-321 (seed — empty/soft-empty until then; need ≥4 chunks per topic to launch a test session), F-325 (chunks API), F-322 (shared `lib/practice-state.ts`, `isTierInsufficientError`, ed-* primitive patterns, `?devLock=tier` capture flag)
+
+**Scope locked:**
+- **Route**: `/vocabulaire/[slug]/test` (nested under topic detail; sibling of F-322's `/practice`). `?mode=test` rejected for the same reasons as F-322.
+- **Exercise types**: MCQ / Dropdown / Exact completion / Matching. **Single-select per session in V1** — user picks one mode at SessionConfigCard. Multi-select mixed sessions filed as F-323.mixed follow-up for V2.
+- **Minimum chunks to launch**: 4. Below 4 → soft-empty state with CTA `/vocabulaire/[slug]/practice` ("This topic needs at least 4 chunks for a test session. Try practice mode instead.").
+- **Direction**: same model as F-322 — URL `?direction=fr|en` → localStorage pref → `'fr'` default. **Same `lemethodic_vocab_practice_pref` storage key** — user's direction choice is shared across practice and test surfaces (one user pref, two surfaces; comprehension-vs-recall preference is consistent across modes).
+- **Session length**: picker 10 / 20 / all; default 20. Same as F-322.
+- **Distractor pool**: pure FE-derived. For MCQ / Dropdown, distractors come from sibling chunks in the same fetched set (limit 20). Pool quality is healthy at F-321 seed scale (~150-250 chunks per topic).
+- **Exact completion grading**: permissive — case-insensitive + whitespace-trim + accent-strip + punctuation-strip, in that order. Strict-match mode deferred to V2.
+- **Matching screen**: 5 pairs per screen. Session of 20 chunks = 4 matching screens of 5 pairs each. Topics with chunk count not divisible by 5 → final screen has fewer pairs.
+- **Matching UX (mobile + desktop)**: tap one side → that item highlights as selected → tap an item in the OPPOSITE column → pair confirmed (visual line/highlight); tapping a second item in the SAME column deselects + re-selects.
+- **Auto-grading**: per-question pass/fail derived from user interaction (no self-grade). Matching block grades each of its 5 chunks independently (5 grade records per screen).
+- **localStorage**: writes to the SAME `lemethodic_vocab_practice_state` key as F-322 — practice and test failures both signal "review this chunk" to V2 SRS. Unified history.
+- **Tier-gate**: 403 + `tier_insufficient` → TierLockedCard via `isTierInsufficientError` helper (shipped in F-322 B1). Surface-specific render (same model as F-322 practice).
+- **F-225 capture for tier-locked**: dev-only `?devLock=tier` URL flag, gated behind `process.env.NODE_ENV !== 'production'`. Same pattern as F-322.
+- **Cache keys**: same TQ key family as F-325 / F-322 (`['vocab', 'chunks', slug, '']`). Browse-with-no-filters → practice → test all share one cache entry; browse-with-filters has a separate cache slot. No collision.
+
+**Component breakdown (all inline in TestClient.tsx, mirroring F-322's single-file model):**
+- `TestClient` — top-level state machine: `view: 'config' | 'session' | 'end'`. Owns shuffled session chunks, exercise type choice, current question index, per-question results.
+- `SessionConfigCard` — direction toggle + session length picker + **exercise type picker** (single-select, 4 buttons) + Start.
+- `QuestionView` — dispatches to `MCQView` / `DropdownView` / `ExactView` / `MatchingView` based on session's exercise type. Shared progress label + Next button after feedback.
+- `MCQView` — 4 button options; click → grade → feedback (correct highlighted, your answer if wrong shown).
+- `DropdownView` — sentence template with `<select>`; submit grades.
+- `ExactView` — input text + submit; permissive normalize-then-compare grading.
+- `MatchingView` — 5 pairs per screen; tap-to-pair UX; submit when all paired; per-chunk grade.
+- `TestEndCard` — overall score + per-exercise-type breakdown (trivial for single-select V1). CTAs: Practice again (reshuffle, reuse same exercise type) / Back to topic / Browse the corpus.
+- `TierLockedCard` / `ErrorCard` / `EmptyCard` / `SoftEmptyCard` / `TestSkeleton` — ed-* primitive mirrors (copied from F-322 — could refactor to a shared component later; defer to avoid file churn).
+
+**Pure helpers (new lib/test-engine.ts):**
+- `buildMCQ(chunk, pool, direction)` → `{ prompt, correct, options[4] }`
+- `buildDropdown(chunk, pool, direction)` → `{ template, correct, options[4] }`
+- `buildExact(chunk, direction)` → `{ prompt, expected }`
+- `buildMatchingBlock(chunks, direction)` → `{ pairs: { id, fr, en }[] }` (takes up to 5 chunks)
+- `normalizeExactAnswer(s)` — permissive normalize per Q3.
+- `pickDistractors(correct, pool, count)` — fisher-yates over sibling chunks, dedupe correct.
+
+**Phase plan (one commit per phase, build + typecheck clean per commit):**
+- **B0** (this commit): F-323 BACKLOG entry locked with the plan. Docs only.
+- **B1**: `lib/test-engine.ts` (pure helpers) + extend `lib/vocab-copy.ts` `test` block in EN + FR.
+- **B2**: `/vocabulaire/[slug]/test` route + `TestClient.tsx` with state machine + 4 exercise components inline + dev-only `?devLock=tier`.
+- **B3**: Wire "Start test" CTA into `app/vocabulaire/[slug]/TopicDetail.tsx` alongside existing "Start practice" CTA (button pair).
+- **B4**: F-225 verification runbook + status flip to "Awaiting verification".
+
 **Owner:** Frontend Engineering
 
 ### F-324 — Diagnostic ↔ Vocabulaire linking (auto-suggest vocab topics from flagged errors)
