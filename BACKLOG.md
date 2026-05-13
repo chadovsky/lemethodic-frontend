@@ -3362,7 +3362,7 @@ Edge cases handled:
 ### F-323 — Le Vocabulaire test UI
 
 **Priority:** MEDIUM (Sprint 2 — F-319 MVP FE-side)
-**Status:** Plan locked 2026-05-13; B0 in flight (B1-B4 follow)
+**Status:** Awaiting verification (F-225 — interactive change; needs 1440px + 375px screenshots of SessionConfigCard, each of the four exercise views pre- and post-submit (MCQ / Dropdown / Exact / Matching), TestEndCard, TierLockedCard via `?devLock=tier`, SoftEmptyCard + interaction trace per runbook below)
 **Filed:** 2026-05-12
 **Plan-approved:** 2026-05-13 (Chadi — 5 open questions answered HIGH-confidence)
 **Source:** F-319 / Decision 3
@@ -3403,12 +3403,41 @@ Edge cases handled:
 - `normalizeExactAnswer(s)` — permissive normalize per Q3.
 - `pickDistractors(correct, pool, count)` — fisher-yates over sibling chunks, dedupe correct.
 
-**Phase plan (one commit per phase, build + typecheck clean per commit):**
-- **B0** (this commit): F-323 BACKLOG entry locked with the plan. Docs only.
-- **B1**: `lib/test-engine.ts` (pure helpers) + extend `lib/vocab-copy.ts` `test` block in EN + FR.
-- **B2**: `/vocabulaire/[slug]/test` route + `TestClient.tsx` with state machine + 4 exercise components inline + dev-only `?devLock=tier`.
-- **B3**: Wire "Start test" CTA into `app/vocabulaire/[slug]/TopicDetail.tsx` alongside existing "Start practice" CTA (button pair).
-- **B4**: F-225 verification runbook + status flip to "Awaiting verification".
+**Phases shipped (one commit per phase, build + typecheck clean per commit):**
+- **B0** (05cbe9a): F-323 BACKLOG entry locked with the plan.
+- **B1** (8b7029e): `lib/test-engine.ts` pure helpers (buildMCQ / buildDropdown / buildExact / buildMatchingBlock / gradeExact / gradeMatching / normalizeExactAnswer / pickDistractors / shuffle); `lib/vocab-copy.ts` extended with `test` block in EN+FR.
+- **B2** (0958a0d): `/vocabulaire/[slug]/test` route + `TestClient.tsx` state machine. SessionConfigCard / QuestionView dispatcher / MCQView / DropdownView / ExactView / MatchingView / TestEndCard / TierLockedCard / ErrorCard / EmptyCard / SoftEmptyCard / TestSkeleton — all inline. Matching tap-to-pair UX with shuffled right column, per-chunk feedback (accent fill for correct, muted strikethrough for wrong). Dev-only `?devLock=tier` flag for F-225 capture.
+- **B3** (922e89e): TopicDetail CTA row becomes a flex pair — "Start practice" (primary, ed-accent) + "Start test" (secondary, ed-paper outline). flex-wrap for 375px stack behavior.
+- **B4** (this commit): F-225 verification runbook + status flip.
+
+**Files touched (shipped):**
+- `BACKLOG.md` — F-323 entry locked (B0); status + runbook (B4).
+- `lib/test-engine.ts` — NEW; pure helpers (B1).
+- `lib/vocab-copy.ts` — `test` block in EN+FR (B1).
+- `app/vocabulaire/[slug]/test/page.tsx` — NEW; ProtectedRoute wrap (B2).
+- `app/vocabulaire/[slug]/test/TestClient.tsx` — NEW; state machine + 4 exercise components (B2).
+- `app/vocabulaire/[slug]/TopicDetail.tsx` — paired Start practice / Start test CTAs (B3).
+
+**Operating-contract block (2026-05-12 contract):**
+- CONFIDENCE: HIGH. Plan-first → 5 open questions resolved before B0 → 5 discrete commits each `pnpm exec tsc --noEmit` silent + `pnpm build` green (39 routes, four `/vocabulaire/*` routes compile clean, 0 warnings). Matching tap-to-pair logic is the only genuinely new state machine; everything else is direct F-322 mirroring.
+- WHY: F-319 MVP completes the Vocabulaire surface trio FE-side: browse (F-325 ✅) + practice (F-322 ✅) + test (F-323 — this). Once F-321 seeds the corpus, all three surfaces have content.
+- UNCERTAINTY: (1) Matching right-column shuffle re-randomizes on remount — browser-back into a previously-submitted matching block could show a different display order. Acceptable for V1; no browser-back is wired through the state machine and the grade record per chunkId is order-independent. (2) Distractor pool quality on small topics (4-19 chunks): MCQ / Dropdown distractors come from the same fetched first-page set; topics with ~5 chunks repeat distractors across questions in a 20-question session. Healthy at F-321 seed scale (~150-250 chunks per topic). (3) `normalizeExactAnswer` regex literal-glyph reliance: combining marks block + smart quote/dash characters are literal in source. Next.js / tsc handle UTF-8 correctly; a future editor that mangles encoding degrades silently to overly-strict matching (never false-positives a wrong answer).
+- VERIFICATION RUNBOOK (Chadi, post-deploy on lemethodic.com):
+  1. **Auth gate** — visit `/vocabulaire/<any>/test` unauthenticated. Expect redirect to `/` via ProtectedRoute.
+  2. **Soft-empty (1-3 chunks)** — if F-321 seeds a tiny topic with <4 chunks, visit its `/test` route. Expect SoftEmptyCard with "Not enough chunks for a test." + CTA → `/practice`. 1440px + 375px.
+  3. **Empty (0 chunks)** — pre-seed, expect EmptyCard ("Nothing to practice yet.").
+  4. **CTA pair on TopicDetail** — visit `/vocabulaire/<topic-slug>`. Verify the CTA row contains BOTH "Start practice" (filled) and "Start test" (outline). 1440px + 375px.
+  5. **SessionConfigCard** — clicking Start test routes to `/test`. Verify the four exercise-type chips (Multiple choice / Dropdown / Exact completion / Matching), direction toggle, session length picker. 1440px + 375px.
+  6. **MCQ flow** — select Multiple choice + 10 chunks + Start. Verify ExerciseCard with prompt + 4 button options. Click a wrong option → correct option highlights ed-accent, your wrong choice strikes through, FeedbackBlock shows "Not quite — the answer was [X]." + Next button. 1440px + 375px pre-submit + post-submit.
+  7. **Dropdown flow** — Start over with Dropdown. Verify the `<select>` renders the 4 options, Submit button disabled until a choice is picked, feedback identical to MCQ post-submit. 1440px + 375px.
+  8. **Exact flow** — Start over with Exact completion. Verify autofocused text input + Submit button. Type a known answer → pass. Type a wrong answer → fail with correct answer in feedback. Permissive grading: case + accents + punctuation tolerated (e.g., "ecole." for "École"). 1440px + 375px.
+  9. **Matching flow** — Start over with Matching (10 chunks = 2 blocks of 5). Verify FR column on the left, EN column on the right (shuffled). **Tap-to-pair UX (per BACKLOG R3)**: tap an FR item → it highlights ed-accent fill → tap an EN item from the OPPOSITE column → both highlight + pair locks visually + selection clears. Tap a SAME-column item while one is selected → switches selection (no pair formed). Tap an already-paired item → unlocks that pair, selects this item. Submit button disabled until all 5 paired. 1440px + 375px pre-submit + post-submit (correct = accent fill, wrong = muted strikethrough).
+  10. **localStorage trace** — DevTools → Application → Local Storage. Verify `lemethodic_vocab_practice_state` accumulates pass/fail records as the test progresses (same key as F-322 — unified history confirmed).
+  11. **TestEndCard** — finish a session. Verify "Test complete." with N got / N total / % accuracy stats. Three CTAs: Test again (reshuffle + same exercise type), Back to topic, Browse the corpus. 1440px + 375px.
+  12. **Tier-lock capture (dev only)** — local `pnpm dev`; visit `/vocabulaire/<any>/test?devLock=tier`. Verify TierLockedCard with the "DEV: simulated tier lock" dashed badge + CTA → /paywall. 1440px + 375px. (Production refuses the flag — `process.env.NODE_ENV !== 'production'` gate.)
+  13. **i18n** — flip `interface_language` to `fr`. Refresh `/vocabulaire/<slug>/test`. Verify all test copy switches to French (exercise type labels, prompts, feedback strings, button labels).
+  14. **F-310 interceptor** — log in as unverified user; visit `/vocabulaire/<slug>/test`. Expect hard-nav to `/verify-email?next=/vocabulaire/<slug>/test`.
+  15. **Runtime log sweep** — Vercel runtime logs for the F-323 deploy: 0 errors / 0 5xx in a 1h window after smoke.
 
 **Owner:** Frontend Engineering
 
