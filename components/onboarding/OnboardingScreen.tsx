@@ -22,9 +22,9 @@ import { ReactNode } from 'react'
 // Tied to Cabinet Grotesk / FluentPath palette. New onboarding chrome uses
 // the editorial system below; these exist only for backward compatibility
 // while F-2xx tickets migrate other consumers.
-export const INK = '#1A1A1A'
-export const INK_SOFT = '#1A1A1AB3'
-export const INK_MUTED = '#1A1A1A66'
+export const INK = 'var(--text-primary)'
+export const INK_SOFT = 'var(--text-secondary)'
+export const INK_MUTED = 'var(--text-muted)'
 export const PAPER = '#FFFFFFCC'
 export const CTA_DISABLED = '#1A1A1A4D'
 export const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'

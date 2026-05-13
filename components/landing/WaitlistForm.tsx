@@ -83,7 +83,7 @@ export default function WaitlistForm({ intent, lang, onClose }: WaitlistFormProp
         ref={dialogRef}
         className="w-full max-w-[440px] flex flex-col"
         style={{
-          backgroundColor: '#FAFAF7',
+          backgroundColor: 'var(--bg-canvas)',
           borderRadius: 24,
           padding: '28px 24px 24px',
           boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
@@ -153,7 +153,7 @@ export default function WaitlistForm({ intent, lang, onClose }: WaitlistFormProp
                 height: 48,
                 width: '100%',
                 borderRadius: 12,
-                border: `2px solid ${error ? '#D08272' : email ? INK : INK_MUTED}`,
+                border: `2px solid ${error ? 'var(--error)' : email ? INK : INK_MUTED}`,
                 backgroundColor: PAPER,
                 padding: '0 16px',
                 fontFamily: DISPLAY_FONT,
@@ -208,7 +208,7 @@ export default function WaitlistForm({ intent, lang, onClose }: WaitlistFormProp
                   fontWeight: 600,
                   fontSize: 13,
                   lineHeight: '20px',
-                  color: '#D08272',
+                  color: 'var(--error)',
                   marginTop: 6,
                   marginBottom: 0,
                 }}
