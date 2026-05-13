@@ -81,6 +81,32 @@ export interface VocabularyCopy {
                                                // strings around it
     devLockBadge: string                       // dev-only flag indicator
   }
+  test: {
+    startCta: string
+    configTitle: string
+    configSubtitle: string
+    exerciseTypeLabel: string
+    typeMcq: string
+    typeDropdown: string
+    typeExact: string
+    typeMatching: string
+    startSession: string
+    progressLabel: (i: number, n: number) => string
+    mcqPrompt: string
+    dropdownPrompt: string
+    exactPrompt: string
+    matchingPrompt: string
+    submit: string
+    next: string
+    feedbackCorrect: string
+    feedbackWrong: (correct: string) => string
+    endTitle: string
+    endStat: (got: number, total: number) => string
+    testAgain: string
+    softEmptyTitle: string
+    softEmptyBody: string
+    softEmptyCta: string
+  }
 }
 
 const EN: VocabularyCopy = {
@@ -157,6 +183,33 @@ const EN: VocabularyCopy = {
     tierLockedTitle: 'This topic is exam-tagged.',
     devLockBadge: 'DEV: simulated tier lock',
   },
+  test: {
+    startCta: 'Start test',
+    configTitle: 'Test this topic',
+    configSubtitle: 'Pick an exercise type, a direction, and a session length.',
+    exerciseTypeLabel: 'Exercise type',
+    typeMcq: 'Multiple choice',
+    typeDropdown: 'Dropdown',
+    typeExact: 'Exact completion',
+    typeMatching: 'Matching',
+    startSession: 'Start session',
+    progressLabel: (i, n) => `Question ${i} of ${n}`,
+    mcqPrompt: 'Pick the translation',
+    dropdownPrompt: 'Complete the translation',
+    exactPrompt: 'Type the translation',
+    matchingPrompt: 'Pair each chunk with its translation',
+    submit: 'Submit',
+    next: 'Next',
+    feedbackCorrect: 'Correct.',
+    feedbackWrong: (correct) => `Not quite — the answer was “${correct}”.`,
+    endTitle: 'Test complete.',
+    endStat: (got, total) =>
+      `${got} of ${total} — ${total === 0 ? 0 : Math.round((got / total) * 100)}%`,
+    testAgain: 'Test again',
+    softEmptyTitle: 'Not enough chunks for a test.',
+    softEmptyBody: 'This topic has fewer than 4 chunks. Try practice mode instead.',
+    softEmptyCta: 'Go to practice',
+  },
 }
 
 const FR: VocabularyCopy = {
@@ -232,6 +285,33 @@ const FR: VocabularyCopy = {
     emptyBody: 'Ce thème ne contient aucun chunk. Revenez quand le corpus sera prêt.',
     tierLockedTitle: 'Ce thème est tagué examen.',
     devLockBadge: 'DEV : verrou de palier simulé',
+  },
+  test: {
+    startCta: 'Commencer le test',
+    configTitle: 'Tester ce thème',
+    configSubtitle: 'Choisissez un type d’exercice, une direction et une durée de session.',
+    exerciseTypeLabel: 'Type d’exercice',
+    typeMcq: 'Choix multiple',
+    typeDropdown: 'Liste déroulante',
+    typeExact: 'Complétion exacte',
+    typeMatching: 'Appariement',
+    startSession: 'Lancer la session',
+    progressLabel: (i, n) => `Question ${i} sur ${n}`,
+    mcqPrompt: 'Choisissez la traduction',
+    dropdownPrompt: 'Complétez la traduction',
+    exactPrompt: 'Saisissez la traduction',
+    matchingPrompt: 'Associez chaque chunk à sa traduction',
+    submit: 'Valider',
+    next: 'Suivant',
+    feedbackCorrect: 'Correct.',
+    feedbackWrong: (correct) => `Pas tout à fait — la réponse était « ${correct} ».`,
+    endTitle: 'Test terminé.',
+    endStat: (got, total) =>
+      `${got} sur ${total} — ${total === 0 ? 0 : Math.round((got / total) * 100)} %`,
+    testAgain: 'Tester encore',
+    softEmptyTitle: 'Pas assez de chunks pour un test.',
+    softEmptyBody: 'Ce thème compte moins de 4 chunks. Essayez plutôt le mode pratique.',
+    softEmptyCta: 'Aller à la pratique',
   },
 }
 
