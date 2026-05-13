@@ -14,7 +14,7 @@ import { useRouter } from 'next/navigation'
 import { useOnboardingStore } from '@/lib/onboarding'
 import { useAuthStore } from '@/lib/auth'
 import { useVerifyAuth } from '@/hooks/useVerifyAuth'
-import { api } from '@/lib/api'
+import { api, isEmailNotVerifiedError, mapStoreToSubmitPayload } from '@/lib/api'
 import {
   type OnboardingQuestion,
   type OnboardingQuestionsResponse,
@@ -244,13 +244,42 @@ export default function OnboardingFlow() {
     setStep(safeIndex + 1)
   }
 
+  // F-BUGS-001-FE-B B.3 — reveal CTA routes by auth state instead of
+  // hardcoding /paywall. Unauth → /paywall (conversion funnel). Auth → POST
+  // /onboarding/submit with the answers we just collected (mirrors the
+  // signup-page flush logic), reset the local store, route to /ecole/intro
+  // (F-202 first-visit destination). Email-not-verified surfaces lift the
+  // /verify-email redirect just like the signup flow.
+  async function handleRevealContinue() {
+    const auth = useAuthStore.getState()
+    if (!auth.token) {
+      router.push('/paywall')
+      return
+    }
+    try {
+      await api.onboarding.submit(mapStoreToSubmitPayload(data, interfaceLanguage))
+      const enrichedUser = await api.users.getMe()
+      auth.setAuth(auth.token, enrichedUser)
+      useOnboardingStore.getState().reset()
+      router.push('/ecole/intro')
+    } catch (flushErr) {
+      if (isEmailNotVerifiedError(flushErr)) {
+        router.push('/verify-email')
+        return
+      }
+      // eslint-disable-next-line no-console
+      console.error('Onboarding flush from reveal failed — routing to /ecole anyway', flushErr)
+      router.push('/ecole')
+    }
+  }
+
   // Closing reveal — pulled from store via the helpers EcoleReveal expects.
   if (onReveal) {
     return (
       <EcoleReveal
         data={data}
         language={interfaceLanguage}
-        onContinue={() => router.push('/paywall')}
+        onContinue={handleRevealContinue}
       />
     )
   }
