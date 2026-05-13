@@ -12,6 +12,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useOnboardingStore } from '@/lib/onboarding'
+import { useAuthStore } from '@/lib/auth'
+import { useVerifyAuth } from '@/hooks/useVerifyAuth'
 import { api } from '@/lib/api'
 import {
   type OnboardingQuestion,
@@ -137,6 +139,27 @@ export default function OnboardingFlow() {
   const setStep = useOnboardingStore((s) => s.setStep)
   const setLanguage = useOnboardingStore((s) => s.setLanguage)
 
+  // F-BUGS-001-FE-B B.2 — authed users with completed onboarding (i.e. BE
+  // already holds their answers, signaled by user.targetLevel being set) skip
+  // straight to /ecole rather than re-walking the questionnaire. Authed users
+  // without completed onboarding still see the flow — they may have signed up
+  // and bailed mid-stream, or BE state is stale.
+  const token = useAuthStore((s) => s.token)
+  const hydrated = useAuthStore((s) => s.hydrated)
+  const verified = useAuthStore((s) => s.verified)
+  const user = useAuthStore((s) => s.user)
+  useEffect(() => {
+    useAuthStore.getState().hydrate()
+  }, [])
+  useVerifyAuth()
+  useEffect(() => {
+    if (hydrated && token && verified && user?.targetLevel) {
+      router.replace('/ecole')
+    }
+  }, [hydrated, token, verified, user, router])
+  const awaitingAuthRedirect =
+    !hydrated || (token != null && !verified) || Boolean(user?.targetLevel && token)
+
   const [questions, setQuestions] = useState<OnboardingQuestion[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -186,6 +209,13 @@ export default function OnboardingFlow() {
     }
     return steps
   }, [questions, data])
+
+  // F-BUGS-001-FE-B B.2 — suppress the questionnaire while we're either
+  // waiting for auth state or about to redirect a completed-onboarding user.
+  // Render before the questions-fetch fallback so we don't flash question 1.
+  if (awaitingAuthRedirect) {
+    return <div style={{ minHeight: '100dvh', backgroundColor: LOADER_BG }} />
+  }
 
   // Loading
   if (error) {
