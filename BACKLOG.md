@@ -3582,6 +3582,20 @@ Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split).
 **Scope:** edit BACKLOG.md:3274 (F-320 scope description) to replace the `oqlf|academie|curated` triple with the canonical four-value enum. Single-line docs change; no code touched. Kept out of the F-325 BACKLOG filing commit to preserve commit-scope discipline.
 **Owner:** Frontend Engineering (docs)
 
+### F-326 — subscriptionStatus on User (BE follow-up to F-BUGS-001-FE-B B.4)
+
+**Priority:** MEDIUM (unblocks proper authed paywall UX)
+**Status:** Queued
+**Filed:** 2026-05-13
+**Source:** F-BUGS-001-FE-B B.4 auth-flow audit — authed users on /paywall currently get a pessimistic redirect to /ecole because the User type carries no subscription / trial-status field. We cannot distinguish (c) authed-with-subscription from (d) authed-without-subscription on FE. Hybrid decision (Chadi, 2026-05-13): ship the redirect now; file BE follow-up so authed-no-sub users can eventually see a tailored upgrade screen instead of being bounced.
+**Dependencies:** BE side — `/api/auth/me` response shape + `User` Pydantic model + DB column (or join from existing subscription/billing table if one exists). FE side — once shipped, `components/Paywall.tsx:125-142` branches on `user.subscriptionStatus`.
+**Scope:**
+1. BE: add `subscription_status` to `/api/auth/me` payload. Suggested enum: `none | trial_active | trial_expired | active | past_due | cancelled`. Source from whatever billing-state record already exists (Stripe sync table? user.stripeCustomerId+lookup? confirm with Chadi).
+2. FE (`lib/types.ts`): add `subscriptionStatus?: 'none' | 'trial_active' | ...` to `User`.
+3. FE (`components/Paywall.tsx`): replace the pessimistic redirect with a branch — `active | trial_active` → `/ecole`; `none | trial_expired | past_due | cancelled` → render paywall with copy + CTA tailored to that state. Re-label CTAs from "Start free trial" → "Upgrade" / "Renew" where appropriate.
+**Risk:** depends on what billing tables already exist BE-side. If there's no subscription record yet (Stripe wiring deferred per F-060), this ticket is blocked until that lands.
+**Owner:** Backend Engineering (step 1), Frontend Engineering (steps 2-3)
+
 ---
 
 ## Working protocol reminder

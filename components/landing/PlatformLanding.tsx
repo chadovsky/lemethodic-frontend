@@ -137,21 +137,34 @@ export default function PlatformLanding({ lang }: Props) {
   const token = useAuthStore((s) => s.token)
   const hydrated = useAuthStore((s) => s.hydrated)
   const verified = useAuthStore((s) => s.verified)
+  const user = useAuthStore((s) => s.user)
 
   useEffect(() => {
     useAuthStore.getState().hydrate()
   }, [])
   useVerifyAuth()
+  // F-BUGS-001-FE-B B.1 — authed users branch by onboarding completion:
+  // targetLevel populated ⇒ user has finished onboarding ⇒ /ecole;
+  // otherwise → /onboarding to finish (or resume) the questionnaire.
   useEffect(() => {
     if (hydrated && token && verified) {
-      router.replace('/ecole')
+      router.replace(user?.targetLevel ? '/ecole' : '/onboarding')
     }
-  }, [hydrated, token, verified, router])
+  }, [hydrated, token, verified, user, router])
   useEffect(() => {
     if (typeof document !== 'undefined') {
       document.documentElement.lang = lang
     }
   }, [lang])
+
+  // F-BUGS-001-FE-B B.1 — pre-paint loader gate. Until the auth store
+  // hydrates (and, if a token exists, /me round-trips), render a neutral
+  // frame instead of the full landing. Closes the "auth user sees the
+  // marketing page for ~500ms before the redirect fires" flash.
+  const awaitingAuthRedirect = !hydrated || (token != null && !verified)
+  if (awaitingAuthRedirect) {
+    return <div style={{ minHeight: '100dvh', backgroundColor: PAGE_BG }} />
+  }
 
   return (
     <main className="min-h-screen w-full ed-page-enter" style={{ backgroundColor: PAGE_BG }}>

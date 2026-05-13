@@ -15,9 +15,11 @@
 // honored — Framer Motion respects the user's prefers-reduced-motion
 // preference automatically.
 
-import { useState, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import { useAuthStore } from '@/lib/auth'
+import { useVerifyAuth } from '@/hooks/useVerifyAuth'
 import { duration, ease } from '@/lib/motion'
 import {
   RadarChart,
@@ -128,6 +130,36 @@ export default function Paywall() {
   const [trialOn, setTrialOn] = useState(true)
   const [compareOpen, setCompareOpen] = useState(false)
   const toggleCompare = useCallback(() => setCompareOpen((v) => !v), [])
+
+  // F-BUGS-001-FE-B B.4 — authed users have no business on /paywall: the
+  // existing CTAs route to /signup, which then bounces them back to /ecole,
+  // producing a confusing dead-end loop. The User type currently has no
+  // subscription field, so we cannot show an authed-but-no-sub "upgrade"
+  // variant on the FE alone (see follow-up BE ticket for adding
+  // subscriptionStatus to /api/auth/me). Pessimistic redirect-to-/ecole is
+  // the minimum-viable fix that ships without waiting on BE.
+  const token = useAuthStore((s) => s.token)
+  const hydrated = useAuthStore((s) => s.hydrated)
+  const verified = useAuthStore((s) => s.verified)
+  useEffect(() => {
+    useAuthStore.getState().hydrate()
+  }, [])
+  useVerifyAuth()
+  useEffect(() => {
+    if (hydrated && token && verified) {
+      router.replace('/ecole')
+    }
+  }, [hydrated, token, verified, router])
+  // Any token at all (verified or not) means the redirect effect above will
+  // fire — suppress the paywall in the meantime so authed users never see it.
+  const awaitingAuthRedirect = !hydrated || token != null
+  if (awaitingAuthRedirect) {
+    return (
+      <div
+        style={{ minHeight: '100dvh', backgroundColor: 'var(--ed-warm-cream)' }}
+      />
+    )
+  }
 
   const handleStartTrial = () => {
     router.push('/signup?trial=true')
