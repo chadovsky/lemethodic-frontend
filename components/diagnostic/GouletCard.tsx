@@ -1,5 +1,14 @@
 'use client'
 
+// F-VISUAL-001 X.4.4 — bottleneck card staggers in after the 4 couche
+// bars finish their 925ms reveal sequence (bar fill 700ms + 3×75ms
+// stagger). Delay set to 1.0s so the goulet arrives AFTER the bars
+// have settled, completing the "diagnostic results reveal" beat.
+// Framer Motion respects prefers-reduced-motion automatically.
+
+import { motion } from 'framer-motion'
+import { duration, ease } from '@/lib/motion'
+
 const INK          = 'var(--text-primary)'
 const INK_SOFT     = 'var(--text-secondary)'
 const INK_MUTED    = 'var(--text-muted)'
@@ -16,7 +25,10 @@ interface Props {
 
 export default function GouletCard({ layer, score, band, estimatedGain, body }: Props) {
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: duration.slow, ease: ease.out, delay: 1.0 }}
       style={{
         backgroundColor: PEACH,
         borderRadius: 24,
@@ -104,6 +116,6 @@ export default function GouletCard({ layer, score, band, estimatedGain, body }: 
           Estimated +{estimatedGain} TCF points if you close this gap
         </span>
       </div>
-    </div>
+    </motion.div>
   )
 }
