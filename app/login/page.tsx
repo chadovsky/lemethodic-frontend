@@ -103,6 +103,16 @@ export default function LoginPage() {
     if (error) setError(null)
   }
 
+  // F-BUGS-001-FE-B B.5 — cosmetic flash fix. Any token (verified or not)
+  // means the redirect effect above will fire — render a neutral loader in
+  // the meantime instead of the login form. Authed users with a stale token
+  // see the same loader until lib/api's 401 interceptor clears it, at which
+  // point token flips to null and the form renders for fresh credentials.
+  const awaitingAuthRedirect = !hydrated || token != null
+  if (awaitingAuthRedirect) {
+    return <div style={{ minHeight: '100dvh', backgroundColor: BG }} />
+  }
+
   return (
     <div
       className="min-h-screen w-full flex flex-col items-center justify-center px-5"
