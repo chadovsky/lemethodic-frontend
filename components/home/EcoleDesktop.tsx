@@ -51,6 +51,16 @@ const COPY = {
     locked: 'Locked',
     inProgress: 'In progress',
     complete: 'Complete',
+    // F-BUGS-001-FE-C — 200-empty states are NOT errors. Differentiated
+    // from the network/HTTP retry surface by inspecting the user shape:
+    // no exam_date → set-exam empty; exam_date set, no lessons →
+    // diagnostic-incomplete empty.
+    emptyNoExamTitle: 'Set your exam date to start your path.',
+    emptyNoExamBody: "Tell us when you sit the TCF and we'll calibrate the 27-lesson sequence to your timeline.",
+    emptyNoExamCta: 'Set exam date',
+    emptyNoEnrollmentTitle: 'Complete your diagnostic to enroll.',
+    emptyNoEnrollmentBody: 'The diagnostic takes a few minutes and unlocks the lesson sequence calibrated to your level.',
+    emptyNoEnrollmentCta: 'Start diagnostic',
   },
   fr: {
     pageEyebrow: "L'École",
@@ -72,6 +82,12 @@ const COPY = {
     locked: 'Verrouillé',
     inProgress: 'En cours',
     complete: 'Terminé',
+    emptyNoExamTitle: "Définissez votre date d'examen pour démarrer.",
+    emptyNoExamBody: "Indiquez-nous quand vous passez le TCF et nous adapterons la séquence de 27 leçons à votre calendrier.",
+    emptyNoExamCta: "Définir la date d'examen",
+    emptyNoEnrollmentTitle: 'Terminez votre diagnostic pour vous inscrire.',
+    emptyNoEnrollmentBody: 'Le diagnostic prend quelques minutes et débloque la séquence de leçons calibrée à votre niveau.',
+    emptyNoEnrollmentCta: 'Démarrer le diagnostic',
   },
 } as const
 
@@ -164,7 +180,20 @@ export default function EcoleDesktop() {
   // every lesson into Fondations and left Approfondissement empty.
   const fondations = lessons?.filter((l) => l.lessonNumber <= 16) ?? []
   const approfondissement = lessons?.filter((l) => l.lessonNumber >= 17) ?? []
-  const lessonsEmpty = lessons !== null && lessons.length === 0
+  // F-BUGS-001-FE-C — four-way state machine for the lesson grid:
+  //   1. lessonsErrorDetail set    → /api/ecole/lessons failed (network,
+  //                                  401, 5xx). Render LessonGridError +
+  //                                  Retry. lessons[] is [] from the catch.
+  //   2. lessons==[] && no exam_date → 200 with empty payload AND user has
+  //                                  no exam date set. Route to /profile.
+  //   3. lessons==[] && exam_date set → 200 with empty payload but exam
+  //                                  date present → user hasn't finished
+  //                                  the diagnostic / enrolled. Route to
+  //                                  /diagnostic.
+  //   4. lessons.length>0          → render the phase grid normally.
+  const lessonsLoadFailed = lessonsErrorDetail !== null
+  const lessonsEmptyOk = lessons !== null && lessons.length === 0 && !lessonsLoadFailed
+  const hasExamDate = !!storeUser?.examDate
   const examDays = daysUntilExam(storeUser?.examDate ?? null)
   const greeting =
     firstName
@@ -277,14 +306,24 @@ export default function EcoleDesktop() {
               gap: 'clamp(24px, 3vw, 40px)',
             }}
           >
-            {/* LEFT — lesson grid by phase (or local error / empty) */}
+            {/* LEFT — lesson grid by phase (or local error / empty).
+                F-BUGS-001-FE-C: four-way branch. Network/HTTP error keeps
+                the existing Retry surface (F-BUGS-001-FE-A); 200-empty
+                splits by exam_date into Set-exam-date or Start-diagnostic. */}
             <main>
-              {lessonsEmpty ? (
+              {lessonsLoadFailed ? (
                 <LessonGridError
                   message={copy.loadError}
                   retryLabel={copy.retry}
                   detail={lessonsErrorDetail}
                   onRetry={() => setRetryKey((k) => k + 1)}
+                />
+              ) : lessonsEmptyOk ? (
+                <LessonGridEmpty
+                  title={hasExamDate ? copy.emptyNoEnrollmentTitle : copy.emptyNoExamTitle}
+                  body={hasExamDate ? copy.emptyNoEnrollmentBody : copy.emptyNoExamBody}
+                  ctaLabel={hasExamDate ? copy.emptyNoEnrollmentCta : copy.emptyNoExamCta}
+                  ctaHref={hasExamDate ? '/diagnostic' : '/profile'}
                 />
               ) : (
                 <>
@@ -651,6 +690,76 @@ function ErrorRetry({ message, retryLabel, onRetry }: { message: string; retryLa
       >
         {retryLabel}
       </button>
+    </div>
+  )
+}
+
+// F-BUGS-001-FE-C — 200-empty empty state. NOT an error surface: the API
+// succeeded with an empty lesson list because the user either hasn't set
+// an exam date or hasn't completed the diagnostic. Caller picks the copy
+// + CTA target by inspecting storeUser.examDate.
+function LessonGridEmpty({
+  title,
+  body,
+  ctaLabel,
+  ctaHref,
+}: {
+  title: string
+  body: string
+  ctaLabel: string
+  ctaHref: string
+}) {
+  return (
+    <div
+      style={{
+        padding: '40px 24px',
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 12,
+        backgroundColor: 'var(--bg-elevated)',
+        border: '1px solid var(--rule-default)',
+        borderRadius: 4,
+      }}
+    >
+      <p
+        style={{
+          fontFamily: SERIF,
+          fontStyle: 'italic',
+          fontWeight: 400,
+          fontSize: 22,
+          lineHeight: 1.25,
+          color: 'var(--ed-warm-espresso)',
+          margin: 0,
+          maxWidth: 480,
+        }}
+      >
+        {title}
+      </p>
+      <p style={{ fontFamily: SANS, fontWeight: 400, fontSize: 14, lineHeight: 1.55, color: ED_FG_SOFT, margin: 0, maxWidth: 480 }}>
+        {body}
+      </p>
+      <Link
+        href={ctaHref}
+        className="ed-btn-press"
+        style={{
+          marginTop: 4,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '10px 18px',
+          borderRadius: 4,
+          backgroundColor: ED_ACCENT,
+          color: '#FFFFFF',
+          fontFamily: SANS,
+          fontWeight: 600,
+          fontSize: 13,
+          textDecoration: 'none',
+        }}
+      >
+        {ctaLabel}
+      </Link>
     </div>
   )
 }
