@@ -22,7 +22,7 @@ import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/lib/auth'
 import { useVerifyAuth } from '@/hooks/useVerifyAuth'
 
-const LOADER_BG = '#FFD8C2' // peach, matches /onboarding so the redirect is seamless
+const LOADER_BG = 'var(--fp-peach)' // peach, matches /onboarding so the redirect is seamless
 
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
   const router = useRouter()
