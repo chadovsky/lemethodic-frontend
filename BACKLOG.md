@@ -3615,6 +3615,37 @@ Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split).
 **Follow-up:** F-326 (this file:3618) — BE adds `subscriptionStatus` to `User`/`/api/auth/me`, then B.4's pessimistic redirect is replaced with a branched authed-paywall UX.
 **Owner:** Frontend Engineering
 
+### F-BUGS-001-FE-C — `/ecole` empty-state vs network-error differentiation
+
+**Priority:** HIGH (regression introduced by FE-A soft-fail wrapper — no-lessons users saw network-error copy)
+**Status:** Shipped 2026-05-13 (commit `a066660` on worktree, merged to main via `d1fd33d`). **F-225 verification deferred — Chadi capture pending per 3-batch plan; screenshots + interaction trace to be attached retroactively.**
+**Filed:** 2026-05-13 (filed at merge-time; ticket worked under informal tracking, formalized for shipped-state record)
+**Source:** Bug 1 of F-BUGS-001-FE — after FE-A's soft-fail wrapper landed (`ba86e95`), `/ecole` started rendering the inline "Couldn't load your path. Retry" message for users with zero enrolled lessons (empty array — a legitimate user state, not a failure). The single error branch couldn't distinguish "no lessons yet" from "lessons API failed", so onboarding-complete users with an empty path were shown a retry CTA that did nothing useful.
+**Scope:**
+1. Lessons fetcher distinguishes between (a) successful response with `[]` and (b) caught error from FE-A wrapper.
+2. Empty-array path renders proper empty-state messaging (no retry CTA, copy oriented toward "your lessons will appear here").
+3. Network-error path keeps the FE-A inline error column with retry CTA + dev-mode detail.
+**Files:** `components/home/EcoleDesktop.tsx`, `components/home/HomeScreen.tsx`, `lib/api` wrappers.
+**Dependencies:** built on FE-A (`ba86e95`) — this ticket exists because FE-A's catch-all collapsed two distinct states into one error branch.
+**F-225 verification status:** ⚠️ Pending. Per CLAUDE.md F-225 protocol, Shipped normally gates on (a) 1440px + 375px screenshots of `/ecole` in both empty-array and network-error states AND (b) interaction trace (failure-path rendering + retry CTA behavior). Chadi to capture per 3-batch plan and attach to this entry. **Until that's attached, this entry is "Shipped on code, awaiting F-225 evidence."**
+**Owner:** Frontend Engineering
+
+### F-BUGS-001-FE-D — Tâche 2 candidate-brief language defaulting + FR/EN toggle
+
+**Priority:** MEDIUM (UX polish — brief comprehension blocker for A1/A2 users)
+**Status:** Shipped 2026-05-13 (commit `341d567`, fast-forward to main from `d1fd33d`). **F-225 verification deferred — Chadi capture pending per 3-batch plan; screenshots + interaction trace to be attached retroactively.**
+**Filed:** 2026-05-13 (filed at merge-time; ticket worked under informal tracking, formalized for shipped-state record)
+**Source:** `candidate_brief` on `/speaking/tache-2/<scenario>` rendered in English regardless of the user's self-assessed level — fine for B1+ users practicing comprehension under FR cognitive load, but a hard blocker for A1/A2 users who couldn't parse the scenario in the first place. No per-user override existed either.
+**Scope:**
+1. Default-language rule by `target_level`: `B1+` defaults to FR (immersion), `A1`/`A2` defaults to EN (comprehension-first).
+2. `BriefLanguageToggle` (FR/EN) added to the Tâche 2 session UI so any user can flip at will.
+3. Per-conversation persistence via `localStorage` key `lemethodic_brief_lang_<conversation_id>` (scoped per scenario instance, so a user can prefer FR on one scenario and EN on another without bleed-over).
+**Files:** `components/speaking/Tache2Session.tsx`, `lib/storage-keys.ts`.
+**Dependencies:** none (pure FE).
+**Caveat:** brief copy is FE-side placeholder mirroring BE seed quality — F-061.1 is the architectural fix that wires FE to BE `candidate_brief_*` fields. This ticket ships the toggle + defaulting UX against the placeholder copy; F-061.1 will replace the source of the strings without touching the toggle behavior.
+**F-225 verification status:** ⚠️ Pending. Per CLAUDE.md F-225 protocol, Shipped normally gates on (a) 1440px + 375px screenshots of `/speaking/tache-2/<scenario>` in FR and EN states AND (b) interaction trace (toggle click → language swap → localStorage persist → reload retains choice). Chadi to capture per 3-batch plan and attach to this entry. **Until that's attached, this entry is "Shipped on code, awaiting F-225 evidence."**
+**Owner:** Frontend Engineering
+
 ### F-326 — subscriptionStatus on User (BE follow-up to F-BUGS-001-FE-B B.4)
 
 **Priority:** MEDIUM (unblocks proper authed paywall UX)
