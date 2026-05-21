@@ -1,8 +1,9 @@
-// UI-001 + UI-002 — TCF Canada landing: hero + persona-match section.
+// UI-001 + UI-002 + UI-003 — TCF Canada landing: hero, persona-match, 5-couche method.
 // PlatformLanding (F-300a multi-surface) preserved at /exam-prep.
 
 import Hero from '@/components/landing/Hero'
 import PersonaMatch from '@/components/landing/PersonaMatch'
+import MethodologyPreview from '@/components/landing/MethodologyPreview'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -19,6 +20,7 @@ export default function Home() {
     <main className="ed-page-enter">
       <Hero />
       <PersonaMatch />
+      <MethodologyPreview />
     </main>
   )
 }

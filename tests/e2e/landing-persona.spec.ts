@@ -25,7 +25,7 @@ test.describe('PersonaMatch section — desktop (1280×800)', () => {
 
   test('section h2 is visible after scrolling', async ({ page }) => {
     await page.goto('/')
-    const heading = page.getByRole('heading', { level: 2 })
+    const heading = page.getByRole('heading', { level: 2, name: /visa-urgent/i })
     await heading.scrollIntoViewIfNeeded()
     await expect(heading).toBeVisible()
   })

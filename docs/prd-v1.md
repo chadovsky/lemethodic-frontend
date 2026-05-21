@@ -185,7 +185,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### UI-003 — Landing methodology preview (5-couche visual)
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged `ba435e4` (feat/ui-003-landing-methodology → main)
 **Branch:** `feat/ui-003-landing-methodology` (FE, from `main`)
 **Effort:** 1 session (~3–5h)
 
