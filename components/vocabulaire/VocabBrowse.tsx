@@ -86,6 +86,28 @@ export default function VocabBrowse() {
           >
             Pratiquer
           </Link>
+          <Link
+            data-testid="vocab-cta-test"
+            href="/vocabulaire/test"
+            className="ed-btn-press"
+            style={{
+              minHeight: 44,
+              padding: '10px 18px',
+              fontFamily: SANS_FONT,
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              color: 'var(--text-primary)',
+              backgroundColor: 'transparent',
+              border: '1px solid var(--rule-default)',
+              borderRadius: 4,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            Tester
+          </Link>
         </div>
       </header>
 

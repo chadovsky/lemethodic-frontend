@@ -744,7 +744,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### UI-012 — Le Vocabulaire test view
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged 48def59 (feat/ui-012-vocab-test → main)
 **Branch:** `feat/ui-012-vocab-test` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 
