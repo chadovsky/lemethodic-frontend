@@ -12,7 +12,8 @@ test.describe('Landing hero — desktop (1280×800)', () => {
   test('CTA navigates to /signup', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('link', { name: /start your prep/i }).click()
-    await expect(page).toHaveURL(/\/signup/)
+    // 15 s budget: first request to /signup triggers dev-server compilation
+    await expect(page).toHaveURL(/\/signup/, { timeout: 15_000 })
   })
 })
 

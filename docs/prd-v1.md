@@ -141,7 +141,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### UI-002 — Landing persona-match section
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged `b4677e0` (feat/ui-002-landing-persona → main)
 **Branch:** `feat/ui-002-landing-persona` (FE, from `main`)
 **Effort:** 1 session (~2–4h)
 

@@ -1,7 +1,8 @@
-// UI-001 — landing page hero. TCF Canada single-purpose hero shell.
+// UI-001 + UI-002 — TCF Canada landing: hero + persona-match section.
 // PlatformLanding (F-300a multi-surface) preserved at /exam-prep.
 
 import Hero from '@/components/landing/Hero'
+import PersonaMatch from '@/components/landing/PersonaMatch'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -14,5 +15,10 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  return <Hero />
+  return (
+    <main className="ed-page-enter">
+      <Hero />
+      <PersonaMatch />
+    </main>
+  )
 }

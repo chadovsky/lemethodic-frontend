@@ -3,7 +3,8 @@ import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 
 export default function Hero() {
   return (
-    <main
+    <section
+      aria-label="Hero"
       style={{
         minHeight: '100dvh',
         backgroundColor: 'var(--bg-canvas)',
@@ -91,6 +92,6 @@ export default function Hero() {
 
         </div>
       </div>
-    </main>
+    </section>
   )
 }

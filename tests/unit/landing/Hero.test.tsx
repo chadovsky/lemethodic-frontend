@@ -31,8 +31,8 @@ describe('Hero', () => {
     expect(cta).toHaveAttribute('href', '/signup')
   })
 
-  it('has a main landmark', () => {
+  it('has a landmark region', () => {
     render(<Hero />)
-    expect(screen.getByRole('main')).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: /hero/i })).toBeInTheDocument()
   })
 })
