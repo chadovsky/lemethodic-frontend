@@ -50,9 +50,9 @@ test.describe('App shell — desktop (1280×800)', () => {
     await expect(page.getByRole('heading', { level: 1, name: /compte/i })).toBeVisible()
   })
 
-  test('shell wraps the /dashboard stub page with a heading', async ({ page }) => {
+  test('shell wraps the /dashboard page with a heading', async ({ page }) => {
     await page.goto('/dashboard')
-    await expect(page.getByRole('heading', { level: 1, name: /tableau de bord/i })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: /bonjour/i })).toBeVisible()
   })
 })
 

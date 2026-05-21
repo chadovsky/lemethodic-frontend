@@ -412,7 +412,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### UI-007 — Dashboard shell
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged `8435aa8` (feat/ui-007-dashboard-shell → main)
 **Branch:** `feat/ui-007-dashboard-shell` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 

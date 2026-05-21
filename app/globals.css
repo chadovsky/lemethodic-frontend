@@ -932,3 +932,17 @@
   .app-shell-main { margin-left: 240px; }
   .app-shell-sidebar { transform: translateX(0); }
 }
+
+/* UI-007 — Dashboard widget grid. 1-col mobile, 2-col tablet (≥640px),
+   4-col xl (≥1440px). Plain CSS per UI-006 convention. */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(16px, 2vw, 24px);
+}
+@media (min-width: 640px) {
+  .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1440px) {
+  .dashboard-grid { grid-template-columns: repeat(4, 1fr); }
+}
