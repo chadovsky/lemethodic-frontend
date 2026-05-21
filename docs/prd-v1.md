@@ -292,7 +292,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### UI-005 — Sign-up form shell
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged `7052165` (feat/ui-005-signup-form-shell → main)
 **Branch:** `feat/ui-005-signup-form-shell` (FE, from `main`)
 **Effort:** 1 session (~3–5h)
 
