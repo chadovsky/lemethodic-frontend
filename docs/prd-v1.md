@@ -675,7 +675,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### UI-011 — Le Vocabulaire practice view
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged 5a359c0 (feat/ui-011-vocab-practice → main)
 **Branch:** `feat/ui-011-vocab-practice` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 

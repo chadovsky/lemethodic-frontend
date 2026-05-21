@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
 import { CHUNKS } from '@/lib/data/chunks'
 import { applyFilters, DEFAULT_FILTER_STATE, type VocabFilterState } from '@/lib/vocab/filter'
@@ -17,32 +18,75 @@ export default function VocabBrowse() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24, paddingTop: 8 }}>
-      <header style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <h1
+      <header
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          alignItems: 'flex-end',
+          justifyContent: 'space-between',
+          gap: 16,
+        }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: '1 1 auto' }}>
+          <h1
+            style={{
+              fontFamily: SERIF_FONT,
+              fontStyle: 'italic',
+              fontWeight: 500,
+              fontSize: 'clamp(32px, 4vw, 52px)',
+              lineHeight: 1.1,
+              letterSpacing: '-0.02em',
+              color: 'var(--text-primary)',
+              margin: 0,
+            }}
+          >
+            Le Vocabulaire
+          </h1>
+          <p
+            style={{
+              fontFamily: SANS_FONT,
+              fontWeight: 500,
+              fontSize: '1rem',
+              color: 'var(--text-muted)',
+              margin: 0,
+            }}
+          >
+            Les chunks qui font la différence.
+          </p>
+        </div>
+
+        <div
           style={{
-            fontFamily: SERIF_FONT,
-            fontStyle: 'italic',
-            fontWeight: 500,
-            fontSize: 'clamp(32px, 4vw, 52px)',
-            lineHeight: 1.1,
-            letterSpacing: '-0.02em',
-            color: 'var(--text-primary)',
-            margin: 0,
+            display: 'flex',
+            flexDirection: 'row',
+            gap: 10,
+            flexShrink: 0,
           }}
         >
-          Le Vocabulaire
-        </h1>
-        <p
-          style={{
-            fontFamily: SANS_FONT,
-            fontWeight: 500,
-            fontSize: '1rem',
-            color: 'var(--text-muted)',
-            margin: 0,
-          }}
-        >
-          Les chunks qui font la différence.
-        </p>
+          <Link
+            data-testid="vocab-cta-practice"
+            href="/vocabulaire/practice"
+            className="ed-btn-press"
+            style={{
+              minHeight: 44,
+              padding: '10px 18px',
+              fontFamily: SANS_FONT,
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              color: 'var(--bg-elevated)',
+              backgroundColor: 'var(--cta-primary)',
+              border: '1px solid var(--cta-primary)',
+              borderRadius: 4,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            Pratiquer
+          </Link>
+        </div>
       </header>
 
       <button
