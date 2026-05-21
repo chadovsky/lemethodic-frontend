@@ -533,7 +533,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### UI-009 — L'École lesson detail view
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged 7a13ce3 (feat/ui-009-ecole-lesson-detail → main)
 **Branch:** `feat/ui-009-ecole-lesson-detail` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 
