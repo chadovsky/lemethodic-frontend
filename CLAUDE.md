@@ -1,5 +1,11 @@
 # CLAUDE.md
 
+## Execution Source of Truth (Manual Mode, May 21 2026)
+- Canonical PRD: docs/prd-v1.md
+- Old BACKLOG.md superseded but retained for audit
+- Current ticket: UI-001 (Landing page hero) on branch feat/ui-001-landing-hero
+- Mode: one micro-feature per session, UI-first sequencing, vitest + Playwright = spec, squash-merge to main
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Commands
