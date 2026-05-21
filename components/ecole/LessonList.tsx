@@ -1,0 +1,133 @@
+import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
+import { lessonsBySection } from '@/lib/data/lessons'
+import LessonCard from './LessonCard'
+
+const FONDATIONS = lessonsBySection('fondations')
+const APPROFONDISSEMENT = lessonsBySection('approfondissement')
+
+export default function LessonList() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 48, paddingTop: 8 }}>
+      <header style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <h1
+          style={{
+            fontFamily: SERIF_FONT,
+            fontStyle: 'italic',
+            fontWeight: 500,
+            fontSize: 'clamp(32px, 4vw, 52px)',
+            lineHeight: 1.1,
+            letterSpacing: '-0.02em',
+            color: 'var(--text-primary)',
+            margin: 0,
+          }}
+        >
+          L&rsquo;École
+        </h1>
+        <p
+          style={{
+            fontFamily: SANS_FONT,
+            fontWeight: 500,
+            fontSize: '1rem',
+            color: 'var(--text-muted)',
+            margin: 0,
+          }}
+        >
+          La méthode en 27 leçons.
+        </p>
+        <p
+          style={{
+            fontFamily: SANS_FONT,
+            fontWeight: 400,
+            fontSize: '0.9375rem',
+            lineHeight: 1.55,
+            color: 'var(--text-muted)',
+            margin: '4px 0 0',
+            maxWidth: 640,
+          }}
+        >
+          Une progression linéaire — 16 leçons de Fondations pour ancrer les
+          réflexes, puis 11 leçons d&rsquo;Approfondissement pour affûter
+          l&rsquo;expression à l&rsquo;oral.
+        </p>
+      </header>
+
+      <Section
+        id="fondations"
+        title="Fondations"
+        eyebrow="Leçons 1 — 16"
+        lessons={FONDATIONS}
+      />
+      <Section
+        id="approfondissement"
+        title="Approfondissement"
+        eyebrow="Leçons 17 — 27"
+        lessons={APPROFONDISSEMENT}
+      />
+    </div>
+  )
+}
+
+function Section({
+  id,
+  title,
+  eyebrow,
+  lessons,
+}: {
+  id: string
+  title: string
+  eyebrow: string
+  lessons: ReturnType<typeof lessonsBySection>
+}) {
+  return (
+    <section
+      data-testid={`section-${id}`}
+      aria-labelledby={`section-${id}-heading`}
+      style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <span
+          style={{
+            fontFamily: SANS_FONT,
+            fontWeight: 600,
+            fontSize: '0.75rem',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: 'var(--text-muted)',
+          }}
+        >
+          {eyebrow}
+        </span>
+        <h2
+          id={`section-${id}-heading`}
+          style={{
+            fontFamily: SERIF_FONT,
+            fontStyle: 'italic',
+            fontWeight: 500,
+            fontSize: 'clamp(24px, 2.8vw, 34px)',
+            lineHeight: 1.2,
+            letterSpacing: '-0.015em',
+            color: 'var(--text-primary)',
+            margin: 0,
+          }}
+        >
+          {title}
+        </h2>
+      </div>
+
+      <ul
+        className="ecole-grid"
+        style={{
+          listStyle: 'none',
+          margin: 0,
+          padding: 0,
+        }}
+      >
+        {lessons.map((lesson) => (
+          <li key={lesson.id}>
+            <LessonCard lesson={lesson} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

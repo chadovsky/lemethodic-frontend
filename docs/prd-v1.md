@@ -475,7 +475,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### UI-008 — L'École lesson list view
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged `05c934e` (feat/ui-008-ecole-lesson-list → main), resolves V-016c
 **Branch:** `feat/ui-008-ecole-lesson-list` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 
