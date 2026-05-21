@@ -236,8 +236,8 @@ None. This is the first UI shell — no upstream blockers.
 
 ### UI-004 — Landing pricing teaser + footer
 
-**Status:** Not Started
-**Branch:** `feat/ui-004-landing-pricing-footer` (FE, from `main`)
+**Status:** Shipped — squash-merged `2c92c69` (feat/ui-004-pricing-footer → main)
+**Branch:** `feat/ui-004-pricing-footer` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 
 #### Scope

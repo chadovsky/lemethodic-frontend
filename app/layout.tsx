@@ -3,6 +3,7 @@ import { Figtree, Fraunces } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import TopNav from '@/components/nav/TopNav'
+import StickyHeader from '@/components/layout/StickyHeader'
 import QueryProvider from '@/components/QueryProvider'
 
 // F-VISUAL-001 X.1 — font system pivot. Figtree replaces Switzer for
@@ -67,6 +68,9 @@ export default function RootLayout({
     <html lang="en" className={`${figtree.variable} ${fraunces.variable}`}>
       <body className="font-sans antialiased">
         <QueryProvider>
+          {/* UI-004 — marketing header (logo + Sign in). Shows on all paths;
+              TopNav handles authenticated in-product paths separately. */}
+          <StickyHeader />
           {/* V-013c — desktop-only top nav. Returns null on marketing /
               conversion / legal paths and below md breakpoint. */}
           <TopNav />
