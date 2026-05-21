@@ -599,8 +599,8 @@ None. This is the first UI shell — no upstream blockers.
 
 ### UI-010 — Le Vocabulaire browse view
 
-**Status:** Not Started
-**Branch:** `feat/ui-010-vocabulaire-browse` (FE, from `main`)
+**Status:** Shipped — squash-merged 9276812 (feat/ui-010-vocab-browse → main)
+**Branch:** `feat/ui-010-vocab-browse` (FE, from `main`)
 **Effort:** 1 session (~4–5h)
 
 #### Scope

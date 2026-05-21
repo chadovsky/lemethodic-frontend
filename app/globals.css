@@ -964,3 +964,15 @@
 @media (min-width: 1440px) {
   .dashboard-grid { grid-template-columns: repeat(4, 1fr); }
 }
+
+/* UI-010 — Le Vocabulaire filter bar. Mobile (<768px) collapses behind
+   a "Filtres" toggle button; desktop (≥768px) shows the bar inline and
+   hides the toggle. Plain CSS per UI-006 convention. !important wins
+   against component-level inline styles when the wrapper is collapsed. */
+.vocab-mobile-filters-toggle { display: inline-flex !important; }
+.vocab-filter-bar-wrapper { display: none !important; }
+.vocab-filter-bar-wrapper[data-mobile-open="true"] { display: block !important; }
+@media (min-width: 768px) {
+  .vocab-mobile-filters-toggle { display: none !important; }
+  .vocab-filter-bar-wrapper { display: block !important; }
+}
