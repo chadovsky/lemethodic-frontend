@@ -348,17 +348,337 @@ None. This is the first UI shell — no upstream blockers.
 
 ---
 
-### UI-006 to UI-015 — Section 1 remaining entries (titles only)
+### UI-006 — App shell (post-login)
+
+**Status:** Not Started
+**Branch:** `feat/ui-006-app-shell` (FE, from `main`)
+**Effort:** 1 session (~4–5h)
+
+#### Scope
+**In:**
+- New Next.js route group `(app)/` establishes the authenticated app shell (no URL prefix; sidebar chrome only).
+- `app/(app)/layout.tsx` renders `<AppShell>` composing `<Sidebar />` + a `<main>` content frame.
+- Sidebar (left rail, 240px desktop, off-canvas drawer on mobile):
+  - Wordmark "Le Méthodic" at top (serif italic, matches landing wordmark).
+  - 5 nav links, in order: **Tableau de bord** (`/dashboard`), **L'École** (`/ecole`), **Le Vocabulaire** (`/vocabulaire`), **Le Diagnostic** (`/diagnostic`), **Compte** (`/account`).
+  - Active link highlighted via `usePathname()` — `--ed-accent` left border + bold weight + `--bg-elevated` row background.
+  - On mobile (≤768px), sidebar collapses behind a hamburger button rendered in a thin top bar; clicking opens an off-canvas drawer.
+- Main content frame: padded container, max-width 1200px, gutter `clamp(16px, 3vw, 32px)`, applies `.ed-page-enter` on route change.
+- Stub pages created for new routes: `/dashboard` and `/account` (each renders a heading + "Bientôt disponible." placeholder under the shell).
+- Existing routes that already live outside the group (`/ecole` and any others) continue to render under their current layout for now — they migrate into `(app)` in their respective UI entries (UI-008+).
+
+**Out:**
+- Auth gate / redirect-to-login (deferred to BE-001).
+- User avatar + dropdown menu in the top bar (deferred to UI-007 polish or a Section 2 entry).
+- Notifications center (Section 7).
+- Search bar in the chrome (deferred).
+- Persistent sidebar-collapse preference / desktop collapse toggle (defer to MOCK).
+- Real dashboard, lesson list, vocab list, diagnostic content (UI-007 through UI-013).
+- Onboarding nudges / first-run banner (defer).
+
+#### Acceptance (Given/When/Then)
+1. **Given** a visitor on `/dashboard`, **When** the page renders, **Then** the sidebar with 5 nav links is visible on the left and the content frame on the right.
+2. **Given** desktop ≥1024px, **When** the page loads, **Then** the sidebar is permanently visible at 240px and no hamburger button is rendered.
+3. **Given** mobile <768px, **When** the page loads, **Then** the sidebar is hidden behind a hamburger button; clicking it opens an off-canvas drawer containing the 5 nav links.
+4. **Given** the visitor is on `/dashboard`, **When** the sidebar renders, **Then** the "Tableau de bord" link has the active state and the other 4 do not.
+5. **Given** the visitor clicks "Compte" from the sidebar, **When** the click fires, **Then** the router navigates to `/account` and the active state shifts to "Compte".
+
+#### Tests
+- `tests/unit/layout/AppShell.test.tsx` (vitest) — renders `<Sidebar />` + children slot.
+- `tests/unit/layout/Sidebar.test.tsx` (vitest) — renders 5 nav links with correct hrefs; active state matches a mocked `usePathname`.
+- `tests/e2e/app-shell.spec.ts` (Playwright) — desktop: shell renders on `/dashboard`, sidebar links navigate, active state updates. Mobile: hamburger opens drawer, link click navigates and closes drawer.
+
+#### Files Touched
+- `app/(app)/layout.tsx` — new shell layout
+- `app/(app)/dashboard/page.tsx` — stub
+- `app/(app)/account/page.tsx` — stub
+- `components/layout/AppShell.tsx` — new
+- `components/layout/Sidebar.tsx` — new
+- `components/layout/SidebarLink.tsx` — single nav link with active state
+- `tests/unit/layout/AppShell.test.tsx`
+- `tests/unit/layout/Sidebar.test.tsx`
+- `tests/e2e/app-shell.spec.ts`
+
+#### Dependencies
+- UI-001 through UI-005 Shipped (marketing surfaces stable; interior work begins here).
+
+#### Notes
+- The `(app)` route group is the convention from this entry forward — UI-007 through UI-013 all live inside it. Do not add an `/app` URL prefix; the route group is invisible in URLs and keeps `/dashboard`, `/ecole`, etc. clean.
+- Existing `/ecole` page (with empty-state / network-error handling from F-BUGS-001-FE-C, F-BUGS-001-FE-D) is **not** migrated here. It keeps rendering under its current layout. UI-008 replaces it with the shell-wrapped lesson list view.
+- Sidebar typography and the active-state treatment are inherited by every authenticated screen — get them right here so UI-007–UI-015 don't need to revisit.
+- Do NOT add auth gating. BE-001 wraps the `(app)` layout with a session check. For now any visitor can reach `/dashboard`.
+
+---
+
+### UI-007 — Dashboard shell
+
+**Status:** Not Started
+**Branch:** `feat/ui-007-dashboard-shell` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+
+#### Scope
+**In:**
+- `/dashboard` page (replaces the UI-006 stub) renders inside the `(app)` shell.
+- Welcome heading: "Bonjour" (no name interpolation yet — BE-001 wires user identity).
+- Sub-heading: today's date in French long format using `Intl.DateTimeFormat('fr-CA', { dateStyle: 'full' })`.
+- 4 widget cards in a responsive grid (1-col mobile, 2-col tablet, 2×2 desktop, 4-col ≥1440px):
+  1. **Progression** — 5-couche stack with placeholder fill levels per layer (Le Fond 80%, Les Moules des Idées 60%, Les Moules 50%, Les Réflexes Anglais 35%, La Voix 20%) rendered as horizontal bars.
+  2. **Activité récente** — list of 3 hardcoded rows (e.g. "Leçon 4 terminée — il y a 2 jours", "10 chunks révisés — il y a 3 jours", "Diagnostic Tâche 1 essayée — il y a 5 jours").
+  3. **Prochaine leçon** — card showing "Leçon 5 : Les expressions de probabilité" + CTA "Reprendre" → `/ecole/5`.
+  4. **Score Diagnostic** — placeholder score "C1" with sub-text "Dernière évaluation : il y a 7 jours" + CTA "Voir le détail" → `/diagnostic`.
+- Each widget is a `<section>` with its own heading and the `.ed-card-lift` hover treatment.
+
+**Out:**
+- Real progress data (BE-XXX endpoints).
+- Real activity log (BE).
+- Streak / engagement counters (defer).
+- Charts via Recharts (placeholders are CSS bars; Recharts only when real data lands).
+- Onboarding tour / coach marks (defer).
+- Dismissible banners / nudges (defer).
+- Per-user personalization (BE).
+- Extracting placeholder data to a fixture file (keep it inline in the widget component — fixture lands in MOCK-XXX).
+
+#### Acceptance (Given/When/Then)
+1. **Given** a visitor on `/dashboard`, **When** the page renders, **Then** the welcome heading, today's date, and all 4 widget cards are visible inside the `(app)` shell.
+2. **Given** desktop ≥1280px, **When** the page renders, **Then** the 4 widgets render in a 2×2 grid with equal heights.
+3. **Given** mobile <768px, **When** the page renders, **Then** the 4 widgets stack vertically with consistent vertical rhythm.
+4. **Given** the "Prochaine leçon" CTA, **When** clicked, **Then** the router navigates to `/ecole/5`.
+5. **Given** the "Score Diagnostic" CTA, **When** clicked, **Then** the router navigates to `/diagnostic`.
+
+#### Tests
+- `tests/unit/dashboard/Dashboard.test.tsx` (vitest) — renders heading, date, and all 4 widget cards.
+- `tests/unit/dashboard/ProgressWidget.test.tsx` (vitest) — renders 5 layer bars in the locked order.
+- `tests/unit/dashboard/RecentActivityWidget.test.tsx` (vitest) — renders 3 activity rows.
+- `tests/e2e/dashboard.spec.ts` (Playwright) — page loads, all widgets visible, "Prochaine leçon" CTA navigates to `/ecole/5`, mobile layout stacks single-column.
+
+#### Files Touched
+- `app/(app)/dashboard/page.tsx` — replaces UI-006 stub
+- `components/dashboard/Dashboard.tsx` — composes the 4 widgets
+- `components/dashboard/ProgressWidget.tsx`
+- `components/dashboard/RecentActivityWidget.tsx`
+- `components/dashboard/NextLessonWidget.tsx`
+- `components/dashboard/DiagnosticScoreWidget.tsx`
+- `tests/unit/dashboard/Dashboard.test.tsx`
+- `tests/unit/dashboard/ProgressWidget.test.tsx`
+- `tests/unit/dashboard/RecentActivityWidget.test.tsx`
+- `tests/e2e/dashboard.spec.ts`
+
+#### Dependencies
+- UI-006 must be Shipped (shell must exist).
+
+#### Notes
+- All widget data is hardcoded inline in component files. Do NOT extract to a fixture or "fake API" hook — that abstraction lands in MOCK-XXX once realistic data takes shape.
+- The 5-couche order in the Progression widget is locked: Le Fond, Les Moules des Idées, Les Moules, Les Réflexes Anglais, La Voix.
+- This is the first screen a logged-in user sees. The widgets are visual stubs; the layout and typography are real and should not need to change when live data lands.
+
+---
+
+### UI-008 — L'École lesson list view
+
+**Status:** Not Started
+**Branch:** `feat/ui-008-ecole-lesson-list` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+
+#### Scope
+**In:**
+- `/ecole` route moves into the `(app)` route group at `app/(app)/ecole/page.tsx`, displacing the existing standalone page.
+- Page header: "L'École" + tagline ("La méthode en 27 leçons.") + 1-sentence intro paragraph.
+- Two sections, in order:
+  - **Fondations** — section heading, then a grid of 16 lesson cards (lessons 1–16).
+  - **Approfondissement** — section heading, then a grid of 11 lesson cards (lessons 17–27).
+- Lesson card: number badge, title (placeholder), 1-sentence description (placeholder), state badge — one of "Terminée" / "Disponible" / "Verrouillée". Placeholder distribution: first 3 Terminée, next 3 Disponible, remaining 21 Verrouillée.
+- Card grid: 1-col mobile, 2-col tablet (≥640px), 3-col desktop (≥1024px), 4-col ≥1280px.
+- Each card is a `<Link>` to `/ecole/[id]` where `[id]` is the lesson number (1–27).
+- Static fixture `lib/data/lessons.ts` exports 27 lesson objects `{ id, title, description, section, state }`.
+
+**Out:**
+- Real lesson titles, descriptions, and body content (CON-XXX).
+- Per-user completion state (BE-XXX; placeholders are static).
+- Pre-requisite gating logic (BE).
+- Search / filter / sort (defer).
+- Lesson preview on hover (defer).
+- Old `/ecole` empty-state and network-error logic from F-BUGS-001-FE-C / FE-D — not applicable here because data is static. The bug-fix code is removed as part of this migration.
+
+#### Acceptance (Given/When/Then)
+1. **Given** a visitor on `/ecole`, **When** the page renders, **Then** "Fondations" shows exactly 16 cards (lessons 1–16) and "Approfondissement" shows exactly 11 (lessons 17–27), in numerical order.
+2. **Given** desktop ≥1024px, **When** the page renders, **Then** cards display in a 3-col grid with equal heights and consistent gutters.
+3. **Given** mobile <640px, **When** the page renders, **Then** cards stack 1-col with consistent vertical rhythm.
+4. **Given** lesson card #5, **When** clicked, **Then** the router navigates to `/ecole/5`.
+5. **Given** the page rendered inside the `(app)` shell, **When** the sidebar shows, **Then** the "L'École" link has active state.
+
+#### Tests
+- `tests/unit/ecole/LessonList.test.tsx` (vitest) — renders 27 cards split into 16/11 across the two sections in correct numerical order.
+- `tests/unit/ecole/LessonCard.test.tsx` (vitest) — renders with passed props; href matches lesson id.
+- `tests/e2e/ecole-list.spec.ts` (Playwright) — section counts correct (16 + 11), card click navigates to `/ecole/<id>`, mobile stacks 1-col.
+
+#### Files Touched
+- `app/(app)/ecole/page.tsx` — new (replaces existing `app/ecole/page.tsx`; delete the old file)
+- `components/ecole/LessonList.tsx` — composes the two sections + grid
+- `components/ecole/LessonCard.tsx` — single card
+- `lib/data/lessons.ts` — static fixture of 27 lesson objects
+- `tests/unit/ecole/LessonList.test.tsx`
+- `tests/unit/ecole/LessonCard.test.tsx`
+- `tests/e2e/ecole-list.spec.ts`
+
+#### Dependencies
+- UI-006 must be Shipped (shell must exist).
+
+#### Notes
+- The 16 Fondations + 11 Approfondissement split is locked methodology terminology. Do not rename or re-segment.
+- Existing `/ecole` page is deleted. Its empty-state + network-error logic (F-BUGS-001-FE-C, F-BUGS-001-FE-D) is removed — the static fixture has no network call. If those edge-state UI components have value, lift them into `components/common/` for reuse by BE-XXX-wired views; otherwise drop.
+- Lesson titles and descriptions are placeholders. Real titles land in CON-XXX. Pick plausible-sounding French placeholders; do not invent methodology terms that would need reconciliation later.
+- State distribution (3 Terminée / 3 Disponible / 21 Verrouillée) is illustrative. Real state comes from BE-XXX progress endpoints.
+
+---
+
+### UI-009 — L'École lesson detail view
+
+**Status:** Not Started
+**Branch:** `feat/ui-009-ecole-lesson-detail` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+
+#### Scope
+**In:**
+- `/ecole/[id]` dynamic route inside the `(app)` shell at `app/(app)/ecole/[id]/page.tsx`.
+- Breadcrumb at top: `L'École > Leçon <num> : <title>`.
+- Lesson header: section badge ("Fondations" or "Approfondissement"), lesson number, lesson title.
+- Audio player placeholder (top of content area): rounded surface with play button, scrubber visual (static fill, e.g. `0:00 / 12:34`), volume icon. Non-functional — clicks do nothing.
+- Content area: 3 stacked sections, each with its own heading:
+  1. **Introduction** — 2–3 placeholder paragraphs.
+  2. **Méthode** — 2–3 placeholder paragraphs (where the 5-couche layer for this lesson would be surfaced).
+  3. **Pratique** — placeholder prompt block (e.g. "Essayez à voix haute : ...") with 2–3 example prompts.
+- Lesson navigation at bottom: "← Leçon précédente" (links to `/ecole/<id-1>`) and "Leçon suivante →" (links to `/ecole/<id+1>`):
+  - Lesson 1: no prev button rendered.
+  - Lesson 27: no next button rendered.
+- Reads lesson title/section from `lib/data/lessons.ts` fixture by id.
+- Invalid id (e.g. `/ecole/99`, `/ecole/abc`) renders Next.js 404 via `notFound()`.
+
+**Out:**
+- Real audio playback (AI-XXX with TTS).
+- Real lesson body content (CON-XXX).
+- Progress tracking, mark-as-complete (BE-XXX).
+- Note-taking, highlights, bookmarks (defer).
+- Quiz at end of lesson (defer to dedicated entry).
+- Comments / discussion (out of scope indefinitely).
+- Transcript toggle on the audio (defer).
+- Playback speed control (defer).
+
+#### Acceptance (Given/When/Then)
+1. **Given** `/ecole/3` loaded, **When** the page renders, **Then** breadcrumb, header, audio-player placeholder, 3 content sections, and nav buttons are visible inside the `(app)` shell.
+2. **Given** `/ecole/1` loaded, **When** the page renders, **Then** the previous-lesson button is not rendered and the next-lesson button links to `/ecole/2`.
+3. **Given** `/ecole/27` loaded, **When** the page renders, **Then** the next-lesson button is not rendered and the previous-lesson button links to `/ecole/26`.
+4. **Given** `/ecole/99` loaded, **When** the route handler runs, **Then** the Next.js 404 page renders.
+5. **Given** mobile <768px, **When** the page renders, **Then** content stacks single-column and the audio player is full-width.
+
+#### Tests
+- `tests/unit/ecole/LessonDetail.test.tsx` (vitest) — renders header, 3 content sections, audio placeholder; nav buttons reflect lesson id (1 → no prev, 27 → no next, mid → both).
+- `tests/unit/ecole/AudioPlayerPlaceholder.test.tsx` (vitest) — renders play button + scrubber + volume; click does nothing.
+- `tests/e2e/ecole-detail.spec.ts` (Playwright) — load `/ecole/3`, all elements visible; click next → land on `/ecole/4`; load `/ecole/27` → no next button; load `/ecole/99` → 404.
+
+#### Files Touched
+- `app/(app)/ecole/[id]/page.tsx` — new dynamic route
+- `components/ecole/LessonDetail.tsx`
+- `components/ecole/AudioPlayerPlaceholder.tsx`
+- `components/ecole/LessonNav.tsx`
+- `components/common/Breadcrumb.tsx` — new generic breadcrumb (reusable by UI-014/015)
+- `lib/data/lessons.ts` — updated if needed (already exists from UI-008)
+- `tests/unit/ecole/LessonDetail.test.tsx`
+- `tests/unit/ecole/AudioPlayerPlaceholder.test.tsx`
+- `tests/e2e/ecole-detail.spec.ts`
+
+#### Dependencies
+- UI-006 Shipped (shell).
+- UI-008 Shipped (lesson fixture + list view that links here).
+
+#### Notes
+- Audio player is visual only. Do NOT add an `<audio>` element, Web Audio API, or any playback library. AI-XXX wires the real player when TTS audio lands.
+- Lesson body content is placeholder prose. Don't fabricate methodology — keep paragraphs generic (e.g. "Dans cette leçon, vous découvrirez...") rather than invent fake 5-couche content that would later need reconciliation with real curriculum.
+- The Breadcrumb component is intentionally generic and reusable — UI-014/015 will reuse it.
+
+---
+
+### UI-010 — Le Vocabulaire browse view
+
+**Status:** Not Started
+**Branch:** `feat/ui-010-vocabulaire-browse` (FE, from `main`)
+**Effort:** 1 session (~4–5h)
+
+#### Scope
+**In:**
+- `/vocabulaire` route inside `(app)` shell at `app/(app)/vocabulaire/page.tsx`.
+- Page header: "Le Vocabulaire" + tagline ("Les chunks qui font la différence.").
+- Filter bar (sticky below header on desktop, collapsible on mobile behind a "Filtres" button):
+  - **CEFR level** chips — `A1` `A2` `B1` `B2` `C1` (multi-select; click toggles inclusion; default = all 5 selected).
+  - **Source** dropdown — single-select; options: "Toutes les sources", "Média", "Conversation", "Travail", "Voyage", "Quotidien".
+  - **Search** input — text field; filters by case-insensitive substring match in the French chunk.
+- Chunk list: scrollable single-column list (no virtualization library). Each row shows:
+  - French chunk (e.g. "Ça tombe à pic")
+  - English gloss (e.g. "That's perfect timing")
+  - CEFR badge
+  - Source pill
+  - Save icon (heart or bookmark, visual only — not wired)
+- Static fixture `lib/data/chunks.ts` of 30 hand-crafted chunks spanning all 5 CEFR levels and all 5 sources.
+- Empty state: when no chunks match the active filter combination, render an inline message ("Aucun chunk ne correspond à vos filtres.") + "Réinitialiser les filtres" button that restores defaults.
+- Filter logic lives in a pure function `lib/vocab/filter.ts` so BE-XXX can later swap the data source without touching filter code.
+
+**Out:**
+- Real chunk data (CON-001+ vocab CSV review; 1,684 chunks awaiting Chadi triage).
+- Real save / collection wiring (BE-XXX).
+- Practice mode (UI-011).
+- Test mode (UI-012).
+- Audio playback per chunk (AI-XXX).
+- Spaced-repetition logic (AI section).
+- Server-side pagination, search, or filter (client-side over the 30-entry fixture only).
+- Sorting (defer).
+- Tag-based filters beyond source (defer).
+- Save-state persistence — no `localStorage`, no BE call (BE-XXX wires it).
+
+#### Acceptance (Given/When/Then)
+1. **Given** `/vocabulaire` loaded, **When** the page renders, **Then** the filter bar and 30 chunk rows are visible inside the `(app)` shell.
+2. **Given** the user deselects the `A1` chip (with all 5 selected initially), **When** the filter applies, **Then** the list re-renders showing only rows whose CEFR is `A2`, `B1`, `B2`, or `C1`.
+3. **Given** the user selects "Média" from the source dropdown, **When** the filter applies, **Then** the list shows only rows tagged with source `Média`.
+4. **Given** the user types "tomber" into the search input, **When** the filter applies, **Then** the list shows only rows whose French chunk contains "tomber" (case-insensitive).
+5. **Given** the user combines filters such that no chunk matches, **When** the list re-renders, **Then** the empty state with "Réinitialiser les filtres" button is shown; clicking the button restores all filters to default.
+6. **Given** mobile <768px, **When** the page renders, **Then** the filter bar collapses behind a "Filtres" button and chunk rows are full-width single-column.
+
+#### Tests
+- `tests/unit/vocabulaire/VocabBrowse.test.tsx` (vitest) — renders header, filter bar, and 30 chunks from fixture.
+- `tests/unit/vocabulaire/FilterBar.test.tsx` (vitest) — CEFR chip toggle, source dropdown, search input update state correctly.
+- `tests/unit/vocabulaire/ChunkRow.test.tsx` (vitest) — renders chunk + gloss + CEFR + source + save icon.
+- `tests/unit/vocabulaire/filter-logic.test.ts` (vitest) — pure-function tests on `applyFilters(chunks, filterState)` covering CEFR + source + search combinations and empty-result case.
+- `tests/e2e/vocabulaire-browse.spec.ts` (Playwright) — deselect A1 filters list; source dropdown filters list; search input filters list; empty state appears when no match; mobile "Filtres" button opens collapsed filter bar.
+
+#### Files Touched
+- `app/(app)/vocabulaire/page.tsx` — new
+- `components/vocabulaire/VocabBrowse.tsx`
+- `components/vocabulaire/FilterBar.tsx`
+- `components/vocabulaire/ChunkRow.tsx`
+- `components/vocabulaire/EmptyState.tsx`
+- `lib/data/chunks.ts` — 30-entry static fixture
+- `lib/vocab/filter.ts` — pure `applyFilters(chunks, filterState)` function
+- `tests/unit/vocabulaire/VocabBrowse.test.tsx`
+- `tests/unit/vocabulaire/FilterBar.test.tsx`
+- `tests/unit/vocabulaire/ChunkRow.test.tsx`
+- `tests/unit/vocabulaire/filter-logic.test.ts`
+- `tests/e2e/vocabulaire-browse.spec.ts`
+
+#### Dependencies
+- UI-006 must be Shipped (shell).
+
+#### Notes
+- The 30 chunks in the fixture are plausible-looking placeholders. F-321 vocab CSV (1,684 chunks awaiting Chadi triage per memory) lands in CON-001. UI-010 does not touch real data.
+- Filter logic lives in a pure function so BE-XXX can swap data source from fixture to API without rewriting filter code.
+- Save icon is visual only. BE-XXX adds the save endpoint. Do NOT add `localStorage` persistence here — it creates a fake-state migration headache when BE wires up.
+- "Source" taxonomy ("Média", "Conversation", "Travail", "Voyage", "Quotidien") is provisional. CON-001 vocab review will validate or revise it.
+
+---
+
+### UI-011 to UI-015 — Section 1 remaining entries (titles only)
 
 To be populated in subsequent planning sessions. Order reflects user journey through the app.
 
 | ID | Title | Purpose |
 |----|-------|---------|
-| UI-006 | App shell (post-login) | Sidebar nav + main content frame, no data |
-| UI-007 | Dashboard shell | Progress widgets as placeholders, recent activity stub |
-| UI-008 | L'École lesson list view | Grid of 27 lesson cards (Fondations 1–16, Approfondissement 17–27), static |
-| UI-009 | L'École lesson detail view | Content area + audio player placeholder + navigation between lessons |
-| UI-010 | Le Vocabulaire browse view | Chunk list with filters (CEFR level, source) — UI only, fake data |
 | UI-011 | Le Vocabulaire practice view | Flashcard-style shell, front/back placeholder |
 | UI-012 | Le Vocabulaire test view | Multi-choice quiz shell |
 | UI-013 | Le Diagnostic landing | Persona match, exam overview, "Start Diagnostic" CTA |
