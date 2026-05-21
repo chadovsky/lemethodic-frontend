@@ -1,0 +1,81 @@
+import { render, screen } from '@testing-library/react'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
+
+const mockUsePathname = vi.fn<() => string>()
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => mockUsePathname(),
+}))
+
+vi.mock('next/link', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  default: ({ href, children, onClick, ...rest }: any) => (
+    <a href={href} onClick={onClick} {...rest}>
+      {children}
+    </a>
+  ),
+}))
+
+import Sidebar from '@/components/layout/Sidebar'
+
+describe('Sidebar', () => {
+  beforeEach(() => {
+    mockUsePathname.mockReset()
+    mockUsePathname.mockReturnValue('/dashboard')
+  })
+
+  it('renders the wordmark "Le Méthodic"', () => {
+    render(<Sidebar drawerOpen={false} />)
+    expect(screen.getByTestId('sidebar-wordmark')).toHaveTextContent('Le Méthodic')
+  })
+
+  it('exposes a primary nav landmark', () => {
+    render(<Sidebar drawerOpen={false} />)
+    expect(screen.getByRole('navigation', { name: /app sections/i })).toBeInTheDocument()
+  })
+
+  it('renders 5 nav links in the locked order with correct hrefs', () => {
+    render(<Sidebar drawerOpen={false} />)
+    const links = screen
+      .getAllByRole('link')
+      .filter((l) => l.getAttribute('data-testid')?.startsWith('sidebar-link-'))
+
+    expect(links).toHaveLength(5)
+    expect(links[0]).toHaveTextContent('Tableau de bord')
+    expect(links[0]).toHaveAttribute('href', '/dashboard')
+    expect(links[1]).toHaveTextContent("L'École")
+    expect(links[1]).toHaveAttribute('href', '/ecole')
+    expect(links[2]).toHaveTextContent('Le Vocabulaire')
+    expect(links[2]).toHaveAttribute('href', '/vocabulaire')
+    expect(links[3]).toHaveTextContent('Le Diagnostic')
+    expect(links[3]).toHaveAttribute('href', '/diagnostic')
+    expect(links[4]).toHaveTextContent('Compte')
+    expect(links[4]).toHaveAttribute('href', '/account')
+  })
+
+  it('marks the link matching the exact current pathname as active', () => {
+    mockUsePathname.mockReturnValue('/dashboard')
+    render(<Sidebar drawerOpen={false} />)
+    const dashboard = screen.getByTestId('sidebar-link-dashboard')
+    expect(dashboard).toHaveAttribute('data-active', 'true')
+    expect(dashboard).toHaveAttribute('aria-current', 'page')
+
+    const account = screen.getByTestId('sidebar-link-account')
+    expect(account).toHaveAttribute('data-active', 'false')
+    expect(account).not.toHaveAttribute('aria-current')
+  })
+
+  it('marks /ecole link active when pathname is a nested ecole route', () => {
+    mockUsePathname.mockReturnValue('/ecole/lesson/3')
+    render(<Sidebar drawerOpen={false} />)
+    expect(screen.getByTestId('sidebar-link-ecole')).toHaveAttribute('data-active', 'true')
+    expect(screen.getByTestId('sidebar-link-dashboard')).toHaveAttribute('data-active', 'false')
+  })
+
+  it('reflects drawerOpen prop on data-drawer-open attribute', () => {
+    const { rerender } = render(<Sidebar drawerOpen={false} />)
+    expect(screen.getByTestId('app-shell-sidebar')).toHaveAttribute('data-drawer-open', 'false')
+    rerender(<Sidebar drawerOpen={true} />)
+    expect(screen.getByTestId('app-shell-sidebar')).toHaveAttribute('data-drawer-open', 'true')
+  })
+})

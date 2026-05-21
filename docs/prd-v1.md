@@ -350,7 +350,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### UI-006 — App shell (post-login)
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged `fca3ffd` (feat/ui-006-app-shell → main)
 **Branch:** `feat/ui-006-app-shell` (FE, from `main`)
 **Effort:** 1 session (~4–5h)
 

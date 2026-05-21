@@ -917,3 +917,18 @@
     gap: clamp(40px, 4vw, 56px);
   }
 }
+
+/* UI-006 — App shell responsive utilities. Plain CSS media queries
+   instead of Tailwind utilities so the breakpoint and transform
+   behavior is explicit and stable regardless of Tailwind class
+   detection. Breakpoint locked to ≥1024px per PRD acceptance. */
+.app-shell-topbar { display: flex; }
+.app-shell-main { margin-left: 0; }
+.app-shell-sidebar { transform: translateX(-100%); }
+.app-shell-sidebar[data-drawer-open="true"] { transform: translateX(0); }
+@media (min-width: 1024px) {
+  .app-shell-topbar { display: none; }
+  .app-shell-backdrop { display: none; }
+  .app-shell-main { margin-left: 240px; }
+  .app-shell-sidebar { transform: translateX(0); }
+}
