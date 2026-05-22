@@ -1425,7 +1425,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### MOCK-008 — L'École fixture flesh-out + lesson card/detail polish
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged 051d1b3
 **Branch:** `feat/mock-008-ecole-polish` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 **Benchmark:** Promova (lesson-card grid state treatments, lesson detail typography, content card design)
