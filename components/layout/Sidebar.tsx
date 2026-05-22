@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { SERIF_FONT } from '@/lib/typography'
+import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 import SidebarLink from './SidebarLink'
 
 const NAV_ITEMS = [
@@ -15,9 +15,10 @@ const NAV_ITEMS = [
 interface SidebarProps {
   drawerOpen: boolean
   onLinkClick?: () => void
+  initials?: string
 }
 
-export default function Sidebar({ drawerOpen, onLinkClick }: SidebarProps) {
+export default function Sidebar({ drawerOpen, onLinkClick, initials = 'CH' }: SidebarProps) {
   return (
     <aside
       id="app-shell-sidebar"
@@ -36,10 +37,37 @@ export default function Sidebar({ drawerOpen, onLinkClick }: SidebarProps) {
         borderRight: '1px solid var(--rule-default)',
         display: 'flex',
         flexDirection: 'column',
-        transition: 'transform 200ms cubic-bezier(0.16, 1, 0.3, 1)',
       }}
     >
-      <div style={{ padding: '24px 20px 16px' }}>
+      <div
+        style={{
+          padding: '20px 20px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+        }}
+      >
+        <div
+          data-testid="sidebar-avatar"
+          aria-label={`User initials: ${initials}`}
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: '50%',
+            backgroundColor: 'var(--ed-accent)',
+            color: '#fff',
+            fontFamily: SANS_FONT,
+            fontWeight: 600,
+            fontSize: '0.8125rem',
+            letterSpacing: '0.03em',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          {initials}
+        </div>
         <Link
           href="/dashboard"
           data-testid="sidebar-wordmark"
@@ -48,7 +76,7 @@ export default function Sidebar({ drawerOpen, onLinkClick }: SidebarProps) {
             fontFamily: SERIF_FONT,
             fontStyle: 'italic',
             fontWeight: 400,
-            fontSize: '1.25rem',
+            fontSize: '1.125rem',
             letterSpacing: '-0.01em',
             color: 'var(--text-primary)',
             textDecoration: 'none',

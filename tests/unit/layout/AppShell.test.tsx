@@ -1,8 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
+
+const mockPathname = vi.fn<() => string>()
 
 vi.mock('next/navigation', () => ({
-  usePathname: () => '/dashboard',
+  usePathname: () => mockPathname(),
 }))
 
 vi.mock('next/link', () => ({
@@ -17,6 +19,10 @@ vi.mock('next/link', () => ({
 import AppShell from '@/components/layout/AppShell'
 
 describe('AppShell', () => {
+  beforeEach(() => {
+    mockPathname.mockReturnValue('/dashboard')
+  })
+
   it('renders children inside the content frame', () => {
     render(
       <AppShell>
@@ -100,5 +106,31 @@ describe('AppShell', () => {
 
     fireEvent.click(screen.getByTestId('sidebar-wordmark'))
     expect(hamburger).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  // MOCK-006 — ed-page-enter + key={pathname} testability
+  it('main element has ed-page-enter class', () => {
+    render(
+      <AppShell>
+        <div />
+      </AppShell>,
+    )
+    expect(screen.getByRole('main')).toHaveClass('ed-page-enter')
+  })
+
+  it('main data-pathname reflects the current pathname', () => {
+    const { rerender } = render(
+      <AppShell>
+        <div />
+      </AppShell>,
+    )
+    expect(screen.getByRole('main')).toHaveAttribute('data-pathname', '/dashboard')
+    mockPathname.mockReturnValue('/ecole')
+    rerender(
+      <AppShell>
+        <div />
+      </AppShell>,
+    )
+    expect(screen.getByRole('main')).toHaveAttribute('data-pathname', '/ecole')
   })
 })

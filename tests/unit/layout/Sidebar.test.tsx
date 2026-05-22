@@ -78,4 +78,34 @@ describe('Sidebar', () => {
     rerender(<Sidebar drawerOpen={true} />)
     expect(screen.getByTestId('app-shell-sidebar')).toHaveAttribute('data-drawer-open', 'true')
   })
+
+  // MOCK-006 — avatar + active row treatment
+  it('renders avatar element with sidebar-avatar testid', () => {
+    render(<Sidebar drawerOpen={false} />)
+    expect(screen.getByTestId('sidebar-avatar')).toBeInTheDocument()
+  })
+
+  it('avatar displays default initials "CH"', () => {
+    render(<Sidebar drawerOpen={false} />)
+    expect(screen.getByTestId('sidebar-avatar')).toHaveTextContent('CH')
+  })
+
+  it('avatar accepts custom initials prop', () => {
+    render(<Sidebar drawerOpen={false} initials="AB" />)
+    expect(screen.getByTestId('sidebar-avatar')).toHaveTextContent('AB')
+  })
+
+  it('active link row has sidebar-active-row class', () => {
+    mockUsePathname.mockReturnValue('/dashboard')
+    render(<Sidebar drawerOpen={false} />)
+    const activeLink = screen.getByTestId('sidebar-link-dashboard')
+    expect(activeLink.parentElement).toHaveClass('sidebar-active-row')
+  })
+
+  it('inactive link row does not have sidebar-active-row class', () => {
+    mockUsePathname.mockReturnValue('/dashboard')
+    render(<Sidebar drawerOpen={false} />)
+    const inactiveLink = screen.getByTestId('sidebar-link-account')
+    expect(inactiveLink.parentElement).not.toHaveClass('sidebar-active-row')
+  })
 })

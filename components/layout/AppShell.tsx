@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
+import { usePathname } from 'next/navigation'
 import { SERIF_FONT } from '@/lib/typography'
 import Sidebar from './Sidebar'
 
@@ -11,6 +12,7 @@ interface AppShellProps {
 export default function AppShell({ children }: AppShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const closeDrawer = () => setDrawerOpen(false)
+  const pathname = usePathname()
 
   return (
     <div
@@ -99,6 +101,8 @@ export default function AppShell({ children }: AppShellProps) {
       <Sidebar drawerOpen={drawerOpen} onLinkClick={closeDrawer} />
 
       <main
+        key={pathname}
+        data-pathname={pathname}
         className="app-shell-main ed-page-enter"
         style={{
           paddingTop: 24,

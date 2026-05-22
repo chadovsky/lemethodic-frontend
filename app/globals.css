@@ -950,13 +950,32 @@
    detection. Breakpoint locked to ≥1024px per PRD acceptance. */
 .app-shell-topbar { display: flex; }
 .app-shell-main { margin-left: 0; }
-.app-shell-sidebar { transform: translateX(-100%); }
+.app-shell-sidebar {
+  transform: translateX(-100%);
+  transition: transform 300ms var(--ed-ease, cubic-bezier(0.16, 1, 0.3, 1));
+}
 .app-shell-sidebar[data-drawer-open="true"] { transform: translateX(0); }
 @media (min-width: 1024px) {
   .app-shell-topbar { display: none; }
   .app-shell-backdrop { display: none; }
   .app-shell-main { margin-left: 240px; }
   .app-shell-sidebar { transform: translateX(0); }
+}
+
+/* MOCK-006 — Sidebar active row full-bleed background */
+.sidebar-active-row { background-color: var(--bg-elevated, #fff); }
+
+/* MOCK-006 — Backdrop fade-in animation */
+@keyframes backdrop-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.app-shell-backdrop { animation: backdrop-fade-in 200ms ease forwards; }
+
+/* Reduce motion: instant drawer slide + no backdrop fade */
+@media (prefers-reduced-motion: reduce) {
+  .app-shell-sidebar { transition: none; }
+  .app-shell-backdrop { animation: none; }
 }
 
 /* UI-008 — L'École lesson grid. 1-col mobile, 2-col tablet (≥640px),

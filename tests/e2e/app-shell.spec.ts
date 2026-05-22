@@ -3,6 +3,28 @@ import { test, expect } from '@playwright/test'
 test.describe('App shell — desktop (1280×800)', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
+  // MOCK-006 — avatar + active left-tab
+  test('sidebar shows CH avatar circle', async ({ page }) => {
+    await page.goto('/dashboard')
+    await expect(page.getByTestId('sidebar-avatar')).toBeVisible()
+    await expect(page.getByTestId('sidebar-avatar')).toHaveText('CH')
+  })
+
+  test('active link row has left-tab indicator visible', async ({ page }) => {
+    await page.goto('/dashboard')
+    const tab = page.getByTestId('sidebar-active-tab')
+    await expect(tab).toBeVisible()
+  })
+
+  test('navigating dashboard→ecole shifts active state', async ({ page }) => {
+    await page.goto('/dashboard')
+    await expect(page.getByTestId('sidebar-link-dashboard')).toHaveAttribute('aria-current', 'page')
+    await page.getByTestId('sidebar-link-ecole').click()
+    await expect(page).toHaveURL(/\/ecole/)
+    await expect(page.getByTestId('sidebar-link-ecole')).toHaveAttribute('aria-current', 'page')
+    await expect(page.getByTestId('sidebar-link-dashboard')).not.toHaveAttribute('aria-current', /.+/)
+  })
+
   test('shell renders on /dashboard with sidebar and 5 nav links', async ({ page }) => {
     await page.goto('/dashboard')
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
@@ -113,5 +135,16 @@ test.describe('App shell — mobile (375×667)', () => {
     const scrollWidth = await page.evaluate(() => document.body.scrollWidth)
     const clientWidth = await page.evaluate(() => document.body.clientWidth)
     expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1)
+  })
+
+  // MOCK-006 — drawer transition property
+  test('sidebar has 300ms transform transition', async ({ page }) => {
+    await page.goto('/dashboard')
+    await page.getByTestId('app-shell-hamburger').click()
+    const transition = await page.getByTestId('app-shell-sidebar').evaluate(
+      (el) => window.getComputedStyle(el).transition,
+    )
+    // Browsers normalize 300ms → 0.3s in computed styles
+    expect(transition).toMatch(/0\.3s|300ms/)
   })
 })

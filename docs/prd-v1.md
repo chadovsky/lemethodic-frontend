@@ -1311,7 +1311,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### MOCK-006 — App shell + sidebar polish
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged 929e874
 **Branch:** `feat/mock-006-app-shell-polish` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 **Benchmark:** Promova (mobile-app chrome polish, native-feel drawer, sidebar avatar treatment)
