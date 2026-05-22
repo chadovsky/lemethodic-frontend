@@ -11,16 +11,16 @@ describe('RecentActivityWidget', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders exactly 3 activity rows', () => {
+  // MOCK-007 — expanded to 5 rows from fixture
+  it('renders exactly 5 activity rows', () => {
     render(<RecentActivityWidget />)
     const list = screen.getByRole('list', { name: /activité récente/i })
-    expect(within(list).getAllByRole('listitem')).toHaveLength(3)
+    expect(within(list).getAllByRole('listitem')).toHaveLength(5)
   })
 
-  it('renders the locked placeholder activities', () => {
+  it('each row has a colored activity dot with data-testid activity-dot', () => {
     render(<RecentActivityWidget />)
-    expect(screen.getByText(/leçon 4 terminée/i)).toBeInTheDocument()
-    expect(screen.getByText(/10 chunks révisés/i)).toBeInTheDocument()
-    expect(screen.getByText(/diagnostic tâche 1 essayée/i)).toBeInTheDocument()
+    const dots = screen.getAllByTestId('activity-dot')
+    expect(dots).toHaveLength(5)
   })
 })

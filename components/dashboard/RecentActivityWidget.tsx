@@ -1,10 +1,5 @@
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
-
-const ACTIVITIES = [
-  { label: 'Leçon 4 terminée', when: 'il y a 2 jours' },
-  { label: '10 chunks révisés', when: 'il y a 3 jours' },
-  { label: 'Diagnostic Tâche 1 essayée', when: 'il y a 5 jours' },
-] as const
+import { RECENT_ACTIVITY, ACTIVITY_DOT_COLOR } from '@/lib/data/dashboard'
 
 export default function RecentActivityWidget() {
   return (
@@ -49,38 +44,52 @@ export default function RecentActivityWidget() {
           gap: 12,
         }}
       >
-        {ACTIVITIES.map((activity, i) => (
+        {RECENT_ACTIVITY.map((activity, i) => (
           <li
             key={i}
             style={{
               display: 'flex',
-              flexDirection: 'column',
-              gap: 2,
-              paddingBottom: i < ACTIVITIES.length - 1 ? 12 : 0,
+              alignItems: 'flex-start',
+              gap: 10,
+              paddingBottom: i < RECENT_ACTIVITY.length - 1 ? 12 : 0,
               borderBottom:
-                i < ACTIVITIES.length - 1 ? '1px solid var(--rule-default)' : 'none',
+                i < RECENT_ACTIVITY.length - 1 ? '1px solid var(--rule-default)' : 'none',
             }}
           >
             <span
+              data-testid="activity-dot"
+              aria-hidden="true"
               style={{
-                fontFamily: SANS_FONT,
-                fontWeight: 500,
-                fontSize: '0.9375rem',
-                color: 'var(--text-primary)',
+                flexShrink: 0,
+                marginTop: 5,
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                backgroundColor: ACTIVITY_DOT_COLOR[activity.category],
               }}
-            >
-              {activity.label}
-            </span>
-            <span
-              style={{
-                fontFamily: SANS_FONT,
-                fontWeight: 400,
-                fontSize: '0.8125rem',
-                color: 'var(--text-muted)',
-              }}
-            >
-              {activity.when}
-            </span>
+            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span
+                style={{
+                  fontFamily: SANS_FONT,
+                  fontWeight: 500,
+                  fontSize: '0.9375rem',
+                  color: 'var(--text-primary)',
+                }}
+              >
+                {activity.label}
+              </span>
+              <span
+                style={{
+                  fontFamily: SANS_FONT,
+                  fontWeight: 400,
+                  fontSize: '0.8125rem',
+                  color: 'var(--text-muted)',
+                }}
+              >
+                {activity.relativeTime}
+              </span>
+            </div>
           </li>
         ))}
       </ul>

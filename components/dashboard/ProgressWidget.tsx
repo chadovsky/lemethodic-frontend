@@ -1,14 +1,17 @@
-import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
+'use client'
 
-const LAYERS = [
-  { slug: 'le-fond', name: 'Le Fond', percent: 80 },
-  { slug: 'les-moules-des-idees', name: 'Les Moules des Idées', percent: 60 },
-  { slug: 'les-moules', name: 'Les Moules', percent: 50 },
-  { slug: 'les-reflexes-anglais', name: 'Les Réflexes Anglais', percent: 35 },
-  { slug: 'la-voix', name: 'La Voix', percent: 20 },
-] as const
+import { useState, useEffect } from 'react'
+import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
+import { PROGRESS_LAYERS } from '@/lib/data/dashboard'
 
 export default function ProgressWidget() {
+  const [animated, setAnimated] = useState(false)
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setAnimated(true))
+    return () => cancelAnimationFrame(raf)
+  }, [])
+
   return (
     <section
       data-testid="dashboard-widget-progression"
@@ -39,7 +42,7 @@ export default function ProgressWidget() {
       </h2>
 
       <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
-        {LAYERS.map((layer) => (
+        {PROGRESS_LAYERS.map((layer) => (
           <li
             key={layer.slug}
             data-testid={`progress-layer-${layer.slug}`}
@@ -84,13 +87,15 @@ export default function ProgressWidget() {
               }}
             >
               <div
+                data-testid={`progress-bar-${layer.slug}`}
                 aria-hidden="true"
+                className="progress-bar-fill"
                 style={{
                   position: 'absolute',
                   top: 0,
                   left: 0,
                   height: '100%',
-                  width: `${layer.percent}%`,
+                  width: animated ? `${layer.percent}%` : '0%',
                   backgroundColor: 'var(--accent-primary)',
                   borderRadius: 3,
                 }}

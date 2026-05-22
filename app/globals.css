@@ -1009,6 +1009,22 @@
 @media (min-width: 1440px) {
   .dashboard-grid { grid-template-columns: repeat(4, 1fr); }
 }
+/* MOCK-007 — mobile bottom separator between stacked widgets */
+@media (max-width: 639px) {
+  .dashboard-grid > * {
+    border-bottom: 1px solid var(--ed-rule);
+  }
+  .dashboard-grid > *:last-child {
+    border-bottom: none;
+  }
+}
+/* MOCK-007 — progress bar fill animation; respects prefers-reduced-motion */
+.progress-bar-fill {
+  transition: width 600ms var(--ed-ease, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress-bar-fill { transition: none; }
+}
 
 /* UI-013 — Le Diagnostic tâche overview grid. 1-col mobile, 3-col at
    ≥768px so the three TCF tâches read as one row on tablet and desktop.

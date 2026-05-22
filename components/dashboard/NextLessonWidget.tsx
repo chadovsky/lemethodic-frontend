@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
+import { NEXT_LESSON } from '@/lib/data/dashboard'
 
 export default function NextLessonWidget() {
   return (
@@ -41,11 +42,11 @@ export default function NextLessonWidget() {
           margin: 0,
         }}
       >
-        Leçon 5 : Les expressions de probabilité
+        Leçon {NEXT_LESSON.id} : {NEXT_LESSON.title}
       </p>
 
       <Link
-        href="/ecole/5"
+        href={`/ecole/${NEXT_LESSON.id}`}
         className="ed-btn-press"
         style={{
           alignSelf: 'flex-start',

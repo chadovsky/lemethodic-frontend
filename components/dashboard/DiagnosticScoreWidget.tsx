@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
+import { DIAGNOSTIC_SCORE } from '@/lib/data/dashboard'
 
 export default function DiagnosticScoreWidget() {
   return (
@@ -44,7 +45,7 @@ export default function DiagnosticScoreWidget() {
             color: 'var(--text-primary)',
           }}
         >
-          C1
+          {DIAGNOSTIC_SCORE.level}
         </span>
         <span
           style={{
@@ -54,7 +55,7 @@ export default function DiagnosticScoreWidget() {
             color: 'var(--text-muted)',
           }}
         >
-          Dernière évaluation : il y a 7 jours
+          Dernière évaluation : {DIAGNOSTIC_SCORE.lastEvaluatedLabel}
         </span>
       </div>
 

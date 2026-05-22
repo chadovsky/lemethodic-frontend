@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('next/link', () => ({
@@ -20,7 +20,7 @@ describe('Dashboard', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders today\'s date in French long format', () => {
+  it("renders today's date in French long format", () => {
     render(<Dashboard />)
     const today = new Date()
     const expected = new Intl.DateTimeFormat('fr-CA', { dateStyle: 'full' }).format(today)
@@ -60,10 +60,27 @@ describe('Dashboard', () => {
     expect(screen.getByTestId('diagnostic-score-value')).toHaveTextContent('C1')
   })
 
-  it('Prochaine leçon widget shows the placeholder lesson title', () => {
+  // MOCK-007 — fixture-driven lesson title (lesson 5 from lib/data/lessons.ts)
+  it('Prochaine leçon widget shows the fixture lesson title', () => {
     render(<Dashboard />)
     expect(
-      screen.getByText(/leçon 5\s*:\s*les expressions de probabilité/i),
+      screen.getByText(/leçon 5\s*:\s*le rythme de la phrase française/i),
     ).toBeInTheDocument()
+  })
+
+  // MOCK-007 — 5 activity rows
+  it('renders 5 activity rows from fixture', () => {
+    render(<Dashboard />)
+    const list = screen.getByRole('list', { name: /activité récente/i })
+    expect(within(list).getAllByRole('listitem')).toHaveLength(5)
+  })
+
+  // MOCK-007 — progress bar data-testids with settled widths
+  it('ProgressWidget bars have correct data-testid and settled width for Le Fond', async () => {
+    render(<Dashboard />)
+    const bar = screen.getByTestId('progress-bar-le-fond')
+    await waitFor(() => {
+      expect(bar).toHaveStyle({ width: '80%' })
+    })
   })
 })

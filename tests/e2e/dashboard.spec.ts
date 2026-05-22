@@ -37,13 +37,36 @@ test.describe('Dashboard — desktop (1280×800)', () => {
 
   test('"Score Diagnostic" CTA links to /diagnostic', async ({ page }) => {
     await page.goto('/dashboard')
-    // /diagnostic is wrapped in ProtectedRoute which redirects unauth-ed
-    // visitors to /. Asserting the href documents the intended destination
-    // without depending on auth state (BE-001 will wire the gate properly).
     await expect(page.getByRole('link', { name: /voir le détail/i })).toHaveAttribute(
       'href',
       '/diagnostic',
     )
+  })
+
+  // MOCK-007 — bar widths animate and settle > 0
+  test('ProgressWidget bar widths settle to target after 700ms', async ({ page }) => {
+    await page.goto('/dashboard')
+    await page.waitForTimeout(700)
+    const fondWidth = await page.getByTestId('progress-bar-le-fond').evaluate(
+      (el: HTMLElement) => parseFloat(el.style.width),
+    )
+    expect(fondWidth).toBeGreaterThan(0)
+  })
+
+  // MOCK-007 — widget cards have ed-card-lift hover class
+  test('widget cards carry ed-card-lift class', async ({ page }) => {
+    await page.goto('/dashboard')
+    await expect(page.getByTestId('dashboard-widget-progression')).toHaveClass(/ed-card-lift/)
+    await expect(page.getByTestId('dashboard-widget-activite')).toHaveClass(/ed-card-lift/)
+    await expect(page.getByTestId('dashboard-widget-prochaine-lecon')).toHaveClass(/ed-card-lift/)
+    await expect(page.getByTestId('dashboard-widget-score')).toHaveClass(/ed-card-lift/)
+  })
+
+  // MOCK-007 — RecentActivityWidget shows 5 rows
+  test('RecentActivityWidget shows exactly 5 activity rows', async ({ page }) => {
+    await page.goto('/dashboard')
+    const dots = page.getByTestId('activity-dot')
+    await expect(dots).toHaveCount(5)
   })
 })
 
@@ -65,5 +88,15 @@ test.describe('Dashboard — mobile (375×667)', () => {
     const scrollWidth = await page.evaluate(() => document.body.scrollWidth)
     const clientWidth = await page.evaluate(() => document.body.clientWidth)
     expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1)
+  })
+
+  // MOCK-007 — mobile widgets have bottom separator
+  test('stacked widgets have bottom separator border in mobile view', async ({ page }) => {
+    await page.goto('/dashboard')
+    const progressWidget = page.getByTestId('dashboard-widget-progression')
+    const borderBottom = await progressWidget.evaluate(
+      (el) => window.getComputedStyle(el).borderBottomWidth,
+    )
+    expect(parseFloat(borderBottom)).toBeGreaterThan(0)
   })
 })

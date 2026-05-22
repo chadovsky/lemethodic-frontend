@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import ProgressWidget from '@/components/dashboard/ProgressWidget'
+import { PROGRESS_LAYERS } from '@/lib/data/dashboard'
 
 const LOCKED_LAYER_ORDER = [
   'Le Fond',
@@ -50,5 +51,23 @@ describe('ProgressWidget', () => {
     expect(bars[2]).toHaveAttribute('aria-valuenow', '50')
     expect(bars[3]).toHaveAttribute('aria-valuenow', '35')
     expect(bars[4]).toHaveAttribute('aria-valuenow', '20')
+  })
+
+  // MOCK-007 — progress bar data-testids + settled width from fixture
+  it('each bar fill element has data-testid progress-bar-{slug}', () => {
+    render(<ProgressWidget />)
+    for (const layer of PROGRESS_LAYERS) {
+      expect(screen.getByTestId(`progress-bar-${layer.slug}`)).toBeInTheDocument()
+    }
+  })
+
+  it('each bar settled width matches fixture percent', async () => {
+    render(<ProgressWidget />)
+    for (const layer of PROGRESS_LAYERS) {
+      const bar = screen.getByTestId(`progress-bar-${layer.slug}`)
+      await waitFor(() => {
+        expect(bar).toHaveStyle({ width: `${layer.percent}%` })
+      })
+    }
   })
 })
