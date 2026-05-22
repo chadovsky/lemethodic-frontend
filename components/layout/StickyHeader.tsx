@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
@@ -40,18 +41,28 @@ function isMarketingPath(pathname: string): boolean {
 
 export default function StickyHeader() {
   const pathname = usePathname() ?? '/'
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => { setScrolled(window.scrollY > 60) }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   if (!isMarketingPath(pathname)) return null
 
   return (
     <header
       data-testid="sticky-header"
+      className={scrolled ? 'sticky-header--scrolled' : ''}
       style={{
         position: 'sticky',
         top: 0,
         zIndex: 100,
         height: 64,
-        backgroundColor: 'var(--bg-elevated)',
-        borderBottom: '1px solid var(--rule-default)',
+        backgroundColor: scrolled ? 'var(--ed-paper)' : 'transparent',
+        borderBottom: scrolled ? '1px solid var(--rule-default)' : 'none',
+        transition: 'background-color 200ms ease, border-color 200ms ease',
         display: 'flex',
         alignItems: 'center',
       }}

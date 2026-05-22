@@ -40,6 +40,13 @@ export const metadata: Metadata = {
   title: 'LeMethodic',
   description: 'Learn French with LeMethodic',
   generator: 'v0.app',
+  openGraph: {
+    title: 'Le Méthodic',
+    description: 'Method-based oral exam prep for anglophone French exam candidates pursuing Quebec PR.',
+    url: 'https://lemethodic.com',
+    siteName: 'Le Méthodic',
+    type: 'website',
+  },
   icons: {
     icon: [
       { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },

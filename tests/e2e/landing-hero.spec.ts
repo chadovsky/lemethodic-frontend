@@ -15,6 +15,29 @@ test.describe('Landing hero — desktop (1280×800)', () => {
     // 15 s budget: first request to /signup triggers dev-server compilation
     await expect(page).toHaveURL(/\/signup/, { timeout: 15_000 })
   })
+
+  // MOCK-001 — RotatingKicker
+  test('kicker element is visible and contains an exam name', async ({ page }) => {
+    await page.goto('/')
+    const kicker = page.getByTestId('hero-kicker')
+    await expect(kicker).toBeVisible()
+    const text = await kicker.textContent()
+    const EXAM_NAMES = ['TCF', 'TEF', 'DELF', 'DALF']
+    expect(EXAM_NAMES.some((name) => text?.includes(name))).toBe(true)
+  })
+
+  // MOCK-001 — Sticky header scroll state
+  test('header gains solid background after scrolling 80px', async ({ page }) => {
+    await page.goto('/')
+    const header = page.getByTestId('sticky-header')
+    // At top — should not have scrolled class
+    await expect(header).not.toHaveClass(/sticky-header--scrolled/)
+    // Scroll down
+    await page.evaluate(() => window.scrollTo(0, 80))
+    // Wait for scroll event to propagate and React to re-render
+    await page.waitForTimeout(100)
+    await expect(header).toHaveClass(/sticky-header--scrolled/)
+  })
 })
 
 test.describe('Landing hero — mobile (375×667)', () => {
@@ -39,5 +62,11 @@ test.describe('Landing hero — mobile (375×667)', () => {
     const box = await cta.boundingBox()
     expect(box).toBeTruthy()
     expect(box!.height).toBeGreaterThanOrEqual(44)
+  })
+
+  // MOCK-001 — kicker visible on mobile
+  test('kicker element is visible on mobile', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.getByTestId('hero-kicker')).toBeVisible()
   })
 })

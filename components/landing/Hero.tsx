@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
+import RotatingKicker from '@/components/landing/RotatingKicker'
 
 export default function Hero() {
   return (
@@ -16,24 +17,12 @@ export default function Hero() {
       <div style={{ maxWidth: 1280, margin: '0 auto', width: '100%' }}>
         <div style={{ maxWidth: 760 }}>
 
-          <p
-            className="ed-hero-rise ed-hero-rise-delay-1"
-            style={{
-              fontFamily: SANS_FONT,
-              fontWeight: 600,
-              fontSize: 12,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: 'var(--accent-primary)',
-              margin: 0,
-              marginBottom: 'clamp(16px, 2vw, 24px)',
-            }}
-          >
-            TCF Canada · Quebec PR
-          </p>
+          <div data-testid="hero-kicker" className="ed-hero-rise">
+            <RotatingKicker lang="en" />
+          </div>
 
           <h1
-            className="text-balance ed-hero-rise ed-hero-rise-delay-2"
+            className="text-balance ed-hero-rise ed-hero-rise-delay-1"
             style={{
               fontFamily: SERIF_FONT,
               fontStyle: 'italic',
@@ -51,7 +40,7 @@ export default function Hero() {
 
           <p
             data-testid="hero-subheadline"
-            className="text-pretty ed-hero-rise ed-hero-rise-delay-3"
+            className="text-pretty ed-hero-rise ed-hero-rise-delay-2"
             style={{
               fontFamily: SANS_FONT,
               fontWeight: 400,
@@ -63,10 +52,10 @@ export default function Hero() {
               marginBottom: 'clamp(32px, 4vw, 48px)',
             }}
           >
-            Method-based oral exam prep for anglophone candidates pursuing Quebec&nbsp;PR.
+            The only TCF Canada prep built on the 5-Couche method — for anglophone candidates racing the clock.
           </p>
 
-          <div className="ed-hero-rise ed-hero-rise-delay-3">
+          <div data-testid="hero-cta-wrapper" className="ed-hero-rise ed-hero-rise-delay-3">
             <Link
               href="/signup"
               className="ed-btn-press"

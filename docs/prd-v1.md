@@ -1048,7 +1048,727 @@ None. This is the first UI shell — no upstream blockers.
 
 **Strategic step:** maps to Step 1 (data layer continues in parallel; mocks here are JSON fixtures hand-curated by Chadi).
 
-**ID range:** MOCK-001 to MOCK-012. To be populated in subsequent planning sessions.
+**ID range:** MOCK-001 to MOCK-012.
+
+---
+
+### MOCK-001 — Landing hero copy + Wispr-benchmark motion
+
+**Status:** Shipped — squash-merged a533862
+**Branch:** `feat/mock-001-hero-motion` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+**Benchmark:** Wispr Flow (landing hero motion, progressive header reveal)
+
+#### Scope
+**In:**
+- Sub-headline copy iteration: "The only TCF Canada prep built on the 5-Couche method — for anglophone candidates racing the clock." (provisional; Chadi reviews before merge)
+- Wire `ed-hero-rise` + `ed-hero-rise-delay-{1|2|3}` CSS classes (already defined in `app/globals.css`) to the headline, sub-headline, and CTA respectively — staggered entrance at 0ms / 250ms / 450ms
+- `RotatingKicker` component (already built in F-212, exported from `lib/motion.ts`) wired into the hero kicker position above the headline; cycles "TCF Canada · TEF Canada · DELF · DALF" on a 2.5s interval
+- Sticky header scroll state: when `scrollY > 60`, StickyHeader background transitions from `transparent` to `var(--ed-paper)` with a 1px `var(--ed-rule)` bottom border (200ms ease); Wispr-style progressive reveal
+- `ed-btn-press` CSS class applied to the hero CTA (`:active` scale-down feedback — class already defined in `app/globals.css`)
+- OG meta tags in `app/layout.tsx`: `og:title` "Le Méthodic", `og:description` (1-sentence positioning copy), `og:url` (production domain string)
+
+**Out:**
+- Animated product demo section (MOCK-002 — blocked on asset pre-work)
+- RotatingKicker audio narration (AI-XXX TTS)
+- A/B variant routing or copy experiments (Section 7)
+- PostHog / Plausible analytics events (Section 7)
+- Twitter Card / Facebook og:image (defer — requires real screenshot/artwork)
+
+#### Acceptance (Given/When/Then)
+1. **Given** desktop 1280×800 with no motion preference, **When** `/` loads, **Then** the headline enters with `ed-hero-rise`, sub-headline with `ed-hero-rise-delay-1`, and CTA with `ed-hero-rise-delay-2` — all complete within 700ms of first paint — and the RotatingKicker element cycles through all 4 exam-name strings.
+2. **Given** `prefers-reduced-motion: reduce` is set, **When** `/` loads, **Then** no entrance animation fires (the `ed-hero-rise` classes are no-ops per `app/globals.css` reduced-motion rule).
+3. **Given** the user scrolls to `scrollY ≥ 80`, **When** the header is inspected, **Then** its background is `var(--ed-paper)` and a 1px `var(--ed-rule)` bottom border is visible; at `scrollY = 0` neither applies.
+4. **Given** mobile 375×667, **When** `/` loads, **Then** hero renders above the fold without horizontal overflow, RotatingKicker is visible, and the CTA has ≥44×44px tap target.
+
+#### Tests
+- `tests/unit/landing/Hero.test.tsx` (vitest) — update: assert hero child elements carry `ed-hero-rise` / `ed-hero-rise-delay-1` / `ed-hero-rise-delay-2` class names; assert RotatingKicker renders with at least one of the 4 exam name strings
+- `tests/unit/layout/StickyHeader.test.tsx` (vitest) — update: simulate `window.scrollY = 80` scroll event and assert the header gains the scrolled CSS class; at `scrollY = 0` assert the class is absent
+- `tests/e2e/landing-hero.spec.ts` (Playwright) — update: assert RotatingKicker element is visible and non-empty on desktop; assert no horizontal overflow on mobile; assert header gains solid background after programmatic scroll to 80px
+
+#### Files Touched
+- `components/landing/Hero.tsx` — wire animation classes, add `<RotatingKicker />`
+- `components/layout/StickyHeader.tsx` — add `useEffect` scroll listener + conditional class
+- `app/layout.tsx` — add static OG meta tags
+- `tests/unit/landing/Hero.test.tsx` — update
+- `tests/unit/layout/StickyHeader.test.tsx` — update
+- `tests/e2e/landing-hero.spec.ts` — update
+
+#### Dependencies
+- UI-001 Shipped (Hero component exists)
+- UI-004 Shipped (StickyHeader component lives in layout)
+
+#### Notes
+- Benchmark: **Wispr Flow landing** — the header transparency-to-solid progressive reveal is the key Wispr signature to replicate. Keep transition to 200ms; avoid elastic or bounce easing.
+- `RotatingKicker` and `useRotatingText` already exist from F-212 editorial system. Import from `lib/motion.ts`; do not re-implement.
+- Sub-headline copy above is provisional. Chadi must approve final wording before merge. Flag as a review gate in the commit message.
+- OG `og:url`: use the production domain from `reference_vercel_production.md` memory. Do not invent a URL.
+
+---
+
+### MOCK-002 — Landing animated demo section
+
+**Status:** Not Started — **BLOCKED on pre-work**
+**Branch:** `feat/mock-002-landing-demo` (FE, from `main`)
+**Effort:** 1 session (~4–5h) — blocked until pre-work delivered
+**Benchmark:** Wispr Flow (product-in-use demo reveal on scroll)
+
+#### Scope
+**In:**
+- A "product demo" section inserted between `<MethodologyPreview />` and `<PricingTeaser />` on `/`
+- Contains a stylized static image of the diagnostic tâche view in Recording state, overlapping with a cropped view of the results score card — two overlapping UI mockup images, desktop-angled perspective crop (Wispr aesthetic)
+- `<RevealOnScroll>` wrapper: `translateY(40px) → 0` + `opacity 0 → 1` over 700ms on viewport entry
+- Desktop: demo block centered, max-width 960px, with `ed-card-lift` shadow ramp on the image surface
+- Mobile: single image, full viewport width, maintains aspect ratio, no overflow
+
+**Out:**
+- Live interactive demo (static image mock only in Section 2)
+- Video embed or Lottie animation (defer)
+- Real product screenshots (Section 7 marketing polish)
+
+#### Dependencies
+- UI-001–005 Shipped
+- MOCK-001 Shipped (hero motion patterns established)
+- **BLOCKING pre-work required before session starts:**
+  1. Wispr Flow reference screenshots — Chadi must supply (URL or local capture of wispr.com demo section)
+  2. Nanobanana sample images — Chadi must supply (product screenshots or art-directed illustration assets to serve as the mockup content)
+
+#### Notes
+- Benchmark: **Wispr Flow** — the scroll-triggered product reveal where the app appears "in context" is the specific pattern to replicate. The visual quality of the mockup image is load-bearing; without the pre-work assets a placeholder rectangle defeats the purpose.
+- This entry is intentionally ordered after MOCK-004 in execution sequence so it does not block MOCK-003–004 from starting.
+- The two overlapping images (tâche Recording + results score card) can be constructed as positioned `<div>` surfaces with border/shadow treatment if real screenshots aren't ready — flag in the PR.
+
+---
+
+### MOCK-003 — Landing persona + methodology visual upgrade
+
+**Status:** Not Started
+**Branch:** `feat/mock-003-landing-persona-method` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+**Benchmark:** Wispr Flow (restrained premium palette, generous whitespace, confident typography sizing)
+
+#### Scope
+**In:**
+- `PersonaMatch` section:
+  - Replace 3 geometric SVG placeholders with final editorial SVGs — each a 2-color line icon matching the `--ed-accent` / `--ed-muted` palette: icon 1 TCF flag motif, icon 2 EN→FR arrow motif, icon 3 stacked-layer motif (5-couche reference)
+  - Wrap each column in `<RevealOnScroll delay={N}>` for staggered scroll entry (col 1: delay 0ms, col 2: 100ms, col 3: 200ms) using the existing `<RevealOnScroll>` component from `lib/motion.ts`
+  - Copy: Chadi reviews and approves the 3 column body texts before merge (current placeholder copy is acceptable in the interim)
+- `MethodologyPreview` section:
+  - Layer bands get a left-border accent (3px, per-layer color from `--fp-*` pastel tokens — purely decorative per F-200 color hierarchy: pastels are the chip/accent layer, not chrome)
+  - Each layer row gets `.ed-card-lift` hover treatment (200ms translateY -2px + shadow ramp)
+  - `<RevealOnScroll>` on the section heading + staggered reveals on each layer row (50ms stagger)
+  - Layer descriptions: 1-sentence copy review — replace generic placeholder prose with specific 5-couche methodology framing; Chadi approves before merge
+
+**Out:**
+- Animated product demo (MOCK-002)
+- Full illustration or photography (editorial SVGs only here)
+- Per-layer drill-down link to the method page (deferred; `/method` stub remains)
+- Animated layer-by-layer build sequence (defer)
+
+#### Acceptance (Given/When/Then)
+1. **Given** desktop, **When** the visitor scrolls to the persona section, **Then** the 3 columns each have a distinct editorial SVG icon (not a geometric placeholder) and enter with staggered `RevealOnScroll` reveals.
+2. **Given** desktop, **When** the visitor hovers over a methodology layer band, **Then** it lifts 2px with the `ed-card-lift` shadow transition (200ms).
+3. **Given** `prefers-reduced-motion: reduce`, **When** the persona or methodology section scrolls into view, **Then** no translateY entrance or hover-lift animation fires.
+4. **Given** mobile 375px, **When** the visitor scrolls to the methodology section, **Then** all 5 layer names and left-border accents are visible single-column without overflow.
+
+#### Tests
+- `tests/unit/landing/PersonaMatch.test.tsx` (vitest) — update: assert 3 SVG icon elements render (`data-testid="persona-icon-{1,2,3}"`); assert RevealOnScroll wrapper elements present
+- `tests/unit/landing/MethodologyPreview.test.tsx` (vitest) — update: assert each layer row has `.ed-card-lift` class; assert left-border style or `data-layer` attribute for per-layer color
+- `tests/e2e/landing-persona.spec.ts` (Playwright) — update: persona icons visible; reduced-motion variant has no animation
+- `tests/e2e/landing-methodology.spec.ts` (Playwright) — update: 5 layers visible with left-border accents; hover lifts on desktop; reduced-motion confirmed
+
+#### Files Touched
+- `components/landing/PersonaMatch.tsx` — add RevealOnScroll, replace icon placeholder references
+- `components/landing/icons/icon-tcf.svg` — new final editorial SVG
+- `components/landing/icons/icon-langue.svg` — new final editorial SVG
+- `components/landing/icons/icon-methode.svg` — new final editorial SVG
+- `components/landing/MethodologyPreview.tsx` — add ed-card-lift, left-border accents, RevealOnScroll
+- `components/landing/CouchesLayer.tsx` — add per-layer pastel border-left prop and hover class
+- `tests/unit/landing/PersonaMatch.test.tsx` — update
+- `tests/unit/landing/MethodologyPreview.test.tsx` — update
+- `tests/e2e/landing-persona.spec.ts` — update
+- `tests/e2e/landing-methodology.spec.ts` — update
+
+#### Dependencies
+- UI-002 Shipped (PersonaMatch component exists)
+- UI-003 Shipped (MethodologyPreview + CouchesLayer exist)
+
+#### Notes
+- Benchmark: **Wispr Flow** — the persona section tone is confident and specific ("built for X, not Y"). Do not soften copy to be inclusive; the targeting is the value prop.
+- SVG icons must be inline (not `<img>` tags) so they inherit CSS color variables. Keep each SVG under 20 path elements — editorial simplicity, not illustration complexity.
+- `RevealOnScroll` component already exists from F-200. Import from `lib/motion.ts`. Stagger values honor the `ED_STAGGER` constant from the same file.
+
+---
+
+### MOCK-004 — Landing pricing + footer visual polish
+
+**Status:** Not Started
+**Branch:** `feat/mock-004-landing-pricing-footer` (FE, from `main`)
+**Effort:** 1 session (~2–3h)
+**Benchmark:** Wispr Flow (pricing section clarity, restrained "most popular" signal, premium footer)
+
+#### Scope
+**In:**
+- `PricingTeaser`:
+  - Add `.ed-card-lift` hover treatment to each tier card
+  - Daily Bundle "Most popular" badge: upgrade from plain text to a styled pill (`--ed-accent` background, white text, `font-weight: 600`, 4px radius) — matches editorial system radii rule
+  - Add `.ed-btn-press` to each tier CTA button
+  - Highlighted Daily Bundle card gains `1px solid var(--ed-accent)` border on hover (200ms transition)
+  - `<RevealOnScroll>` on the pricing section heading
+- `Footer`:
+  - Wordmark: implement as styled text using `DISPLAY_FONT` constant (Cabinet Grotesk italic) rather than a raster image — inline text node or inline SVG path; not `<img src>`
+  - Social link row: GitHub + Twitter/X placeholder `<a>` elements with `href="#"` (visual only; real URLs in Section 7)
+  - Copyright line "© 2026 Le Méthodic" — no change needed
+
+**Out:**
+- Live Stripe checkout (LGL-XXX after Atlas + EIN)
+- Currency switcher (USD only at launch)
+- Newsletter signup form in footer (Section 7)
+- Full tier comparison table (defer)
+- "What's included" expansion panels (defer)
+
+#### Acceptance (Given/When/Then)
+1. **Given** desktop, **When** the visitor hovers over the Daily Bundle card, **Then** the card lifts 2px, the border transitions to `var(--ed-accent)` color, and the "Most popular" pill is visible with accent background.
+2. **Given** any tier CTA button pressed (mousedown), **When** the `.ed-btn-press` scale fires, **Then** the button scales to 0.98.
+3. **Given** the footer rendered, **Then** the wordmark, 3 link columns, social placeholder links, and copyright line are all visible.
+4. **Given** mobile 375px, **When** the pricing section renders, **Then** tier cards stack vertically with the Daily Bundle card still visually distinct (badge visible, no layout breakage).
+
+#### Tests
+- `tests/unit/landing/PricingTeaser.test.tsx` (vitest) — update: assert `.ed-card-lift` and `.ed-btn-press` classes present; assert Daily Bundle card has "Most popular" pill (`data-testid="pricing-badge-popular"`)
+- `tests/unit/landing/Footer.test.tsx` (vitest) — update: assert wordmark element present; assert social link elements (`data-testid="footer-social-github"`, `data-testid="footer-social-twitter"`)
+- `tests/e2e/landing-pricing.spec.ts` (Playwright) — update: Daily Bundle hover shows lift and accent border; mobile cards stack without overflow; social links present in footer
+
+#### Files Touched
+- `components/landing/PricingTeaser.tsx` — ed-card-lift, ed-btn-press, Daily Bundle border hover, badge upgrade, RevealOnScroll
+- `components/landing/Footer.tsx` — wordmark text treatment, social links
+- `tests/unit/landing/PricingTeaser.test.tsx` — update
+- `tests/unit/landing/Footer.test.tsx` — update
+- `tests/e2e/landing-pricing.spec.ts` — update
+
+#### Dependencies
+- UI-004 Shipped (PricingTeaser + Footer exist)
+- MOCK-001 Shipped (ed-btn-press + scroll-reveal patterns confirmed)
+
+#### Notes
+- Benchmark: **Wispr Flow** — the Daily Bundle highlight should feel premium and authoritative, not Stripe-dashboard busy. One accent pill + one accent border is enough signal; resist adding gradient or shadow stacks.
+- Wordmark in footer: `DISPLAY_FONT` constant is imported from `components/onboarding/OnboardingScreen.tsx` (also used by `components/Paywall.tsx`). Keep the same import path.
+- Social links are placeholders with `href="#"`. Real URLs (GitHub profile, Twitter/X handle) land in Section 7 marketing setup.
+
+---
+
+### MOCK-005 — Sign-up form UX polish
+
+**Status:** Not Started
+**Branch:** `feat/mock-005-signup-polish` (FE, from `main`)
+**Effort:** 1 session (~2–3h)
+**Benchmark:** Wispr Flow / shared standard (premium form affordances, ed-field focus treatment — transition point into Promova interior register)
+
+#### Scope
+**In:**
+- `SignupForm`:
+  - Apply `.ed-field` CSS class to all three input elements (focus-visible: `--ed-accent` border + 18%-opacity ring — already defined in `app/globals.css`)
+  - Loading state visual upgrade: on Submit click (during the fake 300ms redirect), replace button text with an inline CSS spinner (`<span>` with `border-top` spin animation, respects `prefers-reduced-motion`); no external spinner library
+  - Inline validation error messages: `color: var(--ed-accent)` + a small warning triangle inline SVG beside the message
+  - "Already have an account? Sign in" link: `color: var(--ed-accent)` with underline on hover
+  - Form card: `background: var(--ed-paper)` + 1px `var(--ed-rule)` border + 8px radius — lifts the form off the page background
+- `PasswordStrength` sub-component (new): a 3-segment row below the password field; filled left-to-right as password length increases (0–4 chars → 1 red/blush segment; 5–7 → 2 amber/butter segments; 8+ → 3 green/sage segments); purely local React state, no library, no entropy analysis
+
+**Out:**
+- Real auth wiring (BE-001)
+- OAuth providers (BE-001)
+- hCaptcha (BE-001 / F-406)
+- Entropy-based password strength (length threshold is sufficient for Section 2)
+- Server-side validation
+- Email verification flow
+
+#### Acceptance (Given/When/Then)
+1. **Given** the user focuses a form field, **When** the focus ring appears, **Then** it uses the `var(--ed-accent)` color + 18%-opacity ring from the `.ed-field` class.
+2. **Given** a password of 6 characters typed, **When** the strength indicator renders, **Then** 2 of 3 segments are filled (amber/butter state).
+3. **Given** valid form filled, **When** Submit is clicked, **Then** the button immediately shows the spinner and is disabled; after ≥300ms the router navigates to `/onboarding`.
+4. **Given** `prefers-reduced-motion: reduce`, **When** Submit is clicked, **Then** the spinner icon is visible but does not rotate.
+
+#### Tests
+- `tests/unit/signup/SignupForm.test.tsx` (vitest) — update: assert `.ed-field` class on all inputs; assert PasswordStrength renders with correct segment count at password lengths 3, 6, and 9; assert spinner element appears in loading state
+- `tests/e2e/signup-flow.spec.ts` (Playwright) — update: focus a field and confirm focus ring visible; type password and confirm segment count changes; submit and confirm spinner appears then redirect
+
+#### Files Touched
+- `components/auth/SignupForm.tsx` — ed-field, spinner, form card surface, link styling
+- `components/auth/PasswordStrength.tsx` — new sub-component
+- `components/auth/FormField.tsx` — ed-field class, styled error message with warning icon
+- `tests/unit/signup/SignupForm.test.tsx` — update
+- `tests/e2e/signup-flow.spec.ts` — update
+
+#### Dependencies
+- UI-005 Shipped (SignupForm + FormField exist)
+- MOCK-001 Shipped (editorial palette + motion token conventions confirmed)
+
+#### Notes
+- The `.ed-field` class is already defined in `app/globals.css`. Apply it via `className` — no inline style needed.
+- Password strength: 3 segments, length threshold only. `zxcvbn` or similar entropy libraries are overkill here and add an unnecessary dependency. Keep it pure CSS + React state.
+- The spinner must be a pure CSS animation on a `<span>` element — no external icon library. Define the `@keyframes spin` in `app/globals.css` and wrap it with the `prefers-reduced-motion` guard already established there.
+
+---
+
+### MOCK-006 — App shell + sidebar polish
+
+**Status:** Not Started
+**Branch:** `feat/mock-006-app-shell-polish` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+**Benchmark:** Promova (mobile-app chrome polish, native-feel drawer, sidebar avatar treatment)
+
+#### Scope
+**In:**
+- Sidebar header: add a user avatar placeholder — a 36×36px circle with initials "CH" (BE-001 will swap to real user identity from session); `--ed-accent` background, white text, `SANS_FONT`, `font-weight: 600`; accepts an `initials` prop defaulting to `"CH"` for a trivial BE-001 swap
+- Sidebar active link: upgrade the active-state treatment from border-only to a full-bleed `var(--bg-elevated)` row background spanning the full sidebar width, plus a 4px-wide `var(--ed-accent)` left-tab indicator (full row height, 2px radius right side) — Promova pill-row pattern
+- Mobile off-canvas drawer: add `transition: transform 300ms var(--ed-ease)` for open/close slide; backdrop `<div>` at `opacity 0 → 0.5` fade (200ms) — closes the drawer on click; respects `prefers-reduced-motion` (instant open if set)
+- `ed-page-enter` fade-in on the `<main>` content frame: apply via `key={pathname}` on the main element (forces remount on route change, re-triggering the CSS animation); `pathname` from `usePathname()`
+
+**Out:**
+- Auth gate / redirect to login (BE-001)
+- Persistent desktop sidebar-collapse toggle (defer)
+- Notification center (Section 7)
+- Real user identity from JWT / session (BE-001)
+- Search bar in chrome (defer)
+
+#### Acceptance (Given/When/Then)
+1. **Given** desktop ≥1024px, **When** `/dashboard` loads, **Then** the sidebar shows the "CH" avatar circle at top, the active link row has full-bleed `--bg-elevated` background, and the 4px left-tab indicator is visible on the active row.
+2. **Given** the user navigates from `/dashboard` to `/ecole`, **When** the route changes, **Then** the main content frame fades in via `ed-page-enter` (250ms) and the sidebar active state shifts to "L'École".
+3. **Given** mobile <768px, **When** the hamburger is tapped, **Then** the drawer slides in with 300ms transform transition; the backdrop fades to 0.5 opacity simultaneously; tapping the backdrop closes the drawer with the reverse transition.
+4. **Given** `prefers-reduced-motion: reduce`, **When** the drawer opens on mobile, **Then** no transform transition fires (instant open/close).
+
+#### Tests
+- `tests/unit/layout/Sidebar.test.tsx` (vitest) — update: assert avatar element with initials "CH" (`data-testid="sidebar-avatar"`); assert active link has `bg-elevated` class in its parent row element
+- `tests/unit/layout/AppShell.test.tsx` (vitest) — update: assert main element has `ed-page-enter` class; assert `key` prop on main changes when mocked `usePathname` returns a different route
+- `tests/e2e/app-shell.spec.ts` (Playwright) — update: desktop avatar visible; navigate dashboard→ecole, confirm page fade-in; mobile drawer slides with transition; backdrop click closes drawer
+
+#### Files Touched
+- `components/layout/Sidebar.tsx` — avatar placeholder, full-bleed active row, left-tab indicator
+- `components/layout/SidebarLink.tsx` — active state treatment refactor
+- `app/(app)/layout.tsx` — `key={pathname}` on main, backdrop element for mobile drawer
+- `tests/unit/layout/Sidebar.test.tsx` — update
+- `tests/unit/layout/AppShell.test.tsx` — update
+- `tests/e2e/app-shell.spec.ts` — update
+
+#### Dependencies
+- UI-006 Shipped (AppShell + Sidebar exist)
+- MOCK-005 Shipped (editorial palette + motion patterns consistent across surfaces)
+
+#### Notes
+- Benchmark: **Promova** — the sidebar chrome and drawer must feel like a native mobile app transplanted to web. The backdrop dim is the critical mobile-native signal; without it the drawer looks like a web overlay, not an app sheet.
+- "CH" initials are a placeholder. BE-001 wires `user.initials` from session. The `initials` prop default is the only coupling point.
+- `ed-page-enter` is already defined in `app/globals.css` (250ms fade-in). The `key={pathname}` technique is idiomatic React for forcing remount on route change; it replaces any manual animation re-trigger approach.
+
+---
+
+### MOCK-007 — Dashboard realistic data + widget motion
+
+**Status:** Not Started
+**Branch:** `feat/mock-007-dashboard-polish` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+**Benchmark:** Promova (app-interior data density, widget card design, mobile-native widget grid)
+
+#### Scope
+**In:**
+- `lib/data/dashboard.ts` — new typed fixture file (hand-curated by Chadi; Claude Code generates plausible values, Chadi reviews before merge):
+  - `RECENT_ACTIVITY`: 5 rows `{ label: string; detail: string; relativeTime: string; category: 'lesson' | 'vocab' | 'diagnostic' }` — relativeTime pre-formatted in French (e.g. `"il y a 2 jours"`) via `Intl.RelativeTimeFormat('fr-CA')`
+  - `PROGRESS_LAYERS`: the 5-couche layers with percent values (moved from inline in `ProgressWidget`)
+  - `NEXT_LESSON`: pointer to `LESSONS[4]` (lesson 5) from `lib/data/lessons.ts` via its `id`
+  - `DIAGNOSTIC_SCORE`: `{ level: 'C1'; lastEvaluatedLabel: 'il y a 7 jours' }`
+- `ProgressWidget`: bars animate from 0% to target width on mount — CSS `transition: width 600ms var(--ed-ease) both` applied after a 1-frame `requestAnimationFrame` delay; respects `prefers-reduced-motion` (no animation, instant final width)
+- `RecentActivityWidget`: expanded to 5 rows; each row gets a small 8px colored dot on the left (lesson → `--fp-sage`, vocab → `--fp-sky`, diagnostic → `--fp-lavender`) per F-200 decorative chip layer
+- All 4 widget cards: add `.ed-card-lift` hover treatment
+- Mobile single-column: add `1px solid var(--ed-rule)` bottom separator between stacked widgets
+
+**Out:**
+- Real progress data (BE-XXX endpoints)
+- Streak / engagement counters (defer)
+- Recharts radar/bar charts (CSS bars only; Recharts when real data lands)
+- Per-user personalization (BE)
+- Dismissible nudge banners (defer)
+
+#### Acceptance (Given/When/Then)
+1. **Given** `/dashboard` loaded on desktop, **When** the ProgressWidget mounts, **Then** each couche bar animates from 0px to its target width over ~600ms (Playwright: evaluate computed width after 700ms settle).
+2. **Given** desktop ≥1280px, **When** all 4 widgets render, **Then** each has `.ed-card-lift` class and visibly lifts 2px on hover.
+3. **Given** the RecentActivityWidget renders from fixture, **When** inspected, **Then** exactly 5 activity rows are visible, each with a colored left-dot (`data-testid="activity-dot"`).
+4. **Given** mobile <768px, **When** widgets stack single-column, **Then** each widget has a `var(--ed-rule)` bottom separator and no horizontal overflow.
+
+#### Tests
+- `tests/unit/dashboard/Dashboard.test.tsx` (vitest) — update: assert 5 activity rows; assert ProgressWidget bars carry `data-testid="progress-bar-{layer-slug}"` with correct target width style from fixture
+- `tests/unit/dashboard/ProgressWidget.test.tsx` (vitest) — update: assert each bar's final `width` style matches fixture value (animation timing not testable in jsdom; assert settled state)
+- `tests/unit/dashboard/RecentActivityWidget.test.tsx` (vitest) — update: assert 5 rows; assert `data-testid="activity-dot"` per row
+- `tests/e2e/dashboard.spec.ts` (Playwright) — update: wait 700ms then check bar widths have settled to >0; hover a widget card and confirm lift; mobile stacks with separators visible
+
+#### Files Touched
+- `lib/data/dashboard.ts` — new fixture
+- `components/dashboard/Dashboard.tsx` — import from fixture, add ed-card-lift, mobile separator
+- `components/dashboard/ProgressWidget.tsx` — CSS bar animation, import layers from fixture
+- `components/dashboard/RecentActivityWidget.tsx` — expand to 5 rows, colored left-dot, import from fixture
+- `components/dashboard/NextLessonWidget.tsx` — import lesson via fixture pointer
+- `components/dashboard/DiagnosticScoreWidget.tsx` — import from fixture
+- `tests/unit/dashboard/Dashboard.test.tsx` — update
+- `tests/unit/dashboard/ProgressWidget.test.tsx` — update
+- `tests/unit/dashboard/RecentActivityWidget.test.tsx` — update
+- `tests/e2e/dashboard.spec.ts` — update
+
+#### Dependencies
+- UI-007 Shipped (dashboard widgets exist)
+- UI-008 Shipped (`lib/data/lessons.ts` fixture exists; NextLessonWidget reads from it)
+- MOCK-006 Shipped (ed-card-lift confirmed on shell surfaces)
+
+#### Notes
+- Benchmark: **Promova** — the dashboard is the first authenticated screen. It should feel like a capable personal tutor's dashboard, not a SaaS metrics board. Dense enough to feel alive; restrained enough to not overwhelm.
+- `lib/data/dashboard.ts` is hand-curated by Chadi before this session starts. Claude Code generates plausible values; Chadi reviews and edits before the PR merges.
+- ProgressWidget animation: `width` CSS transition on the bar element, initial width `0%`, target applied after `requestAnimationFrame`. Same approach as UI-007 / UI-015 bars — maintain consistency.
+- The 5 activity rows should cover: 2 lesson completions, 1 vocab session, 1 diagnostic tâche, 1 vocab test — representative of the product's three surfaces.
+
+---
+
+### MOCK-008 — L'École fixture flesh-out + lesson card/detail polish
+
+**Status:** Not Started
+**Branch:** `feat/mock-008-ecole-polish` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+**Benchmark:** Promova (lesson-card grid state treatments, lesson detail typography, content card design)
+
+#### Scope
+**In:**
+- `lib/data/lessons.ts` — flesh out all 27 lesson objects: add plausible French linguistics topic titles (e.g. "Leçon 7 : L'expression du doute", "Leçon 14 : La cause et la conséquence"), 1-sentence `description` per lesson, and a `cefr` field (provisionally `'B1'` for Fondations 1–16, `'B2'` for Approfondissement 17–27 — CON-XXX assigns real levels); do not invent 5-couche methodology rubric specifics that would need reconciliation; Chadi reviews all 27 titles before merge
+- `LessonCard`:
+  - State badge visual upgrade: "Terminée" → `--fp-sage` chip; "Disponible" → `--ed-accent` chip (white text, `font-weight: 600`); "Verrouillée" → `--ed-muted` text + lock icon (inline SVG, 16×16px) + card `opacity: 0.65`
+  - Card layout: number badge top-left, state badge top-right, title + description below
+  - Add `.ed-card-lift` to Disponible and Terminée cards (Verrouillée cards do not lift — they are locked)
+- `AudioPlayerPlaceholder` (on LessonDetail):
+  - Add a 15-bar static waveform thumbnail left of the play button (same approach as `WaveformPlaceholder` from UI-014, but static — no animation; `data-testid="lesson-waveform-bar"` per bar)
+  - Add a CEFR badge displaying the lesson's `cefr` field
+  - Static time label "12:34" styled more prominently (medium weight, `--ed-fg`)
+- `LessonDetail`:
+  - 3 content sections get 2-paragraph placeholder prose (general language-learning pedagogy tone; no invented 5-couche rubric)
+  - Keyboard arrow navigation: `ArrowRight` → `router.push('/ecole/<id+1>')`, `ArrowLeft` → `router.push('/ecole/<id-1>')` via `useEffect` keydown listener on `window`; boundary-safe (lesson 1 ignores left; lesson 27 ignores right)
+
+**Out:**
+- Real lesson titles and body content (CON-XXX)
+- Real audio (AI-XXX TTS)
+- Progress marking / completion state (BE-XXX)
+- Note-taking, highlights, bookmarks (defer)
+- Quiz at end of lesson (defer)
+
+#### Acceptance (Given/When/Then)
+1. **Given** `/ecole` loaded, **When** the lesson grid renders, **Then** lessons 1–3 show Terminée sage chips; lessons 4–6 show Disponible accent chips; lessons 7–27 show Verrouillée muted text + lock icon at reduced opacity.
+2. **Given** desktop, **When** a Disponible lesson card is hovered, **Then** it lifts 2px (ed-card-lift); a Verrouillée card does not change opacity further on hover.
+3. **Given** `/ecole/5` loaded, **When** the page renders, **Then** the audio placeholder shows 15 waveform bars, a CEFR badge, a styled "12:34" time label, and 2 paragraphs per content section.
+4. **Given** `/ecole/5` loaded, **When** the user presses `ArrowRight`, **Then** the router navigates to `/ecole/6`; pressing `ArrowLeft` navigates to `/ecole/4`.
+5. **Given** `/ecole/1` loaded, **When** the user presses `ArrowLeft`, **Then** nothing happens (boundary guard).
+
+#### Tests
+- `tests/unit/ecole/LessonCard.test.tsx` (vitest) — update: assert state badge text per state; assert lock icon present for Verrouillée (`data-testid="lesson-lock-icon"`); assert `.ed-card-lift` absent on Verrouillée card; assert `opacity: 0.65` style on Verrouillée
+- `tests/unit/ecole/LessonDetail.test.tsx` (vitest) — update: assert 15 bar elements (`data-testid="lesson-waveform-bar"`); assert CEFR badge; assert ArrowRight key event triggers `router.push` mock with correct path; assert ArrowLeft on lesson 1 does not trigger push
+- `tests/e2e/ecole-list.spec.ts` (Playwright) — update: first 3 cards show sage badge; card 4 shows accent badge; card 7 shows lock icon; hover card 4 lifts; Verrouillée card does not lift
+- `tests/e2e/ecole-detail.spec.ts` (Playwright) — update: waveform bars visible; ArrowRight navigates to next lesson; ArrowLeft boundary on lesson 1 does nothing
+
+#### Files Touched
+- `lib/data/lessons.ts` — update all 27 objects: titles, descriptions, cefr field
+- `components/ecole/LessonCard.tsx` — state badge upgrade, lock icon SVG, ed-card-lift, opacity
+- `components/ecole/LessonDetail.tsx` — 2-paragraph content, keyboard nav useEffect
+- `components/ecole/AudioPlayerPlaceholder.tsx` — waveform bars, CEFR badge prop, time label
+- `tests/unit/ecole/LessonCard.test.tsx` — update
+- `tests/unit/ecole/LessonDetail.test.tsx` — update
+- `tests/e2e/ecole-list.spec.ts` — update
+- `tests/e2e/ecole-detail.spec.ts` — update
+
+#### Dependencies
+- UI-008 Shipped (`lib/data/lessons.ts` + LessonCard + LessonList exist)
+- UI-009 Shipped (LessonDetail + AudioPlayerPlaceholder exist)
+- MOCK-006 Shipped (ed-card-lift on shell confirmed)
+
+#### Notes
+- Benchmark: **Promova** — Promova's lesson card grid is the gold standard: clean number badge, clear state distinction, generous card padding. The lock icon + opacity treatment signals unavailable content without being aggressive.
+- Lesson titles are placeholders. Chadi reviews all 27 before this PR merges. Claude Code generates plausible-sounding French linguistics topics; Chadi edits as needed.
+- Keyboard navigation uses `window.addEventListener('keydown', ...)` in `useEffect` with a cleanup `removeEventListener`. Do not attach to the component element directly — focus should not be required to trigger navigation.
+
+---
+
+### MOCK-009 — Le Vocabulaire fixture expansion + browse / practice / test polish
+
+**Status:** Not Started
+**Branch:** `feat/mock-009-vocab-polish` (FE, from `main`)
+**Effort:** 1 session (~4–5h)
+**Benchmark:** Airlearn (flashcard UX, quiz feedback presentation) + Promova (browse-view data density)
+
+#### Scope
+**In:**
+- `lib/data/chunks.ts` — expand from 30 to 60 hand-curated chunks; Chadi authors the 60 entries before the session (or Claude Code generates plausible FR/EN pairs spanning all 5 CEFR levels and all 5 source categories, and Chadi reviews before merge); each entry: `{ id, french, gloss, cefr, source }`
+- `VocabBrowse`:
+  - Header badge: dynamic count label reading `chunks.length` (e.g. "60 chunks")
+  - ChunkRow save icon: click toggles local `saved` boolean state — heart icon fills with `--ed-accent` on save, outlines on unsave; scale microanimation on toggle (scale 1 → 1.3 → 1, 150ms total); no persistence, no BE call
+  - `.ed-card-lift` on each ChunkRow (row becomes a lifted card surface)
+- `Flashcard` (practice view):
+  - Full 3D flip: `perspective(1000px) rotateY(180deg)` CSS transform with `backface-visibility: hidden` on both face elements; 300ms `var(--ed-ease)` — Airlearn-style card turn
+  - Front face: French chunk at 28px `SERIF_FONT`; CEFR badge + source pill below in `SANS_FONT`
+  - Back face: English gloss at 28px `SERIF_FONT`; French chunk repeated at 16px above for reference
+  - Card surface: `var(--ed-paper)` background, 1px `var(--ed-rule)` border, 12px radius, 32px padding desktop / 24px mobile
+- `PracticeActions`:
+  - "À revoir" button: `--fp-blush` chip (warm signal)
+  - "Connu" button: `--fp-sage` chip (positive signal)
+  - "Suivant" (center, primary): `--ed-accent` background + `ed-btn-press`
+- `QuizQuestion` (test view):
+  - Choice cards: full-width, 12px radius, 1px `var(--ed-rule)` border; selected state: `--ed-accent` 4px left-border accent
+  - Correct feedback: `--fp-sage` left-border; incorrect: `--fp-blush` left-border (border-only — no fills per editorial restraint)
+  - "Question suivante" button: delayed 250ms fade-in after Submit (user processes feedback before advancing); implemented as `setTimeout` + `useState` with `vi.useFakeTimers()` in tests
+- `QuizResults`:
+  - Score in display typography: `n/10` at large size, `SERIF_FONT`
+  - Flavor copy by score range: 8–10 → "Excellent. Votre réservoir lexical est solide."; 5–7 → "Bien. Continuez à pratiquer."; ≤4 → "À revoir. Répétez la pratique régulièrement."
+
+**Out:**
+- Real save persistence (BE-XXX)
+- Spaced-repetition deck selection (AI-XXX)
+- Audio playback per chunk (AI-XXX)
+- Server-side quiz generation (BE-XXX)
+- More than 10 quiz questions (defer to BE-XXX)
+
+#### Acceptance (Given/When/Then)
+1. **Given** `/vocabulaire` loaded, **When** the browse view renders, **Then** 60 chunk rows are visible and the header badge reads "60 chunks".
+2. **Given** a ChunkRow save icon clicked, **When** the icon state toggles, **Then** the heart fills with accent color and scales to 1.3 then back to 1 (150ms total); a second click reverses both.
+3. **Given** `/vocabulaire/practice` with the Flashcard in front state, **When** the card is clicked, **Then** it rotates on the Y axis via 3D CSS transform; the back face shows the English gloss at 28px serif.
+4. **Given** quiz Submit clicked on an incorrect answer, **When** feedback renders, **Then** the wrong choice shows `--fp-blush` left-border, the correct choice shows `--fp-sage` left-border, and "Question suivante" becomes visible after 250ms (not instantly).
+5. **Given** a final score of 4/10 at quiz end, **When** QuizResults renders, **Then** "4 / 10" and the "À revoir" flavor copy are both visible.
+6. **Given** mobile 375px at `/vocabulaire/practice`, **When** the Flashcard renders, **Then** it is full-width with 24px padding and the 3 action buttons are each ≥44px tall.
+
+#### Tests
+- `tests/unit/vocabulaire/VocabBrowse.test.tsx` (vitest) — update: assert 60 rows render; header badge shows "60 chunks"; save icon click adds filled class to icon
+- `tests/unit/vocabulaire/Flashcard.test.tsx` (vitest) — update: assert front face text at 28px (inline style); after click assert back-face visible with gloss text; assert 3D transform class applied
+- `tests/unit/vocabulaire/QuizQuestion.test.tsx` (vitest) — update: after Submit with wrong answer, assert `--fp-blush` border class on wrong choice and `--fp-sage` on correct; assert "Question suivante" not visible at t=0, visible after `vi.advanceTimersByTime(250)`
+- `tests/unit/vocabulaire/QuizResults.test.tsx` — new: assert `"4 / 10"` renders for score 4; assert correct flavor copy for each of the 3 score ranges
+- `tests/e2e/vocabulaire-browse.spec.ts` (Playwright) — update: 60 rows visible; save icon click toggles fill; ChunkRow hover lifts
+- `tests/e2e/vocabulaire-practice.spec.ts` (Playwright) — update: card flip 3D transform visible; action button chip colors correct; mobile card full-width
+- `tests/e2e/vocabulaire-test.spec.ts` (Playwright) — update: feedback borders correct; "Question suivante" visible after short wait; results flavor copy matches score range
+
+#### Files Touched
+- `lib/data/chunks.ts` — expand to 60 entries
+- `components/vocabulaire/VocabBrowse.tsx` — count badge, ed-card-lift on rows
+- `components/vocabulaire/ChunkRow.tsx` — save icon toggle state + microanimation
+- `components/vocabulaire/Flashcard.tsx` — 3D flip transform, face typography, card surface
+- `components/vocabulaire/PracticeActions.tsx` — chip color treatments
+- `components/vocabulaire/QuizQuestion.tsx` — choice border accents, feedback colors, "Question suivante" delayed fade-in
+- `components/vocabulaire/QuizResults.tsx` — display typography score, flavor copy variants
+- `tests/unit/vocabulaire/VocabBrowse.test.tsx` — update
+- `tests/unit/vocabulaire/Flashcard.test.tsx` — update
+- `tests/unit/vocabulaire/QuizQuestion.test.tsx` — update
+- `tests/unit/vocabulaire/QuizResults.test.tsx` — new
+- `tests/e2e/vocabulaire-browse.spec.ts` — update
+- `tests/e2e/vocabulaire-practice.spec.ts` — update
+- `tests/e2e/vocabulaire-test.spec.ts` — update
+
+#### Dependencies
+- UI-010 Shipped (VocabBrowse + chunks fixture exist)
+- UI-011 Shipped (Flashcard + PracticeActions exist)
+- UI-012 Shipped (QuizQuestion + QuizResults exist)
+- MOCK-006 Shipped (ed-card-lift confirmed)
+
+#### Notes
+- Benchmark: **Airlearn** for flashcard / quiz surfaces; **Promova** for browse-view data density.
+- 60 chunks is the target. If the fixture hasn't been reviewed by Chadi before session start, Claude Code generates 30 plausible additions (the original 30 are baseline); Chadi reviews before merge. Do NOT block the session waiting for all 60 to be final.
+- 3D card flip requires `transform-style: preserve-3d` on the card container and `backface-visibility: hidden` on both face elements. Test in both Chromium and Firefox (Playwright covers both by default).
+- "Question suivante" delayed fade-in (250ms) is intentional — it gives the user a beat to process the feedback. Implement as `setTimeout` + `useState(false)`; `vi.useFakeTimers()` in unit tests.
+
+---
+
+### MOCK-010 — Le Diagnostic landing + tâche shell polish
+
+**Status:** Not Started
+**Branch:** `feat/mock-010-diagnostic-tache-polish` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+**Benchmark:** Airlearn (recording UI, timer urgency states, assessment-surface typography)
+
+#### Scope
+**In:**
+- `DiagnosticLanding`:
+  - Tâche overview cards: add a 4px left accent bar per tâche (`--fp-lavender` for Tâche 1, `--fp-sky` for Tâche 2, `--fp-peach` for Tâche 3) on the white card body — decorative chip per F-200 color hierarchy
+  - "Commencer le diagnostic" CTA: add `.ed-btn-press` + a right-arrow inline SVG beside the label
+  - Past-score panel: upgrade to dismissible — a × button sets local `dismissed` boolean state (no persistence; re-appears on page reload); visual only
+  - `<RevealOnScroll>` on the "Pourquoi un diagnostic ?" paragraphs
+- `Timer`:
+  - Urgency state: when `secondsLeft < 60` and timer is running, `MM:SS` display color shifts to `--fp-blush`; at `secondsLeft === 0` shifts to `--ed-muted`
+  - Display font size upgrade: 32px `SANS_FONT` tabular-nums (`font-variant-numeric: tabular-nums`) — reads like a real exam timer
+  - Start button: `--ed-accent` background fill + `ed-btn-press`; Pause button: `--ed-accent` border + text (outlined variant)
+- `RecordingPlaceholder`:
+  - Recording state: 2 concentric ripple rings radiating outward from the mic button (CSS `@keyframes` scale 1→2, opacity 1→0, 0.8s stagger between rings, infinite — Airlearn recording-active signature); respects `prefers-reduced-motion` (no animation if set)
+  - Status text: `SANS_FONT`, `--ed-muted` color; Recording state adds a 2px blinking dot (`--fp-blush`, 1s blink interval, `prefers-reduced-motion` suppressed) beside the text
+  - Réécouter / Recommencer buttons in Stopped state: pill style with `var(--ed-rule)` border
+- `WaveformPlaceholder`: verify color transition between active/inactive states is exactly 200ms (from `app/globals.css` `.waveform-bar` definition); likely no code change needed — just confirm
+
+**Out:**
+- Real audio (AI-XXX)
+- Real timer auto-submit on elapsed (out of scope)
+- Mic permission pre-flight modal (defer to AI-XXX)
+- Re-take limits / attempt counters (defer)
+
+#### Acceptance (Given/When/Then)
+1. **Given** `/diagnostic/tache/1`, timer started and running, **When** `secondsLeft` reaches 59, **Then** the timer display color shifts to the urgency color (`--fp-blush` value inspected via computed style).
+2. **Given** the RecordingPlaceholder in Recording state, **When** rendered, **Then** 2 ripple ring elements (`data-testid="recording-ripple"`) are present in the DOM with the animation class.
+3. **Given** `prefers-reduced-motion: reduce`, **When** the mic button is in Recording state, **Then** the ripple elements have no animation applied (animation-name resolves to `"none"`).
+4. **Given** `/diagnostic` loaded with the past-score panel visible, **When** the × button is clicked, **Then** the panel is no longer in the DOM.
+5. **Given** desktop, **When** a tâche card is inspected, **Then** a left accent bar element (`data-testid="tache-card-accent-bar"`) is present with the correct per-tâche `--fp-*` color.
+
+#### Tests
+- `tests/unit/diagnostic/Timer.test.tsx` (vitest) — update: advance timer via `vi.advanceTimersByTime` to 59s remaining, assert urgency CSS class applied; advance to 0, assert elapsed color class
+- `tests/unit/diagnostic/RecordingPlaceholder.test.tsx` (vitest) — update: in Recording state, assert 2 elements with `data-testid="recording-ripple"`; assert ripple class absent when component rendered with a reduced-motion mock
+- `tests/unit/diagnostic/DiagnosticLanding.test.tsx` (vitest) — update: assert past-score × button (`data-testid="past-score-dismiss"`); clicking it removes panel from DOM; assert tâche cards have `data-testid="tache-card-accent-bar"`
+- `tests/e2e/diagnostic-tache.spec.ts` (Playwright) — update: timer color change at <60s; ripple rings visible in Recording state; reduced-motion suppresses ripple
+- `tests/e2e/diagnostic-landing.spec.ts` (Playwright) — update: past-score × dismisses panel; tâche card accent bars visible with correct colors
+
+#### Files Touched
+- `components/diagnostic/DiagnosticLanding.tsx` — RevealOnScroll on persona paragraphs, CTA arrow
+- `components/diagnostic/TacheCard.tsx` — left accent bar element + per-tâche color prop
+- `components/diagnostic/PastScorePanel.tsx` — add × dismiss button + local dismissed state
+- `components/diagnostic/Timer.tsx` — urgency color state (CSS class toggle), display font size, button styles
+- `components/diagnostic/RecordingPlaceholder.tsx` — ripple rings, blinking dot, Stopped-state pill buttons
+- `app/globals.css` — add `@keyframes recording-ripple` and `@keyframes blink-dot` with `prefers-reduced-motion` guards
+- `tests/unit/diagnostic/Timer.test.tsx` — update
+- `tests/unit/diagnostic/RecordingPlaceholder.test.tsx` — update
+- `tests/unit/diagnostic/DiagnosticLanding.test.tsx` — update
+- `tests/e2e/diagnostic-tache.spec.ts` — update
+- `tests/e2e/diagnostic-landing.spec.ts` — update
+
+#### Dependencies
+- UI-013 Shipped (DiagnosticLanding + TacheCard + PastScorePanel exist)
+- UI-014 Shipped (Timer + RecordingPlaceholder exist)
+- MOCK-006 Shipped (motion conventions confirmed across shell)
+
+#### Notes
+- Benchmark: **Airlearn** — the concentric ripple rings during active recording are Airlearn's visual signature for the mic-active state. 2 rings, radiating outward, opacity fade, 0.8s stagger. Keep it tasteful — this is an exam tool, not a live-streaming interface.
+- Per-tâche pastel accent bars (`--fp-lavender` / `--fp-sky` / `--fp-peach`) use the F-200 decorative chip layer — they are NOT structural chrome. The card body remains `--ed-paper` white.
+- Timer urgency at <60s is a deliberate beta-feedback probe: does the user feel urgency? Does the color signal feel right? This is hard to validate without a real UI in front of real users.
+
+---
+
+### MOCK-011 — Le Diagnostic results polish
+
+**Status:** Not Started
+**Branch:** `feat/mock-011-diagnostic-results-polish` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+**Benchmark:** Airlearn (feedback card presentation, score visualization, post-assessment UX)
+
+#### Scope
+**In:**
+- `Results.tsx` header block:
+  - Score "C1" at 72px `SERIF_FONT`, `--ed-fg`; sub-line "Niveau estimé TCF Canada" at 14px `SANS_FONT` `--ed-muted`; date stamp at 12px `--ed-muted`
+  - CEFR pill beside the score: background color mapped to CEFR band — `C1`/`C2` → `--fp-sage`; `B2` → `--fp-sky`; `B1` → `--fp-butter`; `A1`/`A2` → `--fp-blush`; define this mapping as a constant (`CEFR_PASTEL_MAP`) in `lib/data/` for reuse across surfaces
+  - Score block mount animation: `opacity 0 → 1` + `scale(0.96) → scale(1)` over 400ms; respects `prefers-reduced-motion`
+- `CouchesBreakdown`:
+  - Bar fill animation on mount: CSS `transition: width 600ms var(--ed-ease) both` from 0% to target (same approach as MOCK-007 ProgressWidget)
+  - Desktop hover: show a tooltip (`<div>` absolutely positioned) with the full `gloss` sentence on mouse-enter, hide on mouse-leave; mobile: gloss text always visible inline below the bar (no hover state required)
+  - CEFR badge color: apply `CEFR_PASTEL_MAP` constant
+- `TacheSummary`:
+  - Feedback text expanded: each of 3 rows gets 2–3 sentences of placeholder evaluator-style notes (general oral fluency observations; no invented rubric specifics)
+  - "Réécouter" button: pill style with `var(--ed-rule)` border + speaker inline SVG; `cursor: not-allowed` and `opacity: 0.5` (visual-only, not wired)
+- `RecommendationsStub`:
+  - Each row upgraded to a card: `var(--ed-paper)` surface, 1px `var(--ed-rule)` border, 8px radius, `.ed-card-lift` on hover
+  - Left: a 36×36px circular layer-chip badge with 2-character initials (LF / MI / LM / RA / LV) using `--fp-*` token per layer; `SANS_FONT`, white text, `font-weight: 600`
+  - Right: suggestion sentence + CTA pill button (`--ed-accent` background, `ed-btn-press`, 4px radius)
+- Bottom action row: "Recommencer le diagnostic" gets a loop/restart inline SVG icon; "Retour au tableau de bord" styled as secondary outlined (`--ed-accent` border + text, no fill)
+
+**Out:**
+- Real scoring data (AI-XXX 2-pass Diagnostic)
+- Per-layer drill-down view (defer)
+- PDF / shareable export (defer)
+- Historical comparison (defer; requires BE history endpoint)
+- Recharts visualization (CSS bars only here)
+
+#### Acceptance (Given/When/Then)
+1. **Given** `/diagnostic/results` loaded, **When** the header mounts, **Then** the score "C1" enters with scale 0.96→1 + opacity 0→1 (400ms); the CEFR pill shows `--fp-sage` background.
+2. **Given** desktop, **When** CouchesBreakdown mounts, **Then** bars animate from 0% to target width (Playwright: evaluate after 700ms); hovering a couche row shows the gloss tooltip.
+3. **Given** mobile 375px, **When** CouchesBreakdown renders, **Then** gloss sentences are always visible inline (not behind a hover state); bars are full-width single-column.
+4. **Given** the RecommendationsStub on desktop, **When** rendered, **Then** each of the 3 rows is a card with a 36px layer-chip badge, suggestion text, and a CTA pill; hovering lifts the card.
+5. **Given** `prefers-reduced-motion: reduce`, **When** `/diagnostic/results` loads, **Then** no bar fill animation, no score scale/opacity animation, and no card hover-lift transition fires.
+
+#### Tests
+- `tests/unit/diagnostic/Results.test.tsx` (vitest) — update: assert CEFR pill element (`data-testid="results-cefr-pill"`) with expected token class; assert score entry animation class present; assert TacheSummary rows have 2+ sentence feedback
+- `tests/unit/diagnostic/CouchesBreakdown.test.tsx` (vitest) — update: assert each bar has `transition` in its inline style; assert gloss element is in DOM (always present — tooltip visibility is CSS/JS, but the DOM node exists); assert CEFR badge has correct token class from `CEFR_PASTEL_MAP`
+- `tests/unit/diagnostic/RecommendationsStub.test.tsx` (vitest) — update: assert layer-chip badge per row (`data-testid="recommendation-chip"`); assert chip initials correct (LF / MI / LM / RA / LV); assert CTA has `ed-btn-press` class; assert card has `.ed-card-lift`
+- `tests/e2e/diagnostic-results.spec.ts` (Playwright) — update: wait 700ms then check bar widths settled; hover couche row and confirm tooltip visible; CEFR pill color; mobile gloss always visible without hover; reduced-motion prevents animation
+
+#### Files Touched
+- `lib/data/cefr.ts` — new: export `CEFR_PASTEL_MAP` constant (record of CEFR level → `--fp-*` CSS variable name)
+- `components/diagnostic/Results.tsx` — score block animation, CEFR pill (using map), action button styling
+- `components/diagnostic/CouchesBreakdown.tsx` — bar animation, tooltip (desktop) / inline gloss (mobile), CEFR badge colors via map
+- `components/diagnostic/TacheSummary.tsx` — expanded 2–3 sentence feedback, "Réécouter" pill styling
+- `components/diagnostic/RecommendationsStub.tsx` — card surface, layer-chip badge, CTA pill
+- `tests/unit/diagnostic/Results.test.tsx` — update
+- `tests/unit/diagnostic/CouchesBreakdown.test.tsx` — update
+- `tests/unit/diagnostic/RecommendationsStub.test.tsx` — update
+- `tests/e2e/diagnostic-results.spec.ts` — update
+
+#### Dependencies
+- UI-015 Shipped (all Results components exist)
+- MOCK-010 Shipped (diagnostic motion vocabulary established)
+
+#### Notes
+- Benchmark: **Airlearn** — the results page is where Airlearn's feedback presentation excels. Each feedback sentence should feel evaluator-authored, not algorithmic. The recommendation card (chip + suggestion + CTA) mirrors Airlearn's "what to do next" pattern.
+- `CEFR_PASTEL_MAP` in `lib/data/cefr.ts` will be reused in MOCK-008 (lesson CEFR badges), MOCK-009 (chunk CEFR badges in practice), and potentially by BE-XXX scoring responses. Define it once here; import everywhere else.
+- Score entry animation (scale + opacity, 400ms) is subtle — the reveal should feel earned, not flashy. 400ms is the max; do not lengthen it.
+- TacheSummary feedback text: 2–3 sentence general oral fluency notes. Do not invent TCF Canada rubric scoring language. Phrases like "Votre débit était adapté au contexte" are fine; "Vous avez atteint le niveau B2 selon le critère de cohérence pragmatique" are not — they would need reconciliation with AI-XXX.
+
+---
+
+### MOCK-012 — Global motion pass + PWA manifest
+
+**Status:** Not Started
+**Branch:** `feat/mock-012-motion-pwa` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+**Benchmark:** Shared standard (all three benchmarks share: slow confident motion, mobile-native feel, PWA installability)
+
+#### Scope
+**In:**
+- **Motion consistency audit** — review every animated element added in MOCK-001 through MOCK-011; confirm timing values use `ED_DUR` / `ED_EASE_CUBIC` tokens from `lib/motion.ts` rather than raw millisecond literals; fix any deviations; document any intentional exception in a brief code comment
+- **Global `prefers-reduced-motion` audit** — Playwright `{ reducedMotion: 'reduce' }` context visiting all 9 key routes (`/`, `/ecole/3`, `/vocabulaire`, `/vocabulaire/practice`, `/vocabulaire/test`, `/dashboard`, `/diagnostic`, `/diagnostic/tache/1`, `/diagnostic/results`); assert no animation fires on known animated elements across those routes
+- **Touch target audit** — Playwright mobile (375×667) across the same 9 routes; enumerate all `button`, `a[href]`, and `[role="button"]` elements; assert each reports `height ≥ 44 && width ≥ 44` via `getBoundingClientRect()`; fix any failing elements in this entry
+- **PWA manifest** — `public/manifest.json` with: `name: "Le Méthodic"`, `short_name: "Méthodic"`, `start_url: "/"`, `display: "standalone"`, `background_color` (hex of `--ed-bg`), `theme_color` (hex of `--ed-accent`), `icons` array with placeholder 192×192 and 512×512 PNGs in `public/icons/`; linked from `app/layout.tsx` via `<link rel="manifest" href="/manifest.json">`
+- **Theme color meta** — `<meta name="theme-color" content="<ed-accent-hex>">` in `app/layout.tsx`; browser chrome matches app accent on Android / iOS Safari
+- **Viewport meta** — verify `<meta name="viewport">` includes `viewport-fit=cover`; add if missing (required for iPhone notch safe-area-inset handling on fixed/sticky elements)
+
+**Out:**
+- Capacitor native wrap (P1+ — out of scope for Section 2; PWA manifest is the foundation layer before the native wrap)
+- Service worker / offline mode (defer to Section 7 launch prep)
+- Real app icon artwork (placeholder solid-color PNGs are fine here; final artwork is Section 7)
+- Push notification manifest fields (defer — no push feature yet)
+- Full Lighthouse audit (Section 7 gate — target scores not enforced here)
+
+#### Acceptance (Given/When/Then)
+1. **Given** `prefers-reduced-motion: reduce` set in Playwright context, **When** each of the 9 key routes is visited, **Then** no CSS animation or transition fires on known animated elements (verified via `getComputedStyle(el).animationName === 'none'` and `transitionDuration === '0s'` on elements identified by `data-testid`).
+2. **Given** mobile 375×667 in Playwright, **When** every `button`, `a[href]`, and `[role="button"]` element is measured across the 9 key routes, **Then** all report ≥44×44px via `getBoundingClientRect()`.
+3. **Given** `GET /manifest.json`, **When** the response is fetched, **Then** it returns valid JSON containing `name`, `short_name`, `start_url`, `display: "standalone"`, and at least 2 icon entries.
+4. **Given** `app/layout.tsx`, **When** the `<head>` is inspected, **Then** `<link rel="manifest" href="/manifest.json">`, `<meta name="theme-color">`, and a `<meta name="viewport">` tag containing `viewport-fit=cover` are all present.
+
+#### Tests
+- `tests/e2e/reduced-motion.spec.ts` (Playwright) — new: a dedicated `{ reducedMotion: 'reduce' }` project (add to `playwright.config.ts`) visits all 9 routes; asserts `animationName === 'none'` on the key animated elements from MOCK-001–011 (identified by `data-testid`)
+- `tests/e2e/touch-targets.spec.ts` (Playwright) — new: mobile viewport; for each of the 9 routes, query all interactive elements and assert height ≥ 44 AND width ≥ 44 via `getBoundingClientRect()`; build a reusable `getAllInteractiveElements(page)` helper in `tests/helpers/`
+- `tests/unit/pwa/manifest.test.ts` (vitest) — new: `import manifest from '../../../public/manifest.json'`; assert `name`, `short_name`, `start_url`, `display === 'standalone'`, `icons.length ≥ 2`
+- `tests/e2e/layout.spec.ts` (Playwright) — new: load `/`, assert `<link rel="manifest">` in document head; assert `<meta name="theme-color">` present; assert viewport meta contains `viewport-fit=cover`
+
+#### Files Touched
+- `public/manifest.json` — new
+- `public/icons/icon-192.png` — new placeholder (solid-color PNG, `--ed-accent` hex fill)
+- `public/icons/icon-512.png` — new placeholder
+- `app/layout.tsx` — manifest link, theme-color meta, viewport-fit=cover on existing viewport meta
+- `lib/motion.ts` — token alignment fixes only if audit reveals deviations (no new exports expected)
+- `app/globals.css` — timing literal cleanup if audit reveals deviations
+- `playwright.config.ts` — add `reducedMotion: 'reduce'` project variant
+- `tests/helpers/interactiveElements.ts` — new reusable helper
+- `tests/e2e/reduced-motion.spec.ts` — new
+- `tests/e2e/touch-targets.spec.ts` — new
+- `tests/unit/pwa/manifest.test.ts` — new
+- `tests/e2e/layout.spec.ts` — new
+
+#### Dependencies
+- All MOCK-001 through MOCK-011 must be Shipped (this is the audit + cleanup pass over all their outputs)
+
+#### Notes
+- Benchmark: **Shared standard** — all three benchmarks (Wispr / Promova / Airlearn) share mobile-native feel and restrained motion. MOCK-012 enforces that shared floor across every surface.
+- `display: "standalone"` makes the app installable on iOS/Android and removes the browser address bar — this is the foundation for the mobile-browser app-native feel goal before the Capacitor wrap (P1+). The PWA must feel app-native first.
+- Touch target audit: the 44px threshold follows Apple HIG and Google Material guidance. The test will initially fail on some elements — fix those elements in this entry rather than adjusting the threshold. Do not widen the threshold.
+- Placeholder icons: generate a solid `--ed-accent` fill PNG via Canvas API script or any simple tool. Final artwork is a Section 7 / design deliverable. The manifest must reference real, non-404 files.
+- `viewport-fit=cover` is required for iPhone X+ notch (safe-area-inset) handling on fixed/sticky elements (sidebar, sticky header). Without it, content can be obscured on newer iPhones.
+- If any `app/ecole` subroutes remain outside the `(app)` route group (route debt from pre-UI-008 era), flag them in the PR description during the motion audit. Do not migrate them in this entry.
 
 ---
 

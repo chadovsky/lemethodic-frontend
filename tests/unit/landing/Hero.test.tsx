@@ -35,4 +35,34 @@ describe('Hero', () => {
     render(<Hero />)
     expect(screen.getByRole('region', { name: /hero/i })).toBeInTheDocument()
   })
+
+  // MOCK-001 — RotatingKicker integration
+  it('renders the kicker container', () => {
+    render(<Hero />)
+    expect(screen.getByTestId('hero-kicker')).toBeInTheDocument()
+  })
+
+  it('kicker contains at least one of the 4 exam names', () => {
+    render(<Hero />)
+    const kicker = screen.getByTestId('hero-kicker')
+    const text = kicker.textContent ?? ''
+    const EXAM_NAMES = ['TCF', 'TEF', 'DELF', 'DALF']
+    expect(EXAM_NAMES.some((name) => text.includes(name))).toBe(true)
+  })
+
+  // MOCK-001 — animation class assertions
+  it('headline carries ed-hero-rise', () => {
+    render(<Hero />)
+    expect(screen.getByRole('heading', { level: 1 })).toHaveClass('ed-hero-rise')
+  })
+
+  it('subheadline carries ed-hero-rise-delay-2', () => {
+    render(<Hero />)
+    expect(screen.getByTestId('hero-subheadline')).toHaveClass('ed-hero-rise-delay-2')
+  })
+
+  it('CTA wrapper carries ed-hero-rise-delay-3', () => {
+    render(<Hero />)
+    expect(screen.getByTestId('hero-cta-wrapper')).toHaveClass('ed-hero-rise-delay-3')
+  })
 })
