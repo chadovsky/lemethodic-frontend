@@ -1108,8 +1108,8 @@ None. This is the first UI shell — no upstream blockers.
 
 ### MOCK-002 — Landing animated demo section
 
-**Status:** Not Started — **BLOCKED on pre-work**
-**Branch:** `feat/mock-002-landing-demo` (FE, from `main`)
+**Status:** Shipped — squash-merged b710185
+**Branch:** `feat/mock-002-animated-demo` (FE, from `main`)
 **Effort:** 1 session (~4–5h) — blocked until pre-work delivered
 **Benchmark:** Wispr Flow (product-in-use demo reveal on scroll)
 

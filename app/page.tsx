@@ -4,6 +4,7 @@
 import Hero from '@/components/landing/Hero'
 import PersonaMatch from '@/components/landing/PersonaMatch'
 import MethodologyPreview from '@/components/landing/MethodologyPreview'
+import ProductDemo from '@/components/landing/ProductDemo'
 import PricingTeaser from '@/components/landing/PricingTeaser'
 import Footer from '@/components/landing/Footer'
 import type { Metadata } from 'next'
@@ -24,6 +25,7 @@ export default function Home() {
         <Hero />
         <PersonaMatch />
         <MethodologyPreview />
+        <ProductDemo />
         <PricingTeaser />
       </main>
       <Footer />

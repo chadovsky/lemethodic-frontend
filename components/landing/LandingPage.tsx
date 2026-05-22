@@ -27,6 +27,7 @@ import ProblemSection from './sections/ProblemSection'
 import DifferentiationSection from './sections/DifferentiationSection'
 import HowItWorksSection from './sections/HowItWorksSection'
 import PricingSection from './sections/PricingSection'
+import ProductDemo from './ProductDemo'
 import MethodologySection from './sections/MethodologySection'
 import FAQSection from './sections/FAQSection'
 import FinalCTASection from './sections/FinalCTASection'
@@ -82,6 +83,7 @@ export default function LandingPage({ lang }: LandingPageProps) {
           from drill platforms?" — same content as F-202 /ecole/intro
           Section 2 in compressed glance-form. */}
       <MethodologySection lang={lang} />
+      <ProductDemo />
       <HowItWorksSection lang={lang} />
       <PricingSection lang={lang} />
       <FAQSection lang={lang} />
