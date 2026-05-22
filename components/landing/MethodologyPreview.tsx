@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { SANS_FONT } from '@/lib/typography'
+import RevealOnScroll from '@/components/landing/RevealOnScroll'
 import CouchesLayer from './CouchesLayer'
 
 const COUCHES = [
@@ -8,30 +9,35 @@ const COUCHES = [
     description:
       'The structural backbone of every oral response: a clear position, developed argument, and grounded conclusion.',
     backgroundColor: '#D4CBBA',
+    accentColor: 'var(--fp-peach)',
   },
   {
     name: 'Les Moules des Idées',
     description:
       'Ready-made idea frameworks that let you generate relevant content instantly, without relying on memorized topics.',
     backgroundColor: '#DDD6C4',
+    accentColor: 'var(--fp-sage)',
   },
   {
     name: 'Les Moules',
     description:
       'Sentence-level grammar templates that package your ideas into natural, examiner-recognized French structures.',
     backgroundColor: '#E6E0D3',
+    accentColor: 'var(--fp-butter)',
   },
   {
     name: 'Les Réflexes Anglais',
     description:
       'A targeted inventory of anglophone interference patterns — the syntax, register, and reflex traps that cost English speakers points.',
     backgroundColor: '#EEE9DF',
+    accentColor: 'var(--fp-lavender)',
   },
   {
     name: 'La Voix',
     description:
       'Prosody, pacing, and hesitation management: the delivery layer that carries your method into the examiner’s scoring grid.',
     backgroundColor: '#F5F1EA',
+    accentColor: 'var(--fp-sky)',
   },
 ]
 
@@ -52,32 +58,36 @@ export default function MethodologyPreview() {
             'clamp(64px, 10vw, 120px) clamp(24px, 5vw, 80px) clamp(32px, 4vw, 48px)',
         }}
       >
-        <h2
-          id="methodology-heading"
-          className="text-balance"
-          style={{
-            fontFamily: SANS_FONT,
-            fontWeight: 600,
-            fontSize: 'clamp(1.5rem, 2.5vw, 2rem)',
-            lineHeight: 1.2,
-            letterSpacing: '-0.015em',
-            color: 'var(--text-primary)',
-            margin: 0,
-          }}
-        >
-          The 5-Couche Method
-        </h2>
+        <RevealOnScroll>
+          <h2
+            id="methodology-heading"
+            className="text-balance"
+            style={{
+              fontFamily: SANS_FONT,
+              fontWeight: 600,
+              fontSize: 'clamp(1.5rem, 2.5vw, 2rem)',
+              lineHeight: 1.2,
+              letterSpacing: '-0.015em',
+              color: 'var(--text-primary)',
+              margin: 0,
+            }}
+          >
+            The 5-Couche Method
+          </h2>
+        </RevealOnScroll>
       </div>
 
       <div data-testid="couches-stack">
         {COUCHES.map((couche, i) => (
-          <CouchesLayer
-            key={couche.name}
-            number={i + 1}
-            name={couche.name}
-            description={couche.description}
-            backgroundColor={couche.backgroundColor}
-          />
+          <RevealOnScroll key={couche.name} delay={i * 0.05}>
+            <CouchesLayer
+              number={i + 1}
+              name={couche.name}
+              description={couche.description}
+              backgroundColor={couche.backgroundColor}
+              accentColor={couche.accentColor}
+            />
+          </RevealOnScroll>
         ))}
       </div>
 

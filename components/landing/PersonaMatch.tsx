@@ -1,4 +1,5 @@
 import { SANS_FONT } from '@/lib/typography'
+import RevealOnScroll from '@/components/landing/RevealOnScroll'
 import ExamSpecificIcon from './icons/ExamSpecificIcon'
 import EnglishSpeakersIcon from './icons/EnglishSpeakersIcon'
 import MethodBasedIcon from './icons/MethodBasedIcon'
@@ -61,43 +62,46 @@ export default function PersonaMatch() {
           className="grid grid-cols-1 lg:grid-cols-3"
           style={{ gap: 'clamp(32px, 4vw, 48px)' }}
         >
-          {COLUMNS.map(({ Icon, heading, body }) => (
-            <div key={heading} data-testid="persona-column">
-              <div
-                style={{
-                  color: 'var(--accent-primary)',
-                  marginBottom: 20,
-                }}
-              >
-                <Icon />
+          {COLUMNS.map(({ Icon, heading, body }, idx) => (
+            <RevealOnScroll key={heading} delay={idx * 0.1}>
+              <div data-testid="persona-column">
+                <div
+                  data-testid={`persona-icon-${idx + 1}`}
+                  style={{
+                    color: 'var(--accent-primary)',
+                    marginBottom: 20,
+                  }}
+                >
+                  <Icon />
+                </div>
+                <h3
+                  style={{
+                    fontFamily: SANS_FONT,
+                    fontWeight: 600,
+                    fontSize: 'clamp(1rem, 1.4vw, 1.125rem)',
+                    lineHeight: 1.3,
+                    letterSpacing: '-0.01em',
+                    color: 'var(--text-primary)',
+                    margin: 0,
+                    marginBottom: 10,
+                  }}
+                >
+                  {heading}
+                </h3>
+                <p
+                  style={{
+                    fontFamily: SANS_FONT,
+                    fontWeight: 400,
+                    fontSize: '0.9375rem',
+                    lineHeight: 1.6,
+                    color: 'var(--text-muted)',
+                    margin: 0,
+                  }}
+                >
+                  {body}
+                </p>
               </div>
-              <h3
-                style={{
-                  fontFamily: SANS_FONT,
-                  fontWeight: 600,
-                  fontSize: 'clamp(1rem, 1.4vw, 1.125rem)',
-                  lineHeight: 1.3,
-                  letterSpacing: '-0.01em',
-                  color: 'var(--text-primary)',
-                  margin: 0,
-                  marginBottom: 10,
-                }}
-              >
-                {heading}
-              </h3>
-              <p
-                style={{
-                  fontFamily: SANS_FONT,
-                  fontWeight: 400,
-                  fontSize: '0.9375rem',
-                  lineHeight: 1.6,
-                  color: 'var(--text-muted)',
-                  margin: 0,
-                }}
-              >
-                {body}
-              </p>
-            </div>
+            </RevealOnScroll>
           ))}
         </div>
       </div>

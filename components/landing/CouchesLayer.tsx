@@ -5,15 +5,19 @@ interface CouchesLayerProps {
   name: string
   description: string
   backgroundColor: string
+  accentColor: string
 }
 
-export default function CouchesLayer({ number, name, description, backgroundColor }: CouchesLayerProps) {
+export default function CouchesLayer({ number, name, description, backgroundColor, accentColor }: CouchesLayerProps) {
   return (
     <div
       data-testid="couche-layer"
+      data-layer={name}
+      className="ed-card-lift"
       style={{
         backgroundColor,
         borderBottom: '1px solid var(--rule-default)',
+        borderLeft: `3px solid ${accentColor}`,
       }}
     >
       <div

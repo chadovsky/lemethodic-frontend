@@ -29,6 +29,31 @@ test.describe('PersonaMatch section — desktop (1280×800)', () => {
     await heading.scrollIntoViewIfNeeded()
     await expect(heading).toBeVisible()
   })
+
+  // MOCK-003 — editorial icons visible on desktop
+  test('persona icons 1-3 are visible after scrolling', async ({ page }) => {
+    await page.goto('/')
+    for (let n = 1; n <= 3; n++) {
+      const icon = page.getByTestId(`persona-icon-${n}`)
+      await icon.scrollIntoViewIfNeeded()
+      await expect(icon).toBeVisible()
+    }
+  })
+
+  // MOCK-003 — reduced-motion: columns visible at opacity 1, no entrance animation
+  test('persona columns visible at full opacity under reduced-motion', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await page.goto('/')
+    const cols = page.getByTestId('persona-column')
+    await cols.first().scrollIntoViewIfNeeded()
+    for (let i = 0; i < 3; i++) {
+      await expect(cols.nth(i)).toBeVisible()
+      const opacity = await cols.nth(i).evaluate((el) =>
+        parseFloat(window.getComputedStyle(el).opacity)
+      )
+      expect(opacity).toBeGreaterThan(0.9)
+    }
+  })
 })
 
 test.describe('PersonaMatch section — mobile (375×667)', () => {

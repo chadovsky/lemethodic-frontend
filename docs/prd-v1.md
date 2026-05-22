@@ -1142,8 +1142,8 @@ None. This is the first UI shell — no upstream blockers.
 
 ### MOCK-003 — Landing persona + methodology visual upgrade
 
-**Status:** Not Started
-**Branch:** `feat/mock-003-landing-persona-method` (FE, from `main`)
+**Status:** Shipped — squash-merged cb8e4c8
+**Branch:** `feat/mock-003-icons-polish` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 **Benchmark:** Wispr Flow (restrained premium palette, generous whitespace, confident typography sizing)
 

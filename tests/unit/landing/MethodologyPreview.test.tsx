@@ -54,4 +54,21 @@ describe('MethodologyPreview', () => {
       screen.getByRole('region', { name: /5-couche method/i })
     ).toBeInTheDocument()
   })
+
+  // MOCK-003 — ed-card-lift + left-border accent
+  it('each layer row has ed-card-lift class', () => {
+    render(<MethodologyPreview />)
+    const layers = screen.getAllByTestId('couche-layer')
+    layers.forEach((layer) => {
+      expect(layer).toHaveClass('ed-card-lift')
+    })
+  })
+
+  it('each layer row has a data-layer attribute', () => {
+    render(<MethodologyPreview />)
+    const layers = screen.getAllByTestId('couche-layer')
+    layers.forEach((layer) => {
+      expect(layer).toHaveAttribute('data-layer')
+    })
+  })
 })

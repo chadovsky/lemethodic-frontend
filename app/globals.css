@@ -535,6 +535,9 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
   }
 }
+@media (prefers-reduced-motion: reduce) {
+  .ed-card-lift:hover { transform: none; box-shadow: none; }
+}
 
 /* Button press feedback: scale 0.97 on :active (V-012a — was 0.98).
    Transform uses 160ms ease-out for tactile snap (no spring overshoot

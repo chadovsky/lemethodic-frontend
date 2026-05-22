@@ -25,4 +25,30 @@ describe('PersonaMatch', () => {
     expect(texts.some((t) => /english/i.test(t))).toBe(true)
     expect(texts.some((t) => /method/i.test(t))).toBe(true)
   })
+
+  // MOCK-003 — editorial icons
+  it('renders persona-icon testid for each column', () => {
+    render(<PersonaMatch />)
+    expect(screen.getByTestId('persona-icon-1')).toBeInTheDocument()
+    expect(screen.getByTestId('persona-icon-2')).toBeInTheDocument()
+    expect(screen.getByTestId('persona-icon-3')).toBeInTheDocument()
+  })
+
+  it('each icon wrapper contains an SVG element', () => {
+    render(<PersonaMatch />)
+    ;[1, 2, 3].forEach((n) => {
+      const wrapper = screen.getByTestId(`persona-icon-${n}`)
+      expect(wrapper.querySelector('svg')).not.toBeNull()
+    })
+  })
+
+  // MOCK-003 — RevealOnScroll wrapping: columns must not be direct children of the grid
+  it('persona columns are wrapped in RevealOnScroll divs', () => {
+    render(<PersonaMatch />)
+    const grid = screen.getByTestId('persona-columns')
+    const columns = screen.getAllByTestId('persona-column')
+    columns.forEach((col) => {
+      expect(col.parentElement).not.toBe(grid)
+    })
+  })
 })

@@ -8,9 +8,12 @@ export default function MethodBasedIcon() {
       aria-hidden="true"
       style={{ display: 'block' }}
     >
-      <rect x="4" y="9"  width="32" height="5" rx="2" stroke="currentColor" strokeWidth="1.5" />
-      <rect x="4" y="18" width="32" height="5" rx="2" stroke="currentColor" strokeWidth="1.5" />
-      <rect x="4" y="27" width="32" height="5" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      {/* 5 stacked layers — decreasing width, top 3 in accent, bottom 2 muted */}
+      <rect x="4" y="4"  width="32" height="4" rx="1" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="4" y="11" width="28" height="4" rx="1" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="4" y="18" width="24" height="4" rx="1" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="4" y="25" width="20" height="4" rx="1" stroke="var(--text-muted)" strokeWidth="1.5" />
+      <rect x="4" y="32" width="16" height="4" rx="1" stroke="var(--text-muted)" strokeWidth="1.5" />
     </svg>
   )
 }
