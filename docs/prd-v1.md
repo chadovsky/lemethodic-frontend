@@ -968,7 +968,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### UI-015 — Le Diagnostic results view
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged 5750c11
 **Branch:** `feat/ui-015-diagnostic-results` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 
