@@ -14,11 +14,11 @@ describe('AudioPlayerPlaceholder', () => {
     expect(screen.getByTestId('audio-play-button')).toBeInTheDocument()
   })
 
-  it('renders a static scrubber with placeholder time (0:00 / 12:34)', () => {
+  it('renders a static scrubber with prominent time label 12:34', () => {
     render(<AudioPlayerPlaceholder />)
     const scrubber = screen.getByTestId('audio-scrubber')
     expect(scrubber).toBeInTheDocument()
-    expect(screen.getByText(/0:00\s*\/\s*12:34/)).toBeInTheDocument()
+    expect(screen.getByText('12:34')).toBeInTheDocument()
   })
 
   it('renders a volume icon', () => {

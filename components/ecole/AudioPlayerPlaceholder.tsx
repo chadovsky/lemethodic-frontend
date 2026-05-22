@@ -1,8 +1,11 @@
 'use client'
 
 import { SANS_FONT } from '@/lib/typography'
+import type { LessonCefr } from '@/lib/data/lessons'
 
-export default function AudioPlayerPlaceholder() {
+const WAVEFORM_HEIGHTS = [8, 14, 10, 20, 16, 24, 12, 28, 18, 22, 14, 20, 10, 16, 8]
+
+export default function AudioPlayerPlaceholder({ cefr }: { cefr?: LessonCefr }) {
   return (
     <div
       data-testid="audio-player-placeholder"
@@ -11,14 +14,38 @@ export default function AudioPlayerPlaceholder() {
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 16,
+        gap: 14,
         padding: 'clamp(14px, 1.5vw, 18px) clamp(16px, 2vw, 22px)',
-        backgroundColor: 'var(--bg-elevated)',
-        border: '1px solid var(--rule-default)',
+        backgroundColor: 'var(--ed-paper)',
+        border: '1px solid var(--ed-rule)',
         borderRadius: 8,
         width: '100%',
       }}
     >
+      {/* Static waveform thumbnail */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          flexShrink: 0,
+        }}
+      >
+        {WAVEFORM_HEIGHTS.map((h, i) => (
+          <div
+            key={i}
+            data-testid="lesson-waveform-bar"
+            style={{
+              width: 3,
+              height: h,
+              backgroundColor: 'var(--ed-muted)',
+              borderRadius: 1.5,
+              opacity: 0.45,
+            }}
+          />
+        ))}
+      </div>
+
       <button
         type="button"
         data-testid="audio-play-button"
@@ -32,9 +59,9 @@ export default function AudioPlayerPlaceholder() {
           width: 44,
           height: 44,
           borderRadius: '50%',
-          backgroundColor: 'var(--cta-primary)',
+          backgroundColor: 'var(--ed-accent)',
           border: 'none',
-          color: 'var(--bg-elevated)',
+          color: '#fff',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -69,7 +96,7 @@ export default function AudioPlayerPlaceholder() {
             position: 'relative',
             height: 4,
             borderRadius: 999,
-            backgroundColor: 'var(--bg-subtle)',
+            backgroundColor: 'var(--ed-bg)',
             overflow: 'hidden',
           }}
         >
@@ -78,7 +105,7 @@ export default function AudioPlayerPlaceholder() {
               position: 'absolute',
               inset: 0,
               width: '0%',
-              backgroundColor: 'var(--accent-primary)',
+              backgroundColor: 'var(--ed-accent)',
               borderRadius: 999,
             }}
           />
@@ -86,14 +113,36 @@ export default function AudioPlayerPlaceholder() {
         <span
           style={{
             fontFamily: SANS_FONT,
-            fontSize: '0.75rem',
-            color: 'var(--text-muted)',
+            fontSize: '0.9375rem',
+            fontWeight: 500,
+            color: 'var(--ed-fg)',
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          0:00 / 12:34
+          12:34
         </span>
       </div>
+
+      {cefr && (
+        <span
+          data-testid="audio-cefr-badge"
+          style={{
+            flexShrink: 0,
+            fontFamily: SANS_FONT,
+            fontWeight: 700,
+            fontSize: '0.6875rem',
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: 'var(--ed-accent)',
+            backgroundColor: 'var(--ed-bg)',
+            border: '1px solid var(--ed-rule)',
+            padding: '3px 8px',
+            borderRadius: 999,
+          }}
+        >
+          {cefr}
+        </span>
+      )}
 
       <span
         data-testid="audio-volume-icon"
@@ -102,7 +151,7 @@ export default function AudioPlayerPlaceholder() {
           flexShrink: 0,
           width: 24,
           height: 24,
-          color: 'var(--text-muted)',
+          color: 'var(--ed-muted)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

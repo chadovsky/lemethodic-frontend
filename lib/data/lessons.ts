@@ -3,9 +3,11 @@
 // descriptions are plausible-sounding placeholders; real curriculum
 // content lands in CON-XXX. State distribution is illustrative
 // (3 Terminée / 3 Disponible / 21 Verrouillée) per PRD UI-008.
+// MOCK-008 — cefr field added: B1 for Fondations, B2 for Approfondissement.
 
 export type LessonState = 'completed' | 'available' | 'locked'
 export type LessonSection = 'fondations' | 'approfondissement'
+export type LessonCefr = 'B1' | 'B2'
 
 export interface Lesson {
   id: number
@@ -13,6 +15,7 @@ export interface Lesson {
   description: string
   section: LessonSection
   state: LessonState
+  cefr: LessonCefr
 }
 
 const FONDATIONS_TITLES: { title: string; description: string }[] = [
@@ -70,6 +73,7 @@ export const LESSONS: readonly Lesson[] = [
     description: entry.description,
     section: 'fondations' as const,
     state: stateForLessonId(i + 1),
+    cefr: 'B1' as const,
   })),
   ...APPROFONDISSEMENT_TITLES.map((entry, i) => ({
     id: 17 + i,
@@ -77,6 +81,7 @@ export const LESSONS: readonly Lesson[] = [
     description: entry.description,
     section: 'approfondissement' as const,
     state: stateForLessonId(17 + i),
+    cefr: 'B2' as const,
   })),
 ]
 

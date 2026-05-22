@@ -54,6 +54,30 @@ test.describe("L'École lesson detail — desktop (1280×800)", () => {
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     await expect(page.getByTestId('audio-player-placeholder')).toBeVisible()
   })
+
+  // MOCK-008 — waveform bars, keyboard navigation
+  test('audio player shows 15 waveform bars on /ecole/3', async ({ page }) => {
+    await page.goto('/ecole/3')
+    await expect(page.getByTestId('lesson-waveform-bar')).toHaveCount(15)
+  })
+
+  test('ArrowRight on /ecole/3 navigates to /ecole/4', async ({ page }) => {
+    await page.goto('/ecole/3')
+    await page.keyboard.press('ArrowRight')
+    await expect(page).toHaveURL(/\/ecole\/4$/)
+  })
+
+  test('ArrowLeft on /ecole/3 navigates to /ecole/2', async ({ page }) => {
+    await page.goto('/ecole/3')
+    await page.keyboard.press('ArrowLeft')
+    await expect(page).toHaveURL(/\/ecole\/2$/)
+  })
+
+  test('ArrowLeft on /ecole/1 does not navigate away (boundary guard)', async ({ page }) => {
+    await page.goto('/ecole/1')
+    await page.keyboard.press('ArrowLeft')
+    await expect(page).toHaveURL(/\/ecole\/1$/)
+  })
 })
 
 test.describe("L'École lesson detail — mobile (375×667)", () => {

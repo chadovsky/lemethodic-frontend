@@ -1,3 +1,7 @@
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
 import type { Lesson, LessonSection } from '@/lib/data/lessons'
 import Breadcrumb from '@/components/common/Breadcrumb'
@@ -9,8 +13,23 @@ const SECTION_LABEL_FR: Record<LessonSection, string> = {
   approfondissement: 'Approfondissement',
 }
 
+const TOTAL_LESSONS = 27
+
 export default function LessonDetail({ lesson }: { lesson: Lesson }) {
+  const router = useRouter()
   const sectionLabel = SECTION_LABEL_FR[lesson.section]
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight' && lesson.id < TOTAL_LESSONS) {
+        router.push(`/ecole/${lesson.id + 1}`)
+      } else if (e.key === 'ArrowLeft' && lesson.id > 1) {
+        router.push(`/ecole/${lesson.id - 1}`)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [lesson.id, router])
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 8 }}>
@@ -32,8 +51,9 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
             fontSize: '0.6875rem',
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: 'var(--text-primary)',
-            backgroundColor: 'var(--accent-primary-soft)',
+            color: 'var(--ed-accent)',
+            backgroundColor: 'var(--ed-bg)',
+            border: '1px solid var(--ed-rule)',
             padding: '4px 10px',
             borderRadius: 999,
           }}
@@ -50,7 +70,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
               fontSize: 'clamp(28px, 3vw, 40px)',
               lineHeight: 1,
               letterSpacing: '-0.01em',
-              color: 'var(--text-muted)',
+              color: 'var(--ed-muted)',
               fontVariantNumeric: 'tabular-nums',
             }}
           >
@@ -64,7 +84,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
               fontSize: 'clamp(28px, 3.5vw, 44px)',
               lineHeight: 1.15,
               letterSpacing: '-0.015em',
-              color: 'var(--text-primary)',
+              color: 'var(--ed-fg)',
               margin: 0,
             }}
           >
@@ -77,7 +97,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
             fontWeight: 400,
             fontSize: '1rem',
             lineHeight: 1.55,
-            color: 'var(--text-muted)',
+            color: 'var(--ed-muted)',
             margin: 0,
             maxWidth: 680,
           }}
@@ -86,15 +106,14 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
         </p>
       </header>
 
-      <AudioPlayerPlaceholder />
+      <AudioPlayerPlaceholder cefr={lesson.cefr} />
 
       <ContentSection
         id="introduction"
         title="Introduction"
         paragraphs={[
-          "Dans cette leçon, vous découvrirez les réflexes à installer avant de passer à la pratique. L'objectif est de poser un cadre clair plutôt que d'empiler des règles.",
-          "Prenez le temps de lire calmement — la méthode privilégie l'ancrage à la quantité. Une idée bien comprise tient mieux qu'une dizaine survolées.",
-          "Quand vous serez prêt(e), passez à la Méthode pour entrer dans le détail des mécanismes que cette leçon traite.",
+          "Dans cette leçon, vous découvrirez les mécanismes qui permettent de prendre la parole avec fluidité. L'objectif est de poser un cadre clair et de comprendre l'intention avant de pratiquer.",
+          "Prenez le temps de lire attentivement — la compréhension précède l'imitation, et une idée bien ancrée produit des réflexes durables.",
         ]}
       />
 
@@ -102,9 +121,8 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
         id="methode"
         title="Méthode"
         paragraphs={[
-          "La méthode s'articule autour des cinq couches qui structurent toute prise de parole spontanée : forme, fond, rythme, lien, registre. Cette leçon en travaille un sous-ensemble.",
-          "Vous trouverez ici les points d'attention concrets — quoi écouter, quoi reproduire, quoi éviter. Aucun jargon : on décrit ce que fait la langue, pas ce qu'on en dit.",
-          "Lisez d'abord, écoutez ensuite. La compréhension précède l'imitation : c'est dans cet ordre que les réflexes s'installent durablement.",
+          "La méthode met en lumière les points d'attention concrets : quoi observer à l'écoute, quoi reproduire à la pratique, et quels pièges éviter. Aucun jargon technique — on décrit ce que fait la langue.",
+          "Lisez d'abord, écoutez ensuite. L'ordre compte : la compréhension intellectuelle prépare l'oreille, et l'oreille guide la production.",
         ]}
       />
 
@@ -112,7 +130,8 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
         id="pratique"
         title="Pratique"
         paragraphs={[
-          'Essayez à voix haute, sans relire la leçon. Notez les hésitations — ce sont elles qui indiquent où la couche n\'est pas encore automatique.',
+          "Essayez à voix haute, sans relire la leçon. Notez les hésitations — elles indiquent précisément où le réflexe n'est pas encore automatique.",
+          "Répétez l'exercice à intervalles espacés : le lendemain, puis trois jours plus tard. La répétition espacée consolide ce que la pratique initiale a installé.",
         ]}
         prompts={[
           'Reformulez l\'idée de la leçon en une phrase, sans utiliser les mots du texte.',
@@ -152,7 +171,7 @@ function ContentSection({
           fontSize: 'clamp(22px, 2.6vw, 30px)',
           lineHeight: 1.2,
           letterSpacing: '-0.01em',
-          color: 'var(--text-primary)',
+          color: 'var(--ed-fg)',
           margin: 0,
         }}
       >
@@ -167,7 +186,7 @@ function ContentSection({
               fontWeight: 400,
               fontSize: '1rem',
               lineHeight: 1.6,
-              color: 'var(--text-primary)',
+              color: 'var(--ed-fg)',
               margin: 0,
             }}
           >
@@ -195,10 +214,10 @@ function ContentSection({
                 fontWeight: 400,
                 fontSize: '0.9375rem',
                 lineHeight: 1.55,
-                color: 'var(--text-primary)',
+                color: 'var(--ed-fg)',
                 padding: '12px 14px',
-                backgroundColor: 'var(--bg-subtle)',
-                border: '1px solid var(--rule-default)',
+                backgroundColor: 'var(--ed-bg)',
+                border: '1px solid var(--ed-rule)',
                 borderRadius: 4,
               }}
             >

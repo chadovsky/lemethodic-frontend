@@ -19,6 +19,7 @@ const SAMPLE: Lesson = {
   description: 'Nuancer une opinion sans surcharger la phrase.',
   section: 'fondations',
   state: 'available',
+  cefr: 'B1',
 }
 
 describe('LessonCard', () => {
@@ -55,5 +56,34 @@ describe('LessonCard', () => {
     const card = screen.getByTestId('lesson-card')
     expect(card).toHaveAttribute('data-lesson-id', '5')
     expect(card).toHaveAttribute('data-lesson-state', 'available')
+  })
+
+  // MOCK-008 — lock icon, conditional ed-card-lift, opacity
+  it('renders a lock icon for a locked lesson', () => {
+    render(<LessonCard lesson={{ ...SAMPLE, id: 20, state: 'locked' }} />)
+    expect(screen.getByTestId('lesson-lock-icon')).toBeInTheDocument()
+  })
+
+  it('does not render a lock icon for available or completed lessons', () => {
+    render(<LessonCard lesson={SAMPLE} />)
+    expect(screen.queryByTestId('lesson-lock-icon')).not.toBeInTheDocument()
+  })
+
+  it('locked card does not have ed-card-lift class', () => {
+    render(<LessonCard lesson={{ ...SAMPLE, id: 20, state: 'locked' }} />)
+    const card = screen.getByTestId('lesson-card')
+    expect(card.className).not.toMatch(/ed-card-lift/)
+  })
+
+  it('available card has ed-card-lift class', () => {
+    render(<LessonCard lesson={SAMPLE} />)
+    const card = screen.getByTestId('lesson-card')
+    expect(card.className).toMatch(/ed-card-lift/)
+  })
+
+  it('locked card has opacity 0.65', () => {
+    render(<LessonCard lesson={{ ...SAMPLE, id: 20, state: 'locked' }} />)
+    const card = screen.getByTestId('lesson-card')
+    expect(card).toHaveStyle({ opacity: '0.65' })
   })
 })
