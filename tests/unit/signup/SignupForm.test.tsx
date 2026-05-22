@@ -108,4 +108,62 @@ describe('SignupForm', () => {
     expect(mockPush).toHaveBeenCalledWith('/onboarding')
     vi.useRealTimers()
   })
+
+  // MOCK-005 — ed-field, PasswordStrength, spinner
+  it('all inputs have ed-field class', () => {
+    render(<SignupForm />)
+    expect(screen.getByLabelText('Email')).toHaveClass('ed-field')
+    expect(screen.getByLabelText('Password', { exact: true })).toHaveClass('ed-field')
+    expect(screen.getByLabelText('Confirm password')).toHaveClass('ed-field')
+  })
+
+  it('PasswordStrength shows 1 filled segment at password length 3', () => {
+    render(<SignupForm />)
+    fireEvent.change(screen.getByLabelText('Password', { exact: true }), {
+      target: { value: 'abc' },
+    })
+    const filled = screen.getAllByTestId('strength-segment').filter(
+      (s) => s.dataset.filled === 'true'
+    )
+    expect(filled).toHaveLength(1)
+  })
+
+  it('PasswordStrength shows 2 filled segments at password length 6', () => {
+    render(<SignupForm />)
+    fireEvent.change(screen.getByLabelText('Password', { exact: true }), {
+      target: { value: 'abcdef' },
+    })
+    const filled = screen.getAllByTestId('strength-segment').filter(
+      (s) => s.dataset.filled === 'true'
+    )
+    expect(filled).toHaveLength(2)
+  })
+
+  it('PasswordStrength shows 3 filled segments at password length 9', () => {
+    render(<SignupForm />)
+    fireEvent.change(screen.getByLabelText('Password', { exact: true }), {
+      target: { value: 'abcdefghi' },
+    })
+    const filled = screen.getAllByTestId('strength-segment').filter(
+      (s) => s.dataset.filled === 'true'
+    )
+    expect(filled).toHaveLength(3)
+  })
+
+  it('spinner element appears in button during submit loading', async () => {
+    vi.useFakeTimers()
+    render(<SignupForm />)
+    fillValid()
+
+    act(() => {
+      fireEvent.click(screen.getByRole('button', { name: /create account/i }))
+    })
+
+    expect(screen.getByTestId('signup-spinner')).toBeInTheDocument()
+
+    await act(async () => {
+      await vi.runAllTimersAsync()
+    })
+    vi.useRealTimers()
+  })
 })

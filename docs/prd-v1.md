@@ -1258,8 +1258,8 @@ None. This is the first UI shell — no upstream blockers.
 
 ### MOCK-005 — Sign-up form UX polish
 
-**Status:** Not Started
-**Branch:** `feat/mock-005-signup-polish` (FE, from `main`)
+**Status:** Shipped — squash-merged f875330
+**Branch:** `feat/mock-005-signup-ux` (FE, from `main`)
 **Effort:** 1 session (~2–3h)
 **Benchmark:** Wispr Flow / shared standard (premium form affordances, ed-field focus treatment — transition point into Promova interior register)
 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 import FormField from './FormField'
+import PasswordStrength from './PasswordStrength'
 import {
   validateEmail,
   validatePassword,
@@ -58,9 +59,9 @@ export default function SignupForm({ tier }: SignupFormProps) {
         style={{
           width: '100%',
           maxWidth: 440,
-          backgroundColor: 'var(--bg-elevated)',
-          border: '1px solid var(--rule-default)',
-          borderRadius: 4,
+          backgroundColor: 'var(--ed-paper, var(--bg-elevated))',
+          border: '1px solid var(--ed-rule)',
+          borderRadius: 8,
           padding: 'clamp(32px, 4vw, 48px) clamp(24px, 3vw, 40px)',
         }}
       >
@@ -129,16 +130,19 @@ export default function SignupForm({ tier }: SignupFormProps) {
             error={emailTouched ? emailError : null}
           />
 
-          <FormField
-            label="Password"
-            id="password"
-            type="password"
-            value={password}
-            autoComplete="new-password"
-            onChange={setPassword}
-            onBlur={() => setPasswordTouched(true)}
-            error={passwordTouched ? passwordError : null}
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <FormField
+              label="Password"
+              id="password"
+              type="password"
+              value={password}
+              autoComplete="new-password"
+              onChange={setPassword}
+              onBlur={() => setPasswordTouched(true)}
+              error={passwordTouched ? passwordError : null}
+            />
+            <PasswordStrength password={password} />
+          </div>
 
           <FormField
             label="Confirm password"
@@ -171,7 +175,15 @@ export default function SignupForm({ tier }: SignupFormProps) {
               letterSpacing: '0.01em',
             }}
           >
-            {loading ? 'Creating account…' : 'Create account'}
+            {loading ? (
+              <span
+                data-testid="signup-spinner"
+                className="signup-spinner"
+                aria-label="Creating account"
+              />
+            ) : (
+              'Create account'
+            )}
           </button>
         </form>
       </div>
@@ -190,7 +202,7 @@ export default function SignupForm({ tier }: SignupFormProps) {
         <Link
           href="/login"
           style={{
-            color: 'var(--text-primary)',
+            color: 'var(--ed-accent)',
             fontWeight: 600,
             textDecoration: 'underline',
             textUnderlineOffset: 2,

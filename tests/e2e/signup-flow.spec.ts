@@ -50,6 +50,31 @@ test.describe('Signup form — desktop (1280×800)', () => {
     await page.getByRole('button', { name: /create account/i }).click()
     await expect(page).toHaveURL(/\/onboarding/, { timeout: 15_000 })
   })
+
+  // MOCK-005 — password strength segments and spinner
+  test('password strength segments update as password length increases', async ({ page }) => {
+    await page.goto('/signup')
+    const passwordInput = page.getByLabel('Password', { exact: true })
+
+    await passwordInput.fill('abc')
+    await expect(page.locator('[data-testid="strength-segment"][data-filled="true"]')).toHaveCount(1)
+
+    await passwordInput.fill('abcdef')
+    await expect(page.locator('[data-testid="strength-segment"][data-filled="true"]')).toHaveCount(2)
+
+    await passwordInput.fill('abcdefghi')
+    await expect(page.locator('[data-testid="strength-segment"][data-filled="true"]')).toHaveCount(3)
+  })
+
+  test('submit shows spinner then navigates to /onboarding', async ({ page }) => {
+    await page.goto('/signup')
+    await page.getByLabel('Email').fill('test@example.com')
+    await page.getByLabel('Password', { exact: true }).fill('password123')
+    await page.getByLabel('Confirm password').fill('password123')
+    await page.getByRole('button', { name: /create account/i }).click()
+    await expect(page.getByTestId('signup-spinner')).toBeVisible()
+    await expect(page).toHaveURL(/\/onboarding/, { timeout: 15_000 })
+  })
 })
 
 test.describe('Signup form — mobile (375×667)', () => {

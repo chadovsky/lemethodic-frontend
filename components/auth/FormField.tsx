@@ -72,10 +72,30 @@ export default function FormField({
             fontFamily: SANS_FONT,
             fontWeight: 500,
             fontSize: '0.8125rem',
-            color: 'var(--fp-error, #B91C1C)',
+            color: 'var(--ed-accent)',
             margin: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
           }}
         >
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+            aria-hidden="true"
+            style={{ flexShrink: 0 }}
+          >
+            <path
+              d="M6 1.5L11 10.5H1L6 1.5Z"
+              stroke="currentColor"
+              strokeWidth="1.2"
+              strokeLinejoin="round"
+            />
+            <line x1="6" y1="5" x2="6" y2="7.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+            <circle cx="6" cy="9" r="0.65" fill="currentColor" />
+          </svg>
           {error}
         </p>
       )}
