@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
+import RevealOnScroll from '@/components/landing/RevealOnScroll'
 
 interface Tier {
   name: string
@@ -64,22 +65,24 @@ export default function PricingTeaser() {
       }}
     >
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-        <h2
-          id="pricing-heading"
-          className="text-balance"
-          style={{
-            fontFamily: SANS_FONT,
-            fontWeight: 600,
-            fontSize: 'clamp(1.5rem, 2.5vw, 2rem)',
-            lineHeight: 1.2,
-            letterSpacing: '-0.015em',
-            color: 'var(--text-primary)',
-            margin: 0,
-            marginBottom: 'clamp(32px, 5vw, 56px)',
-          }}
-        >
-          Choose your plan
-        </h2>
+        <RevealOnScroll>
+          <h2
+            id="pricing-heading"
+            className="text-balance"
+            style={{
+              fontFamily: SANS_FONT,
+              fontWeight: 600,
+              fontSize: 'clamp(1.5rem, 2.5vw, 2rem)',
+              lineHeight: 1.2,
+              letterSpacing: '-0.015em',
+              color: 'var(--text-primary)',
+              margin: 0,
+              marginBottom: 'clamp(32px, 5vw, 56px)',
+            }}
+          >
+            Choose your plan
+          </h2>
+        </RevealOnScroll>
 
         <div
           className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5"
@@ -89,12 +92,10 @@ export default function PricingTeaser() {
             <div
               key={tier.slug}
               data-testid="pricing-tier"
-              className="ed-card-lift"
+              className={tier.popular ? 'ed-card-lift pricing-popular-card' : 'ed-card-lift'}
               style={{
                 backgroundColor: 'var(--bg-elevated)',
-                border: tier.popular
-                  ? '2px solid var(--cta-primary)'
-                  : '1px solid var(--rule-default)',
+                ...(tier.popular ? {} : { border: '1px solid var(--rule-default)' }),
                 borderRadius: 4,
                 padding: 'clamp(20px, 2.5vw, 28px)',
                 display: 'flex',
@@ -104,17 +105,17 @@ export default function PricingTeaser() {
             >
               {tier.popular && (
                 <span
-                  data-testid="popular-badge"
+                  data-testid="pricing-badge-popular"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     alignSelf: 'flex-start',
                     padding: '3px 9px',
-                    borderRadius: 3,
-                    backgroundColor: 'var(--cta-primary)',
+                    borderRadius: 4,
+                    backgroundColor: 'var(--ed-accent)',
                     color: '#ffffff',
                     fontFamily: SANS_FONT,
-                    fontWeight: 700,
+                    fontWeight: 600,
                     fontSize: '0.625rem',
                     letterSpacing: '0.08em',
                     textTransform: 'uppercase',

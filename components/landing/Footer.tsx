@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
+import { SANS_FONT } from '@/lib/typography'
+import { DISPLAY_FONT } from '@/components/onboarding/OnboardingScreen'
 
 const COLUMNS = [
   {
@@ -46,12 +47,12 @@ export default function Footer() {
           <div>
             <Link
               href="/"
+              data-testid="footer-wordmark"
               style={{
-                fontFamily: SERIF_FONT,
-                fontStyle: 'italic',
-                fontWeight: 400,
-                fontSize: '1.25rem',
-                letterSpacing: '-0.01em',
+                fontFamily: DISPLAY_FONT,
+                fontWeight: 700,
+                fontSize: '1.125rem',
+                letterSpacing: '-0.02em',
                 color: 'rgba(248, 244, 237, 0.9)',
                 textDecoration: 'none',
                 display: 'inline-block',
@@ -117,6 +118,11 @@ export default function Footer() {
           style={{
             borderTop: '1px solid rgba(255,255,255,0.08)',
             paddingTop: 'clamp(20px, 2.5vw, 28px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 16,
+            flexWrap: 'wrap',
           }}
         >
           <p
@@ -131,6 +137,34 @@ export default function Footer() {
           >
             © 2026 Le Méthodic
           </p>
+          <div style={{ display: 'flex', gap: 16 }}>
+            <a
+              data-testid="footer-social-github"
+              href="#"
+              style={{
+                fontFamily: SANS_FONT,
+                fontWeight: 400,
+                fontSize: '0.8125rem',
+                color: 'rgba(248, 244, 237, 0.45)',
+                textDecoration: 'none',
+              }}
+            >
+              GitHub
+            </a>
+            <a
+              data-testid="footer-social-twitter"
+              href="#"
+              style={{
+                fontFamily: SANS_FONT,
+                fontWeight: 400,
+                fontSize: '0.8125rem',
+                color: 'rgba(248, 244, 237, 0.45)',
+                textDecoration: 'none',
+              }}
+            >
+              Twitter / X
+            </a>
+          </div>
         </div>
       </div>
     </footer>

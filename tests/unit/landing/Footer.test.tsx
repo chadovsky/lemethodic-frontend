@@ -39,4 +39,24 @@ describe('Footer', () => {
     render(<Footer />)
     expect(screen.getByRole('contentinfo')).toBeInTheDocument()
   })
+
+  // MOCK-004 — wordmark testid + social links
+  it('wordmark element has footer-wordmark testid', () => {
+    render(<Footer />)
+    expect(screen.getByTestId('footer-wordmark')).toBeInTheDocument()
+  })
+
+  it('GitHub social link has correct testid and href', () => {
+    render(<Footer />)
+    const gh = screen.getByTestId('footer-social-github')
+    expect(gh).toBeInTheDocument()
+    expect(gh).toHaveAttribute('href', '#')
+  })
+
+  it('Twitter/X social link has correct testid and href', () => {
+    render(<Footer />)
+    const tw = screen.getByTestId('footer-social-twitter')
+    expect(tw).toBeInTheDocument()
+    expect(tw).toHaveAttribute('href', '#')
+  })
 })

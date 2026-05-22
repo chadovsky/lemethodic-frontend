@@ -22,8 +22,8 @@ describe('PricingTeaser', () => {
 
   it('Daily Bundle is marked as Most popular', () => {
     render(<PricingTeaser />)
-    expect(screen.getByTestId('popular-badge')).toBeInTheDocument()
-    expect(screen.getByTestId('popular-badge')).toHaveTextContent('Most popular')
+    expect(screen.getByTestId('pricing-badge-popular')).toBeInTheDocument()
+    expect(screen.getByTestId('pricing-badge-popular')).toHaveTextContent('Most popular')
   })
 
   it('each CTA links to /signup with the correct tier slug', () => {
@@ -43,5 +43,27 @@ describe('PricingTeaser', () => {
   it('renders the section heading', () => {
     render(<PricingTeaser />)
     expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument()
+  })
+
+  // MOCK-004 — ed-card-lift + ed-btn-press + badge testid
+  it('each tier card has ed-card-lift class', () => {
+    render(<PricingTeaser />)
+    screen.getAllByTestId('pricing-tier').forEach((card) => {
+      expect(card).toHaveClass('ed-card-lift')
+    })
+  })
+
+  it('each tier CTA has ed-btn-press class', () => {
+    render(<PricingTeaser />)
+    screen.getAllByTestId('tier-cta').forEach((cta) => {
+      expect(cta).toHaveClass('ed-btn-press')
+    })
+  })
+
+  it('pricing-badge-popular has correct testid and text', () => {
+    render(<PricingTeaser />)
+    const badge = screen.getByTestId('pricing-badge-popular')
+    expect(badge).toBeInTheDocument()
+    expect(badge).toHaveTextContent('Most popular')
   })
 })

@@ -539,6 +539,12 @@
   .ed-card-lift:hover { transform: none; box-shadow: none; }
 }
 
+/* MOCK-004 — Daily Bundle popular card: accent border + hover transition */
+.pricing-popular-card { border: 2px solid var(--cta-primary); }
+@media (hover: hover) {
+  .pricing-popular-card:hover { border-color: var(--ed-accent); }
+}
+
 /* Button press feedback: scale 0.97 on :active (V-012a — was 0.98).
    Transform uses 160ms ease-out for tactile snap (no spring overshoot
    on a button press). Color/bg use --ease-spring at 200ms for soft

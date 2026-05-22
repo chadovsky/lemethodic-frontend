@@ -1202,8 +1202,8 @@ None. This is the first UI shell — no upstream blockers.
 
 ### MOCK-004 — Landing pricing + footer visual polish
 
-**Status:** Not Started
-**Branch:** `feat/mock-004-landing-pricing-footer` (FE, from `main`)
+**Status:** Shipped — squash-merged 175bffa
+**Branch:** `feat/mock-004-pricing-footer-polish` (FE, from `main`)
 **Effort:** 1 session (~2–3h)
 **Benchmark:** Wispr Flow (pricing section clarity, restrained "most popular" signal, premium footer)
 
