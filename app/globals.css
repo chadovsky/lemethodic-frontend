@@ -965,6 +965,19 @@
   .dashboard-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
+/* UI-013 — Le Diagnostic tâche overview grid. 1-col mobile, 3-col at
+   ≥768px so the three TCF tâches read as one row on tablet and desktop.
+   Plain CSS per UI-006 convention. */
+.tache-overview-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(16px, 2vw, 24px);
+  align-items: stretch;
+}
+@media (min-width: 768px) {
+  .tache-overview-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
 /* UI-010 — Le Vocabulaire filter bar. Mobile (<768px) collapses behind
    a "Filtres" toggle button; desktop (≥768px) shows the bar inline and
    hides the toggle. Plain CSS per UI-006 convention. !important wins

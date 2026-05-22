@@ -1,0 +1,65 @@
+import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
+import type { Tache } from '@/lib/data/taches'
+
+export default function TacheCard({ tache }: { tache: Tache }) {
+  return (
+    <article
+      data-testid="tache-card"
+      data-tache-id={String(tache.id)}
+      className="ed-card-lift"
+      style={{
+        backgroundColor: 'var(--bg-elevated)',
+        border: '1px solid var(--rule-default)',
+        borderRadius: 4,
+        padding: 'clamp(20px, 2vw, 28px)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        height: '100%',
+      }}
+    >
+      <h3
+        data-testid="tache-card-title"
+        style={{
+          fontFamily: SERIF_FONT,
+          fontStyle: 'italic',
+          fontWeight: 500,
+          fontSize: 'clamp(20px, 2.2vw, 24px)',
+          lineHeight: 1.25,
+          letterSpacing: '-0.01em',
+          color: 'var(--text-primary)',
+          margin: 0,
+        }}
+      >
+        {tache.title}
+      </h3>
+      <p
+        data-testid="tache-card-descriptor"
+        style={{
+          fontFamily: SANS_FONT,
+          fontWeight: 400,
+          fontSize: '0.9375rem',
+          lineHeight: 1.55,
+          color: 'var(--text-muted)',
+          margin: 0,
+          flex: 1,
+        }}
+      >
+        {tache.descriptor}
+      </p>
+      <p
+        data-testid="tache-card-duration"
+        style={{
+          fontFamily: SANS_FONT,
+          fontWeight: 600,
+          fontSize: '0.8125rem',
+          letterSpacing: '0.005em',
+          color: 'var(--text-primary)',
+          margin: 0,
+        }}
+      >
+        Durée : {tache.durationLabel}
+      </p>
+    </article>
+  )
+}

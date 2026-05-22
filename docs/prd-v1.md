@@ -818,7 +818,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### UI-013 — Le Diagnostic landing
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged e315798
 **Branch:** `feat/ui-013-diagnostic-landing` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 
