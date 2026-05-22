@@ -978,6 +978,32 @@
   .tache-overview-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
+/* UI-014 — Timer row. On desktop the timer sits right-aligned; on mobile
+   it left-aligns and takes full width. Waveform bars animate in Recording
+   state; animation is suppressed for prefers-reduced-motion. */
+.tache-timer-row {
+  display: flex;
+  justify-content: flex-end;
+}
+@media (max-width: 767px) {
+  .tache-timer-row { justify-content: flex-start; }
+}
+
+.waveform-bar {
+  transform-origin: center;
+  transition: background-color 200ms ease;
+}
+.waveform-bar-active {
+  animation: waveform-pulse 600ms ease-in-out infinite alternate;
+}
+@keyframes waveform-pulse {
+  from { transform: scaleY(0.35); }
+  to   { transform: scaleY(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .waveform-bar-active { animation: none; }
+}
+
 /* UI-010 — Le Vocabulaire filter bar. Mobile (<768px) collapses behind
    a "Filtres" toggle button; desktop (≥768px) shows the bar inline and
    hides the toggle. Plain CSS per UI-006 convention. !important wins

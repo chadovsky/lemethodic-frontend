@@ -888,7 +888,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### UI-014 — Le Diagnostic Tâche 1/2/3 unified shell
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged c57fea8
 **Branch:** `feat/ui-014-diagnostic-tache` (FE, from `main`)
 **Effort:** 1 session (~4–5h)
 
