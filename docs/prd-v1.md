@@ -1362,7 +1362,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### MOCK-007 — Dashboard realistic data + widget motion
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged cb57f34
 **Branch:** `feat/mock-007-dashboard-polish` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 **Benchmark:** Promova (app-interior data density, widget card design, mobile-native widget grid)
