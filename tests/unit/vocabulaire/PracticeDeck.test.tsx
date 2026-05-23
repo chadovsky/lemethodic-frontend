@@ -66,7 +66,7 @@ describe('PracticeDeck', () => {
     expect(screen.queryByTestId('flashcard')).not.toBeInTheDocument()
     expect(screen.getByTestId('end-of-deck')).toBeInTheDocument()
     expect(screen.getByTestId('end-of-deck')).toHaveTextContent(
-      /vous avez terminé les 30 chunks\./i,
+      /vous avez terminé les 60 chunks\./i,
     )
     expect(screen.getByTestId('end-of-deck-restart')).toBeInTheDocument()
     expect(screen.getByTestId('end-of-deck-back-to-list')).toHaveAttribute('href', '/vocabulaire')

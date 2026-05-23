@@ -14,9 +14,9 @@ describe('VocabBrowse', () => {
     expect(screen.getByTestId('vocab-filter-bar')).toBeInTheDocument()
   })
 
-  it('renders all 30 chunks from the fixture by default', () => {
+  it('renders all 60 chunks from the fixture by default', () => {
     render(<VocabBrowse />)
-    expect(screen.getAllByTestId('chunk-row')).toHaveLength(30)
+    expect(screen.getAllByTestId('chunk-row')).toHaveLength(60)
   })
 
   it('deselecting A1 hides all A1 rows', () => {
@@ -24,7 +24,7 @@ describe('VocabBrowse', () => {
     fireEvent.click(screen.getByTestId('cefr-chip-A1'))
     const remaining = screen.getAllByTestId('chunk-row')
     expect(remaining.every((row) => row.getAttribute('data-chunk-level') !== 'A1')).toBe(true)
-    expect(remaining.length).toBe(24)
+    expect(remaining.length).toBe(48)
   })
 
   it('selecting source = "Média" shows only Média rows', () => {
@@ -48,7 +48,6 @@ describe('VocabBrowse', () => {
 
   it('combining A1 only + source = Média yields empty state with reset button', () => {
     render(<VocabBrowse />)
-    // Deselect everything except A1
     fireEvent.click(screen.getByTestId('cefr-chip-A2'))
     fireEvent.click(screen.getByTestId('cefr-chip-B1'))
     fireEvent.click(screen.getByTestId('cefr-chip-B2'))
@@ -60,7 +59,7 @@ describe('VocabBrowse', () => {
     expect(screen.getByTestId('vocab-empty-reset')).toBeInTheDocument()
   })
 
-  it('clicking "Réinitialiser les filtres" restores all 30 rows', () => {
+  it('clicking "Réinitialiser les filtres" restores all 60 rows', () => {
     render(<VocabBrowse />)
     fireEvent.click(screen.getByTestId('cefr-chip-A2'))
     fireEvent.click(screen.getByTestId('cefr-chip-B1'))
@@ -70,7 +69,23 @@ describe('VocabBrowse', () => {
     expect(screen.getByTestId('vocab-empty-state')).toBeInTheDocument()
 
     fireEvent.click(screen.getByTestId('vocab-empty-reset'))
-    expect(screen.getAllByTestId('chunk-row')).toHaveLength(30)
+    expect(screen.getAllByTestId('chunk-row')).toHaveLength(60)
     expect(screen.queryByTestId('vocab-empty-state')).not.toBeInTheDocument()
+  })
+
+  // MOCK-009 — count badge and save toggle
+  it('renders a count badge showing "60 chunks"', () => {
+    render(<VocabBrowse />)
+    expect(screen.getByTestId('vocab-count-badge')).toHaveTextContent('60 chunks')
+  })
+
+  it('clicking the save icon on a chunk row toggles the saved state', () => {
+    render(<VocabBrowse />)
+    const saveButton = screen.getAllByTestId('chunk-row-save')[0]
+    expect(saveButton).toHaveAttribute('data-saved', 'false')
+    fireEvent.click(saveButton)
+    expect(saveButton).toHaveAttribute('data-saved', 'true')
+    fireEvent.click(saveButton)
+    expect(saveButton).toHaveAttribute('data-saved', 'false')
   })
 })

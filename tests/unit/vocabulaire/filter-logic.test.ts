@@ -3,8 +3,8 @@ import { CHUNKS, CEFR_LEVELS, CHUNK_SOURCES } from '@/lib/data/chunks'
 import { applyFilters, DEFAULT_FILTER_STATE } from '@/lib/vocab/filter'
 
 describe('applyFilters — fixture sanity', () => {
-  it('has 30 chunks', () => {
-    expect(CHUNKS).toHaveLength(30)
+  it('has 60 chunks', () => {
+    expect(CHUNKS).toHaveLength(60)
   })
 
   it('every CEFR level (A1–C1) is represented at least once', () => {
@@ -23,8 +23,8 @@ describe('applyFilters — fixture sanity', () => {
 })
 
 describe('applyFilters — defaults', () => {
-  it('default state returns all 30 chunks', () => {
-    expect(applyFilters(CHUNKS, DEFAULT_FILTER_STATE)).toHaveLength(30)
+  it('default state returns all 60 chunks', () => {
+    expect(applyFilters(CHUNKS, DEFAULT_FILTER_STATE)).toHaveLength(60)
   })
 })
 
@@ -51,7 +51,7 @@ describe('applyFilters — CEFR filtering', () => {
 
 describe('applyFilters — source filtering', () => {
   it('source = "all" returns all chunks', () => {
-    expect(applyFilters(CHUNKS, { ...DEFAULT_FILTER_STATE, source: 'all' })).toHaveLength(30)
+    expect(applyFilters(CHUNKS, { ...DEFAULT_FILTER_STATE, source: 'all' })).toHaveLength(60)
   })
 
   it('source = "Média" returns only Média chunks', () => {
@@ -93,7 +93,7 @@ describe('applyFilters — search filtering', () => {
   })
 
   it('empty search treats every chunk as matching', () => {
-    expect(applyFilters(CHUNKS, { ...DEFAULT_FILTER_STATE, search: '' })).toHaveLength(30)
+    expect(applyFilters(CHUNKS, { ...DEFAULT_FILTER_STATE, search: '' })).toHaveLength(60)
   })
 })
 

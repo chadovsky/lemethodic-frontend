@@ -1489,7 +1489,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### MOCK-009 — Le Vocabulaire fixture expansion + browse / practice / test polish
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged 3e6bca4
 **Branch:** `feat/mock-009-vocab-polish` (FE, from `main`)
 **Effort:** 1 session (~4–5h)
 **Benchmark:** Airlearn (flashcard UX, quiz feedback presentation) + Promova (browse-view data density)

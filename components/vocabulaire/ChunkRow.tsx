@@ -1,15 +1,19 @@
 'use client'
 
+import { useState } from 'react'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
 import type { Chunk } from '@/lib/data/chunks'
 
 export default function ChunkRow({ chunk }: { chunk: Chunk }) {
+  const [saved, setSaved] = useState(false)
+
   return (
     <li
       data-testid="chunk-row"
       data-chunk-id={chunk.id}
       data-chunk-level={chunk.level}
       data-chunk-source={chunk.source}
+      className="ed-card-lift"
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -88,10 +92,9 @@ export default function ChunkRow({ chunk }: { chunk: Chunk }) {
       <button
         type="button"
         data-testid="chunk-row-save"
-        aria-label={`Sauvegarder « ${chunk.fr} »`}
-        onClick={() => {
-          /* Save state — BE-XXX wires the endpoint */
-        }}
+        data-saved={saved}
+        aria-label={`${saved ? 'Retirer des sauvegardes' : 'Sauvegarder'} « ${chunk.fr} »`}
+        onClick={() => setSaved((v) => !v)}
         className="ed-btn-press"
         style={{
           flexShrink: 0,
@@ -99,27 +102,28 @@ export default function ChunkRow({ chunk }: { chunk: Chunk }) {
           height: 36,
           borderRadius: 4,
           border: '1px solid var(--rule-default)',
-          backgroundColor: 'transparent',
-          color: 'var(--text-muted)',
+          backgroundColor: saved ? 'var(--fp-blush)' : 'transparent',
+          color: saved ? 'var(--error)' : 'var(--text-muted)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
           padding: 0,
+          transition: 'background-color 200ms, color 200ms',
         }}
       >
         <svg
           width="16"
           height="16"
           viewBox="0 0 24 24"
-          fill="none"
+          fill={saved ? 'currentColor' : 'none'}
           stroke="currentColor"
           strokeWidth="1.6"
           strokeLinecap="round"
           strokeLinejoin="round"
           aria-hidden="true"
         >
-          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
         </svg>
       </button>
     </li>

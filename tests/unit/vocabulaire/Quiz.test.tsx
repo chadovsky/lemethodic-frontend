@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import Quiz from '@/components/vocabulaire/Quiz'
 import { CHUNKS } from '@/lib/data/chunks'
 import { buildQuiz } from '@/lib/vocab/quiz'
@@ -7,19 +7,20 @@ import { buildQuiz } from '@/lib/vocab/quiz'
 const QUIZ = buildQuiz(CHUNKS, 10)
 
 function answerCurrent(correctly: boolean) {
-  // For tests, find the right index from the question’s data attribute.
-  // Quiz exposes data-question-index on the QuizQuestion wrapper so we can
-  // look up the source question in the prebuilt QUIZ array.
   const wrapper = screen.getByTestId('quiz-question')
   const qIndex = Number(wrapper.getAttribute('data-question-index'))
   const correctIndex = QUIZ[qIndex].correctIndex
   const choiceIndex = correctly ? correctIndex : (correctIndex + 1) % 4
   fireEvent.click(screen.getByTestId(`quiz-choice-${choiceIndex}`))
   fireEvent.click(screen.getByTestId('quiz-submit'))
+  act(() => vi.advanceTimersByTime(250))
   fireEvent.click(screen.getByTestId('quiz-next'))
 }
 
 describe('Quiz', () => {
+  beforeEach(() => vi.useFakeTimers())
+  afterEach(() => vi.useRealTimers())
+
   it('renders header "Test" with descriptor and back-to-list link', () => {
     render(<Quiz />)
     expect(screen.getByRole('heading', { level: 1, name: /^test$/i })).toBeInTheDocument()
@@ -77,7 +78,6 @@ describe('Quiz', () => {
 
   it('mixed answers produce the matching score', () => {
     render(<Quiz />)
-    // 7 correct, 3 incorrect (alternating pattern)
     const pattern = [true, true, true, false, true, false, true, true, false, true]
     for (const correct of pattern) {
       answerCurrent(correct)

@@ -65,4 +65,24 @@ describe('Flashcard', () => {
     const { container } = render(<Flashcard chunk={SAMPLE} flipped={false} onFlip={() => {}} />)
     expect(container.querySelector('audio')).toBeNull()
   })
+
+  // MOCK-009 — 3D flip, 28px font, back face
+  it('front face French text has font-size 28px (inline style)', () => {
+    render(<Flashcard chunk={SAMPLE} flipped={false} onFlip={() => {}} />)
+    const frText = screen.getByTestId('flashcard-fr-front')
+    expect(frText).toHaveStyle({ fontSize: '28px' })
+  })
+
+  it('after flip, back face has aria-hidden=false and shows English gloss', () => {
+    render(<Flashcard chunk={SAMPLE} flipped={true} onFlip={() => {}} />)
+    expect(screen.getByTestId('flashcard-back')).toHaveAttribute('aria-hidden', 'false')
+    expect(screen.getByTestId('flashcard-en')).toHaveTextContent("That's perfect timing")
+  })
+
+  it('flashcard container has rotateY(180deg) transform when flipped', () => {
+    render(<Flashcard chunk={SAMPLE} flipped={true} onFlip={() => {}} />)
+    const card = screen.getByTestId('flashcard')
+    const transform = card.style.transform
+    expect(transform).toContain('rotateY(180deg)')
+  })
 })

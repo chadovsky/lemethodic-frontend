@@ -9,12 +9,10 @@ interface QuizResultsProps {
   onRestart: () => void
 }
 
-function flavorCopy(score: number, total: number): string {
-  const pct = score / total
-  if (pct >= 0.9) return 'Maîtrise solide. Continuez à varier vos sources.'
-  if (pct >= 0.7) return 'Bon socle. Les zones à revoir se dégagent.'
-  if (pct >= 0.4) return 'Travail à approfondir. Repassez en mode pratique.'
-  return 'Démarrage à consolider. La pratique précède le test.'
+function flavorCopy(score: number): string {
+  if (score >= 8) return 'Excellent. Votre réservoir lexical est solide.'
+  if (score >= 5) return 'Bien. Continuez à pratiquer.'
+  return 'À revoir. Répétez la pratique régulièrement.'
 }
 
 export default function QuizResults({ score, total, onRestart }: QuizResultsProps) {
@@ -65,6 +63,7 @@ export default function QuizResults({ score, total, onRestart }: QuizResultsProp
         {score} / {total}
       </h2>
       <p
+        data-testid="quiz-results-flavor"
         style={{
           fontFamily: SANS_FONT,
           fontWeight: 400,
@@ -74,7 +73,7 @@ export default function QuizResults({ score, total, onRestart }: QuizResultsProp
           maxWidth: 360,
         }}
       >
-        {flavorCopy(score, total)}
+        {flavorCopy(score)}
       </p>
       <div
         style={{

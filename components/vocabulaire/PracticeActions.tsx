@@ -10,7 +10,7 @@ interface PracticeActionsProps {
   isFirst: boolean
 }
 
-const secondaryButtonStyle: React.CSSProperties = {
+const reviewButtonStyle: React.CSSProperties = {
   flex: '1 1 0',
   minHeight: 48,
   padding: '12px 16px',
@@ -18,22 +18,36 @@ const secondaryButtonStyle: React.CSSProperties = {
   fontWeight: 600,
   fontSize: '0.9375rem',
   color: 'var(--text-primary)',
-  backgroundColor: 'var(--bg-elevated)',
+  backgroundColor: 'var(--fp-blush)',
   border: '1px solid var(--rule-default)',
   borderRadius: 4,
   cursor: 'pointer',
 }
 
-const primaryButtonStyle: React.CSSProperties = {
+const knownButtonStyle: React.CSSProperties = {
   flex: '1 1 0',
   minHeight: 48,
   padding: '12px 16px',
   fontFamily: SANS_FONT,
   fontWeight: 600,
   fontSize: '0.9375rem',
-  color: 'var(--bg-elevated)',
-  backgroundColor: 'var(--cta-primary)',
-  border: '1px solid var(--cta-primary)',
+  color: 'var(--text-primary)',
+  backgroundColor: 'var(--fp-sage)',
+  border: '1px solid var(--rule-default)',
+  borderRadius: 4,
+  cursor: 'pointer',
+}
+
+const nextButtonStyle: React.CSSProperties = {
+  flex: '1 1 0',
+  minHeight: 48,
+  padding: '12px 16px',
+  fontFamily: SANS_FONT,
+  fontWeight: 600,
+  fontSize: '0.9375rem',
+  color: '#fff',
+  backgroundColor: 'var(--ed-accent)',
+  border: '1px solid var(--ed-accent)',
   borderRadius: 4,
   cursor: 'pointer',
 }
@@ -94,7 +108,7 @@ export default function PracticeActions({
           data-testid="practice-action-review"
           onClick={onReview}
           className="ed-btn-press"
-          style={secondaryButtonStyle}
+          style={reviewButtonStyle}
         >
           À revoir
         </button>
@@ -103,7 +117,7 @@ export default function PracticeActions({
           data-testid="practice-action-next"
           onClick={onNext}
           className="ed-btn-press"
-          style={primaryButtonStyle}
+          style={nextButtonStyle}
         >
           Suivant
         </button>
@@ -112,7 +126,7 @@ export default function PracticeActions({
           data-testid="practice-action-known"
           onClick={onKnown}
           className="ed-btn-press"
-          style={secondaryButtonStyle}
+          style={knownButtonStyle}
         >
           Connu
         </button>

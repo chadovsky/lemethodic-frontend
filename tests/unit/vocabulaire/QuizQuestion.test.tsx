@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import QuizQuestion from '@/components/vocabulaire/QuizQuestion'
 import type { QuizQuestionData } from '@/lib/vocab/quiz'
 import type { Chunk } from '@/lib/data/chunks'
@@ -19,6 +19,9 @@ const QUESTION: QuizQuestionData = {
 }
 
 describe('QuizQuestion', () => {
+  beforeEach(() => vi.useFakeTimers())
+  afterEach(() => vi.useRealTimers())
+
   it('renders the French prompt, CEFR badge, and source pill', () => {
     render(
       <QuizQuestion
@@ -83,7 +86,7 @@ describe('QuizQuestion', () => {
     expect(screen.getByTestId('quiz-choice-1')).toHaveAttribute('data-selected', 'false')
   })
 
-  it('after Submit, choices freeze and Question suivante replaces Submit', () => {
+  it('after Submit, choices freeze and Question suivante replaces Submit after 250ms', () => {
     render(
       <QuizQuestion
         question={QUESTION}
@@ -95,6 +98,8 @@ describe('QuizQuestion', () => {
     fireEvent.click(screen.getByTestId('quiz-choice-1'))
     fireEvent.click(screen.getByTestId('quiz-submit'))
     expect(screen.queryByTestId('quiz-submit')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('quiz-next')).not.toBeInTheDocument()
+    act(() => vi.advanceTimersByTime(250))
     expect(screen.getByTestId('quiz-next')).toBeInTheDocument()
   })
 
@@ -147,6 +152,7 @@ describe('QuizQuestion', () => {
     )
     fireEvent.click(screen.getByTestId('quiz-choice-0'))
     fireEvent.click(screen.getByTestId('quiz-submit'))
+    act(() => vi.advanceTimersByTime(250))
     fireEvent.click(screen.getByTestId('quiz-next'))
     expect(onComplete).toHaveBeenCalledTimes(1)
     expect(onComplete).toHaveBeenCalledWith(true)
@@ -164,6 +170,7 @@ describe('QuizQuestion', () => {
     )
     fireEvent.click(screen.getByTestId('quiz-choice-2'))
     fireEvent.click(screen.getByTestId('quiz-submit'))
+    act(() => vi.advanceTimersByTime(250))
     fireEvent.click(screen.getByTestId('quiz-next'))
     expect(onComplete).toHaveBeenCalledWith(false)
   })
@@ -194,5 +201,63 @@ describe('QuizQuestion', () => {
       />,
     )
     expect(container.querySelector('audio')).toBeNull()
+  })
+
+  // MOCK-009 — delayed quiz-next and left-border feedback colors
+  it('Question suivante is not visible immediately after Submit (250ms delay)', () => {
+    render(
+      <QuizQuestion
+        question={QUESTION}
+        questionNumber={1}
+        totalQuestions={10}
+        onComplete={() => {}}
+      />,
+    )
+    fireEvent.click(screen.getByTestId('quiz-choice-0'))
+    fireEvent.click(screen.getByTestId('quiz-submit'))
+    expect(screen.queryByTestId('quiz-next')).not.toBeInTheDocument()
+  })
+
+  it('Question suivante becomes visible after 250ms', () => {
+    render(
+      <QuizQuestion
+        question={QUESTION}
+        questionNumber={1}
+        totalQuestions={10}
+        onComplete={() => {}}
+      />,
+    )
+    fireEvent.click(screen.getByTestId('quiz-choice-0'))
+    fireEvent.click(screen.getByTestId('quiz-submit'))
+    act(() => vi.advanceTimersByTime(250))
+    expect(screen.getByTestId('quiz-next')).toBeInTheDocument()
+  })
+
+  it('correct choice gets class quiz-choice-correct after submit', () => {
+    render(
+      <QuizQuestion
+        question={QUESTION}
+        questionNumber={1}
+        totalQuestions={10}
+        onComplete={() => {}}
+      />,
+    )
+    fireEvent.click(screen.getByTestId('quiz-choice-1'))
+    fireEvent.click(screen.getByTestId('quiz-submit'))
+    expect(screen.getByTestId('quiz-choice-0')).toHaveClass('quiz-choice-correct')
+  })
+
+  it('wrong choice gets class quiz-choice-incorrect after submit', () => {
+    render(
+      <QuizQuestion
+        question={QUESTION}
+        questionNumber={1}
+        totalQuestions={10}
+        onComplete={() => {}}
+      />,
+    )
+    fireEvent.click(screen.getByTestId('quiz-choice-1'))
+    fireEvent.click(screen.getByTestId('quiz-submit'))
+    expect(screen.getByTestId('quiz-choice-1')).toHaveClass('quiz-choice-incorrect')
   })
 })

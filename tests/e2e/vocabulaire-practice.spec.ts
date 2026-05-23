@@ -10,7 +10,7 @@ test.describe('Le Vocabulaire practice — desktop (1280×800)', () => {
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
     await expect(page.getByRole('heading', { level: 1, name: /pratique/i })).toBeVisible()
     await expect(page.getByText(/révisez vos chunks, un par un\./i)).toBeVisible()
-    await expect(page.getByTestId('practice-progress')).toHaveText(/carte 1 sur 30/i)
+    await expect(page.getByTestId('practice-progress')).toHaveText(/carte 1 sur 60/i)
     await expect(page.getByTestId('flashcard')).toBeVisible()
     await expect(page.getByTestId('flashcard')).toHaveAttribute('data-flipped', 'false')
     await expect(page.getByTestId('practice-action-review')).toBeVisible()
@@ -51,15 +51,15 @@ test.describe('Le Vocabulaire practice — desktop (1280×800)', () => {
   test('clicking Suivant advances to card 2', async ({ page }) => {
     await page.goto('/vocabulaire/practice')
     await page.getByTestId('practice-action-next').click()
-    await expect(page.getByTestId('practice-progress')).toHaveText(/carte 2 sur 30/i)
+    await expect(page.getByTestId('practice-progress')).toHaveText(/carte 2 sur 60/i)
     await expect(page.getByTestId('practice-prev')).toBeEnabled()
   })
 
-  test('advancing through all 30 cards shows the end-of-deck panel; Recommencer resets to card 1', async ({
+  test('advancing through all 60 cards shows the end-of-deck panel; Recommencer resets to card 1', async ({
     page,
   }) => {
     await page.goto('/vocabulaire/practice')
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 60; i++) {
       await page.getByTestId('practice-action-next').click()
     }
     await expect(page.getByTestId('flashcard')).toHaveCount(0)
@@ -71,7 +71,7 @@ test.describe('Le Vocabulaire practice — desktop (1280×800)', () => {
     )
 
     await page.getByTestId('end-of-deck-restart').click()
-    await expect(page.getByTestId('practice-progress')).toHaveText(/carte 1 sur 30/i)
+    await expect(page.getByTestId('practice-progress')).toHaveText(/carte 1 sur 60/i)
     await expect(page.getByTestId('flashcard')).toHaveAttribute('data-flipped', 'false')
   })
 
@@ -88,6 +88,26 @@ test.describe('Le Vocabulaire practice — desktop (1280×800)', () => {
     await page.goto('/vocabulaire/practice')
     await page.getByTestId('practice-back-to-list').click()
     await expect(page).toHaveURL(/\/vocabulaire$/)
+  })
+
+  // MOCK-009 — 3D flip transform, action button chip colors
+  test('card flip applies rotateY transform', async ({ page }) => {
+    await page.goto('/vocabulaire/practice')
+    const card = page.getByTestId('flashcard')
+    await card.click()
+    const transform = await card.evaluate((el: HTMLElement) => el.style.transform)
+    expect(transform).toContain('rotateY(180deg)')
+  })
+
+  test('À revoir and Connu action buttons are visible and have non-transparent backgrounds', async ({ page }) => {
+    await page.goto('/vocabulaire/practice')
+    await expect(page.getByTestId('practice-action-review')).toBeVisible()
+    await expect(page.getByTestId('practice-action-known')).toBeVisible()
+    const reviewBg = await page.getByTestId('practice-action-review').evaluate(
+      (el) => window.getComputedStyle(el).backgroundColor,
+    )
+    expect(reviewBg).not.toBe('rgba(0, 0, 0, 0)')
+    expect(reviewBg).not.toBe('transparent')
   })
 })
 
@@ -117,5 +137,14 @@ test.describe('Le Vocabulaire practice — mobile (375×667)', () => {
       expect(box!.height).toBeGreaterThanOrEqual(44)
       expect(box!.width).toBeGreaterThanOrEqual(44)
     }
+  })
+
+  // MOCK-009 — mobile card full-width
+  test('flashcard is full-width on mobile', async ({ page }) => {
+    await page.goto('/vocabulaire/practice')
+    const cardBox = await page.getByTestId('flashcard').boundingBox()
+    const bodyWidth = await page.evaluate(() => document.body.clientWidth)
+    expect(cardBox).not.toBeNull()
+    expect(cardBox!.width).toBeGreaterThanOrEqual(bodyWidth * 0.85)
   })
 })

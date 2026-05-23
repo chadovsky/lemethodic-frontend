@@ -25,17 +25,16 @@ export default function Flashcard({ chunk, flipped, onFlip }: FlashcardProps) {
         maxWidth: 520,
         minHeight: 240,
         margin: '0 auto',
-        padding: 'clamp(24px, 4vw, 40px)',
-        backgroundColor: 'var(--bg-elevated)',
-        border: '1px solid var(--rule-default)',
-        borderRadius: 8,
+        padding: 0,
+        backgroundColor: 'var(--ed-paper)',
+        border: '1px solid var(--ed-rule)',
+        borderRadius: 12,
         cursor: 'pointer',
-        textAlign: 'center',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
         fontFamily: 'inherit',
         color: 'inherit',
+        transformStyle: 'preserve-3d',
+        transform: `perspective(1000px) rotateY(${flipped ? 180 : 0}deg)`,
+        transition: `transform 0.45s var(--ed-ease)`,
       }}
     >
       {/* Front face */}
@@ -43,11 +42,15 @@ export default function Flashcard({ chunk, flipped, onFlip }: FlashcardProps) {
         data-testid="flashcard-front"
         aria-hidden={flipped}
         style={{
-          display: flipped ? 'none' : 'flex',
+          position: 'absolute',
+          inset: 0,
+          backfaceVisibility: 'hidden',
+          display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          justifyContent: 'center',
           gap: 18,
-          width: '100%',
+          padding: 'clamp(24px, 3vw, 32px)',
         }}
       >
         <span
@@ -56,7 +59,7 @@ export default function Flashcard({ chunk, flipped, onFlip }: FlashcardProps) {
             fontFamily: SERIF_FONT,
             fontStyle: 'italic',
             fontWeight: 500,
-            fontSize: 'clamp(28px, 4vw, 44px)',
+            fontSize: '28px',
             lineHeight: 1.15,
             letterSpacing: '-0.015em',
             color: 'var(--text-primary)',
@@ -99,16 +102,21 @@ export default function Flashcard({ chunk, flipped, onFlip }: FlashcardProps) {
         </div>
       </div>
 
-      {/* Back face */}
+      {/* Back face — rotated 180deg so it faces away by default; card rotation reveals it */}
       <div
         data-testid="flashcard-back"
         aria-hidden={!flipped}
         style={{
-          display: flipped ? 'flex' : 'none',
+          position: 'absolute',
+          inset: 0,
+          backfaceVisibility: 'hidden',
+          transform: 'rotateY(180deg)',
+          display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          justifyContent: 'center',
           gap: 14,
-          width: '100%',
+          padding: 'clamp(24px, 3vw, 32px)',
         }}
       >
         <span
@@ -130,7 +138,7 @@ export default function Flashcard({ chunk, flipped, onFlip }: FlashcardProps) {
             fontFamily: SERIF_FONT,
             fontStyle: 'italic',
             fontWeight: 500,
-            fontSize: 'clamp(26px, 3.6vw, 40px)',
+            fontSize: '28px',
             lineHeight: 1.15,
             letterSpacing: '-0.015em',
             color: 'var(--text-primary)',

@@ -36,7 +36,6 @@ test.describe('Le Vocabulaire test — desktop (1280×800)', () => {
     await page.getByTestId('quiz-submit').click()
     await expect(page.getByTestId('quiz-submit')).toHaveCount(0)
     await expect(page.getByTestId('quiz-next')).toBeVisible()
-    // Exactly one choice is in the correct state
     const correctCount = await page.locator('[data-testid^="quiz-choice-"][data-state="correct"]').count()
     expect(correctCount).toBe(1)
   })
@@ -78,6 +77,33 @@ test.describe('Le Vocabulaire test — desktop (1280×800)', () => {
     await page.goto('/vocabulaire/test')
     await page.getByTestId('quiz-back-to-list').click()
     await expect(page).toHaveURL(/\/vocabulaire$/)
+  })
+
+  // MOCK-009 — delayed quiz-next, feedback border classes, flavor copy
+  test('Question suivante appears after Submit (Playwright auto-waits)', async ({ page }) => {
+    await page.goto('/vocabulaire/test')
+    await page.getByTestId('quiz-choice-0').click()
+    await page.getByTestId('quiz-submit').click()
+    await expect(page.getByTestId('quiz-next')).toBeVisible()
+  })
+
+  test('correct choice has class quiz-choice-correct after Submit', async ({ page }) => {
+    await page.goto('/vocabulaire/test')
+    await page.getByTestId('quiz-choice-0').click()
+    await page.getByTestId('quiz-submit').click()
+    // Find whichever choice is correct
+    const correct = page.locator('[data-state="correct"]')
+    await expect(correct).toHaveClass(/quiz-choice-correct/)
+  })
+
+  test('quiz results show flavor copy text', async ({ page }) => {
+    await page.goto('/vocabulaire/test')
+    for (let i = 0; i < 10; i++) {
+      await page.getByTestId('quiz-choice-0').click()
+      await page.getByTestId('quiz-submit').click()
+      await page.getByTestId('quiz-next').click()
+    }
+    await expect(page.getByTestId('quiz-results-flavor')).toBeVisible()
   })
 })
 

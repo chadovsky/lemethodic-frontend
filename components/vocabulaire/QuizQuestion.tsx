@@ -42,6 +42,7 @@ export default function QuizQuestion({
 }: QuizQuestionProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [submitted, setSubmitted] = useState(false)
+  const [showNext, setShowNext] = useState(false)
 
   const handleSelect = (index: number) => {
     if (submitted) return
@@ -51,10 +52,11 @@ export default function QuizQuestion({
   const handleSubmit = () => {
     if (selectedIndex === null || submitted) return
     setSubmitted(true)
+    setTimeout(() => setShowNext(true), 250)
   }
 
   const handleNext = () => {
-    if (!submitted || selectedIndex === null) return
+    if (!showNext || selectedIndex === null) return
     onComplete(selectedIndex === question.correctIndex)
   }
 
@@ -176,7 +178,7 @@ export default function QuizQuestion({
                 aria-pressed={selected}
                 disabled={submitted}
                 onClick={() => handleSelect(index)}
-                className="ed-btn-press"
+                className={`ed-btn-press${state === 'correct' ? ' quiz-choice-correct' : state === 'incorrect' ? ' quiz-choice-incorrect' : ''}`}
                 style={{
                   width: '100%',
                   minHeight: 56,
@@ -231,7 +233,7 @@ export default function QuizQuestion({
           width: '100%',
         }}
       >
-        {submitted ? (
+        {showNext ? (
           <button
             type="button"
             data-testid="quiz-next"
@@ -252,7 +254,7 @@ export default function QuizQuestion({
           >
             Question suivante
           </button>
-        ) : (
+        ) : !submitted ? (
           <button
             type="button"
             data-testid="quiz-submit"
@@ -278,7 +280,7 @@ export default function QuizQuestion({
           >
             Valider
           </button>
-        )}
+        ) : null}
       </div>
     </section>
   )

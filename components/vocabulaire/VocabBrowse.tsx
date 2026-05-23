@@ -54,6 +54,18 @@ export default function VocabBrowse() {
           >
             Les chunks qui font la différence.
           </p>
+          <span
+            data-testid="vocab-count-badge"
+            style={{
+              fontFamily: SANS_FONT,
+              fontWeight: 600,
+              fontSize: '0.75rem',
+              letterSpacing: '0.04em',
+              color: 'var(--text-muted)',
+            }}
+          >
+            {CHUNKS.length} chunks
+          </span>
         </div>
 
         <div
