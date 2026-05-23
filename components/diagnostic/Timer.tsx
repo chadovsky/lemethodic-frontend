@@ -13,6 +13,7 @@ export default function Timer({ initialSeconds }: { initialSeconds: number }) {
   const [secondsLeft, setSecondsLeft] = useState(initialSeconds)
   const [running, setRunning] = useState(false)
   const elapsed = secondsLeft === 0
+  const urgency = secondsLeft > 0 && secondsLeft < 60 && running
 
   useEffect(() => {
     if (!running) return
@@ -43,12 +44,12 @@ export default function Timer({ initialSeconds }: { initialSeconds: number }) {
     >
       <span
         data-testid="timer-display"
+        className={elapsed ? 'timer-elapsed-display' : urgency ? 'timer-urgency' : ''}
         style={{
           fontFamily: SANS_FONT,
           fontWeight: 600,
-          fontSize: 'clamp(28px, 3vw, 40px)',
+          fontSize: '32px',
           letterSpacing: '-0.02em',
-          color: elapsed ? 'var(--text-muted)' : 'var(--text-primary)',
           fontVariantNumeric: 'tabular-nums',
         }}
       >
@@ -83,12 +84,13 @@ export default function Timer({ initialSeconds }: { initialSeconds: number }) {
           fontFamily: SANS_FONT,
           fontWeight: 600,
           fontSize: '0.875rem',
-          color: 'var(--text-primary)',
-          backgroundColor: 'transparent',
-          border: '1px solid var(--rule-default)',
+          color: running ? 'var(--ed-accent)' : '#fff',
+          backgroundColor: running ? 'transparent' : 'var(--ed-accent)',
+          border: '1px solid var(--ed-accent)',
           borderRadius: 4,
           padding: '6px 14px',
           cursor: elapsed ? 'default' : 'pointer',
+          opacity: elapsed ? 0.5 : 1,
         }}
       >
         {running ? 'Pause' : 'Démarrer'}

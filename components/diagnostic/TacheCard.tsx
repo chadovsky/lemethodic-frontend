@@ -1,7 +1,15 @@
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
 import type { Tache } from '@/lib/data/taches'
 
+const TACHE_ACCENT: Record<number, string> = {
+  1: 'var(--fp-lavender)',
+  2: 'var(--fp-sky)',
+  3: 'var(--fp-peach)',
+}
+
 export default function TacheCard({ tache }: { tache: Tache }) {
+  const accentColor = TACHE_ACCENT[tache.id] ?? 'var(--rule-default)'
+
   return (
     <article
       data-testid="tache-card"
@@ -16,8 +24,23 @@ export default function TacheCard({ tache }: { tache: Tache }) {
         flexDirection: 'column',
         gap: 12,
         height: '100%',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
+      {/* Per-tâche decorative left accent bar — F-200 chip layer */}
+      <div
+        data-testid="tache-card-accent-bar"
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: 4,
+          backgroundColor: accentColor,
+          borderRadius: '4px 0 0 4px',
+        }}
+      />
       <h3
         data-testid="tache-card-title"
         style={{

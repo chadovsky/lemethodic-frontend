@@ -12,8 +12,14 @@ const STATUS: Record<RecordingState, string> = {
   stopped: 'Enregistrement terminé.',
 }
 
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined') return false
+  return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+}
+
 export default function RecordingPlaceholder() {
   const [state, setState] = useState<RecordingState>('idle')
+  const reducedMotion = prefersReducedMotion()
 
   const handleMicClick = () => {
     if (state === 'idle') setState('recording')
@@ -33,42 +39,75 @@ export default function RecordingPlaceholder() {
     >
       <WaveformPlaceholder isActive={state === 'recording'} />
 
-      <button
-        data-testid="recording-mic-btn"
-        onClick={handleMicClick}
-        disabled={state === 'stopped'}
-        aria-label={state === 'recording' ? 'Arrêter l\'enregistrement' : 'Commencer l\'enregistrement'}
-        className="ed-btn-press"
-        style={{
-          width: 96,
-          height: 96,
-          borderRadius: '50%',
-          border: `2px solid ${state === 'recording' ? 'var(--cta-primary)' : 'var(--rule-default)'}`,
-          backgroundColor: state === 'recording' ? 'var(--cta-primary)' : 'var(--bg-elevated)',
-          cursor: state === 'stopped' ? 'default' : 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'background-color 200ms ease, border-color 200ms ease',
-        }}
-      >
-        <svg
-          width="32"
-          height="32"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke={state === 'recording' ? 'var(--bg-elevated)' : 'var(--text-primary)'}
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
+      {/* Mic button + ripple rings container */}
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {state === 'recording' && !reducedMotion && (
+          <>
+            <div
+              data-testid="recording-ripple"
+              className="recording-ripple recording-ripple-1"
+              style={{
+                position: 'absolute',
+                width: 96,
+                height: 96,
+                borderRadius: '50%',
+                border: '2px solid var(--cta-primary)',
+                pointerEvents: 'none',
+              }}
+            />
+            <div
+              data-testid="recording-ripple"
+              className="recording-ripple recording-ripple-2"
+              style={{
+                position: 'absolute',
+                width: 96,
+                height: 96,
+                borderRadius: '50%',
+                border: '2px solid var(--cta-primary)',
+                pointerEvents: 'none',
+              }}
+            />
+          </>
+        )}
+        <button
+          data-testid="recording-mic-btn"
+          onClick={handleMicClick}
+          disabled={state === 'stopped'}
+          aria-label={state === 'recording' ? "Arrêter l'enregistrement" : "Commencer l'enregistrement"}
+          className="ed-btn-press"
+          style={{
+            width: 96,
+            height: 96,
+            borderRadius: '50%',
+            border: `2px solid ${state === 'recording' ? 'var(--cta-primary)' : 'var(--rule-default)'}`,
+            backgroundColor: state === 'recording' ? 'var(--cta-primary)' : 'var(--bg-elevated)',
+            cursor: state === 'stopped' ? 'default' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'background-color 200ms ease, border-color 200ms ease',
+            position: 'relative',
+            zIndex: 1,
+          }}
         >
-          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-          <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-          <line x1="12" y1="19" x2="12" y2="23" />
-          <line x1="8" y1="23" x2="16" y2="23" />
-        </svg>
-      </button>
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke={state === 'recording' ? 'var(--bg-elevated)' : 'var(--text-primary)'}
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+            <line x1="12" y1="19" x2="12" y2="23" />
+            <line x1="8" y1="23" x2="16" y2="23" />
+          </svg>
+        </button>
+      </div>
 
       <p
         data-testid="recording-status"
@@ -76,12 +115,28 @@ export default function RecordingPlaceholder() {
           fontFamily: SANS_FONT,
           fontWeight: 400,
           fontSize: '0.9375rem',
-          color: 'var(--text-muted)',
+          color: 'var(--ed-muted)',
           margin: 0,
           textAlign: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
         }}
       >
         {STATUS[state]}
+        {state === 'recording' && (
+          <span
+            className={reducedMotion ? '' : 'recording-blink-dot'}
+            style={{
+              display: 'inline-block',
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              backgroundColor: 'var(--fp-blush)',
+              flexShrink: 0,
+            }}
+          />
+        )}
       </p>
 
       {state === 'stopped' && (
@@ -94,9 +149,9 @@ export default function RecordingPlaceholder() {
               fontSize: '0.875rem',
               color: 'var(--text-muted)',
               background: 'none',
-              border: '1px solid var(--rule-default)',
-              borderRadius: 4,
-              padding: '8px 16px',
+              border: '1px solid var(--ed-rule)',
+              borderRadius: 999,
+              padding: '8px 18px',
               cursor: 'pointer',
             }}
           >
@@ -112,9 +167,9 @@ export default function RecordingPlaceholder() {
               fontSize: '0.875rem',
               color: 'var(--text-primary)',
               background: 'none',
-              border: '1px solid var(--rule-default)',
-              borderRadius: 4,
-              padding: '8px 16px',
+              border: '1px solid var(--ed-rule)',
+              borderRadius: 999,
+              padding: '8px 18px',
               cursor: 'pointer',
             }}
           >

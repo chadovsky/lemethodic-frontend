@@ -78,6 +78,30 @@ test.describe('Le Diagnostic tâche shell — desktop (1280×800)', () => {
     await page.goto('/diagnostic/tache/1')
     expect(await page.locator('audio').count()).toBe(0)
   })
+
+  // MOCK-010 — timer urgency, ripple rings, reduced-motion
+  test('timer display gets urgency class when running and < 60s remaining', async ({ page }) => {
+    await page.clock.install()
+    await page.goto('/diagnostic/tache/1') // 180s timer
+    await page.getByTestId('timer-toggle').click()
+    await page.clock.fastForward(121_000) // → 59s remaining
+    await expect(page.getByTestId('timer-display')).toHaveClass(/timer-urgency/)
+  })
+
+  test('recording state shows 2 ripple ring elements', async ({ page }) => {
+    await page.goto('/diagnostic/tache/1')
+    await page.getByTestId('recording-mic-btn').click()
+    await expect(page.getByTestId('recording-ripple')).toHaveCount(2)
+  })
+
+  test('ripple rings absent when prefers-reduced-motion is set', async ({ browser }) => {
+    const context = await browser.newContext({ reducedMotion: 'reduce' })
+    const page = await context.newPage()
+    await page.goto('/diagnostic/tache/1')
+    await page.getByTestId('recording-mic-btn').click()
+    await expect(page.getByTestId('recording-ripple')).toHaveCount(0)
+    await context.close()
+  })
 })
 
 test.describe('Le Diagnostic tâche shell — mobile (375×667)', () => {

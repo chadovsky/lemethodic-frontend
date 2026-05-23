@@ -1,8 +1,12 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, afterEach } from 'vitest'
 import RecordingPlaceholder from '@/components/diagnostic/RecordingPlaceholder'
 
 describe('RecordingPlaceholder', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('renders in Idle state initially with correct status text', () => {
     render(<RecordingPlaceholder />)
     expect(screen.getByTestId('recording-status')).toHaveTextContent(
@@ -69,5 +73,41 @@ describe('RecordingPlaceholder', () => {
   it('renders the waveform placeholder', () => {
     render(<RecordingPlaceholder />)
     expect(screen.getByTestId('waveform-placeholder')).toBeInTheDocument()
+  })
+
+  // MOCK-010 — ripple rings and reduced-motion
+  it('in Recording state, renders exactly 2 ripple ring elements', () => {
+    render(<RecordingPlaceholder />)
+    fireEvent.click(screen.getByTestId('recording-mic-btn'))
+    expect(screen.getAllByTestId('recording-ripple')).toHaveLength(2)
+  })
+
+  it('ripple rings are NOT rendered in Idle state', () => {
+    render(<RecordingPlaceholder />)
+    expect(screen.queryAllByTestId('recording-ripple')).toHaveLength(0)
+  })
+
+  it('ripple rings are NOT rendered in Stopped state', () => {
+    render(<RecordingPlaceholder />)
+    fireEvent.click(screen.getByTestId('recording-mic-btn'))
+    fireEvent.click(screen.getByTestId('recording-mic-btn'))
+    expect(screen.queryAllByTestId('recording-ripple')).toHaveLength(0)
+  })
+
+  it('with prefers-reduced-motion, no ripple rings rendered in Recording state', () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: query === '(prefers-reduced-motion: reduce)',
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }))
+    render(<RecordingPlaceholder />)
+    fireEvent.click(screen.getByTestId('recording-mic-btn'))
+    expect(screen.queryAllByTestId('recording-ripple')).toHaveLength(0)
+    vi.unstubAllGlobals()
   })
 })

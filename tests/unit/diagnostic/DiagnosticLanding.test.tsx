@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, within, fireEvent } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import DiagnosticLanding from '@/components/diagnostic/DiagnosticLanding'
 import { TACHES } from '@/lib/data/taches'
@@ -48,9 +48,6 @@ describe('DiagnosticLanding', () => {
     for (const name of COUCHE_NAMES) {
       expect(within(section).getByText(name)).toBeInTheDocument()
     }
-    // Verify order. Search starts after the previous match so that
-    // "Les Moules" — which is a prefix of "Les Moules des Idées" — is
-    // located by its standalone occurrence rather than by the prefix.
     const renderedText = section.textContent ?? ''
     let lastIndex = -1
     for (const name of COUCHE_NAMES) {
@@ -81,5 +78,27 @@ describe('DiagnosticLanding', () => {
   it('does NOT contain an <audio> element', () => {
     const { container } = render(<DiagnosticLanding />)
     expect(container.querySelector('audio')).toBeNull()
+  })
+
+  // MOCK-010 — dismiss button and tâche accent bars
+  it('past-score panel has a dismiss button', () => {
+    render(<DiagnosticLanding />)
+    const panel = screen.getByTestId('diagnostic-past-score')
+    expect(within(panel).getByTestId('past-score-dismiss')).toBeInTheDocument()
+  })
+
+  it('clicking the dismiss button removes the past-score panel from DOM', () => {
+    render(<DiagnosticLanding />)
+    fireEvent.click(screen.getByTestId('past-score-dismiss'))
+    expect(screen.queryByTestId('diagnostic-past-score')).not.toBeInTheDocument()
+  })
+
+  it('each tâche card has an accent bar element', () => {
+    render(<DiagnosticLanding />)
+    const cards = screen.getAllByTestId('tache-card')
+    expect(cards).toHaveLength(3)
+    for (const card of cards) {
+      expect(within(card).getByTestId('tache-card-accent-bar')).toBeInTheDocument()
+    }
   })
 })

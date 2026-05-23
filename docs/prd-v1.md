@@ -1574,7 +1574,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### MOCK-010 — Le Diagnostic landing + tâche shell polish
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged a59c4de
 **Branch:** `feat/mock-010-diagnostic-tache-polish` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 **Benchmark:** Airlearn (recording UI, timer urgency states, assessment-surface typography)

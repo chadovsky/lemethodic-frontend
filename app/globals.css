@@ -562,6 +562,37 @@
 .quiz-choice-correct { border-left: 4px solid var(--fp-sage); }
 .quiz-choice-incorrect { border-left: 4px solid var(--fp-blush); }
 
+/* MOCK-010 — timer urgency color states */
+.timer-urgency { color: var(--fp-blush); }
+.timer-elapsed-display { color: var(--ed-muted); }
+
+/* MOCK-010 — recording ripple rings (Airlearn mic-active signature) */
+@keyframes recording-ripple {
+  from { transform: scale(1); opacity: 0.7; }
+  to   { transform: scale(2.2); opacity: 0; }
+}
+.recording-ripple {
+  animation: recording-ripple 1.6s ease-out infinite;
+}
+.recording-ripple-2 {
+  animation-delay: 0.8s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .recording-ripple { animation: none; }
+}
+
+/* MOCK-010 — blinking dot beside recording status text */
+@keyframes blink-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.recording-blink-dot {
+  animation: blink-dot 1s step-start infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .recording-blink-dot { animation: none; }
+}
+
 /* MOCK-005 — submit button inline CSS spinner */
 @keyframes spin {
   to { transform: rotate(360deg); }

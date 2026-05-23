@@ -71,4 +71,34 @@ describe('Timer', () => {
     fireEvent.click(screen.getByTestId('timer-toggle'))
     expect(screen.getByTestId('timer-toggle')).toHaveTextContent(/pause/i)
   })
+
+  // MOCK-010 — urgency state
+  it('timer-display gets "timer-urgency" class when running and secondsLeft < 60', () => {
+    render(<Timer initialSeconds={61} />)
+    fireEvent.click(screen.getByTestId('timer-toggle'))
+    act(() => { vi.advanceTimersByTime(2000) }) // 61 → 59 seconds
+    expect(screen.getByTestId('timer-display')).toHaveClass('timer-urgency')
+  })
+
+  it('timer-display does not have "timer-urgency" at 61s (not yet urgent)', () => {
+    render(<Timer initialSeconds={61} />)
+    fireEvent.click(screen.getByTestId('timer-toggle'))
+    act(() => { vi.advanceTimersByTime(0) }) // still at 61
+    expect(screen.getByTestId('timer-display')).not.toHaveClass('timer-urgency')
+  })
+
+  it('timer-display gets "timer-elapsed-display" class when countdown reaches 0', () => {
+    render(<Timer initialSeconds={3} />)
+    fireEvent.click(screen.getByTestId('timer-toggle'))
+    act(() => { vi.advanceTimersByTime(3000) })
+    expect(screen.getByTestId('timer-display')).toHaveClass('timer-elapsed-display')
+  })
+
+  it('timer-display does not have "timer-urgency" when paused (not running)', () => {
+    render(<Timer initialSeconds={61} />)
+    fireEvent.click(screen.getByTestId('timer-toggle')) // start
+    act(() => { vi.advanceTimersByTime(2000) })          // → 59s
+    fireEvent.click(screen.getByTestId('timer-toggle')) // pause
+    expect(screen.getByTestId('timer-display')).not.toHaveClass('timer-urgency')
+  })
 })

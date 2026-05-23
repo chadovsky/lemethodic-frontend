@@ -3,6 +3,7 @@ import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
 import CouchesPreview from './CouchesPreview'
 import PastScorePanel from './PastScorePanel'
 import TacheOverviewGrid from './TacheOverviewGrid'
+import RevealOnScroll from '@/components/landing/RevealOnScroll'
 
 export default function DiagnosticLanding() {
   return (
@@ -55,51 +56,57 @@ export default function DiagnosticLanding() {
         >
           Pourquoi un diagnostic ?
         </h2>
-        <p
-          style={{
-            fontFamily: SANS_FONT,
-            fontWeight: 400,
-            fontSize: '1rem',
-            lineHeight: 1.6,
-            color: 'var(--text-secondary)',
-            margin: 0,
-            maxWidth: 720,
-          }}
-        >
-          Le diagnostic mesure votre expression orale dans les conditions du
-          TCF Canada : trois tâches enchaînées, un seul essai, une évaluation
-          fine de ce qui sort vraiment de votre bouche le jour J.
-        </p>
-        <p
-          style={{
-            fontFamily: SANS_FONT,
-            fontWeight: 400,
-            fontSize: '1rem',
-            lineHeight: 1.6,
-            color: 'var(--text-secondary)',
-            margin: 0,
-            maxWidth: 720,
-          }}
-        >
-          Pour les candidats anglophones pressés par un dossier d&rsquo;immigration,
-          la question n&rsquo;est plus « combien de mots je connais » mais
-          « quels réflexes francophones je peux mobiliser sous pression ». Le
-          diagnostic répond précisément à cette question.
-        </p>
-        <p
-          style={{
-            fontFamily: SANS_FONT,
-            fontWeight: 400,
-            fontSize: '1rem',
-            lineHeight: 1.6,
-            color: 'var(--text-secondary)',
-            margin: 0,
-            maxWidth: 720,
-          }}
-        >
-          L&rsquo;évaluation suit la méthode en 5 couches — pas un test de
-          vocabulaire, mais une cartographie de votre voix française.
-        </p>
+        <RevealOnScroll delay={0}>
+          <p
+            style={{
+              fontFamily: SANS_FONT,
+              fontWeight: 400,
+              fontSize: '1rem',
+              lineHeight: 1.6,
+              color: 'var(--text-secondary)',
+              margin: 0,
+              maxWidth: 720,
+            }}
+          >
+            Le diagnostic mesure votre expression orale dans les conditions du
+            TCF Canada : trois tâches enchaînées, un seul essai, une évaluation
+            fine de ce qui sort vraiment de votre bouche le jour J.
+          </p>
+        </RevealOnScroll>
+        <RevealOnScroll delay={0.08}>
+          <p
+            style={{
+              fontFamily: SANS_FONT,
+              fontWeight: 400,
+              fontSize: '1rem',
+              lineHeight: 1.6,
+              color: 'var(--text-secondary)',
+              margin: 0,
+              maxWidth: 720,
+            }}
+          >
+            Pour les candidats anglophones pressés par un dossier d&rsquo;immigration,
+            la question n&rsquo;est plus « combien de mots je connais » mais
+            « quels réflexes francophones je peux mobiliser sous pression ». Le
+            diagnostic répond précisément à cette question.
+          </p>
+        </RevealOnScroll>
+        <RevealOnScroll delay={0.16}>
+          <p
+            style={{
+              fontFamily: SANS_FONT,
+              fontWeight: 400,
+              fontSize: '1rem',
+              lineHeight: 1.6,
+              color: 'var(--text-secondary)',
+              margin: 0,
+              maxWidth: 720,
+            }}
+          >
+            L&rsquo;évaluation suit la méthode en 5 couches — pas un test de
+            vocabulaire, mais une cartographie de votre voix française.
+          </p>
+        </RevealOnScroll>
       </section>
 
       <section
@@ -162,6 +169,20 @@ export default function DiagnosticLanding() {
           }}
         >
           Commencer le diagnostic
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            style={{ marginLeft: 8, flexShrink: 0 }}
+          >
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
         </Link>
       </div>
     </div>

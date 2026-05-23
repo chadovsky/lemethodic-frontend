@@ -1,7 +1,14 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
 
 export default function PastScorePanel() {
+  const [dismissed, setDismissed] = useState(false)
+
+  if (dismissed) return null
+
   return (
     <aside
       data-testid="diagnostic-past-score"
@@ -16,6 +23,7 @@ export default function PastScorePanel() {
         backgroundColor: 'var(--bg-subtle)',
         border: '1px solid var(--rule-default)',
         borderRadius: 4,
+        position: 'relative',
       }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -57,24 +65,49 @@ export default function PastScorePanel() {
           </span>
         </div>
       </div>
-      <Link
-        data-testid="diagnostic-past-score-link"
-        href="/diagnostic/results"
-        className="ed-btn-press"
-        style={{
-          padding: '10px 16px',
-          fontFamily: SANS_FONT,
-          fontWeight: 600,
-          fontSize: '0.875rem',
-          color: 'var(--text-primary)',
-          backgroundColor: 'transparent',
-          border: '1px solid var(--rule-default)',
-          borderRadius: 4,
-          textDecoration: 'none',
-        }}
-      >
-        Voir les résultats
-      </Link>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <Link
+          data-testid="diagnostic-past-score-link"
+          href="/diagnostic/results"
+          className="ed-btn-press"
+          style={{
+            padding: '10px 16px',
+            fontFamily: SANS_FONT,
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            color: 'var(--text-primary)',
+            backgroundColor: 'transparent',
+            border: '1px solid var(--rule-default)',
+            borderRadius: 4,
+            textDecoration: 'none',
+          }}
+        >
+          Voir les résultats
+        </Link>
+        <button
+          type="button"
+          data-testid="past-score-dismiss"
+          aria-label="Fermer le panneau de score"
+          onClick={() => setDismissed(true)}
+          style={{
+            width: 32,
+            height: 32,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'none',
+            border: 'none',
+            borderRadius: 4,
+            color: 'var(--text-muted)',
+            cursor: 'pointer',
+            padding: 0,
+            fontSize: '1.1rem',
+            lineHeight: 1,
+          }}
+        >
+          ×
+        </button>
+      </div>
     </aside>
   )
 }

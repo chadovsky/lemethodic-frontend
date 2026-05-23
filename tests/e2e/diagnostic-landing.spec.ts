@@ -61,6 +61,23 @@ test.describe('Le Diagnostic landing — desktop (1280×800)', () => {
     const audioCount = await page.locator('audio').count()
     expect(audioCount).toBe(0)
   })
+
+  // MOCK-010 — dismiss button and tâche accent bars
+  test('clicking the × dismiss button removes the past-score panel', async ({ page }) => {
+    await page.goto('/diagnostic')
+    await expect(page.getByTestId('diagnostic-past-score')).toBeVisible()
+    await page.getByTestId('past-score-dismiss').click()
+    await expect(page.getByTestId('diagnostic-past-score')).not.toBeAttached()
+  })
+
+  test('tâche cards each have an accent bar element', async ({ page }) => {
+    await page.goto('/diagnostic')
+    const cards = page.getByTestId('tache-card')
+    await expect(cards).toHaveCount(3)
+    for (let i = 0; i < 3; i++) {
+      await expect(cards.nth(i).getByTestId('tache-card-accent-bar')).toBeVisible()
+    }
+  })
 })
 
 test.describe('Le Diagnostic landing — mobile (375×667)', () => {
