@@ -1,5 +1,3 @@
-import { LESSONS } from './lessons'
-
 export type ActivityCategory = 'lesson' | 'vocab' | 'diagnostic'
 
 export interface ActivityRow {
@@ -57,8 +55,10 @@ export const RECENT_ACTIVITY: readonly ActivityRow[] = [
   },
 ] as const
 
-// Pointer to lesson 5 (LESSONS[4])
-export const NEXT_LESSON = LESSONS[4]
+export const NEXT_LESSON = {
+  id: 5,
+  title: 'Le rythme de la phrase française',
+}
 
 export const DIAGNOSTIC_SCORE = {
   level: 'C1',

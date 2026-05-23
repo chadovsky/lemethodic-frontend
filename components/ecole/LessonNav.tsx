@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
-import { getLessonById } from '@/lib/data/lessons'
+
+const TOTAL_LESSONS = 27
 
 export default function LessonNav({ currentId }: { currentId: number }) {
-  const prev = getLessonById(currentId - 1)
-  const next = getLessonById(currentId + 1)
+  const prevNumber = currentId > 1 ? currentId - 1 : null
+  const nextNumber = currentId < TOTAL_LESSONS ? currentId + 1 : null
 
   return (
     <nav
@@ -19,24 +20,22 @@ export default function LessonNav({ currentId }: { currentId: number }) {
         flexWrap: 'wrap',
       }}
     >
-      {prev ? (
+      {prevNumber !== null ? (
         <NavLink
           testId="lesson-nav-prev"
-          href={`/ecole/${prev.id}`}
+          href={`/ecole/${prevNumber}`}
           direction="prev"
-          lessonNumber={prev.id}
-          lessonTitle={prev.title}
+          lessonNumber={prevNumber}
         />
       ) : (
         <span />
       )}
-      {next ? (
+      {nextNumber !== null ? (
         <NavLink
           testId="lesson-nav-next"
-          href={`/ecole/${next.id}`}
+          href={`/ecole/${nextNumber}`}
           direction="next"
-          lessonNumber={next.id}
-          lessonTitle={next.title}
+          lessonNumber={nextNumber}
         />
       ) : (
         <span />
@@ -50,13 +49,11 @@ function NavLink({
   href,
   direction,
   lessonNumber,
-  lessonTitle,
 }: {
   testId: string
   href: string
   direction: 'prev' | 'next'
   lessonNumber: number
-  lessonTitle: string
 }) {
   const label = direction === 'prev' ? '← Leçon précédente' : 'Leçon suivante →'
   const align = direction === 'prev' ? 'flex-start' : 'flex-end'
@@ -101,7 +98,7 @@ function NavLink({
           color: 'var(--text-primary)',
         }}
       >
-        {lessonNumber}. {lessonTitle}
+        {lessonNumber}
       </span>
     </Link>
   )

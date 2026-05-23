@@ -3,33 +3,32 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
-import type { Lesson, LessonSection } from '@/lib/data/lessons'
+import type { Lesson } from '@/lib/types'
 import Breadcrumb from '@/components/common/Breadcrumb'
 import AudioPlayerPlaceholder from './AudioPlayerPlaceholder'
 import LessonNav from './LessonNav'
 
-const SECTION_LABEL_FR: Record<LessonSection, string> = {
-  fondations: 'Fondations',
-  approfondissement: 'Approfondissement',
-}
-
 const TOTAL_LESSONS = 27
+
+function sectionLabel(phase: 1 | 2): string {
+  return phase === 1 ? 'Fondations' : 'Approfondissement'
+}
 
 export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   const router = useRouter()
-  const sectionLabel = SECTION_LABEL_FR[lesson.section]
+  const cefr = lesson.phase === 1 ? 'B1' : 'B2'
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' && lesson.id < TOTAL_LESSONS) {
-        router.push(`/ecole/${lesson.id + 1}`)
-      } else if (e.key === 'ArrowLeft' && lesson.id > 1) {
-        router.push(`/ecole/${lesson.id - 1}`)
+      if (e.key === 'ArrowRight' && lesson.lessonNumber < TOTAL_LESSONS) {
+        router.push(`/ecole/${lesson.lessonNumber + 1}`)
+      } else if (e.key === 'ArrowLeft' && lesson.lessonNumber > 1) {
+        router.push(`/ecole/${lesson.lessonNumber - 1}`)
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [lesson.id, router])
+  }, [lesson.lessonNumber, router])
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 8 }}>
@@ -37,7 +36,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
         testId="lesson-breadcrumb"
         items={[
           { label: "L'École", href: '/ecole' },
-          { label: `Leçon ${lesson.id} : ${lesson.title}` },
+          { label: `Leçon ${lesson.lessonNumber} : ${lesson.title}` },
         ]}
       />
 
@@ -58,7 +57,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
             borderRadius: 999,
           }}
         >
-          {sectionLabel}
+          {sectionLabel(lesson.phase)}
         </span>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, flexWrap: 'wrap' }}>
           <span
@@ -74,7 +73,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
               fontVariantNumeric: 'tabular-nums',
             }}
           >
-            {lesson.id}
+            {lesson.lessonNumber}
           </span>
           <h1
             style={{
@@ -102,11 +101,11 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
             maxWidth: 680,
           }}
         >
-          {lesson.description}
+          {lesson.shortDescription}
         </p>
       </header>
 
-      <AudioPlayerPlaceholder cefr={lesson.cefr} />
+      <AudioPlayerPlaceholder cefr={cefr} />
 
       <ContentSection
         id="introduction"
@@ -134,13 +133,13 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
           "Répétez l'exercice à intervalles espacés : le lendemain, puis trois jours plus tard. La répétition espacée consolide ce que la pratique initiale a installé.",
         ]}
         prompts={[
-          'Reformulez l\'idée de la leçon en une phrase, sans utiliser les mots du texte.',
+          "Reformulez l'idée de la leçon en une phrase, sans utiliser les mots du texte.",
           'Donnez un exemple personnel qui illustre le point central — vingt secondes maximum.',
-          'Anticipez une question d\'examinateur sur ce point et préparez une réponse en trois temps : position, raison, exemple.',
+          "Anticipez une question d'examinateur sur ce point et préparez une réponse en trois temps : position, raison, exemple.",
         ]}
       />
 
-      <LessonNav currentId={lesson.id} />
+      <LessonNav currentId={lesson.lessonNumber} />
     </div>
   )
 }

@@ -1950,8 +1950,8 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 ### BE-003 — Lesson data API
 
-**Status:** Not Started
-**Branch:** `feat/be-003-lesson-api` (FE, from `main`)
+**Status:** Shipped — squash-merged `7319141` (feat/be-003-ecole-wiring → main)
+**Branch:** `feat/be-003-ecole-wiring`
 **Effort:** 1 session (~3–4h)
 
 #### Scope

@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
-import LessonDetail from '@/components/ecole/LessonDetail'
-import { getLessonById } from '@/lib/data/lessons'
+import LessonDetailContainer from '@/components/ecole/LessonDetailContainer'
 
 export const metadata = {
   title: 'Leçon — Le Méthodic',
@@ -8,11 +7,12 @@ export const metadata = {
 
 type Params = Promise<{ id: string }>
 
+const TOTAL_LESSONS = 27
+
 export default async function LessonDetailPage({ params }: { params: Params }) {
   const { id } = await params
   if (!/^\d+$/.test(id)) notFound()
   const numericId = Number(id)
-  const lesson = getLessonById(numericId)
-  if (!lesson) notFound()
-  return <LessonDetail lesson={lesson} />
+  if (numericId < 1 || numericId > TOTAL_LESSONS) notFound()
+  return <LessonDetailContainer id={numericId} />
 }

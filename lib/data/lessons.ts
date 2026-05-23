@@ -1,3 +1,7 @@
+// DEPRECATED — BE-003 wired L'École to the FastAPI backend via lib/api/lessons.ts.
+// This fixture is retained only as a title/description seed reference; do not
+// add new consumers. Remove after CON-XXX delivers real content via the API.
+//
 // UI-008 — static lesson fixture for L'École list + detail views.
 // 16 Fondations + 11 Approfondissement = 27 lessons. Titles and
 // descriptions are plausible-sounding placeholders; real curriculum

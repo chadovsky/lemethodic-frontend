@@ -1,11 +1,21 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
-import { lessonsBySection } from '@/lib/data/lessons'
+import { fetchLessons } from '@/lib/api/lessons'
+import type { Lesson } from '@/lib/types'
 import LessonCard from './LessonCard'
 
-const FONDATIONS = lessonsBySection('fondations')
-const APPROFONDISSEMENT = lessonsBySection('approfondissement')
-
 export default function LessonList() {
+  const [lessons, setLessons] = useState<Lesson[]>([])
+
+  useEffect(() => {
+    fetchLessons().then(setLessons).catch(() => {})
+  }, [])
+
+  const fondations = lessons.filter((l) => l.phase === 1)
+  const approfondissement = lessons.filter((l) => l.phase === 2)
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 48, paddingTop: 8 }}>
       <header style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -55,13 +65,13 @@ export default function LessonList() {
         id="fondations"
         title="Fondations"
         eyebrow="Leçons 1 — 16"
-        lessons={FONDATIONS}
+        lessons={fondations}
       />
       <Section
         id="approfondissement"
         title="Approfondissement"
         eyebrow="Leçons 17 — 27"
-        lessons={APPROFONDISSEMENT}
+        lessons={approfondissement}
       />
     </div>
   )
@@ -76,7 +86,7 @@ function Section({
   id: string
   title: string
   eyebrow: string
-  lessons: ReturnType<typeof lessonsBySection>
+  lessons: Lesson[]
 }) {
   return (
     <section

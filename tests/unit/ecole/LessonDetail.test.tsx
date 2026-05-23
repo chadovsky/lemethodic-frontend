@@ -16,58 +16,94 @@ vi.mock('next/navigation', () => ({
 }))
 
 import LessonDetail from '@/components/ecole/LessonDetail'
-import { getLessonById } from '@/lib/data/lessons'
+import type { Lesson } from '@/lib/types'
+
+const LESSON_1: Lesson = {
+  id: 1, lessonNumber: 1, code: 'F001',
+  title: "L'amorce d'une idee",
+  shortDescription: 'Comment ouvrir une reponse sans hesiter.',
+  status: 'completed', quizAttempts: 1, quizBestScore: 85, completedAt: '2026-01-01T00:00:00Z',
+  phase: 1,
+}
+
+const LESSON_3: Lesson = {
+  id: 3, lessonNumber: 3, code: 'F003',
+  title: 'Les connecteurs essentiels',
+  shortDescription: 'Sept connecteurs qui structurent toute prise de parole.',
+  status: 'completed', quizAttempts: 1, quizBestScore: 80, completedAt: '2026-01-01T00:00:00Z',
+  phase: 1,
+}
+
+const LESSON_5: Lesson = {
+  id: 5, lessonNumber: 5, code: 'F005',
+  title: 'Le rythme de la phrase',
+  shortDescription: "Pourquoi le debit trahit le candidat.",
+  status: 'unlocked', quizAttempts: 0, quizBestScore: null, completedAt: null,
+  phase: 1,
+}
+
+const LESSON_17: Lesson = {
+  id: 17, lessonNumber: 17, code: 'A001',
+  title: "L'argumentation soutenue",
+  shortDescription: "Articuler un argument long.",
+  status: 'locked', quizAttempts: 0, quizBestScore: null, completedAt: null,
+  phase: 2,
+}
+
+const LESSON_27: Lesson = {
+  id: 27, lessonNumber: 27, code: 'A011',
+  title: 'La parole strategique',
+  shortDescription: "Gerer le temps imparti.",
+  status: 'locked', quizAttempts: 0, quizBestScore: null, completedAt: null,
+  phase: 2,
+}
 
 describe('LessonDetail', () => {
   beforeEach(() => mockPush.mockClear())
 
-  it('renders the breadcrumb with L\'École and lesson number/title', () => {
-    const lesson = getLessonById(3)!
-    render(<LessonDetail lesson={lesson} />)
+  it("renders the breadcrumb with L'Ecole and lesson number/title", () => {
+    render(<LessonDetail lesson={LESSON_3} />)
     const crumb = screen.getByTestId('lesson-breadcrumb')
-    // Encoding-agnostic apostrophe in L'École
-    expect(within(crumb).getByText(/l['']école/i)).toBeInTheDocument()
+    expect(within(crumb).getByRole('link')).toHaveAttribute('href', '/ecole')
     expect(within(crumb).getByText(/leçon\s*3/i)).toBeInTheDocument()
-    expect(within(crumb).getByText(new RegExp(lesson.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'))).toBeInTheDocument()
+    expect(
+      within(crumb).getByText(
+        new RegExp(LESSON_3.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'),
+      ),
+    ).toBeInTheDocument()
   })
 
-  it('renders the Fondations section badge for a fondations lesson', () => {
-    const lesson = getLessonById(3)!
-    render(<LessonDetail lesson={lesson} />)
+  it('renders the Fondations section badge for a phase-1 lesson', () => {
+    render(<LessonDetail lesson={LESSON_3} />)
     expect(screen.getByTestId('lesson-section-badge')).toHaveTextContent(/fondations/i)
   })
 
-  it('renders the Approfondissement section badge for an approfondissement lesson', () => {
-    const lesson = getLessonById(17)!
-    render(<LessonDetail lesson={lesson} />)
+  it('renders the Approfondissement section badge for a phase-2 lesson', () => {
+    render(<LessonDetail lesson={LESSON_17} />)
     expect(screen.getByTestId('lesson-section-badge')).toHaveTextContent(/approfondissement/i)
   })
 
   it('renders the lesson header with number and title', () => {
-    const lesson = getLessonById(5)!
-    render(<LessonDetail lesson={lesson} />)
+    render(<LessonDetail lesson={LESSON_5} />)
     const heading = screen.getByRole('heading', { level: 1 })
-    expect(heading).toHaveTextContent(lesson.title)
+    expect(heading).toHaveTextContent(LESSON_5.title)
     expect(screen.getByTestId('lesson-detail-number')).toHaveTextContent('5')
   })
 
   it('renders the audio player placeholder', () => {
-    const lesson = getLessonById(3)!
-    render(<LessonDetail lesson={lesson} />)
+    render(<LessonDetail lesson={LESSON_3} />)
     expect(screen.getByTestId('audio-player-placeholder')).toBeInTheDocument()
   })
 
-  it('renders the three content section headings: Introduction, Méthode, Pratique', () => {
-    const lesson = getLessonById(3)!
-    render(<LessonDetail lesson={lesson} />)
+  it('renders the three content section headings: Introduction, Methode, Pratique', () => {
+    render(<LessonDetail lesson={LESSON_3} />)
     expect(screen.getByRole('heading', { level: 2, name: /^introduction$/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2, name: /^méthode$/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2, name: /^pratique$/i })).toBeInTheDocument()
   })
 
   it('renders the three content sections in DOM order', () => {
-    const lesson = getLessonById(3)!
-    render(<LessonDetail lesson={lesson} />)
+    render(<LessonDetail lesson={LESSON_3} />)
     const intro = screen.getByTestId('lesson-section-introduction')
     const methode = screen.getByTestId('lesson-section-methode')
     const pratique = screen.getByTestId('lesson-section-pratique')
@@ -79,67 +115,64 @@ describe('LessonDetail', () => {
     ).toBeTruthy()
   })
 
-  it('lesson 1 — renders no previous-lesson button, only a next button linking to /ecole/2', () => {
-    const lesson = getLessonById(1)!
-    render(<LessonDetail lesson={lesson} />)
+  it('lesson 1 - renders no previous-lesson button, only a next button linking to /ecole/2', () => {
+    render(<LessonDetail lesson={LESSON_1} />)
     expect(screen.queryByTestId('lesson-nav-prev')).not.toBeInTheDocument()
     const next = screen.getByTestId('lesson-nav-next')
     expect(next).toHaveAttribute('href', '/ecole/2')
   })
 
-  it('lesson 27 — renders no next-lesson button, only a prev button linking to /ecole/26', () => {
-    const lesson = getLessonById(27)!
-    render(<LessonDetail lesson={lesson} />)
+  it('lesson 27 - renders no next-lesson button, only a prev button linking to /ecole/26', () => {
+    render(<LessonDetail lesson={LESSON_27} />)
     expect(screen.queryByTestId('lesson-nav-next')).not.toBeInTheDocument()
     const prev = screen.getByTestId('lesson-nav-prev')
     expect(prev).toHaveAttribute('href', '/ecole/26')
   })
 
-  it('mid lesson (5) — renders both prev (→ /ecole/4) and next (→ /ecole/6) buttons', () => {
-    const lesson = getLessonById(5)!
-    render(<LessonDetail lesson={lesson} />)
+  it('mid lesson (5) - renders both prev and next buttons', () => {
+    render(<LessonDetail lesson={LESSON_5} />)
     expect(screen.getByTestId('lesson-nav-prev')).toHaveAttribute('href', '/ecole/4')
     expect(screen.getByTestId('lesson-nav-next')).toHaveAttribute('href', '/ecole/6')
   })
 
-  // MOCK-008 — waveform bars, CEFR badge, keyboard navigation
+  // MOCK-008 - waveform bars, CEFR badge, keyboard navigation
   it('audio player shows 15 waveform bars', () => {
-    const lesson = getLessonById(3)!
-    render(<LessonDetail lesson={lesson} />)
+    render(<LessonDetail lesson={LESSON_3} />)
     expect(screen.getAllByTestId('lesson-waveform-bar')).toHaveLength(15)
   })
 
-  it('audio player shows the lesson CEFR badge', () => {
-    const lesson = getLessonById(3)!
-    render(<LessonDetail lesson={lesson} />)
+  it('audio player shows B1 CEFR badge for a phase-1 lesson', () => {
+    render(<LessonDetail lesson={LESSON_3} />)
     const badge = screen.getByTestId('audio-cefr-badge')
-    expect(badge).toHaveTextContent(lesson.cefr)
+    expect(badge).toHaveTextContent('B1')
+  })
+
+  it('audio player shows B2 CEFR badge for a phase-2 lesson', () => {
+    render(<LessonDetail lesson={LESSON_17} />)
+    const badge = screen.getByTestId('audio-cefr-badge')
+    expect(badge).toHaveTextContent('B2')
   })
 
   it('ArrowRight on lesson 5 pushes to /ecole/6', () => {
-    const lesson = getLessonById(5)!
-    render(<LessonDetail lesson={lesson} />)
+    render(<LessonDetail lesson={LESSON_5} />)
     fireEvent.keyDown(window, { key: 'ArrowRight' })
     expect(mockPush).toHaveBeenCalledWith('/ecole/6')
   })
 
   it('ArrowLeft on lesson 5 pushes to /ecole/4', () => {
-    const lesson = getLessonById(5)!
-    render(<LessonDetail lesson={lesson} />)
+    render(<LessonDetail lesson={LESSON_5} />)
     fireEvent.keyDown(window, { key: 'ArrowLeft' })
     expect(mockPush).toHaveBeenCalledWith('/ecole/4')
   })
 
   it('ArrowLeft on lesson 1 does not push (boundary guard)', () => {
-    const lesson = getLessonById(1)!
-    render(<LessonDetail lesson={lesson} />)
+    render(<LessonDetail lesson={LESSON_1} />)
     fireEvent.keyDown(window, { key: 'ArrowLeft' })
     expect(mockPush).not.toHaveBeenCalled()
   })
 
   it('ArrowRight on lesson 27 does not push (boundary guard)', () => {
-    const lesson = getLessonById(27)!
-    render(<LessonDetail lesson={lesson} />)
+    render(<LessonDetail lesson={LESSON_27} />)
     fireEvent.keyDown(window, { key: 'ArrowRight' })
     expect(mockPush).not.toHaveBeenCalled()
   })

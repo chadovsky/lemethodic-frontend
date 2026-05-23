@@ -1,8 +1,36 @@
 import { test, expect } from '@playwright/test'
 import { injectAuthToken } from '../helpers/auth-e2e'
 
+function makeMockLessonsRaw() {
+  const lessons = []
+  for (let i = 1; i <= 27; i++) {
+    const phase = i <= 16 ? 1 : 2
+    const status = i <= 3 ? 'completed' : i <= 6 ? 'unlocked' : 'locked'
+    lessons.push({
+      id: i,
+      lesson_number: i,
+      code: i <= 16 ? `F${String(i).padStart(3, '0')}` : `A${String(i - 16).padStart(3, '0')}`,
+      title: `Leçon ${i}`,
+      short_description: `Description de la leçon ${i}.`,
+      status,
+      quiz_attempts: 0,
+      quiz_best_score: null,
+      completed_at: i <= 3 ? '2026-01-01T00:00:00Z' : null,
+      phase,
+    })
+  }
+  return lessons
+}
+
 test.beforeEach(async ({ page }) => {
   await injectAuthToken(page)
+  await page.route('**/api/ecole/lessons', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ lessons: makeMockLessonsRaw() }),
+    })
+  })
 })
 
 test.describe("L'École lesson list — desktop (1280×800)", () => {
@@ -15,7 +43,7 @@ test.describe("L'École lesson list — desktop (1280×800)", () => {
     await expect(page.getByText(/la méthode en 27 leçons\./i)).toBeVisible()
   })
 
-  test('shows L\'École as active in the sidebar', async ({ page }) => {
+  test("shows L'École as active in the sidebar", async ({ page }) => {
     await page.goto('/ecole')
     await expect(page.getByTestId('sidebar-link-ecole')).toHaveAttribute(
       'aria-current',

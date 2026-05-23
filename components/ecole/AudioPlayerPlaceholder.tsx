@@ -1,11 +1,10 @@
 'use client'
 
 import { SANS_FONT } from '@/lib/typography'
-import type { LessonCefr } from '@/lib/data/lessons'
 
 const WAVEFORM_HEIGHTS = [8, 14, 10, 20, 16, 24, 12, 28, 18, 22, 14, 20, 10, 16, 8]
 
-export default function AudioPlayerPlaceholder({ cefr }: { cefr?: LessonCefr }) {
+export default function AudioPlayerPlaceholder({ cefr }: { cefr?: string }) {
   return (
     <div
       data-testid="audio-player-placeholder"

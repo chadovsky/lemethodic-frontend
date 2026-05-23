@@ -1,9 +1,23 @@
 import Link from 'next/link'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
-import { STATE_LABEL_FR, type Lesson, type LessonState } from '@/lib/data/lessons'
+import type { Lesson, LessonStatus } from '@/lib/types'
 
-function stateBadgeStyle(state: LessonState): React.CSSProperties {
-  switch (state) {
+type VisualState = 'completed' | 'available' | 'locked'
+
+function toVisualState(status: LessonStatus): VisualState {
+  if (status === 'completed') return 'completed'
+  if (status === 'locked') return 'locked'
+  return 'available'
+}
+
+const STATE_LABEL_FR: Record<VisualState, string> = {
+  completed: 'Terminée',
+  available: 'Disponible',
+  locked: 'Verrouillée',
+}
+
+function stateBadgeStyle(vs: VisualState): React.CSSProperties {
+  switch (vs) {
     case 'completed':
       return {
         backgroundColor: 'var(--fp-sage)',
@@ -48,15 +62,16 @@ function LockIcon() {
 }
 
 export default function LessonCard({ lesson }: { lesson: Lesson }) {
-  const isLocked = lesson.state === 'locked'
-  const badgeStyle = stateBadgeStyle(lesson.state)
+  const vs = toVisualState(lesson.status)
+  const isLocked = vs === 'locked'
+  const badgeStyle = stateBadgeStyle(vs)
 
   return (
     <Link
-      href={`/ecole/${lesson.id}`}
+      href={`/ecole/${lesson.lessonNumber}`}
       data-testid="lesson-card"
-      data-lesson-id={lesson.id}
-      data-lesson-state={lesson.state}
+      data-lesson-id={lesson.lessonNumber}
+      data-lesson-state={vs}
       className={isLocked ? undefined : 'ed-card-lift'}
       style={{
         display: 'flex',
@@ -85,7 +100,7 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          {lesson.id}
+          {lesson.lessonNumber}
         </span>
         <span
           data-testid="lesson-card-state"
@@ -105,7 +120,7 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
           }}
         >
           {isLocked && <LockIcon />}
-          {STATE_LABEL_FR[lesson.state]}
+          {STATE_LABEL_FR[vs]}
         </span>
       </div>
 
@@ -134,7 +149,7 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
           margin: 0,
         }}
       >
-        {lesson.description}
+        {lesson.shortDescription}
       </p>
     </Link>
   )
