@@ -2022,8 +2022,8 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 ### BE-004 — Chunk data API
 
-**Status:** Not Started
-**Branch:** `feat/be-004-chunk-api` (FE, from `main`)
+**Status:** Shipped — squash-merged af1deb3
+**Branch:** `feat/be-004-vocab-wiring` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 
 #### Scope

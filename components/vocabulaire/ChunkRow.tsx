@@ -2,16 +2,16 @@
 
 import { useState } from 'react'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
-import type { Chunk } from '@/lib/data/chunks'
+import type { VocabularyChunk } from '@/lib/types'
 
-export default function ChunkRow({ chunk }: { chunk: Chunk }) {
+export default function ChunkRow({ chunk }: { chunk: VocabularyChunk }) {
   const [saved, setSaved] = useState(false)
 
   return (
     <li
       data-testid="chunk-row"
       data-chunk-id={chunk.id}
-      data-chunk-level={chunk.level}
+      data-chunk-level={chunk.cefrLevel}
       data-chunk-source={chunk.source}
       className="ed-card-lift"
       style={{
@@ -37,7 +37,7 @@ export default function ChunkRow({ chunk }: { chunk: Chunk }) {
             color: 'var(--text-primary)',
           }}
         >
-          {chunk.fr}
+          {chunk.chunkFr}
         </span>
         <span
           data-testid="chunk-row-en"
@@ -49,7 +49,7 @@ export default function ChunkRow({ chunk }: { chunk: Chunk }) {
             color: 'var(--text-muted)',
           }}
         >
-          {chunk.en}
+          {chunk.translationEn}
         </span>
       </div>
 
@@ -68,7 +68,7 @@ export default function ChunkRow({ chunk }: { chunk: Chunk }) {
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        {chunk.level}
+        {chunk.cefrLevel}
       </span>
 
       <span
@@ -93,7 +93,7 @@ export default function ChunkRow({ chunk }: { chunk: Chunk }) {
         type="button"
         data-testid="chunk-row-save"
         data-saved={saved}
-        aria-label={`${saved ? 'Retirer des sauvegardes' : 'Sauvegarder'} « ${chunk.fr} »`}
+        aria-label={`${saved ? 'Retirer des sauvegardes' : 'Sauvegarder'} « ${chunk.chunkFr} »`}
         onClick={() => setSaved((v) => !v)}
         className="ed-btn-press"
         style={{

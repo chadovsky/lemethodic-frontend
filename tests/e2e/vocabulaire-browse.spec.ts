@@ -1,12 +1,69 @@
-﻿import { test, expect } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import { injectAuthToken } from '../helpers/auth-e2e'
+
+const CEFR_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1'] as const
+const ALL_SOURCES = ['Conversation', 'Travail', 'Voyage', 'Quotidien', 'Média']
+const NON_MEDIA_SOURCES = ['Conversation', 'Travail', 'Voyage', 'Quotidien']
+
+function makeMockChunksRaw() {
+  return Array.from({ length: 60 }, (_, i) => {
+    const cefr_level = CEFR_LEVELS[Math.floor(i / 12)]
+    // A1 chunks never have Média source so A1+Média filter yields empty state
+    const source =
+      cefr_level === 'A1' ? NON_MEDIA_SOURCES[i % 4] : ALL_SOURCES[i % 5]
+    return {
+      id: i + 1,
+      chunk_fr: i < 3 ? `laisser tomber ${i + 1}` : `expression ${i + 1}`,
+      translation_en: `gloss ${i + 1}`,
+      cefr_level,
+      exam_tag: null,
+      register: 'standard',
+      source,
+    }
+  })
+}
+
+const ALL_CHUNKS_RAW = makeMockChunksRaw()
 
 test.beforeEach(async ({ page }) => {
   await injectAuthToken(page)
+
+  // Chunks endpoint (more specific — register before topics list)
+  await page.route(/\/api\/vocab\/topics\/[^/]+\/chunks/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        chunks: ALL_CHUNKS_RAW,
+        total: ALL_CHUNKS_RAW.length,
+        limit: 500,
+        offset: 0,
+      }),
+    })
+  })
+
+  // Topics list endpoint
+  await page.route('**/api/vocab/topics', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([
+        {
+          slug: 'all-chunks',
+          title: 'Tous les chunks',
+          corpus_partition: 'CC_corpus',
+          source: 'CC',
+          chunk_count: 60,
+          exam_tags: [],
+          cefr_range: { min: 'A1', max: 'C1' },
+        },
+      ]),
+    })
+  })
 })
 
 
-test.describe('Le Vocabulaire browse â€” desktop (1280Ã—800)', () => {
+test.describe('Le Vocabulaire browse — desktop (1280×800)', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
   test('renders page header inside the (app) shell with filter bar and 60 chunks', async ({
@@ -15,7 +72,7 @@ test.describe('Le Vocabulaire browse â€” desktop (1280Ã—800)', () => {
     await page.goto('/vocabulaire')
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
     await expect(page.getByRole('heading', { level: 1, name: /le vocabulaire/i })).toBeVisible()
-    await expect(page.getByText(/les chunks qui font la diffÃ©rence\./i)).toBeVisible()
+    await expect(page.getByText(/les chunks qui font la différence\./i)).toBeVisible()
     await expect(page.getByTestId('vocab-filter-bar')).toBeVisible()
     await expect(page.getByTestId('chunk-row')).toHaveCount(60)
   })
@@ -43,13 +100,13 @@ test.describe('Le Vocabulaire browse â€” desktop (1280Ã—800)', () => {
     }
   })
 
-  test('selecting source "MÃ©dia" filters to MÃ©dia rows only', async ({ page }) => {
+  test('selecting source "Média" filters to Média rows only', async ({ page }) => {
     await page.goto('/vocabulaire')
-    await page.getByTestId('source-select').selectOption('MÃ©dia')
+    await page.getByTestId('source-select').selectOption('Média')
     const rows = await page.getByTestId('chunk-row').all()
     expect(rows.length).toBeGreaterThan(0)
     for (const row of rows) {
-      await expect(row).toHaveAttribute('data-chunk-source', 'MÃ©dia')
+      await expect(row).toHaveAttribute('data-chunk-source', 'Média')
     }
   })
 
@@ -73,7 +130,7 @@ test.describe('Le Vocabulaire browse â€” desktop (1280Ã—800)', () => {
     await page.getByTestId('cefr-chip-B1').click()
     await page.getByTestId('cefr-chip-B2').click()
     await page.getByTestId('cefr-chip-C1').click()
-    await page.getByTestId('source-select').selectOption('MÃ©dia')
+    await page.getByTestId('source-select').selectOption('Média')
 
     await expect(page.getByTestId('chunk-row')).toHaveCount(0)
     await expect(page.getByTestId('vocab-empty-state')).toBeVisible()
@@ -81,7 +138,7 @@ test.describe('Le Vocabulaire browse â€” desktop (1280Ã—800)', () => {
     await expect(page.getByTestId('chunk-row')).toHaveCount(60)
   })
 
-  // MOCK-009 â€” save icon toggle, ed-card-lift on rows
+  // MOCK-009 — save icon toggle, ed-card-lift on rows
   test('clicking save icon toggles data-saved attribute', async ({ page }) => {
     await page.goto('/vocabulaire')
     const saveBtn = page.getByTestId('chunk-row-save').first()
@@ -99,7 +156,7 @@ test.describe('Le Vocabulaire browse â€” desktop (1280Ã—800)', () => {
   })
 })
 
-test.describe('Le Vocabulaire browse â€” mobile (375Ã—667)', () => {
+test.describe('Le Vocabulaire browse — mobile (375×667)', () => {
   test.use({ viewport: { width: 375, height: 667 } })
 
   test('filter bar collapses behind a "Filtres" button on mobile', async ({ page }) => {

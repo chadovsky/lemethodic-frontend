@@ -1,13 +1,15 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import ChunkRow from '@/components/vocabulaire/ChunkRow'
-import type { Chunk } from '@/lib/data/chunks'
+import type { VocabularyChunk } from '@/lib/types'
 
-const SAMPLE: Chunk = {
+const SAMPLE: VocabularyChunk = {
   id: 13,
-  fr: 'Ça tombe à pic',
-  en: "That's perfect timing",
-  level: 'B1',
+  chunkFr: 'Ça tombe à pic',
+  translationEn: "That's perfect timing",
+  cefrLevel: 'B1',
+  examTag: null,
+  register: 'standard',
   source: 'Conversation',
 }
 

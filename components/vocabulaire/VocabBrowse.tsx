@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
-import { CHUNKS } from '@/lib/data/chunks'
-import { applyFilters, DEFAULT_FILTER_STATE, type VocabFilterState } from '@/lib/vocab/filter'
+import { applyLocalFilters, DEFAULT_FILTER_STATE, type VocabFilterState } from '@/lib/vocab/filter'
+import { buildChunkParams } from '@/lib/vocab/params'
+import { useChunks } from '@/lib/hooks/useChunks'
 import FilterBar from './FilterBar'
 import ChunkRow from './ChunkRow'
 import EmptyState from './EmptyState'
@@ -12,8 +13,10 @@ import EmptyState from './EmptyState'
 export default function VocabBrowse() {
   const [filterState, setFilterState] = useState<VocabFilterState>(DEFAULT_FILTER_STATE)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const { chunks: allChunks, isLoading, total } = useChunks()
 
-  const filtered = applyFilters(CHUNKS, filterState)
+  const params = buildChunkParams(filterState)
+  const filtered = params === null ? [] : applyLocalFilters(allChunks, filterState)
   const resetFilters = () => setFilterState(DEFAULT_FILTER_STATE)
 
   return (
@@ -64,7 +67,7 @@ export default function VocabBrowse() {
               color: 'var(--text-muted)',
             }}
           >
-            {CHUNKS.length} chunks
+            {total} chunks
           </span>
         </div>
 
@@ -155,7 +158,27 @@ export default function VocabBrowse() {
         <FilterBar state={filterState} onChange={setFilterState} />
       </div>
 
-      {filtered.length === 0 ? (
+      {isLoading ? (
+        <ul
+          style={{
+            listStyle: 'none',
+            margin: 0,
+            padding: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 12,
+          }}
+        >
+          {Array.from({ length: 8 }, (_, i) => (
+            <li
+              key={i}
+              data-testid="chunk-row-skeleton"
+              className="ed-skeleton"
+              style={{ height: 72, borderRadius: 4 }}
+            />
+          ))}
+        </ul>
+      ) : filtered.length === 0 ? (
         <EmptyState onReset={resetFilters} />
       ) : (
         <ul
