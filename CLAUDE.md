@@ -3,10 +3,17 @@
 ## Execution Source of Truth (Manual Mode, May 21 2026)
 - Canonical PRD: docs/prd-v1.md
 - Old BACKLOG.md superseded but retained for audit
-- Current ticket: UI-001 (Landing page hero) on branch feat/ui-001-landing-hero
+- Current section: BE wiring (5/22 shipped). Latest: BE-005 (Tâches data wiring), main at 4fd9ea3, tag v0.3.5
 - Mode: one micro-feature per session, UI-first sequencing, vitest + Playwright = spec, squash-merge to main
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Four principles
+
+1. **No silent assumptions.** If you don't know what a function does or what shape an API returns, read the code. Don't guess.
+2. **Scope is sacred.** A 50-line feature stays 50 lines. Don't expand to 500 because "it might be useful later." V1.1+ is a real place we put things.
+3. **Don't touch what wasn't requested.** Orthogonal changes (formatting, refactoring, renaming) are forbidden in feature work. Open a separate PR if it matters.
+4. **No "it works" without evidence.** Run the tests. Say which ones passed. If they failed, fix the test or fix the code — don't skip it.
 
 ## Commands
 
@@ -17,25 +24,29 @@ Package manager is **pnpm** (lockfile is `pnpm-lock.yaml`).
 - `pnpm start` — run the production build
 - `pnpm lint` — `eslint .` (no ESLint config is checked in, so this is essentially a no-op until one is added)
 
-There is **no test runner** configured.
+Tests: **vitest** (unit, jsdom env) for component/lib tests, **Playwright** for e2e. Check `package.json` scripts for the exact commands (typically `pnpm test`, `pnpm test:e2e`). Test setup in `tests/setup.ts` stubs `IntersectionObserver` for Framer Motion `whileInView`. ~387 unit / ~250 e2e at last count.
 
 ## v0 integration
 
 The repo is linked to a v0 project (see README). Edits in v0 push commits directly to this repo, and every merge to `main` auto-deploys. When making changes here, assume `main` is continuously deployed — don't merge half-finished work.
 
-## Shipping verification protocol (F-225, 2026-05-04)
+## Shipping verification protocol (F-225, amended 2026-05-23)
 
-**Hard gate.** Every FE ticket gets the `Shipped` status only after the following are attached to its `BACKLOG.md` entry:
+**Hard gate via Playwright.** Every FE ticket gets the `Shipped` status only after Playwright captures the receipts as part of the e2e suite. Manual screenshot capture is retired — humans should not do what the test runner can do for free.
 
-1. **1440px desktop screenshot** of every affected route, captured on production (`lemethodic.com`).
-2. **375px mobile screenshot** (iPhone SE width) of every affected route, captured on production.
-3. If a ticket affects multiple screens (e.g. an onboarding-flow change spans 11 questions + reveal), attach all of them.
-4. If the change is genuinely non-visual (BE-only, config, deps, copy/text that doesn't affect layout, doc updates), note `non-visual change — verification skipped` on the BACKLOG entry instead of attaching screenshots.
-5. **Interactive verification (added 2026-05-04, F-225 amendment):** for tickets that change interactive behavior (handlers, navigation, form submission, state mutation), verification requires both: (a) 1440px + 375px screenshots of the affected screen, AND (b) a recorded interaction trace — either a Loom link, a screen recording, or a written test plan with pass/fail observed outcomes documented in the BACKLOG entry. Screenshots alone don't catch a Sign Out that does nothing on click; an interaction trace does.
+Every ticket that touches a visible surface must have e2e coverage that:
 
-The rule exists because mobile-first development without desktop verification has shipped broken desktop layouts repeatedly. The soft-beta scope locks in mobile + desktop as both first-class. Until a ticket's verification (screenshots + interaction trace where applicable) is attached or the non-visual exemption is noted, it stays in `Status: Awaiting verification` — not `Shipped`.
+1. Visits each affected route.
+2. Captures `tests/screenshots/<ticket-id>-<route-slug>-1440.png` (1440px desktop viewport).
+3. Captures `tests/screenshots/<ticket-id>-<route-slug>-375.png` (375px mobile viewport, iPhone SE width).
+4. Runs the happy-path interaction (click, submit, navigate) the ticket introduced.
+5. Records a Playwright trace (`--trace on`) committed to `tests/traces/<ticket-id>.zip`.
 
-This protocol applies to every FE ticket, including hotfixes. The only ticket exempt from itself is F-225 (this doc commit) — the rule didn't exist when the work was done.
+If the change is genuinely non-visual (BE-only, config, deps, copy that doesn't affect layout, doc updates), note `non-visual change — verification skipped` on the PRD entry instead.
+
+**Debt accepted (2026-05-23):** UI-001 through BE-005 shipped before this amendment landed. Their individual receipts are lost (production today is the layered superset). A one-time full-surface battery will be captured at soft-beta launch and serve as the canonical baseline.
+
+The rule exists because mobile-first development without desktop verification has shipped broken desktop layouts repeatedly. Automating it removes the ceremony cost so the rule actually gets followed.
 
 ## Architecture
 
@@ -68,7 +79,7 @@ Prefer using these primitives over hand-rolling new buttons/cards — the press-
 
 ### Design tokens
 
-`app/globals.css` is the source of truth for Tailwind v4 styling. It defines a **FluentPath pastel palette** as CSS variables (`--fp-peach`, `--fp-sage`, `--fp-butter`, `--fp-lavender`, `--fp-sky`, `--fp-blush`) plus ink/paper/CTA neutrals, then exposes them as Tailwind utilities via `@theme inline` (so `bg-fp-peach`, `text-fp-ink`, etc. all work). shadcn's own `--background`/`--foreground`/etc. tokens also live here.
+`app/globals.css` is the source of truth for Tailwind v4 styling. It defines a pastel palette as CSS variables (`--fp-peach`, `--fp-sage`, `--fp-butter`, `--fp-lavender`, `--fp-sky`, `--fp-blush` — the `fp-` prefix is legacy from the prior product name; **do not reintroduce FluentPath/FluentPrep in new code or copy**) plus ink/paper/CTA neutrals, then exposes them as Tailwind utilities via `@theme inline` (so `bg-fp-peach`, `text-fp-ink`, etc. all work). shadcn's own `--background`/`--foreground`/etc. tokens also live here.
 
 Note: each onboarding step currently hardcodes its background hex rather than using the Tailwind token (e.g. `style={{ backgroundColor: '#FFD8C2' }}`). When touching a step, keep that pattern unless you're doing a deliberate migration.
 
@@ -77,6 +88,8 @@ There is a **duplicate** `styles/globals.css` that is not imported anywhere — 
 ### Fonts
 
 Geist/Geist Mono are loaded via `next/font/google` in `app/layout.tsx` but the returned font variables are intentionally not applied (prefixed `_geist`). The display font is **Cabinet Grotesk**, loaded from `fonts.cdnfonts.com` via a plain `<link>` in `<head>` and referenced through the `DISPLAY_FONT` constant in inline styles.
+
+The editorial system (F-200+) introduces a second font pairing via `lib/typography.ts`: **Geist** as `SANS_FONT`, **Source Serif 4** as `SERIF_FONT`. Both are used by the editorial primitives below.
 
 ### Other routes
 
@@ -133,6 +146,20 @@ The editorial system established by F-200 has these reusable primitives:
 - Slow confident motion: 200ms hover, 300ms state, 600-800ms reveal
 - 4px button radii (premium signal vs soft 14-16px tutorial-app radii)
 
+### BE wiring conventions (Section 3, established BE-001–005)
+
+- **API clients** live in `lib/api/<feature>.ts`. Schema reconciliation (BE shape → FE shape) happens here, not in components. Examples: `lib/api/lessons.ts`, `lib/api/vocab.ts`, `lib/api/taches.ts`.
+- **Feature helpers** live in `lib/<feature>/*`: `lib/taches/normalize.ts`, `lib/vocab/params.ts`.
+- **Fixtures** in `lib/data/*` are being phased out as BE wiring lands. Don't add new fixture files for features that have BE endpoints.
+- **Flatten hierarchical BE shapes** for V1.0 surfaces. Hierarchy comes back V1.1+ (see BE-004 vocab reconciliation precedent: BE returns nested topics→subtopics→chunks, FE flattens to a single chunk list with topic metadata inline).
+- **Auth** wraps the authed `(app)` route group via `ProtectedRoute`. Sidebar has signout. hCaptcha is on the auth surfaces. EXCLUDED_PREFIXES in TopNav governs marketing-nav hiding.
+
+### FastAPI BE is preserved (Architecture Path A, locked 2026-05-23)
+
+- The BE repo `chadovsky/lemethodic-backend` (branch: `master`) is 53.8K LOC of FastAPI + SQLAlchemy + Postgres on DigitalOcean FRA1 (production: `seal-app-75fiu.ondigitalocean.app`). **Do not propose rewriting it** in Next.js Route Handlers, Prisma, Drizzle, or anything else.
+- We wire to existing `/api/*` endpoints. New endpoints require BE work in the other repo, not Next.js Route Handlers in this one.
+- **BE surfaces deferred to V1.1+** (do not wire in V1.0 entries): `/api/writing/*`, `/api/analytics/*`, `/api/today/*`, `/api/modules` + `/api/users/me/recurring_modules`, `/api/oral/generate-structure`. These endpoints exist and work, but the FE surfaces for them are V1.1.
+
 ### Build config gotchas
 
 `next.config.mjs` sets:
@@ -141,3 +168,28 @@ The editorial system established by F-200 has these reusable primitives:
 - `images.unoptimized: true` — Next's image optimizer is off. All illustrations in `/public` ship as-is; both `.png` (transparent) and `.jpg` versions exist for each illustration.
 
 Analytics (`@vercel/analytics`) is rendered only when `NODE_ENV === 'production'`.
+
+## Git workflow + environment
+
+- Branch name: `feat/<id>-<name>` (e.g., `feat/be-006-recording-upload`).
+- Squash-merge to `main`. Always. No merge commits.
+- Update PRD status on feature branch before squash-merge — the status line in `docs/prd-v1.md` should move to `Shipped` with the post-squash SHA.
+- Tag every 5 shipped entries within a section: `v0.<section>.<count>` (e.g., `v0.3.5` after 5 BE entries shipped).
+- **PRD (`docs/prd-v1.md`) is the source of truth.** If the work drifts, update the PRD before the next entry.
+- Dev machine: Windows + PowerShell. Use `code.cmd` not `code` (PATH hijack).
+- PowerShell escapes curly braces in stash refs: `'stash@{0}'` (single quotes).
+- Multi-line pastes break PowerShell — single-line, joined with `;`.
+- **BE repo uses `master`. This repo uses `main`. Not interchangeable.**
+- **Never call the product FluentPrep or FluentPath.** It's Le Méthodic.
+- **Le Maître** (ElevenLabs Chadi-clone) is the unified tutor persona. OpenAI TTS-1-HD is examiner-only for Tâches. Sophie is dead.
+
+## Done definition
+
+A feature is done when:
+
+1. All tests pass (unit + e2e for the touched surface).
+2. Playwright e2e captures the 1440px + 375px screenshots and trace per the F-225 amended protocol (or `non-visual change` is noted on the PRD entry).
+3. PRD status line moved to `Shipped` with the SHA on the feature branch.
+4. Squash-merged to main.
+5. If at a 5-count milestone, tag pushed.
+6. Branch deleted locally and on origin.
