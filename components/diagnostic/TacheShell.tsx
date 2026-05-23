@@ -5,12 +5,6 @@ import Timer from './Timer'
 import RecordingPlaceholder from './RecordingPlaceholder'
 import TacheNav from './TacheNav'
 
-const TACHE_SECONDS: Record<number, number> = {
-  1: 180,
-  2: 210,
-  3: 300,
-}
-
 export default function TacheShell({ tache }: { tache: Tache }) {
   const breadcrumbItems = [
     { label: 'Le Diagnostic', href: '/diagnostic' },
@@ -70,7 +64,7 @@ export default function TacheShell({ tache }: { tache: Tache }) {
       </header>
 
       <div className="tache-timer-row">
-        <Timer initialSeconds={TACHE_SECONDS[tache.id]} />
+        <Timer initialSeconds={tache.durationSeconds} />
       </div>
 
       <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

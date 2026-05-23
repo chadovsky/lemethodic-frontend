@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { TACHES } from '@/lib/data/taches'
+import { fetchTache } from '@/lib/api/taches'
 import TacheShell from '@/components/diagnostic/TacheShell'
 
 type Params = Promise<{ n: string }>
@@ -10,7 +10,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { n } = await params
-  const tache = TACHES.find((t) => t.id === Number(n))
+  const tache = await fetchTache(Number(n))
   if (!tache) return { title: 'Not Found' }
   return { title: `${tache.title} — Le Méthodic` }
 }
@@ -18,6 +18,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 export default async function TachePage({ params }: { params: Params }) {
   const { n } = await params
   if (!/^[123]$/.test(n)) notFound()
-  const tache = TACHES.find((t) => t.id === Number(n))!
+  const tache = await fetchTache(Number(n))
+  if (!tache) notFound()
   return <TacheShell tache={tache} />
 }

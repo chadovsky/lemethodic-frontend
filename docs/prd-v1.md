@@ -2094,8 +2094,8 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 ### BE-005 — Tâche data API
 
-**Status:** Not Started
-**Branch:** `feat/be-005-tache-api` (FE, from `main`)
+**Status:** Shipped — squash-merged d6c8a10
+**Branch:** `feat/be-005-taches-wiring` (FE, from `main`)
 **Effort:** 1 session (~2–3h)
 
 #### Scope

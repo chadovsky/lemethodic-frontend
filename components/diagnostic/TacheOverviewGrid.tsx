@@ -1,10 +1,10 @@
-import { TACHES } from '@/lib/data/taches'
+import type { Tache } from '@/lib/data/taches'
 import TacheCard from './TacheCard'
 
-export default function TacheOverviewGrid() {
+export default function TacheOverviewGrid({ taches }: { taches: readonly Tache[] }) {
   return (
     <div className="tache-overview-grid">
-      {TACHES.map((tache) => (
+      {taches.map((tache) => (
         <TacheCard key={tache.id} tache={tache} />
       ))}
     </div>

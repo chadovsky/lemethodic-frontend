@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
+import type { Tache } from '@/lib/data/taches'
 import CouchesPreview from './CouchesPreview'
 import PastScorePanel from './PastScorePanel'
 import TacheOverviewGrid from './TacheOverviewGrid'
 import RevealOnScroll from '@/components/landing/RevealOnScroll'
 
-export default function DiagnosticLanding() {
+export default function DiagnosticLanding({ taches }: { taches: readonly Tache[] }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 40, paddingTop: 8 }}>
       <header style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -140,7 +141,7 @@ export default function DiagnosticLanding() {
             Trois tâches enchaînées, environ douze minutes au total.
           </p>
         </div>
-        <TacheOverviewGrid />
+        <TacheOverviewGrid taches={taches} />
       </section>
 
       <section data-testid="diagnostic-section-couches">
