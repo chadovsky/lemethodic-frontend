@@ -1,7 +1,8 @@
-import { render, screen, fireEvent, act } from '@testing-library/react'
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 const mockPush = vi.fn()
+const mockRegister = vi.fn()
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
@@ -14,6 +15,39 @@ vi.mock('next/link', () => ({
       {children}
     </a>
   ),
+}))
+
+vi.mock('@hcaptcha/react-hcaptcha', () => ({
+  default: vi.fn(({ onVerify }: { onVerify: (token: string) => void }) => (
+    <button type="button" data-testid="hcaptcha-mock" onClick={() => onVerify('test-token')}>
+      Verify Captcha
+    </button>
+  )),
+}))
+
+vi.mock('@/lib/api', () => {
+  class ApiError extends Error {
+    status: number
+    constructor(status: number, message: string, _body?: unknown) {
+      super(message)
+      this.name = 'ApiError'
+      this.status = status
+    }
+  }
+  return {
+    api: {
+      auth: {
+        register: (...args: unknown[]) => mockRegister(...args),
+      },
+    },
+    ApiError,
+  }
+})
+
+vi.mock('@/lib/auth', () => ({
+  useAuthStore: {
+    getState: () => ({ setAuth: vi.fn() }),
+  },
 }))
 
 import SignupForm from '@/components/auth/SignupForm'
@@ -33,6 +67,7 @@ function fillValid() {
 describe('SignupForm', () => {
   beforeEach(() => {
     mockPush.mockClear()
+    mockRegister.mockClear()
   })
 
   it('renders email, password, and confirm-password fields', () => {
@@ -74,9 +109,16 @@ describe('SignupForm', () => {
     expect(screen.getByText("Passwords don't match.")).toBeInTheDocument()
   })
 
-  it('Submit button is enabled when all fields are valid', () => {
+  it('Submit button is disabled after valid fields — captcha still required', () => {
     render(<SignupForm />)
     fillValid()
+    expect(screen.getByRole('button', { name: /create account/i })).toBeDisabled()
+  })
+
+  it('Submit button enables after valid fields AND captcha verified', () => {
+    render(<SignupForm />)
+    fillValid()
+    fireEvent.click(screen.getByTestId('hcaptcha-mock'))
     expect(screen.getByRole('button', { name: /create account/i })).not.toBeDisabled()
   })
 
@@ -96,17 +138,19 @@ describe('SignupForm', () => {
   })
 
   it('navigates to /onboarding after valid submit', async () => {
-    vi.useFakeTimers()
+    mockRegister.mockResolvedValueOnce({
+      token: 'tok',
+      user: { id: 1, email: 'test@example.com', fullName: '' },
+    })
     render(<SignupForm />)
     fillValid()
+    fireEvent.click(screen.getByTestId('hcaptcha-mock'))
 
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /create account/i }))
-      await vi.runAllTimersAsync()
     })
 
-    expect(mockPush).toHaveBeenCalledWith('/onboarding')
-    vi.useRealTimers()
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/onboarding'))
   })
 
   // MOCK-005 — ed-field, PasswordStrength, spinner
@@ -123,7 +167,7 @@ describe('SignupForm', () => {
       target: { value: 'abc' },
     })
     const filled = screen.getAllByTestId('strength-segment').filter(
-      (s) => s.dataset.filled === 'true'
+      (s) => s.dataset.filled === 'true',
     )
     expect(filled).toHaveLength(1)
   })
@@ -134,7 +178,7 @@ describe('SignupForm', () => {
       target: { value: 'abcdef' },
     })
     const filled = screen.getAllByTestId('strength-segment').filter(
-      (s) => s.dataset.filled === 'true'
+      (s) => s.dataset.filled === 'true',
     )
     expect(filled).toHaveLength(2)
   })
@@ -145,25 +189,22 @@ describe('SignupForm', () => {
       target: { value: 'abcdefghi' },
     })
     const filled = screen.getAllByTestId('strength-segment').filter(
-      (s) => s.dataset.filled === 'true'
+      (s) => s.dataset.filled === 'true',
     )
     expect(filled).toHaveLength(3)
   })
 
   it('spinner element appears in button during submit loading', async () => {
-    vi.useFakeTimers()
+    // Never resolves so we can observe the in-flight loading state.
+    mockRegister.mockReturnValueOnce(new Promise(() => {}))
     render(<SignupForm />)
     fillValid()
+    fireEvent.click(screen.getByTestId('hcaptcha-mock'))
 
     act(() => {
       fireEvent.click(screen.getByRole('button', { name: /create account/i }))
     })
 
     expect(screen.getByTestId('signup-spinner')).toBeInTheDocument()
-
-    await act(async () => {
-      await vi.runAllTimersAsync()
-    })
-    vi.useRealTimers()
   })
 })

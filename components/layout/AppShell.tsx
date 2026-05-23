@@ -1,18 +1,29 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { SERIF_FONT } from '@/lib/typography'
+import { useAuthStore, signOut } from '@/lib/auth'
 import Sidebar from './Sidebar'
 
 interface AppShellProps {
   children: ReactNode
 }
 
+function getInitials(fullName?: string | null): string {
+  if (!fullName?.trim()) return 'CH'
+  const parts = fullName.trim().split(/\s+/)
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+}
+
 export default function AppShell({ children }: AppShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const closeDrawer = () => setDrawerOpen(false)
   const pathname = usePathname()
+  const router = useRouter()
+  const user = useAuthStore((s) => s.user)
+  const initials = getInitials(user?.fullName)
 
   return (
     <div
@@ -98,7 +109,12 @@ export default function AppShell({ children }: AppShellProps) {
         />
       )}
 
-      <Sidebar drawerOpen={drawerOpen} onLinkClick={closeDrawer} />
+      <Sidebar
+        drawerOpen={drawerOpen}
+        onLinkClick={closeDrawer}
+        onSignOut={() => signOut(router)}
+        initials={initials}
+      />
 
       <main
         key={pathname}

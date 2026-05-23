@@ -1,6 +1,12 @@
-import { test, expect } from '@playwright/test'
+﻿import { test, expect } from '@playwright/test'
+import { injectAuthToken } from '../helpers/auth-e2e'
 
-test.describe("L'École lesson detail — desktop (1280×800)", () => {
+test.beforeEach(async ({ page }) => {
+  await injectAuthToken(page)
+})
+
+
+test.describe("L'Ã‰cole lesson detail â€” desktop (1280Ã—800)", () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
   test('renders inside the (app) shell with breadcrumb, header, audio placeholder, sections, nav', async ({
@@ -25,24 +31,24 @@ test.describe("L'École lesson detail — desktop (1280×800)", () => {
     await expect(page).toHaveURL(/\/ecole\/4$/)
   })
 
-  test('/ecole/1 — no previous button, next links to /ecole/2', async ({ page }) => {
+  test('/ecole/1 â€” no previous button, next links to /ecole/2', async ({ page }) => {
     await page.goto('/ecole/1')
     await expect(page.getByTestId('lesson-nav-prev')).toHaveCount(0)
     await expect(page.getByTestId('lesson-nav-next')).toHaveAttribute('href', '/ecole/2')
   })
 
-  test('/ecole/27 — no next button, prev links to /ecole/26', async ({ page }) => {
+  test('/ecole/27 â€” no next button, prev links to /ecole/26', async ({ page }) => {
     await page.goto('/ecole/27')
     await expect(page.getByTestId('lesson-nav-next')).toHaveCount(0)
     await expect(page.getByTestId('lesson-nav-prev')).toHaveAttribute('href', '/ecole/26')
   })
 
-  test('/ecole/99 — renders Next.js 404', async ({ page }) => {
+  test('/ecole/99 â€” renders Next.js 404', async ({ page }) => {
     const response = await page.goto('/ecole/99')
     expect(response?.status()).toBe(404)
   })
 
-  test('/ecole/abc — renders Next.js 404 (non-numeric id)', async ({ page }) => {
+  test('/ecole/abc â€” renders Next.js 404 (non-numeric id)', async ({ page }) => {
     const response = await page.goto('/ecole/abc')
     expect(response?.status()).toBe(404)
   })
@@ -55,7 +61,7 @@ test.describe("L'École lesson detail — desktop (1280×800)", () => {
     await expect(page.getByTestId('audio-player-placeholder')).toBeVisible()
   })
 
-  // MOCK-008 — waveform bars, keyboard navigation
+  // MOCK-008 â€” waveform bars, keyboard navigation
   test('audio player shows 15 waveform bars on /ecole/3', async ({ page }) => {
     await page.goto('/ecole/3')
     await expect(page.getByTestId('lesson-waveform-bar')).toHaveCount(15)
@@ -80,7 +86,7 @@ test.describe("L'École lesson detail — desktop (1280×800)", () => {
   })
 })
 
-test.describe("L'École lesson detail — mobile (375×667)", () => {
+test.describe("L'Ã‰cole lesson detail â€” mobile (375Ã—667)", () => {
   test.use({ viewport: { width: 375, height: 667 } })
 
   test('renders /ecole/3 with audio placeholder full-width and content stacked', async ({

@@ -1,11 +1,15 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useState, useRef, useEffect, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 import FormField from './FormField'
 import PasswordStrength from './PasswordStrength'
+import { api, ApiError } from '@/lib/api'
+import { useAuthStore } from '@/lib/auth'
+import { resolveHcaptchaSitekey } from '@/lib/hcaptcha'
 import {
   validateEmail,
   validatePassword,
@@ -19,28 +23,63 @@ interface SignupFormProps {
 
 export default function SignupForm({ tier }: SignupFormProps) {
   const router = useRouter()
+  const captchaRef = useRef<HCaptcha>(null)
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
   const [emailTouched, setEmailTouched] = useState(false)
   const [passwordTouched, setPasswordTouched] = useState(false)
   const [confirmTouched, setConfirmTouched] = useState(false)
 
   const [loading, setLoading] = useState(false)
+  const [serverError, setServerError] = useState<string | null>(null)
+
+  // E2E bypass: window.__HCAPTCHA_AUTO_VERIFY__ skips the captcha widget in
+  // Playwright tests. Never set in production — real users always see the widget.
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as Window & { __HCAPTCHA_AUTO_VERIFY__?: boolean }).__HCAPTCHA_AUTO_VERIFY__) {
+      setCaptchaToken('e2e-bypass-token')
+    }
+  }, [])
 
   const emailError = validateEmail(email)
   const passwordError = validatePassword(password)
   const confirmError = validateConfirmPassword(password, confirmPassword)
-  const hasErrors = !!(emailError || passwordError || confirmError)
+  const hasFormErrors = !!(emailError || passwordError || confirmError)
+  const disabled = hasFormErrors || !captchaToken || loading
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (hasErrors || loading) return
+    if (disabled) return
     setLoading(true)
-    await new Promise<void>((resolve) => setTimeout(resolve, 300))
-    router.push('/onboarding')
+    setServerError(null)
+    try {
+      const { token, user } = await api.auth.register(
+        email,
+        password,
+        undefined,
+        captchaToken,
+      )
+      useAuthStore.getState().setAuth(token, user)
+      router.push('/onboarding')
+    } catch (err) {
+      captchaRef.current?.resetCaptcha()
+      setCaptchaToken(null)
+      if (err instanceof ApiError) {
+        setServerError(
+          err.status === 409
+            ? 'Email already registered.'
+            : 'Something went wrong. Try again.',
+        )
+      } else {
+        setServerError("Can't reach the server. Check your connection.")
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -155,23 +194,46 @@ export default function SignupForm({ tier }: SignupFormProps) {
             error={confirmTouched ? confirmError : null}
           />
 
+          {/* Only render the real widget when the e2e bypass is not active */}
+          {!captchaToken && (
+            <HCaptcha
+              ref={captchaRef}
+              sitekey={resolveHcaptchaSitekey()}
+              onVerify={(token) => setCaptchaToken(token)}
+              onExpire={() => setCaptchaToken(null)}
+            />
+          )}
+
+          {serverError && (
+            <p
+              role="alert"
+              style={{
+                color: '#B42318',
+                fontSize: '0.875rem',
+                margin: 0,
+                fontFamily: SANS_FONT,
+              }}
+            >
+              {serverError}
+            </p>
+          )}
+
           <button
             type="submit"
-            disabled={hasErrors || loading}
+            disabled={disabled}
             aria-busy={loading}
             style={{
               marginTop: 8,
               width: '100%',
               height: 52,
-              backgroundColor:
-                hasErrors || loading ? 'var(--rule-default)' : 'var(--cta-primary)',
-              color: hasErrors || loading ? 'var(--text-muted)' : '#ffffff',
+              backgroundColor: disabled ? 'var(--rule-default)' : 'var(--cta-primary)',
+              color: disabled ? 'var(--text-muted)' : '#ffffff',
               borderRadius: 4,
               border: 'none',
               fontFamily: SANS_FONT,
               fontWeight: 600,
               fontSize: '0.9375rem',
-              cursor: hasErrors || loading ? 'not-allowed' : 'pointer',
+              cursor: disabled ? 'not-allowed' : 'pointer',
               letterSpacing: '0.01em',
             }}
           >

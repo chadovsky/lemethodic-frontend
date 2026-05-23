@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 const mockUsePathname = vi.fn<() => string>()
@@ -107,5 +107,18 @@ describe('Sidebar', () => {
     render(<Sidebar drawerOpen={false} />)
     const inactiveLink = screen.getByTestId('sidebar-link-account')
     expect(inactiveLink.parentElement).not.toHaveClass('sidebar-active-row')
+  })
+
+  // BE-001 — signout affordance
+  it('renders a sign-out button when onSignOut prop is provided', () => {
+    render(<Sidebar drawerOpen={false} onSignOut={vi.fn()} />)
+    expect(screen.getByTestId('sidebar-signout')).toBeInTheDocument()
+  })
+
+  it('clicking sign-out calls the onSignOut callback', () => {
+    const onSignOut = vi.fn()
+    render(<Sidebar drawerOpen={false} onSignOut={onSignOut} />)
+    fireEvent.click(screen.getByTestId('sidebar-signout'))
+    expect(onSignOut).toHaveBeenCalledTimes(1)
   })
 })

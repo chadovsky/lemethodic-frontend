@@ -1,5 +1,10 @@
 import { test, expect } from '@playwright/test'
 import { getFailingTouchTargets } from '../helpers/interactiveElements'
+import { injectAuthToken } from '../helpers/auth-e2e'
+
+test.beforeEach(async ({ page }) => {
+  await injectAuthToken(page)
+})
 
 // All interactive routes in the app
 const ROUTES = [

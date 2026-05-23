@@ -1,6 +1,12 @@
-import { test, expect } from '@playwright/test'
+﻿import { test, expect } from '@playwright/test'
+import { injectAuthToken } from '../helpers/auth-e2e'
 
-test.describe('Le Vocabulaire practice — desktop (1280×800)', () => {
+test.beforeEach(async ({ page }) => {
+  await injectAuthToken(page)
+})
+
+
+test.describe('Le Vocabulaire practice â€” desktop (1280Ã—800)', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
   test('renders inside (app) shell with header, first card, progress, and action row', async ({
@@ -9,7 +15,7 @@ test.describe('Le Vocabulaire practice — desktop (1280×800)', () => {
     await page.goto('/vocabulaire/practice')
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
     await expect(page.getByRole('heading', { level: 1, name: /pratique/i })).toBeVisible()
-    await expect(page.getByText(/révisez vos chunks, un par un\./i)).toBeVisible()
+    await expect(page.getByText(/rÃ©visez vos chunks, un par un\./i)).toBeVisible()
     await expect(page.getByTestId('practice-progress')).toHaveText(/carte 1 sur 60/i)
     await expect(page.getByTestId('flashcard')).toBeVisible()
     await expect(page.getByTestId('flashcard')).toHaveAttribute('data-flipped', 'false')
@@ -90,7 +96,7 @@ test.describe('Le Vocabulaire practice — desktop (1280×800)', () => {
     await expect(page).toHaveURL(/\/vocabulaire$/)
   })
 
-  // MOCK-009 — 3D flip transform, action button chip colors
+  // MOCK-009 â€” 3D flip transform, action button chip colors
   test('card flip applies rotateY transform', async ({ page }) => {
     await page.goto('/vocabulaire/practice')
     const card = page.getByTestId('flashcard')
@@ -99,7 +105,7 @@ test.describe('Le Vocabulaire practice — desktop (1280×800)', () => {
     expect(transform).toContain('rotateY(180deg)')
   })
 
-  test('À revoir and Connu action buttons are visible and have non-transparent backgrounds', async ({ page }) => {
+  test('Ã€ revoir and Connu action buttons are visible and have non-transparent backgrounds', async ({ page }) => {
     await page.goto('/vocabulaire/practice')
     await expect(page.getByTestId('practice-action-review')).toBeVisible()
     await expect(page.getByTestId('practice-action-known')).toBeVisible()
@@ -111,7 +117,7 @@ test.describe('Le Vocabulaire practice — desktop (1280×800)', () => {
   })
 })
 
-test.describe('Le Vocabulaire practice — mobile (375×667)', () => {
+test.describe('Le Vocabulaire practice â€” mobile (375Ã—667)', () => {
   test.use({ viewport: { width: 375, height: 667 } })
 
   test('renders the practice surface single-column without horizontal overflow', async ({
@@ -125,7 +131,7 @@ test.describe('Le Vocabulaire practice — mobile (375×667)', () => {
     expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1)
   })
 
-  test('each of the 3 action buttons has a tap target ≥ 44×44px on mobile', async ({ page }) => {
+  test('each of the 3 action buttons has a tap target â‰¥ 44Ã—44px on mobile', async ({ page }) => {
     await page.goto('/vocabulaire/practice')
     for (const id of [
       'practice-action-review',
@@ -139,7 +145,7 @@ test.describe('Le Vocabulaire practice — mobile (375×667)', () => {
     }
   })
 
-  // MOCK-009 — mobile card full-width
+  // MOCK-009 â€” mobile card full-width
   test('flashcard is full-width on mobile', async ({ page }) => {
     await page.goto('/vocabulaire/practice')
     const cardBox = await page.getByTestId('flashcard').boundingBox()

@@ -1,4 +1,9 @@
 import { test, expect } from '@playwright/test'
+import { injectAuthToken } from '../helpers/auth-e2e'
+
+test.beforeEach(async ({ page }) => {
+  await injectAuthToken(page)
+})
 
 test.describe('App shell — desktop (1280×800)', () => {
   test.use({ viewport: { width: 1280, height: 800 } })

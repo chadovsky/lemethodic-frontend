@@ -15,10 +15,16 @@ const NAV_ITEMS = [
 interface SidebarProps {
   drawerOpen: boolean
   onLinkClick?: () => void
+  onSignOut?: () => void
   initials?: string
 }
 
-export default function Sidebar({ drawerOpen, onLinkClick, initials = 'CH' }: SidebarProps) {
+export default function Sidebar({
+  drawerOpen,
+  onLinkClick,
+  onSignOut,
+  initials = 'CH',
+}: SidebarProps) {
   return (
     <aside
       id="app-shell-sidebar"
@@ -99,6 +105,32 @@ export default function Sidebar({ drawerOpen, onLinkClick, initials = 'CH' }: Si
           ))}
         </ul>
       </nav>
+
+      {onSignOut && (
+        <div style={{ padding: '12px 16px', borderTop: '1px solid var(--rule-default)' }}>
+          <button
+            type="button"
+            data-testid="sidebar-signout"
+            onClick={onSignOut}
+            style={{
+              width: '100%',
+              height: 40,
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: SANS_FONT,
+              fontWeight: 500,
+              fontSize: '0.875rem',
+              color: 'var(--text-muted)',
+              textAlign: 'left',
+              padding: '0 8px',
+              borderRadius: 4,
+            }}
+          >
+            Sign out
+          </button>
+        </div>
+      )}
     </aside>
   )
 }

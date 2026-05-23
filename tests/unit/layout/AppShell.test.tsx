@@ -2,9 +2,16 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 const mockPathname = vi.fn<() => string>()
+const mockPush = vi.fn()
 
 vi.mock('next/navigation', () => ({
   usePathname: () => mockPathname(),
+  useRouter: () => ({ push: mockPush }),
+}))
+
+vi.mock('@/lib/auth', () => ({
+  useAuthStore: (selector: (s: { user: null }) => unknown) => selector({ user: null }),
+  signOut: vi.fn(),
 }))
 
 vi.mock('next/link', () => ({

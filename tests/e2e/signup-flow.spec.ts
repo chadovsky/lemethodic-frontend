@@ -1,4 +1,14 @@
 import { test, expect } from '@playwright/test'
+import { mockRegisterEndpoint } from '../helpers/auth-e2e'
+
+// Bypass hCaptcha in e2e: sets window.__HCAPTCHA_AUTO_VERIFY__ = true before
+// the page JS runs, so SignupForm auto-sets the captcha token on mount.
+async function bypassCaptcha(page: import('@playwright/test').Page) {
+  await page.addInitScript(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(window as any).__HCAPTCHA_AUTO_VERIFY__ = true
+  })
+}
 
 test.describe('Signup form — desktop (1280×800)', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
@@ -43,6 +53,8 @@ test.describe('Signup form — desktop (1280×800)', () => {
   })
 
   test('valid form submission navigates to /onboarding', async ({ page }) => {
+    await bypassCaptcha(page)
+    await mockRegisterEndpoint(page)
     await page.goto('/signup')
     await page.getByLabel('Email').fill('test@example.com')
     await page.getByLabel('Password', { exact: true }).fill('password123')
@@ -67,6 +79,8 @@ test.describe('Signup form — desktop (1280×800)', () => {
   })
 
   test('submit shows spinner then navigates to /onboarding', async ({ page }) => {
+    await bypassCaptcha(page)
+    await mockRegisterEndpoint(page)
     await page.goto('/signup')
     await page.getByLabel('Email').fill('test@example.com')
     await page.getByLabel('Password', { exact: true }).fill('password123')

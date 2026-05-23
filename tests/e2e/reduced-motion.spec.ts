@@ -1,4 +1,5 @@
 import { test, expect, type BrowserContext } from '@playwright/test'
+import { injectAuthToken } from '../helpers/auth-e2e'
 
 const ROUTES = [
   '/',
@@ -30,6 +31,7 @@ test.afterAll(async () => {
 for (const route of ROUTES) {
   test(`reduced-motion: no horizontal overflow on ${route}`, async () => {
     const page = await rmCtx.newPage()
+    await injectAuthToken(page)
     await page.goto(route)
     const scrollWidth = await page.evaluate(() => document.body.scrollWidth)
     const clientWidth = await page.evaluate(() => document.body.clientWidth)
@@ -40,6 +42,7 @@ for (const route of ROUTES) {
 
 test('reduced-motion: results-score-block animation is suppressed on /diagnostic/results', async () => {
   const page = await rmCtx.newPage()
+  await injectAuthToken(page)
   await page.goto('/diagnostic/results')
   const scoreBlock = page.getByTestId('results-score-block')
   await expect(scoreBlock).toBeVisible()
@@ -67,6 +70,7 @@ test('reduced-motion: ed-hero-rise elements have no animation on /', async () =>
 
 test('reduced-motion: CSS transitions are instant on score block', async () => {
   const page = await rmCtx.newPage()
+  await injectAuthToken(page)
   await page.goto('/diagnostic/results')
   const scoreBlock = page.getByTestId('results-score-block')
   await expect(scoreBlock).toBeVisible()

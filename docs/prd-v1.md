@@ -1778,7 +1778,386 @@ None. This is the first UI shell — no upstream blockers.
 
 **Strategic step:** maps to Step 2b (surface wiring).
 
-**ID range:** BE-001 to BE-022. To be populated in subsequent planning sessions.
+**ID range:** BE-001 to BE-022.
+
+---
+
+### BE-001 — Auth: signup → login → session → logout
+
+**Status:** Shipped — squash-merged `ecdd1b0` (feat/be-001-auth-wiring → main)
+**Branch:** `feat/be-001-auth-wiring` (FE, from `main`)
+**Effort:** 1 session (~5–6h)
+
+**Auth library choice: NextAuth v5 (Auth.js) with Credentials provider**
+
+Rationale:
+1. Native Next.js App Router integration — `auth()` helper works in Server Components, Route Handlers, and middleware without glue code
+2. No external managed-service cost at Y0 (Supabase Auth: ~$25/mo; operating ceiling $20–50/mo total)
+3. JWT strategy with token rotation covers the refresh-token requirement without a database session table
+4. hCaptcha token verified server-side in the `authorize()` callback before any DB lookup (F-406)
+5. Credentials provider is replaceable with OAuth in a future entry without restructuring session handling
+
+Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 proves painful — it would absorb both auth and database. That migration is straightforward at Y0 user counts. Deferred.
+
+#### Scope
+**In:**
+- `pnpm add next-auth@beta @auth/prisma-adapter bcryptjs @hcaptcha/react-hcaptcha`; `pnpm add -D @types/bcryptjs`
+- `pnpm add prisma @prisma/client`; `pnpm add -D prisma` — Prisma ORM with Postgres (Neon serverless free tier at Y0; connection string in `.env.local` as `DATABASE_URL`)
+- `prisma/schema.prisma` — initial schema: `User` (id, email, passwordHash, emailVerified, preferredName, createdAt), plus Auth.js adapter tables `Account`, `Session`, `VerificationToken`
+- `auth.config.ts` at repo root — Credentials provider; JWT strategy; `session.maxAge: 60 * 60 * 24 * 7` (7 days); cookie flags `httpOnly: true, sameSite: 'lax', secure: NODE_ENV === 'production'`
+- `app/api/auth/[...nextauth]/route.ts` — Auth.js v5 App Router catch-all handler
+- **Signup Route Handler** `app/api/auth/register/route.ts`:
+  - Server-side Zod validation (email format, password ≥ 8 chars, password match)
+  - hCaptcha server-side verify via `POST https://hcaptcha.com/siteverify`; helper in `lib/auth/hcaptcha.ts`; uses `HCAPTCHA_SECRET` env var
+  - Checks for duplicate email; returns 409 on conflict
+  - `bcryptjs.hash(password, 12)` before `prisma.user.create()`
+  - Returns `{ userId, email }` on 201; structured `{ error: string }` with 4xx on failure
+- **Credentials `authorize()`**: receives `{ email, password, hcaptchaToken }`, verifies hCaptcha, queries Prisma, `bcryptjs.compare()`; returns `{ id, email, name: null }` on success, `null` on failure
+- **Refresh tokens**: Auth.js `jwt` callback with access token expiry `NEXTAUTH_ACCESS_TOKEN_EXPIRY=900` (15 min); stateless token rotation — new JWT issued on expiry without a refresh-token DB table (sufficient at V1; add DB-backed refresh tokens in a future hardening entry)
+- **Rate limiting** on `/api/auth/register` and the credentials login path: in-process `Map<ip, { count; resetAt }>` keyed by `x-forwarded-for` / `request.ip`; 5 attempts / 15 min window; 429 + `Retry-After` header on breach; logic in `lib/auth/rateLimit.ts`
+- **Middleware** `middleware.ts` at repo root: `auth()` from Auth.js; redirects unauthenticated requests on `(app)` paths to `/login`; matcher: `['/((?!api|_next/static|_next/image|favicon.ico|public).*)']`; `(app)` paths: `/dashboard`, `/ecole`, `/vocabulaire`, `/diagnostic`, `/account`
+- **TopNav coexistence** (carry-forward): `EXCLUDED_PREFIXES` constant in `components/layout/StickyHeader.tsx`; `usePathname()` check returns `null` when pathname starts with any of: `/dashboard`, `/ecole`, `/vocabulaire`, `/diagnostic`, `/account`, `/signup`, `/login`, `/onboarding`. Future cleanup: restructure landing routes into a `(marketing)` route group so StickyHeader is never mounted for `(app)` routes.
+- **`LoginForm`** `components/auth/LoginForm.tsx` — email + password fields + `HCaptcha` widget; submit calls `signIn('credentials', { email, password, hcaptchaToken, callbackUrl: '/dashboard' })`; inline error on 401; `ed-field` class on inputs; `.ed-btn-press` on submit; form card surface matches `SignupForm` (MOCK-005 treatment)
+- `app/login/page.tsx` — replaces UI-004 stub; renders `<LoginForm />`; must NOT render inside `(app)` shell
+- **`SignupForm` update**: replace the fake 300ms redirect from UI-005 with a real `POST /api/auth/register`; on 201, call `signIn('credentials', ...)` programmatically; add `HCaptcha` widget; propagate hCaptchaToken into the request body
+- **Signout**: `signOut({ callbackUrl: '/' })` wired to a "Déconnexion" link in a new `SidebarFooter` sub-component rendered at the bottom of `Sidebar.tsx`; icon: inline door/exit SVG
+- **Sidebar session display**: `Sidebar.tsx` updated to call `useSession()` from `next-auth/react`; avatar initials derived from `session.user.name` (first letter of each word, max 2 chars) or first letter of email; removes the hardcoded `"CH"` default
+
+**Out (deferred, do not add):**
+- OAuth providers (Google, Apple) — deferred to BE-XXX
+- Email verification email send (SES/Resend) — deferred to BE-XXX
+- 2FA / TOTP — deferred
+- Passwordless magic link — deferred
+- Account deletion self-service — LGL-XXX (data subject rights)
+- Prisma models for lessons/chunks/taches — BE-003/004/005
+- Real user name / persona from onboarding persistence — BE-002
+- DB-backed refresh token rotation (stateless JWT rotation is sufficient at V1) — BE-XXX hardening
+- Redis-backed rate limiting (in-memory is sufficient at Y0) — BE-XXX hardening
+
+#### Acceptance (Given/When/Then)
+1. **Given** a valid signup form submission with a solved hCaptcha token, **When** `POST /api/auth/register` is called, **Then** a User row exists in Postgres, the response is 201 `{ userId, email }`, and the browser receives a session cookie.
+2. **Given** a registered user on `/login`, **When** they submit valid credentials with a solved hCaptcha, **Then** `signIn()` resolves, the session cookie is set, and the router navigates to `/dashboard`.
+3. **Given** an unauthenticated browser, **When** the user navigates to `/dashboard`, **Then** middleware redirects to `/login`.
+4. **Given** an authenticated session, **When** the user navigates to `/ecole` or `/dashboard`, **Then** the `StickyHeader` is absent from those routes.
+5. **Given** the same IP submits 6 `POST /api/auth/register` calls within 15 min, **When** the 6th arrives, **Then** the response is 429 with a `Retry-After` header.
+6. **Given** an authenticated user in the sidebar, **When** "Déconnexion" is clicked, **Then** `signOut()` fires and the browser returns to `/`.
+7. **Given** mobile 375px on `/login`, **When** the form renders, **Then** all inputs, the hCaptcha widget, and the submit button are visible without horizontal scroll; the submit button is ≥44px tall.
+
+#### Tests
+- `tests/unit/auth/register.test.ts` (vitest) — route handler returns 201 on valid input; 409 on duplicate email; 422 on Zod failure; 429 on 6th call within window; hCaptcha success + failure paths mocked via `vi.mock('lib/auth/hcaptcha')`
+- `tests/unit/auth/login.test.tsx` (vitest) — `LoginForm` renders email + password + hCaptcha widget; submit disabled until both fields non-empty + hCaptcha token present; error message renders when `signIn` returns `{ error }`
+- `tests/unit/auth/rateLimit.test.ts` (vitest) — allows 5 calls, blocks 6th, resets after window; uses `vi.useFakeTimers()`
+- `tests/unit/layout/StickyHeader.test.tsx` (vitest) — update: assert returns `null` for `/dashboard`, `/ecole`, `/vocabulaire`, `/diagnostic`, `/account`; assert renders for `/`, `/signup`, `/login`
+- `tests/e2e/auth-flow.spec.ts` (Playwright) — sign up with new email → lands on `/dashboard`; sign out → `/`; sign in → `/dashboard`; unauthenticated `/dashboard` redirects to `/login`; `StickyHeader` absent on `/dashboard`, present on `/`
+
+#### Files Touched
+- `auth.config.ts` — new
+- `prisma/schema.prisma` — new
+- `prisma/migrations/` — new (generated; commit the migration SQL)
+- `app/api/auth/[...nextauth]/route.ts` — new
+- `app/api/auth/register/route.ts` — new
+- `app/login/page.tsx` — replaces UI-004 stub
+- `components/auth/LoginForm.tsx` — new
+- `components/auth/SignupForm.tsx` — update: wire `/api/auth/register`, add hCaptcha widget
+- `components/layout/StickyHeader.tsx` — update: `EXCLUDED_PREFIXES` + `usePathname()` null guard
+- `components/layout/Sidebar.tsx` — update: `useSession()` initials, `SidebarFooter`
+- `components/layout/SidebarFooter.tsx` — new: signout link
+- `middleware.ts` — new
+- `lib/auth/rateLimit.ts` — new
+- `lib/auth/hcaptcha.ts` — new
+- `tests/unit/auth/register.test.ts` — new
+- `tests/unit/auth/login.test.tsx` — new
+- `tests/unit/auth/rateLimit.test.ts` — new
+- `tests/unit/layout/StickyHeader.test.tsx` — update
+- `tests/e2e/auth-flow.spec.ts` — new
+
+#### Dependencies
+- All MOCK-001 through MOCK-012 Shipped (auth is the first Section 3 entry; all UI + mock surfaces must be stable before real session state is introduced)
+- `.env.local` variables required before session starts: `DATABASE_URL` (Neon), `NEXTAUTH_SECRET` (generate with `openssl rand -base64 32`), `NEXTAUTH_URL` (e.g. `http://localhost:3000`), `HCAPTCHA_SECRET`, `HCAPTCHA_SITE_KEY`
+- Neon Postgres project created and connection string available
+
+#### Notes
+- **Auth.js v5 vs v4**: v5 is the App Router–native release with the `auth()` export. Do not install `next-auth@4` — the App Router integration is fundamentally different. Read the Auth.js v5 docs for the Prisma adapter setup and the `jwt` callback signature changes.
+- **Prisma + Neon**: use `@neondatabase/serverless` HTTP adapter for Edge runtime compatibility (`previewFeatures = ["driverAdapters"]` in `schema.prisma`). `prisma generate` must run after schema changes; add it to `package.json` `postinstall`.
+- **TopNav carry-forward**: the `EXCLUDED_PREFIXES` list must be updated whenever a new `(app)` route is added. Document this in the StickyHeader file with a comment. The permanent fix (route group restructure) is tracked as a future cleanup; do NOT do it in this entry.
+- **Route debt flag**: if any `app/ecole` subroutes remain outside the `(app)` group, confirm the middleware matcher does not accidentally block them. Add them to `EXCLUDED_PREFIXES` in `StickyHeader` if they have chrome from the landing layout.
+- **hCaptcha in CI**: use the hCaptcha test site key `10000000-ffff-ffff-ffff-000000000001` (always passes) in `HCAPTCHA_SITE_KEY` for test environments. Never hardcode keys — always read from env vars.
+- **Password hash cost**: `bcryptjs` cost factor 12 is standard for Y0 traffic. If auth latency becomes a concern, this can be lowered to 10; do not go below 10.
+
+---
+
+### BE-002 — User profile API
+
+**Status:** Not Started
+**Branch:** `feat/be-002-user-profile` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+
+#### Scope
+**In:**
+- Extend `prisma/schema.prisma` `User` model with persona fields: `preferredName String?`, `goal String?` (TCF_CANADA | DALF_C1 | TEF_CANADA — locked taxonomy per onboarding), `currentLevel String?` (A1_A2 | A2_B1 | B1_B2 | B2_plus), `targetScore String?`, `examDate String?`; run `prisma migrate dev`
+- `app/api/me/route.ts` — GET: requires Auth.js session (return 401 if missing); reads `prisma.user.findUnique({ where: { id: session.user.id } })`; returns `{ id, email, preferredName, emailVerified, persona: { goal, currentLevel, targetScore, examDate } }`
+- `app/api/me/route.ts` — PATCH: Zod-validated body `{ preferredName?, goal?, currentLevel?, targetScore?, examDate? }`; `prisma.user.update()`; returns updated profile on 200
+- `lib/api/me.ts` — typed fetch helpers `fetchMe(): Promise<UserProfile>` and `updateMe(patch): Promise<UserProfile>` that call `/api/me`; these are the sole import point for components — no component calls `fetch('/api/me')` directly
+- **Dashboard greeting**: `app/(app)/dashboard/page.tsx` upgraded from a Client Component to a Server Component; calls `auth()` to get session; renders `Bonjour, {user.preferredName || user.name || 'vous'}` — replaces the plain "Bonjour" from UI-007
+- **Sidebar session display**: `Sidebar.tsx` already updated in BE-001 to derive initials from session; no further change here unless the `preferredName` field improves initials derivation (update the initials logic if so)
+- **Email verification banner**: `app/(app)/layout.tsx` renders a dismissible inline banner "Vérifiez votre adresse email pour activer votre compte." when `session.user.emailVerified === null`; local `dismissed` state only (no persistence); banner styled as `--fp-butter` background chip, 1-line, with × button; does NOT send an email (send is Scope Out)
+- `/exam-prep` LandingPage.tsx flag: if `LandingPage.tsx` or any landing component imports user profile data, flag in PR description. This entry does NOT touch landing components.
+
+**Out (deferred, do not add):**
+- Email verification email send (SES/Resend/Postmark) — deferred to BE-XXX
+- Onboarding persona persistence (wiring the existing onboarding state machine to POST `/api/me` on step-6 continue) — deferred to a separate BE entry; this entry only creates the GET + PATCH endpoint
+- Avatar image upload — deferred
+- Account settings page full implementation (`/account` is still a stub) — deferred
+- Public profile / shareable diagnostic results — CON-XXX
+- GDPR data export / deletion endpoint — LGL-XXX
+- components/home/* legacy consumers (/vocab, /speaking, /writing, /profile, /more) — flag in PR if any read user state; do not touch in this entry
+
+#### Acceptance (Given/When/Then)
+1. **Given** an authenticated session, **When** `GET /api/me` is called, **Then** the response is 200 with `{ id, email, preferredName, emailVerified, persona: { goal, currentLevel, targetScore, examDate } }` matching the session user's DB record.
+2. **Given** an unauthenticated request, **When** `GET /api/me` is called, **Then** the response is 401.
+3. **Given** `PATCH /api/me` with `{ preferredName: "Chadi" }`, **When** the handler runs, **Then** the Postgres `User.preferredName` field is updated and the response returns the updated profile.
+4. **Given** a logged-in user whose `emailVerified` is null, **When** any `(app)` route renders, **Then** the email-verification banner is visible; clicking × removes it from the DOM (page-reload restores it).
+5. **Given** `/dashboard` loaded by an authenticated user with `preferredName: "Chadi"`, **When** the Server Component renders, **Then** the greeting reads "Bonjour, Chadi".
+
+#### Tests
+- `tests/unit/api/me.test.ts` (vitest) — GET returns 200 with correct shape for an authenticated mock session; GET returns 401 for unauthenticated; PATCH updates preferredName; PATCH with invalid goal enum returns 422
+- `tests/unit/dashboard/Dashboard.test.tsx` (vitest) — update: assert greeting includes the name passed as prop (Server Component tested via mocked `auth()`)
+- `tests/unit/layout/AppShell.test.tsx` (vitest) — update: assert email-verification banner renders when `emailVerified === null`; assert × click removes it
+- `tests/e2e/profile-api.spec.ts` (Playwright) — sign in; `GET /api/me` returns session email; `PATCH /api/me` with new preferredName; refresh `/dashboard` and confirm greeting reflects new name; unverified email banner visible, × dismisses it
+
+#### Files Touched
+- `prisma/schema.prisma` — extend User model with persona fields
+- `prisma/migrations/` — new migration
+- `app/api/me/route.ts` — new
+- `lib/api/me.ts` — new
+- `app/(app)/dashboard/page.tsx` — convert to Server Component, add personalized greeting
+- `app/(app)/layout.tsx` — add email-verification banner
+- `tests/unit/api/me.test.ts` — new
+- `tests/unit/dashboard/Dashboard.test.tsx` — update
+- `tests/unit/layout/AppShell.test.tsx` — update
+- `tests/e2e/profile-api.spec.ts` — new
+
+#### Dependencies
+- BE-001 Shipped (Auth.js session + Prisma + User model must exist; EXCLUDED_PREFIXES in StickyHeader already resolved)
+
+#### Notes
+- The `lib/api/me.ts` helper is the single import seam. When the data source changes (e.g. moves to the Python backend), only this file changes — no component updates.
+- Dashboard conversion to Server Component requires removing the `'use client'` directive and any browser-only hooks. Date formatting via `Intl.DateTimeFormat` still works in Server Components; `useState` / `useEffect` must move to a child Client Component if needed.
+- Persona field taxonomy (`goal`, `currentLevel`) must match the string values used in the existing onboarding components (`TCFGoalSelect`, `CurrentLevelSelect`). Check `OnboardingFlow.tsx` for the canonical string values before writing the Zod schema.
+- `/exam-prep` dual landing (LandingPage.tsx) carry-forward: if `LandingPage.tsx` renders user-specific content gated on persona, that wiring is a separate BE entry. This entry only creates the endpoint.
+
+---
+
+### BE-003 — Lesson data API
+
+**Status:** Not Started
+**Branch:** `feat/be-003-lesson-api` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+
+#### Scope
+**In:**
+- Extend `prisma/schema.prisma` with `Lesson` model: `id Int @id`, `title String`, `description String`, `section String` (Fondations | Approfondissement), `cefr String` (B1 | B2), `position Int` (1–27, unique, used for ordering); run `prisma migrate dev`
+- `prisma/seed.ts` — reads `lib/data/lessons.ts` fixture and `prisma.lesson.upsert()`s all 27 entries; run with `prisma db seed`; add `"prisma": { "seed": "ts-node prisma/seed.ts" }` to `package.json`
+- `app/api/lessons/route.ts` — GET: no auth required (public curriculum); returns all 27 lessons ordered by `position` as `Lesson[]`; response shape matches the existing `lib/data/lessons.ts` export shape exactly
+- `app/api/lessons/[id]/route.ts` — GET: `prisma.lesson.findUnique({ where: { id: parseInt(params.id) } })`; returns `Lesson` on 200, 404 if not found, 400 if `id` is non-numeric
+- `lib/api/lessons.ts` — typed helpers `fetchLessons(): Promise<Lesson[]>` and `fetchLesson(id: number): Promise<Lesson | null>`; these are the sole import point for components
+- **Frontend migration** for lesson consumers: replace all direct `import { LESSONS } from 'lib/data/lessons'` calls with calls to `lib/api/lessons.ts` helpers:
+  - `components/ecole/LessonList.tsx` — use `fetchLessons()` (Server Component)
+  - `app/(app)/ecole/[id]/page.tsx` — use `fetchLesson(id)` (Server Component); `notFound()` when null
+  - `lib/data/dashboard.ts` `NEXT_LESSON` pointer — update to call `fetchLesson(4)` or derive from a Server Component fetch; see Notes
+- **`lib/data/lessons.ts`** — keep file in place as the migration source (seed script reads it); add a deprecation comment: `// Deprecated: seed source only — use lib/api/lessons.ts for component data`
+- **Route debt flag**: `app/ecole/` subroutes outside `(app)` group (`/intro`, `/lesson/[id]`, `/quiz`) — if any exist, they are documented in the PR description as route debt. This entry does NOT migrate them; they continue to import from `lib/data/lessons.ts` until a dedicated migration entry.
+
+**Out (deferred, do not add):**
+- Per-user completion state / progress tracking on lessons — BE-XXX (a `UserLesson` join table with `completedAt`)
+- Lesson body content (real curriculum text for the 27 lessons) — CON-XXX
+- Lesson audio files — AI-XXX (TTS)
+- Filtering / sorting lessons by CEFR, section, state — covered by query params when per-user state lands
+- Pre-requisite gating logic — BE-XXX
+- Real audio elements of any kind
+
+#### Acceptance (Given/When/Then)
+1. **Given** `GET /api/lessons`, **When** the handler runs, **Then** the response is 200 JSON array of 27 Lesson objects in ascending `position` order, each with `id`, `title`, `description`, `section`, `cefr` fields.
+2. **Given** `GET /api/lessons/5`, **When** the handler runs, **Then** the response is 200 with the lesson at position 5; `GET /api/lessons/99` returns 404; `GET /api/lessons/abc` returns 400.
+3. **Given** `/ecole` rendered as a Server Component, **When** the page loads, **Then** `fetchLessons()` is called (no direct `lib/data/lessons` import); the 16 Fondations + 11 Approfondissement split renders correctly.
+4. **Given** `/ecole/3` rendered as a Server Component, **When** the page loads, **Then** `fetchLesson(3)` populates the breadcrumb title and lesson header with DB data.
+5. **Given** the seed script runs against an empty Postgres DB, **When** `pnpm prisma db seed` completes, **Then** exactly 27 Lesson rows exist in the `Lesson` table.
+
+#### Tests
+- `tests/unit/api/lessons.test.ts` (vitest) — GET returns 200 + 27 lessons in order; GET /5 returns lesson at id 5; GET /99 returns 404; GET /abc returns 400; no auth required
+- `tests/unit/ecole/LessonList.test.tsx` (vitest) — update: mock `fetchLessons()` from `lib/api/lessons`; confirm it is called rather than the static import; rendering assertions unchanged from UI-008
+- `tests/unit/ecole/LessonDetail.test.tsx` (vitest) — update: mock `fetchLesson(3)` from `lib/api/lessons`; rendering assertions unchanged from UI-009
+- `tests/e2e/ecole-list.spec.ts` (Playwright) — update: lesson list still renders 27 cards split 16/11; data sourced from DB via API (seed must run before e2e suite)
+- `tests/e2e/ecole-detail.spec.ts` (Playwright) — update: lesson detail title matches DB fixture; invalid id still 404s
+
+#### Files Touched
+- `prisma/schema.prisma` — add Lesson model
+- `prisma/migrations/` — new migration
+- `prisma/seed.ts` — new (or update if exists from BE-001)
+- `app/api/lessons/route.ts` — new
+- `app/api/lessons/[id]/route.ts` — new
+- `lib/api/lessons.ts` — new
+- `lib/data/lessons.ts` — add deprecation comment; do NOT delete (seed reads it)
+- `components/ecole/LessonList.tsx` — update import to `lib/api/lessons`
+- `app/(app)/ecole/[id]/page.tsx` — update to Server Component fetch via `lib/api/lessons`
+- `lib/data/dashboard.ts` — update `NEXT_LESSON` pointer (see Notes)
+- `tests/unit/api/lessons.test.ts` — new
+- `tests/unit/ecole/LessonList.test.tsx` — update
+- `tests/unit/ecole/LessonDetail.test.tsx` — update
+- `tests/e2e/ecole-list.spec.ts` — update
+- `tests/e2e/ecole-detail.spec.ts` — update
+
+#### Dependencies
+- BE-001 Shipped (Prisma + DB connection established; seed infrastructure exists)
+- BE-002 recommended (Server Component conversion pattern established for dashboard — apply same pattern here)
+
+#### Notes
+- **Response shape must match fixture**: compare the TypeScript type in `lib/data/lessons.ts` before writing the Prisma query — column names must be identical so zero component changes are needed downstream. If any field name in `schema.prisma` differs from the fixture type, alias it in the Prisma `select` clause.
+- **`lib/data/dashboard.ts` NEXT_LESSON**: this field currently holds a static reference to `LESSONS[4]`. After migration, it should either (a) be converted to a Server Component fetch in `NextLessonWidget.tsx` pulling `fetchLesson(5)` directly, or (b) remain static until BE-XXX wires per-user next-lesson logic. Option (a) is preferred — it removes the dashboard.ts fixture dependency on lessons data. Document the choice in the PR.
+- **Route debt (`app/ecole/` outside `(app)`)**: if any such routes exist (flagged in MOCK-012), their `lib/data/lessons.ts` import is left untouched by this entry. Note them by filename in the PR description.
+- **Seed idempotency**: `prisma.lesson.upsert()` on `id` ensures re-running `pnpm prisma db seed` is safe. Use `upsert` not `create` in the seed script.
+- **No auth on lesson endpoints**: lesson data is public curriculum. Auth is not required for `GET /api/lessons` or `GET /api/lessons/[id]`. Per-user state (progress, completion) is a future endpoint.
+
+---
+
+### BE-004 — Chunk data API
+
+**Status:** Not Started
+**Branch:** `feat/be-004-chunk-api` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+
+#### Scope
+**In:**
+- Extend `prisma/schema.prisma` with `Chunk` model: `id Int @id @default(autoincrement())`, `french String`, `gloss String`, `cefr String` (A1 | A2 | B1 | B2 | C1), `source String` (Média | Conversation | Travail | Voyage | Quotidien); run `prisma migrate dev`
+- `prisma/seed.ts` — updated to also upsert the 60 chunks from `lib/data/chunks.ts`
+- `app/api/chunks/route.ts` — GET: query params `cefr` (comma-separated, e.g. `?cefr=A1,B1`), `source` (single value), `q` (case-insensitive substring match on `french`); all params optional; no auth required; returns filtered `Chunk[]` ordered by `id`; filtering implemented as Prisma `where` clauses — NOT in application code
+- `lib/api/chunks.ts` — typed helper `fetchChunks(params: ChunkFilterParams): Promise<Chunk[]>`; `ChunkFilterParams` matches the query param shape; this is the sole import point for components
+- **`lib/vocab/filter.ts` becomes a thin client wrapper**: the function `applyFilters(chunks, filterState)` is replaced by `buildChunkParams(filterState): ChunkFilterParams` which constructs the query params for `fetchChunks()`; the actual filtering now happens server-side in the Postgres query; `filter.ts` is renamed to `lib/vocab/params.ts` (update all imports)
+- **Frontend migration** for chunk consumers:
+  - `components/vocabulaire/VocabBrowse.tsx` — replaces static import with a client-side `useSWR('/api/chunks', ...)` call (or `useEffect` fetch); pass active filter state as query params; `fetchChunks(filterState)` from `lib/api/chunks.ts` via a custom hook `useChunks(filterState)` in `lib/hooks/useChunks.ts`
+  - `components/vocabulaire/PracticeDeck.tsx` — replaces static import with `fetchChunks({})` call (all chunks, no filter) on component mount
+  - `lib/vocab/quiz.ts` `buildQuiz()` — updated to accept `Chunk[]` from the caller rather than importing from the fixture directly (function signature unchanged beyond input source)
+- **components/home/* legacy consumers**: if any file under `components/home/` or `/vocab`, `/speaking`, `/writing`, `/profile`, `/more` routes imports from `lib/data/chunks.ts`, flag in PR description. This entry does NOT touch those consumers.
+- `lib/data/chunks.ts` — add deprecation comment; keep as seed source
+
+**Out (deferred, do not add):**
+- Real save / collection (saving chunks to a user's list) — BE-XXX (`UserChunk` table with `savedAt`)
+- Server-side pagination (client loads all chunks matching filters; pagination when chunk count justifies it)
+- Spaced-repetition scoring and deck selection — AI-XXX
+- Audio playback per chunk (TTS pronunciation) — AI-XXX
+- Tag-based filters beyond source and CEFR — deferred
+- Sorting — deferred
+
+#### Acceptance (Given/When/Then)
+1. **Given** `GET /api/chunks`, **When** no query params are sent, **Then** the response is 200 with all 60 chunks as a JSON array.
+2. **Given** `GET /api/chunks?cefr=A1,B1`, **When** the handler runs, **Then** only chunks with `cefr` in `['A1', 'B1']` are returned.
+3. **Given** `GET /api/chunks?source=Média`, **When** the handler runs, **Then** only chunks with `source === 'Média'` are returned.
+4. **Given** `GET /api/chunks?q=tomber`, **When** the handler runs, **Then** only chunks whose `french` field contains "tomber" (case-insensitive) are returned.
+5. **Given** `/vocabulaire` loaded, **When** the browse view renders, **Then** `fetchChunks({})` is called (no static import); 60 rows render; the CEFR chip filter triggers a new `fetchChunks({ cefr: [...] })` call.
+6. **Given** all 5 CEFR chips deselected, **When** the filter applies, **Then** `GET /api/chunks?cefr=` is NOT called (empty selection = no results, show empty state — preserve existing empty-state UX from UI-010).
+
+#### Tests
+- `tests/unit/api/chunks.test.ts` (vitest) — GET 200 + 60 items unfiltered; CEFR filter; source filter; search filter; combined CEFR+source filter; empty result case
+- `tests/unit/vocabulaire/filter-logic.test.ts` (vitest) — update: tests now call `buildChunkParams(filterState)` and assert the output query param object; rename file to `tests/unit/vocabulaire/params-logic.test.ts`
+- `tests/unit/vocabulaire/VocabBrowse.test.tsx` (vitest) — update: mock `useChunks` from `lib/hooks/useChunks`; assert it is called on mount; assert filter chip toggle calls the hook with updated params
+- `tests/e2e/vocabulaire-browse.spec.ts` (Playwright) — update: 60 rows visible; deselect A1 chip → only non-A1 rows; source dropdown → filtered rows; search → filtered rows; empty state appears when no match; e2e seed must include chunks
+
+#### Files Touched
+- `prisma/schema.prisma` — add Chunk model
+- `prisma/migrations/` — new migration
+- `prisma/seed.ts` — update to seed chunks
+- `app/api/chunks/route.ts` — new
+- `lib/api/chunks.ts` — new
+- `lib/vocab/params.ts` — renamed from `lib/vocab/filter.ts`; exports `buildChunkParams()` instead of `applyFilters()`
+- `lib/hooks/useChunks.ts` — new: client-side hook wrapping `fetchChunks()`
+- `lib/data/chunks.ts` — add deprecation comment; keep as seed source
+- `components/vocabulaire/VocabBrowse.tsx` — replace static import with `useChunks()`
+- `components/vocabulaire/PracticeDeck.tsx` — replace static import with `fetchChunks({})` on mount
+- `lib/vocab/quiz.ts` — update `buildQuiz()` to accept `Chunk[]` parameter (no longer imports fixture)
+- `tests/unit/api/chunks.test.ts` — new
+- `tests/unit/vocabulaire/params-logic.test.ts` — renamed + updated from `filter-logic.test.ts`
+- `tests/unit/vocabulaire/VocabBrowse.test.tsx` — update
+- `tests/e2e/vocabulaire-browse.spec.ts` — update
+
+#### Dependencies
+- BE-001 Shipped (Prisma + DB)
+- BE-003 Shipped recommended (seed infrastructure and migration pattern established)
+
+#### Notes
+- **Filter logic moves server-side**: `applyFilters()` is deleted; the Prisma `where` clause is the new filter engine. The existing `filter-logic.test.ts` unit tests should be rewritten to test `buildChunkParams()` output shapes rather than in-memory filter behavior. The e2e tests catch the end-to-end filter correctness.
+- **`useChunks` hook**: wrap `useSWR` or a simple `useEffect` + `useState` pattern. SWR is preferred — it handles deduplication, caching, and revalidation cleanly for this use case. `pnpm add swr` if not already installed.
+- **VocabBrowse async state**: converting from synchronous static import to async fetch means a loading state is needed. Add a skeleton row (using the existing `.ed-skeleton` CSS utility from `app/globals.css`) visible while the fetch resolves. The skeleton should show 8–10 placeholder rows at the same height as ChunkRows.
+- **Empty CEFR selection edge case**: when all 5 CEFR chips are deselected, the UI shows the empty state without making a network request (same behavior as UI-010 empty-state logic). Handle this in `buildChunkParams()` — return `null` (don't call the API) when the CEFR array is empty.
+- **Legacy consumers flag**: `components/home/*` files were legacy consumers of vocab data per the carry-forward. If `VocabBrowse` or any home component imports `lib/data/chunks.ts`, flag the file path in the PR description. They are not migrated in this entry.
+
+---
+
+### BE-005 — Tâche data API
+
+**Status:** Not Started
+**Branch:** `feat/be-005-tache-api` (FE, from `main`)
+**Effort:** 1 session (~2–3h)
+
+#### Scope
+**In:**
+- Extend `prisma/schema.prisma` with `Tache` model: `id Int @id`, `title String`, `descriptor String`, `durationLabel String`, `durationSeconds Int`, `prompt String`; run `prisma migrate dev`
+- `prisma/seed.ts` — updated to also upsert the 3 tâches from `lib/data/taches.ts`
+- `app/api/taches/route.ts` — GET: no auth required; returns all 3 tâches as `Tache[]` ordered by `id`
+- `app/api/taches/[id]/route.ts` — GET: `prisma.tache.findUnique({ where: { id: parseInt(params.id) } })`; returns `Tache` on 200; 404 if not found; 400 if `id` non-numeric
+- `lib/api/taches.ts` — typed helpers `fetchTaches(): Promise<Tache[]>` and `fetchTache(id: number): Promise<Tache | null>`; sole import point for components
+- **Frontend migration** for tâche consumers:
+  - `app/(app)/diagnostic/page.tsx` — Server Component; replace `lib/data/taches.ts` import with `fetchTaches()` to populate the `TacheOverviewGrid`
+  - `app/(app)/diagnostic/tache/[n]/page.tsx` — Server Component; replace with `fetchTache(n)`; `notFound()` when null (preserves the existing 404 behavior for `n > 3` or non-numeric)
+- `lib/data/taches.ts` — add deprecation comment; keep as seed source
+- `durationSeconds` field: add `durationSeconds` to `lib/data/taches.ts` fixture entries before seeding (Tâche 1: 180, Tâche 2: 210, Tâche 3: 300); the `Timer` component should read `durationSeconds` instead of parsing `durationLabel` — update `Timer.tsx` accordingly
+
+**Out (deferred, do not add):**
+- Real tâche prompt library expansion (50 scenarios — F-061.2 Livraison 2/2) — CON-XXX
+- Per-user tâche attempt history / scoring — BE-XXX (a `UserTache` join table)
+- Audio recording submission (MediaRecorder → Python backend) — AI-XXX (F-327 voice pipeline)
+- Real scoring of tâche responses — AI-XXX (F-322 validator)
+- Re-take limits / attempt counters — BE-XXX
+
+#### Acceptance (Given/When/Then)
+1. **Given** `GET /api/taches`, **When** the handler runs, **Then** the response is 200 with exactly 3 Tache objects in ascending `id` order, each with `id`, `title`, `descriptor`, `durationLabel`, `durationSeconds`, `prompt` fields.
+2. **Given** `GET /api/taches/2`, **When** the handler runs, **Then** the response is 200 with the Tâche 2 record; `GET /api/taches/4` returns 404; `GET /api/taches/xyz` returns 400.
+3. **Given** `/diagnostic` rendered as a Server Component, **When** the page loads, **Then** `fetchTaches()` is called; the 3-card tâche overview grid renders with DB-sourced titles and descriptors.
+4. **Given** `/diagnostic/tache/1` rendered as a Server Component, **When** the page loads, **Then** `fetchTache(1)` populates the tâche header and prompt; the `Timer` initializes to `durationSeconds: 180` (3:00).
+5. **Given** `/diagnostic/tache/4` loaded, **When** `fetchTache(4)` returns null, **Then** `notFound()` fires and the Next.js 404 page renders.
+
+#### Tests
+- `tests/unit/api/taches.test.ts` (vitest) — GET returns 200 + 3 tâches ordered by id; GET /2 returns tâche 2; GET /4 returns 404; GET /xyz returns 400; no auth required
+- `tests/unit/diagnostic/TacheShell.test.tsx` (vitest) — update: mock `fetchTache(1)` from `lib/api/taches`; assert `Timer` receives `durationSeconds: 180`; rendering assertions unchanged from UI-014
+- `tests/unit/diagnostic/Timer.test.tsx` (vitest) — update: Timer accepts `durationSeconds` prop (not parsed from string); existing urgency + reset tests pass with numeric input
+- `tests/e2e/diagnostic-landing.spec.ts` (Playwright) — update: tâche cards render with DB-sourced titles (seed must run before e2e)
+- `tests/e2e/diagnostic-tache.spec.ts` (Playwright) — update: `/diagnostic/tache/1` timer initializes to 3:00; `/diagnostic/tache/4` still 404s
+
+#### Files Touched
+- `prisma/schema.prisma` — add Tache model
+- `prisma/migrations/` — new migration
+- `prisma/seed.ts` — update to seed tâches
+- `app/api/taches/route.ts` — new
+- `app/api/taches/[id]/route.ts` — new
+- `lib/api/taches.ts` — new
+- `lib/data/taches.ts` — add `durationSeconds` field to fixture entries; add deprecation comment
+- `app/(app)/diagnostic/page.tsx` — convert to Server Component; replace static import with `fetchTaches()`
+- `app/(app)/diagnostic/tache/[n]/page.tsx` — convert to Server Component; replace static import with `fetchTache(n)`
+- `components/diagnostic/Timer.tsx` — update to accept `durationSeconds: number` prop instead of parsing `durationLabel`
+- `tests/unit/api/taches.test.ts` — new
+- `tests/unit/diagnostic/TacheShell.test.tsx` — update
+- `tests/unit/diagnostic/Timer.test.tsx` — update
+- `tests/e2e/diagnostic-landing.spec.ts` — update
+- `tests/e2e/diagnostic-tache.spec.ts` — update
+
+#### Dependencies
+- BE-001 Shipped (Prisma + DB)
+- BE-003 Shipped recommended (seed + migration pattern established; consistent `durationSeconds` approach mirrors lesson fixture migration pattern)
+
+#### Notes
+- **`durationSeconds` refactor**: the `Timer` component currently parses `durationLabel` (e.g. `"03:00"`) into seconds. This entry adds a first-class `durationSeconds` field to the Prisma model and fixture, and updates `Timer` to accept it as a numeric prop. This is a non-breaking change — `durationLabel` remains in the API response for display use (the "Durée : ~3 min" label on TacheCard).
+- **Only 3 tâches**: the tâche library expansion to 50 scenarios (F-061.2) is CON-XXX content work. This entry seeds exactly the 3 existing fixtures; do not generate placeholder additional tâches.
+- **Lightest of the five BE entries**: tâches are the simplest dataset (3 items, no filtering). This entry is primarily a migration from static fixture to DB + API, following the patterns established in BE-003 and BE-004.
+- **Timer prop change is the only logic change**: all other diagnostic component changes are pure import swaps (fixture → `lib/api/taches.ts`). Confirm `Timer.test.tsx` passes with the `durationSeconds` numeric prop before merging.
 
 ---
 

@@ -56,7 +56,7 @@ export default function LoginPage() {
   }, [])
   useEffect(() => {
     if (hydrated && token) {
-      router.replace('/ecole')
+      router.replace('/dashboard')
     }
   }, [hydrated, token, router])
 
@@ -74,7 +74,7 @@ export default function LoginPage() {
     try {
       const { token, user } = await api.auth.login(email.trim(), password)
       useAuthStore.getState().setAuth(token, user)
-      router.push('/ecole')
+      router.push('/dashboard')
     } catch (err) {
       if (err instanceof ApiError) {
         setError(mapApiError(err))

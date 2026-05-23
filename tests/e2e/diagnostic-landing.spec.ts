@@ -1,16 +1,22 @@
-import { test, expect } from '@playwright/test'
+﻿import { test, expect } from '@playwright/test'
+import { injectAuthToken } from '../helpers/auth-e2e'
 
-test.describe('Le Diagnostic landing — desktop (1280×800)', () => {
+test.beforeEach(async ({ page }) => {
+  await injectAuthToken(page)
+})
+
+
+test.describe('Le Diagnostic landing â€” desktop (1280Ã—800)', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
-  test('renders header, sections, 3 tâche cards, 5-couche preview, CTA inside (app) shell', async ({
+  test('renders header, sections, 3 tÃ¢che cards, 5-couche preview, CTA inside (app) shell', async ({
     page,
   }) => {
     await page.goto('/diagnostic')
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
     await expect(page.getByRole('heading', { level: 1, name: /le diagnostic/i })).toBeVisible()
     await expect(
-      page.getByText(/mesurez votre niveau réel en expression orale tcf canada\./i),
+      page.getByText(/mesurez votre niveau rÃ©el en expression orale tcf canada\./i),
     ).toBeVisible()
     await expect(page.getByTestId('diagnostic-section-persona')).toBeVisible()
     await expect(page.getByTestId('diagnostic-section-overview')).toBeVisible()
@@ -42,7 +48,7 @@ test.describe('Le Diagnostic landing — desktop (1280×800)', () => {
     await expect(link).toHaveAttribute('href', '/diagnostic/results')
   })
 
-  test('3 tâche cards render side-by-side at desktop width', async ({ page }) => {
+  test('3 tÃ¢che cards render side-by-side at desktop width', async ({ page }) => {
     await page.goto('/diagnostic')
     const cards = page.getByTestId('tache-card')
     await expect(cards).toHaveCount(3)
@@ -62,15 +68,15 @@ test.describe('Le Diagnostic landing — desktop (1280×800)', () => {
     expect(audioCount).toBe(0)
   })
 
-  // MOCK-010 — dismiss button and tâche accent bars
-  test('clicking the × dismiss button removes the past-score panel', async ({ page }) => {
+  // MOCK-010 â€” dismiss button and tÃ¢che accent bars
+  test('clicking the Ã— dismiss button removes the past-score panel', async ({ page }) => {
     await page.goto('/diagnostic')
     await expect(page.getByTestId('diagnostic-past-score')).toBeVisible()
     await page.getByTestId('past-score-dismiss').click()
     await expect(page.getByTestId('diagnostic-past-score')).not.toBeAttached()
   })
 
-  test('tâche cards each have an accent bar element', async ({ page }) => {
+  test('tÃ¢che cards each have an accent bar element', async ({ page }) => {
     await page.goto('/diagnostic')
     const cards = page.getByTestId('tache-card')
     await expect(cards).toHaveCount(3)
@@ -80,10 +86,10 @@ test.describe('Le Diagnostic landing — desktop (1280×800)', () => {
   })
 })
 
-test.describe('Le Diagnostic landing — mobile (375×667)', () => {
+test.describe('Le Diagnostic landing â€” mobile (375Ã—667)', () => {
   test.use({ viewport: { width: 375, height: 667 } })
 
-  test('3 tâche cards stack vertically on mobile', async ({ page }) => {
+  test('3 tÃ¢che cards stack vertically on mobile', async ({ page }) => {
     await page.goto('/diagnostic')
     const cards = page.getByTestId('tache-card')
     await expect(cards).toHaveCount(3)
