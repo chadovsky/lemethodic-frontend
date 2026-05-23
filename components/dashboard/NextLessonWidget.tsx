@@ -60,6 +60,9 @@ export default function NextLessonWidget() {
           letterSpacing: '0.01em',
           textDecoration: 'none',
           borderRadius: 4,
+          minHeight: 44,
+          display: 'inline-flex',
+          alignItems: 'center',
         }}
       >
         Reprendre

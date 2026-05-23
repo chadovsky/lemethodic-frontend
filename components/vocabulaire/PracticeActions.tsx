@@ -79,7 +79,7 @@ export default function PracticeActions({
           disabled={isFirst}
           className="ed-btn-press"
           style={{
-            minHeight: 36,
+            minHeight: 44,
             padding: '6px 10px',
             fontFamily: SANS_FONT,
             fontWeight: 500,

@@ -80,6 +80,7 @@ export default function TacheSummary() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 6,
+                minHeight: 44,
               }}
             >
               <svg
@@ -112,6 +113,7 @@ export default function TacheSummary() {
                 padding: '5px 12px',
                 display: 'inline-flex',
                 alignItems: 'center',
+                minHeight: 44,
               }}
             >
               Relire l&rsquo;énoncé

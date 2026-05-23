@@ -48,6 +48,9 @@ export default function Breadcrumb({
                   style={{
                     color: 'var(--text-muted)',
                     textDecoration: 'none',
+                    minHeight: 44,
+                    display: 'inline-flex',
+                    alignItems: 'center',
                   }}
                 >
                   {item.label}

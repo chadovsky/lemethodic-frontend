@@ -75,6 +75,9 @@ export default function DiagnosticScoreWidget() {
           textDecoration: 'none',
           borderRadius: 4,
           border: '1px solid var(--text-primary)',
+          minHeight: 44,
+          display: 'inline-flex',
+          alignItems: 'center',
         }}
       >
         Voir le détail

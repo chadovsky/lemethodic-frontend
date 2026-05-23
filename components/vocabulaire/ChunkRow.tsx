@@ -98,8 +98,8 @@ export default function ChunkRow({ chunk }: { chunk: Chunk }) {
         className="ed-btn-press"
         style={{
           flexShrink: 0,
-          width: 36,
-          height: 36,
+          width: 44,
+          height: 44,
           borderRadius: 4,
           border: '1px solid var(--rule-default)',
           backgroundColor: saved ? 'var(--fp-blush)' : 'transparent',

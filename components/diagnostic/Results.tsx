@@ -141,6 +141,7 @@ export default function Results() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 8,
+            minHeight: 44,
           }}
         >
           <svg
@@ -175,6 +176,7 @@ export default function Results() {
             textDecoration: 'none',
             display: 'inline-flex',
             alignItems: 'center',
+            minHeight: 44,
           }}
         >
           Retour au tableau de bord

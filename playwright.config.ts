@@ -19,6 +19,14 @@ export default defineConfig({
       name: 'mobile',
       use: { viewport: { width: 375, height: 667 }, isMobile: true },
     },
+    {
+      name: 'reduced-motion',
+      use: {
+        viewport: { width: 1280, height: 800 },
+        reducedMotion: 'reduce',
+      },
+      testMatch: '**/reduced-motion.spec.ts',
+    },
   ],
   webServer: {
     command: 'pnpm dev',

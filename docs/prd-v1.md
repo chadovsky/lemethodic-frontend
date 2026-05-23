@@ -1712,8 +1712,8 @@ None. This is the first UI shell — no upstream blockers.
 
 ### MOCK-012 — Global motion pass + PWA manifest
 
-**Status:** Not Started
-**Branch:** `feat/mock-012-motion-pwa` (FE, from `main`)
+**Status:** Shipped — squash-merged 1414938
+**Branch:** `feat/mock-012-audit` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 **Benchmark:** Shared standard (all three benchmarks share: slow confident motion, mobile-native feel, PWA installability)
 

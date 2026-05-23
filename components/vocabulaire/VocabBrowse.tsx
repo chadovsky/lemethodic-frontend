@@ -141,6 +141,7 @@ export default function VocabBrowse() {
           borderRadius: 4,
           cursor: 'pointer',
           alignSelf: 'flex-start',
+          minHeight: 44,
         }}
       >
         Filtres {mobileFiltersOpen ? '▲' : '▼'}

@@ -13,6 +13,7 @@ const NAV_LINK_STYLE = {
   borderRadius: 4,
   display: 'inline-flex',
   alignItems: 'center',
+  minHeight: 44,
 }
 
 export default function TacheNav({ tacheId }: { tacheId: TacheId }) {

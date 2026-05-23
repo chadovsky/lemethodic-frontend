@@ -80,6 +80,9 @@ export default function PastScorePanel() {
             border: '1px solid var(--rule-default)',
             borderRadius: 4,
             textDecoration: 'none',
+            minHeight: 44,
+            display: 'inline-flex',
+            alignItems: 'center',
           }}
         >
           Voir les résultats
@@ -90,8 +93,8 @@ export default function PastScorePanel() {
           aria-label="Fermer le panneau de score"
           onClick={() => setDismissed(true)}
           style={{
-            width: 32,
-            height: 32,
+            width: 44,
+            height: 44,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
