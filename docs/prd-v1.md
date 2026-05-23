@@ -1643,7 +1643,7 @@ None. This is the first UI shell — no upstream blockers.
 
 ### MOCK-011 — Le Diagnostic results polish
 
-**Status:** Not Started
+**Status:** Shipped — squash-merged 54863da
 **Branch:** `feat/mock-011-diagnostic-results-polish` (FE, from `main`)
 **Effort:** 1 session (~3–4h)
 **Benchmark:** Airlearn (feedback card presentation, score visualization, post-assessment UX)

@@ -37,4 +37,33 @@ describe('RecommendationsStub', () => {
       expect(within(row).getByTestId('recommendation-suggestion')).toBeInTheDocument()
     })
   })
+
+  it('each row has a layer-chip badge with data-testid "recommendation-chip"', () => {
+    render(<RecommendationsStub />)
+    expect(screen.getAllByTestId('recommendation-chip')).toHaveLength(3)
+  })
+
+  it('chip initials are LM, LF, LV in row order', () => {
+    render(<RecommendationsStub />)
+    const chips = screen.getAllByTestId('recommendation-chip')
+    expect(chips[0]).toHaveTextContent('LM')
+    expect(chips[1]).toHaveTextContent('LF')
+    expect(chips[2]).toHaveTextContent('LV')
+  })
+
+  it('every CTA link has ed-btn-press class', () => {
+    render(<RecommendationsStub />)
+    const ctas = screen.getAllByTestId('recommendation-cta')
+    ctas.forEach((cta) => {
+      expect(cta).toHaveClass('ed-btn-press')
+    })
+  })
+
+  it('every recommendation row has ed-card-lift class', () => {
+    render(<RecommendationsStub />)
+    const rows = screen.getAllByTestId('recommendation-row')
+    rows.forEach((row) => {
+      expect(row).toHaveClass('ed-card-lift')
+    })
+  })
 })

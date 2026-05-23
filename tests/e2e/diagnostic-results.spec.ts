@@ -61,6 +61,46 @@ test.describe('Le Diagnostic results — desktop (1280×800)', () => {
     await page.goto('/diagnostic/results')
     await expect(page.getByTestId('recommendation-row')).toHaveCount(3)
   })
+
+  test('couche bars have non-zero widths 700ms after mount', async ({ page }) => {
+    await page.goto('/diagnostic/results')
+    await page.waitForTimeout(700)
+    const widths = await page.getByTestId('couche-bar').evaluateAll(
+      (els) => els.map((el) => parseFloat((el as HTMLElement).style.width)),
+    )
+    widths.forEach((w) => expect(w).toBeGreaterThan(0))
+  })
+
+  test('hovering a couche row reveals the gloss tooltip', async ({ page }) => {
+    await page.goto('/diagnostic/results')
+    await page.getByTestId('couche-row').first().hover()
+    await expect(page.getByTestId('couche-tooltip').first()).toBeVisible()
+  })
+
+  test('CEFR pill is visible and shows "C1"', async ({ page }) => {
+    await page.goto('/diagnostic/results')
+    const pill = page.getByTestId('results-cefr-pill')
+    await expect(pill).toBeVisible()
+    await expect(pill).toContainText('C1')
+  })
+
+  test('each recommendation row has a chip badge and accent CTA', async ({ page }) => {
+    await page.goto('/diagnostic/results')
+    await expect(page.getByTestId('recommendation-chip')).toHaveCount(3)
+  })
+
+  test('reduced-motion: score block animation is suppressed', async ({ browser }) => {
+    const ctx = await browser.newContext({ reducedMotion: 'reduce' })
+    const page = await ctx.newPage()
+    await page.goto('/diagnostic/results')
+    const scoreBlock = page.getByTestId('results-score-block')
+    await expect(scoreBlock).toBeVisible()
+    const animName = await scoreBlock.evaluate(
+      (el) => getComputedStyle(el).animationName,
+    )
+    expect(animName).toBe('none')
+    await ctx.close()
+  })
 })
 
 test.describe('Le Diagnostic results — mobile (375×667)', () => {
@@ -79,5 +119,12 @@ test.describe('Le Diagnostic results — mobile (375×667)', () => {
     await expect(page.getByTestId('results-section-couches')).toBeVisible()
     await expect(page.getByTestId('results-section-taches')).toBeVisible()
     await expect(page.getByTestId('results-action-recommencer')).toBeVisible()
+  })
+
+  test('couche gloss sentences are visible inline without hover', async ({ page }) => {
+    await page.goto('/diagnostic/results')
+    const glosses = page.getByTestId('couche-gloss')
+    await expect(glosses.first()).toBeVisible()
+    expect(await glosses.count()).toBe(5)
   })
 })

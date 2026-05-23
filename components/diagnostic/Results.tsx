@@ -1,9 +1,12 @@
 import Link from 'next/link'
 import Breadcrumb from '@/components/common/Breadcrumb'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
+import { CEFR_PASTEL_MAP } from '@/lib/data/cefr'
 import CouchesBreakdown from './CouchesBreakdown'
 import TacheSummary from './TacheSummary'
 import RecommendationsStub from './RecommendationsStub'
+
+const SCORE = 'C1'
 
 const EVAL_DATE = new Intl.DateTimeFormat('fr-CA', { dateStyle: 'long' }).format(
   new Date(2026, 4, 15),
@@ -32,12 +35,9 @@ export default function Results() {
 
       {/* Header: overall score */}
       <div
-        data-testid="results-header"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 6,
-        }}
+        data-testid="results-score-block"
+        className="results-score-enter"
+        style={{ display: 'flex', flexDirection: 'column', gap: 6 }}
       >
         <span
           style={{
@@ -51,7 +51,7 @@ export default function Results() {
         >
           Niveau estimé TCF Canada
         </span>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
           <span
             data-testid="results-score"
             style={{
@@ -64,7 +64,23 @@ export default function Results() {
               color: 'var(--text-primary)',
             }}
           >
-            C1
+            {SCORE}
+          </span>
+          <span
+            data-testid="results-cefr-pill"
+            style={{
+              fontFamily: SANS_FONT,
+              fontWeight: 700,
+              fontSize: '0.875rem',
+              letterSpacing: '0.04em',
+              color: 'var(--text-primary)',
+              backgroundColor: CEFR_PASTEL_MAP[SCORE],
+              borderRadius: 4,
+              padding: '4px 10px',
+              flexShrink: 0,
+            }}
+          >
+            {SCORE}
           </span>
           <span
             style={{
@@ -124,8 +140,23 @@ export default function Results() {
             textDecoration: 'none',
             display: 'inline-flex',
             alignItems: 'center',
+            gap: 8,
           }}
         >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+          </svg>
           Recommencer le diagnostic
         </Link>
         <Link
@@ -136,9 +167,9 @@ export default function Results() {
             fontFamily: SANS_FONT,
             fontWeight: 600,
             fontSize: '0.9375rem',
-            color: 'var(--text-primary)',
+            color: 'var(--ed-accent)',
             backgroundColor: 'transparent',
-            border: '1px solid var(--rule-default)',
+            border: '1px solid var(--ed-accent)',
             borderRadius: 4,
             padding: '12px 24px',
             textDecoration: 'none',

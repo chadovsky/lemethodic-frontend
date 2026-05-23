@@ -61,4 +61,34 @@ describe('Results', () => {
     const { container } = render(<Results />)
     expect(container.querySelector('audio')).toBeNull()
   })
+
+  it('renders a CEFR pill with data-testid "results-cefr-pill"', () => {
+    render(<Results />)
+    expect(screen.getByTestId('results-cefr-pill')).toBeInTheDocument()
+  })
+
+  it('CEFR pill shows "C1"', () => {
+    render(<Results />)
+    expect(screen.getByTestId('results-cefr-pill')).toHaveTextContent('C1')
+  })
+
+  it('score block has results-score-enter animation class', () => {
+    render(<Results />)
+    expect(screen.getByTestId('results-score-block')).toHaveClass('results-score-enter')
+  })
+
+  it('"Recommencer le diagnostic" contains an inline SVG icon', () => {
+    render(<Results />)
+    const recommencer = screen.getByTestId('results-action-recommencer')
+    expect(recommencer.querySelector('svg')).not.toBeNull()
+  })
+
+  it('each TacheSummary row has multi-sentence feedback (>=80 chars)', () => {
+    render(<Results />)
+    const feedbacks = screen.getAllByTestId('tache-summary-feedback')
+    expect(feedbacks).toHaveLength(3)
+    feedbacks.forEach((fb) => {
+      expect((fb.textContent ?? '').length).toBeGreaterThanOrEqual(80)
+    })
+  })
 })

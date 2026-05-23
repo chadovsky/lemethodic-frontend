@@ -56,4 +56,26 @@ describe('CouchesBreakdown', () => {
       expect(within(row).getByTestId('couche-gloss')).toBeInTheDocument()
     })
   })
+
+  it('each couche bar has a width CSS transition in its inline style', () => {
+    render(<CouchesBreakdown />)
+    const bars = screen.getAllByTestId('couche-bar')
+    bars.forEach((bar) => {
+      expect(bar.style.transition).toContain('width')
+    })
+  })
+
+  it('each couche badge has a data-cefr-token attribute from CEFR_PASTEL_MAP', () => {
+    render(<CouchesBreakdown />)
+    const badges = screen.getAllByTestId('couche-badge')
+    // C1 (Le Fond, index 0) → fp-sage
+    expect(badges[0].getAttribute('data-cefr-token')).toContain('fp-sage')
+    // B1 (Les Réflexes Anglais, index 3) → fp-butter
+    expect(badges[3].getAttribute('data-cefr-token')).toContain('fp-butter')
+  })
+
+  it('gloss elements are always in the DOM regardless of hover state', () => {
+    render(<CouchesBreakdown />)
+    expect(screen.getAllByTestId('couche-gloss')).toHaveLength(5)
+  })
 })
