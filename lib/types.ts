@@ -43,6 +43,10 @@ export interface User {
   goal?: string | null
   currentLevel?: string | null
   interfaceLanguage?: string | null
+  // F-310 Phase B — BE returns email_verified boolean from serialize_user().
+  // undefined when the response comes from a stripped login/register shape
+  // that doesn't include the field; false triggers the verification banner.
+  emailVerified?: boolean
 }
 
 // ── Lessons (L'École) ───────────────────────────────────────────────────

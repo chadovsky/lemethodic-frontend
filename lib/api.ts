@@ -336,6 +336,9 @@ interface RawUser {
   goal?: string | null
   current_level?: string | null
   interface_language?: string | null
+  // F-310 Phase B — present on /api/auth/me (get_current_user_allow_unverified);
+  // absent on /api/auth/login and /api/auth/register (stripped shape).
+  email_verified?: boolean
 }
 
 function mapUser(raw: RawUser): User {
@@ -350,6 +353,7 @@ function mapUser(raw: RawUser): User {
     goal: raw.goal ?? null,
     currentLevel: raw.current_level ?? null,
     interfaceLanguage: raw.interface_language ?? null,
+    emailVerified: raw.email_verified,
   }
 }
 

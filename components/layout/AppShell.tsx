@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { SERIF_FONT } from '@/lib/typography'
 import { useAuthStore, signOut } from '@/lib/auth'
 import Sidebar from './Sidebar'
+import EmailVerificationBanner from '@/components/app/EmailVerificationBanner'
 
 interface AppShellProps {
   children: ReactNode
@@ -115,6 +116,8 @@ export default function AppShell({ children }: AppShellProps) {
         onSignOut={() => signOut(router)}
         initials={initials}
       />
+
+      <EmailVerificationBanner />
 
       <main
         key={pathname}

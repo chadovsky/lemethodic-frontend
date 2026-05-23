@@ -8,6 +8,9 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./tests/setup.ts'],
     include: ['tests/unit/**/*.test.{ts,tsx}'],
+    env: {
+      NEXT_PUBLIC_API_URL: 'http://localhost:8000',
+    },
   },
   resolve: {
     alias: {

@@ -10,6 +10,12 @@ vi.mock('next/link', () => ({
   ),
 }))
 
+// DashboardGreeting uses useAuthStore; provide a null-user stub so
+// tests remain deterministic and show "Bonjour" (no name).
+vi.mock('@/lib/auth', () => ({
+  useAuthStore: (selector: (s: { user: null }) => unknown) => selector({ user: null }),
+}))
+
 import Dashboard from '@/components/dashboard/Dashboard'
 
 describe('Dashboard', () => {
