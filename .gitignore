@@ -37,3 +37,5 @@ next-env.d.ts
 
 # Playwright per-run state (F-225 captures live elsewhere)
 test-results/
+
+.impeccable/
