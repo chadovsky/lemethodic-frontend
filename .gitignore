@@ -34,7 +34,6 @@ next-env.d.ts
 !.claude/skills/
 !.claude/agents/
 !.claude/commands/
-!.claude/settings.json
 
 # Playwright per-run state (F-225 captures live elsewhere)
 test-results/
