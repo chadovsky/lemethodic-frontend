@@ -66,6 +66,21 @@ const PERSONA_LABELS: Record<Persona, { en: string; fr: string }> = {
   cram: { en: 'Intensive', fr: 'Intensif' },
 }
 
+const PERSONA_DESCRIPTORS: Record<Persona, { en: string; fr: string }> = {
+  foundation: {
+    en: 'Plenty of time to build your French solidly.',
+    fr: 'Suffisamment de temps pour construire solidement.',
+  },
+  acceleration: {
+    en: 'A focused run — enough weeks to prepare well.',
+    fr: 'Un sprint ciblé — suffisamment de semaines pour bien préparer.',
+  },
+  cram: {
+    en: 'A tight timeline. Every session is targeted.',
+    fr: 'Un calendrier serré. Chaque séance compte.',
+  },
+}
+
 const SECTION_LABELS = {
   en: {
     plan: 'Your plan',
@@ -220,6 +235,18 @@ export default function EcoleReveal({ data, language, onContinue }: EcoleRevealP
           >
             {personaLabel}
           </h1>
+          <p
+            style={{
+              fontFamily: SANS,
+              fontWeight: 400,
+              fontSize: 15,
+              color: ED_MUTED,
+              margin: '12px 0 0',
+              lineHeight: 1.5,
+            }}
+          >
+            {PERSONA_DESCRIPTORS[persona][language]}
+          </p>
         </div>
 
         {/* Headline — reinforces the moment */}

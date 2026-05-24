@@ -64,6 +64,17 @@ export default function DateInputQuestion({
 
   const isEnabled = noExam || dateValue !== ''
 
+  // Inline reassurance for short-timeline users. Recomputes on every date
+  // change; maxes at 0 (minDate constraint already blocks past dates).
+  const weeksUntilExam = useMemo(() => {
+    if (!dateValue) return null
+    const examDate = new Date(dateValue)
+    if (isNaN(examDate.getTime())) return null
+    const msPerWeek = 1000 * 60 * 60 * 24 * 7
+    return Math.max(0, Math.ceil((examDate.getTime() - Date.now()) / msPerWeek))
+  }, [dateValue])
+  const showUrgencyHint = weeksUntilExam !== null && weeksUntilExam <= 8
+
   function handleDateChange(val: string) {
     setDateValue(val)
     if (val !== '') setNoExam(false)
@@ -156,6 +167,29 @@ export default function DateInputQuestion({
           />
         </div>
       </div>
+
+      {/* Urgency reassurance — appears when exam is ≤8 weeks away */}
+      {showUrgencyHint && (
+        <p
+          aria-live="polite"
+          style={{
+            fontFamily: SANS,
+            fontWeight: 400,
+            fontSize: 13,
+            color: ED_MUTED,
+            margin: 0,
+            lineHeight: 1.5,
+          }}
+        >
+          {weeksUntilExam === 0
+            ? (language === 'fr'
+                ? "Votre examen est cette semaine — nous allons construire votre plan le plus ciblé."
+                : "Your exam is this week — we'll build your most focused plan.")
+            : (language === 'fr'
+                ? `${weeksUntilExam} semaine${weeksUntilExam !== 1 ? 's' : ''} jusqu'à votre examen — nous allons construire votre plan autour de ce calendrier.`
+                : `${weeksUntilExam} week${weeksUntilExam !== 1 ? 's' : ''} to your exam — we'll build your plan around this window.`)}
+        </p>
+      )}
 
       {/* No-exam toggle as a card */}
       <OnboardingCard
