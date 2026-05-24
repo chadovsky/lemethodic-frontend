@@ -75,6 +75,7 @@ export default function OtherFreetextScreen({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={copy.placeholder}
+        maxLength={60}
         autoFocus
         onKeyDown={(e) => {
           if (e.key === 'Enter' && isEnabled) {

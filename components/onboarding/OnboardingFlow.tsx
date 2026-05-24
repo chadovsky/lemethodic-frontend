@@ -309,9 +309,9 @@ export default function OnboardingFlow() {
   }
 
   const step = flowSteps[safeIndex]
-  const headerToggle = (
-    <LanguageToggle language={interfaceLanguage} onChange={setLanguage} />
-  )
+  const headerToggle = safeIndex === 0
+    ? <LanguageToggle language={interfaceLanguage} onChange={setLanguage} />
+    : undefined
   const onBack = safeIndex > 0 ? goBack : undefined
 
   if (step.kind === 'q9_other') {

@@ -171,7 +171,7 @@ export default function EcoleReveal({ data, language, onContinue }: EcoleRevealP
 
   return (
     <div
-      className="min-h-screen w-full flex flex-col items-center"
+      className="min-h-screen w-full flex flex-col items-center ed-page-enter"
       style={{ backgroundColor: ED_BG }}
     >
       <div
