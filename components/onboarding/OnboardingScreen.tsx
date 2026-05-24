@@ -258,6 +258,7 @@ interface OnboardingScreenProps {
   descriptor?: string
   ctaLabel?: string
   ctaEnabled: boolean
+  ctaHint?: string
   onContinue: () => void
   onBack?: () => void
   headerRight?: ReactNode
@@ -275,6 +276,7 @@ export function OnboardingScreen({
   descriptor,
   ctaLabel = 'Continue',
   ctaEnabled,
+  ctaHint,
   onContinue,
   onBack,
   headerRight,
@@ -370,6 +372,22 @@ export function OnboardingScreen({
         {/* Spacer */}
         <div className="flex-1" style={{ minHeight: 'clamp(48px, 8vw, 96px)' }} />
 
+        {/* CTA hint — guides user when no selection has been made */}
+        {!ctaEnabled && ctaHint && (
+          <p
+            aria-live="polite"
+            style={{
+              fontFamily: SANS,
+              fontWeight: 400,
+              fontSize: 13,
+              color: ED_MUTED,
+              textAlign: 'center',
+              margin: '0 0 10px',
+            }}
+          >
+            {ctaHint}
+          </p>
+        )}
         {/* CTA */}
         <CTAButton label={ctaLabel} enabled={ctaEnabled} onClick={onContinue} />
       </div>

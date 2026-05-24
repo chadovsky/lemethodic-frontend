@@ -162,6 +162,7 @@ export default function OnboardingFlow() {
 
   const [questions, setQuestions] = useState<OnboardingQuestion[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [fetchKey, setFetchKey] = useState(0)
 
   // Detect browser language on first ever mount (when no persisted state
   // exists yet). Subsequent visits respect the user's last toggle choice.
@@ -173,9 +174,10 @@ export default function OnboardingFlow() {
     }
   }, [setLanguage])
 
-  // Fetch questions on mount.
+  // Fetch questions on mount, and on retry (fetchKey bump).
   useEffect(() => {
     let cancelled = false
+    setError(null)
     api.onboarding
       .getQuestions()
       .then((res: OnboardingQuestionsResponse) => {
@@ -192,7 +194,7 @@ export default function OnboardingFlow() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [fetchKey])
 
   // Build the visible flow steps from the BE questions + answers + the
   // synthetic q9 freetext follow-up.
@@ -221,10 +223,28 @@ export default function OnboardingFlow() {
   if (error) {
     return (
       <div
-        className="min-h-screen w-full flex items-center justify-center px-6"
+        className="min-h-screen w-full flex flex-col items-center justify-center gap-5 px-6"
         style={{ backgroundColor: LOADER_BG, fontFamily: DISPLAY_FONT, color: INK }}
       >
-        <p style={{ fontWeight: 600, textAlign: 'center' }}>{error}</p>
+        <p style={{ fontWeight: 600, textAlign: 'center', maxWidth: 400 }}>{error}</p>
+        <button
+          onClick={retryFetch}
+          style={{
+            height: 48,
+            padding: '0 28px',
+            backgroundColor: 'var(--ed-accent)',
+            color: '#FFFFFF',
+            borderRadius: 4,
+            fontFamily: DISPLAY_FONT,
+            fontWeight: 600,
+            fontSize: 15,
+            border: 'none',
+            cursor: 'pointer',
+            outline: 'none',
+          }}
+        >
+          Try again
+        </button>
       </div>
     )
   }
@@ -235,6 +255,10 @@ export default function OnboardingFlow() {
   const totalSteps = flowSteps.length + 1 // +1 for EcoleReveal as a dot
   const safeIndex = Math.min(currentStepIndex, flowSteps.length)
   const onReveal = safeIndex >= flowSteps.length
+
+  function retryFetch() {
+    setFetchKey((k) => k + 1)
+  }
 
   function goBack() {
     setStep(Math.max(0, safeIndex - 1))

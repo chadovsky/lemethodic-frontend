@@ -54,6 +54,7 @@ export default function SingleSelectQuestion({
       headline={question.heading[language]}
       descriptor={helperOverride ?? question.helper[language]}
       ctaEnabled={selected !== null}
+      ctaHint={language === 'fr' ? 'Choisissez une option pour continuer.' : 'Select an option to continue.'}
       onContinue={() => selected !== null && onContinue(selected)}
       onBack={onBack}
       headerRight={headerRight}
