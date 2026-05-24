@@ -2161,6 +2161,435 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 ---
 
+### BE-006 — Onboarding questionnaire wiring
+
+**Status:** Not Started
+**Branch:** `feat/be-006-onboarding-submit` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+
+#### Scope
+**In:**
+- `lib/api/onboarding.ts` — two typed fetch helpers:
+  - `fetchOnboardingQuestions(): Promise<OnboardingQuestionsResponse>` — calls `GET /onboarding/questions`; returns 11 questions with `{ id, order, type, required, heading: { en, fr }, helper: { en, fr }, options?: [{ value, label: { en, fr } }] }`; used to populate option copy dynamically at runtime
+  - `submitOnboarding(payload: OnboardingSubmitRequest): Promise<OnboardingSubmitResponse>` — calls `POST /onboarding/submit`; these are the sole import points — no component calls fetch directly
+- **Schema reconciliation** — the FE `OnboardingState` shape diverges from the BE `OnboardingSubmitRequest`; the following mapping must be applied before the POST call:
+  - `interface_language`: pass through from `LanguageSelect` (`"en" | "fr"`)
+  - `q0_target_exam`: FE `TCFGoalSelect` currently emits custom goal slugs (`TCF_CANADA` etc.); normalize to BE contract slugs: `tcf_canada | tef_canada | delf_b1_b2 | another_exam | not_sure`; update the `TCFGoalSelect` option values to match the BE enum exactly and remove any separate mapping layer
+  - `q1_current_level`: FE `CurrentLevelSelect` emits `A1_A2 | A2_B1 | B1_B2 | B2_plus`; BE expects `a2 | b1 | b2 | c1 | not_sure`; map A1_A2 → a2, A2_B1 → b1, B1_B2 → b2, B2_plus → c1; update the `CurrentLevelSelect` option values and the `CurrentLevel` type export
+  - `q2_target_level`: FE `TargetScoreSelect` emits custom labels; normalize to `b1 | b2 | c1 | c2 | not_sure`; update option values and the `TargetScore` type export
+  - `q3_exam_date / q3_no_exam_scheduled`: FE `ExamDateSelect` already captures a date string or a "quick" label; any "no exam scheduled" label must set `q3_no_exam_scheduled: true` and `q3_exam_date: null`; date values must be sent as ISO 8601 date strings (`YYYY-MM-DD`)
+- **New onboarding step 6 "À propos de vous"** — inserted before the current EcoleReveal (which becomes step 7); collects the four required BE fields not yet present in the FE: `q7_hours_per_week` (`less_than_2 | 2_to_5 | 5_to_10 | more_than_10`), `q9_native_language` (`english | arabic | spanish | portuguese | mandarin | hindi | russian | german | italian | other`), `q10_prior_exam_history` (`never | recent_6mo | recent_12mo | older`), `q11_feedback_mode` (`calm | method`); all four displayed as single-select cards using the existing `OnboardingCard` / `OnboardingScreen` primitives; pressing continue advances to step 7 (EcoleReveal); `total={7}` and `filledUpTo` values updated throughout
+- **EcoleReveal step 7** — continue CTA replaced: instead of `router.push('/paywall')`, calls `submitOnboarding(state)` first:
+  - loading state: CTA shows inline spinner, is disabled during the fetch
+  - on response `redirect_to_diagnostic: true` → `router.push('/diagnostic')`
+  - on response `waitlist: true` → `router.push('/waitlist')`
+  - on network / 4xx error → inline error message below the CTA: "Une erreur est survenue. Réessayez." with a retry button
+- **`/waitlist` stub page** — `app/waitlist/page.tsx`: renders a centered card "Vous êtes sur la liste d'attente — nous vous contacterons dès l'ouverture de votre parcours." with a "Retour à l'accueil" link to `/`; no shell (public-facing, not behind `(app)` layout)
+- `OnboardingFlow.tsx` — update `total={7}`, add step 6 `BackgroundStep` component, update `OnboardingState` type to include the four new fields; update all `filledUpTo` calculations
+- Optional BE fields `q4_motivation`, `q5_strongest_skill`, `q6_weakest_skill`, `q8_topics_tested_on` — omit from the submit payload in V1 (all are `Optional` / default-empty in the BE schema); document omission in a comment on the payload builder
+
+**Out (deferred, do not add):**
+- Fully dynamic question rendering via `GET /onboarding/questions` (fetch is called and its copy is used to hydrate question option labels at runtime; the step components themselves remain statically structured — a full "render questions from API shape" re-architecture is a future dedicated entry)
+- Optional questions Q4 (motivation), Q5 (strongest skill), Q6 (weakest skill), Q8 (topics tested on) — steps not added in this entry; fields will be null/omitted in the submit payload
+- Capacity warning display (the response may return `capacity_warning: { weeks_to_exam, hours_per_week_selected, recommended_minimum_hours }`; it is received but not surfaced to the user in this entry)
+- Re-onboarding flow (user who re-submits onboarding hits the same endpoint; enrollment is upserted on the BE; FE treats the response identically)
+- L'École gating updates triggered by the `above_a2` flag (ECole gating is a future BE entry)
+- Landing-page persona targeting based on onboarding responses
+
+#### Acceptance (Given/When/Then)
+1. **Given** a signed-in user has completed steps 1–5 of the onboarding flow, **When** they reach step 6, **Then** four single-select card questions render in order (hours/week, native language, prior exam history, feedback mode) with EN/FR copy driven by `fetchOnboardingQuestions()` and the `ProgressDots` show `filledUpTo=5 total=7`.
+2. **Given** the user has selected answers for all four step-6 questions, **When** they press continue, **Then** the flow advances to step 7 (EcoleReveal) and the CTA button is enabled.
+3. **Given** step 7 (EcoleReveal) rendered, **When** the user presses the continue CTA, **Then** the button shows an inline spinner + is disabled while `POST /onboarding/submit` is in-flight.
+4. **Given** the submit response returns `{ redirect_to_diagnostic: true }`, **When** the response is received, **Then** the router navigates to `/diagnostic`.
+5. **Given** the submit response returns `{ waitlist: true }`, **When** the response is received, **Then** the router navigates to `/waitlist` which renders the waitlist card without the `(app)` shell.
+6. **Given** `POST /onboarding/submit` returns a 4xx or network error, **When** the error is caught, **Then** an inline error message "Une erreur est survenue. Réessayez." appears below the CTA and the button re-enables for retry.
+
+#### Tests
+- `tests/unit/onboarding/BackgroundStep.test.tsx` (vitest) — new: renders 4 question groups in order; continue button disabled until all 4 answered; back button renders; correct option values are passed to `onContinue`
+- `tests/unit/onboarding/EcoleReveal.test.tsx` (vitest) — update: CTA click calls `submitOnboarding` mock; shows spinner during inflight; on `redirect_to_diagnostic: true` calls `router.push('/diagnostic')`; on `waitlist: true` calls `router.push('/waitlist')`; on error shows error text + re-enables button
+- `tests/unit/api/onboarding.test.ts` (vitest) — new: `fetchOnboardingQuestions` makes GET to correct path; `submitOnboarding` makes POST with correct schema shape; q1_current_level mapping A2_B1 → b1 verified; q3_no_exam_scheduled true when "no exam" variant selected
+- `tests/e2e/onboarding-flow.spec.ts` (Playwright) — update: complete all 7 steps; mock `POST /onboarding/submit` to return `redirect_to_diagnostic: true`; confirm navigation to `/diagnostic`; mock waitlist response; confirm navigation to `/waitlist`; step 6 four questions all required before advancing
+
+#### Files Touched
+- `lib/api/onboarding.ts` — new
+- `components/onboarding/BackgroundStep.tsx` — new step 6 component
+- `components/onboarding/OnboardingFlow.tsx` — add step 6, update total + filledUpTo, update EcoleReveal continue handler, update `OnboardingState` type
+- `components/onboarding/EcoleReveal.tsx` — replace `router.push('/paywall')` with `submitOnboarding` call + navigation logic
+- `components/onboarding/TCFGoalSelect.tsx` — normalize option values to BE enum slugs
+- `components/onboarding/CurrentLevelSelect.tsx` — normalize option values + update `CurrentLevel` type export
+- `components/onboarding/TargetScoreSelect.tsx` — normalize option values + update `TargetScore` type export
+- `components/onboarding/ExamDateSelect.tsx` — ensure no-exam path sets `q3_no_exam_scheduled=true`
+- `app/waitlist/page.tsx` — new stub
+- `tests/unit/onboarding/BackgroundStep.test.tsx` — new
+- `tests/unit/onboarding/EcoleReveal.test.tsx` — update
+- `tests/unit/api/onboarding.test.ts` — new
+- `tests/e2e/onboarding-flow.spec.ts` — update
+
+#### Dependencies
+- BE-001 Shipped (auth + session; submit endpoint requires authenticated user)
+- BE-002 Shipped (user profile endpoint exists; onboarding answers persist to User model fields confirmed in backend schema)
+
+#### Notes
+- **Schema gap is the core work**: the FE option values (`A1_A2`, `TCF_CANADA`, etc.) were designed before the BE contract was locked. The schema reconciliation (normalize option values + type exports) is as important as the API call itself. Updating the `CurrentLevel`, `TargetScore`, `TargetExam` type exports ensures downstream code (any component reading `OnboardingState`) stays type-safe without manual casts.
+- **Step 6 question copy**: `fetchOnboardingQuestions()` returns the canonical FR/EN option labels for all 11 questions. Step 6 should use these labels (indexed by `id` matching `q7_hours_per_week`, `q9_native_language`, etc.) so the step's displayed copy is always in sync with what the backend defines. Cache the response in a `useState` at the `OnboardingFlow` level on mount.
+- **`q3_no_exam_scheduled` XOR validation**: the BE validates that exactly one of `q3_exam_date` or `q3_no_exam_scheduled=true` is set; sending both is a 422. The FE must guarantee the XOR before submitting — add an `assert`-style guard in the payload builder.
+- **`q4–q6, q8` omission**: these optional fields default to `null` / empty list on the BE when absent. Explicitly omit them from the payload (don't send `undefined` — JSON serialization may vary) rather than sending nulls; let the BE defaults apply cleanly.
+- **Navigation change**: the previous `EcoleReveal` → `/paywall` path is replaced by the dynamic redirect. The `/paywall` route and `Paywall.tsx` component are unchanged — they are reached via the Stripe checkout flow (BE-007), not from onboarding.
+- **`/waitlist` is not behind `(app)` auth**: the user may hit the waitlist immediately after submitting onboarding, before ever paying. Keep it a standalone public page.
+
+---
+
+### BE-007 — Stripe checkout + subscription wiring
+
+**Status:** Not Started
+**Branch:** `feat/be-007-stripe-checkout` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+
+#### Scope
+**In:**
+- `pnpm add @stripe/stripe-js` — Stripe.js library for client-side Checkout redirect
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` env var required; `STRIPE_WEBHOOK_SECRET` already required by the BE (`app/services/webhooks.py`); add both to `.env.local` documentation in the PR
+- `lib/api/stripe.ts` — typed helpers:
+  - `createCheckoutSession(tierId: PricingTier): Promise<{ url: string }>` — calls `POST /api/stripe/checkout-session` (to be created by P-106 on the BE; this entry creates the FE caller and documents the required endpoint shape)
+  - `fetchSubscriptionStatus(): Promise<{ subscription_tier: string; subscription_status: string | null }>` — calls `GET /api/users/me` (exists on the BE user router) and extracts the `subscription_tier` + `subscription_status` fields from the User model
+- `components/Paywall.tsx` — wire each "Choisir ce forfait" CTA to call `createCheckoutSession(tier)`:
+  - on success: `window.location.href = url` to redirect to Stripe-hosted Checkout page
+  - loading state: the clicked tier card's CTA shows inline spinner + is disabled; other tier CTAs remain enabled
+  - on error (network / BE not ready): inline error below the clicked CTA: "Impossible d'accéder au paiement. Réessayez."
+  - `PricingTier` type: `"a_la_carte" | "daily_bundle" | "exam_bundle" | "pro" | "sprint"` — maps each of the 5 pricing cards to a slug the BE checkout endpoint can resolve to a Stripe Price ID
+- **Success page** `app/paywall/success/page.tsx` — rendered when Stripe redirects to `?success=true`; displays "Paiement confirmé. Votre abonnement est en cours d'activation." + animated checkmark; polls `fetchSubscriptionStatus()` every 3 seconds up to 30 seconds until `subscription_status !== null`; on confirmation navigates to `/dashboard`; after 30s timeout shows "Votre abonnement sera activé sous peu — vérifiez votre tableau de bord." + "Aller au tableau de bord" link
+- **Cancel page** `app/paywall/cancel/page.tsx` — rendered when Stripe redirects to `?canceled=true`; displays "Paiement annulé." + "Retour aux forfaits" link to `/paywall`; no polling
+- **Subscription status badge** on the `Paywall.tsx` header area: fetch `fetchSubscriptionStatus()` on mount; if `subscription_tier !== "free"`, show a "Forfait actif : <tier_label>" chip near the page heading; if free, show nothing (preserve the existing CTA state)
+- Stripe webhook route is already live on the BE (`POST /api/stripe/webhook`, `stripe_webhook.py`) — it verifies the signature and logs; no FE change needed for the webhook itself; note in the PR that P-106 adds DB-write dispatch to this handler
+
+**Out (deferred, do not add):**
+- `POST /api/stripe/checkout-session` endpoint on the BE (P-106 work; this entry creates the FE caller and documents the required shape: `POST body { tier_slug: string }, response: { url: string }`)
+- Real subscription activation / entitlement gate (pending P-106 webhook dispatch + DB writes on the BE)
+- Subscription management page (cancel, upgrade, billing portal — LGL-XXX after Atlas + EIN)
+- Payment method updates, invoices, receipt emails (LGL-XXX)
+- Free tier or trial flow (memory lock: no free tier at V1)
+- Currency switcher (USD only at launch)
+- Coupon / promo code redemption (defer)
+- Per-route subscription gate (Middleware check that `subscription_tier !== "free"` — defer until P-106 activates real entitlements)
+
+#### Acceptance (Given/When/Then)
+1. **Given** a visitor on `/paywall`, **When** they click the "Daily Bundle" CTA, **Then** the button shows an inline spinner + is disabled; `createCheckoutSession("daily_bundle")` is called with the correct slug; on a 200 response `window.location.href` is set to the returned `url`.
+2. **Given** `createCheckoutSession` returns a network error, **When** the promise rejects, **Then** an inline error message appears below the clicked CTA and the button re-enables for retry.
+3. **Given** Stripe redirects the user to `GET /paywall/success`, **When** the page renders, **Then** the "Paiement confirmé" message and an animated checkmark are visible; `fetchSubscriptionStatus()` is called every 3 seconds; when it returns `subscription_status !== null`, the router navigates to `/dashboard`.
+4. **Given** the polling runs for 30 seconds without a non-null `subscription_status`, **When** the timeout fires, **Then** the success page shows "Votre abonnement sera activé sous peu" + a "Aller au tableau de bord" link and polling stops.
+5. **Given** Stripe redirects to `GET /paywall/cancel`, **When** the page renders, **Then** "Paiement annulé." and a "Retour aux forfaits" link to `/paywall` are visible.
+6. **Given** a user whose `subscription_tier` is not `"free"`, **When** `/paywall` renders, **Then** a "Forfait actif" chip appears near the page heading.
+
+#### Tests
+- `tests/unit/paywall/Paywall.test.tsx` (vitest) — update: each CTA click calls `createCheckoutSession` mock with correct tier slug; loading state applied to clicked CTA; on error shows error text; active subscription badge renders when tier is not "free"
+- `tests/unit/paywall/PaywallSuccess.test.tsx` (vitest) — new: renders confirmation message; polling mock calls `fetchSubscriptionStatus`; on `subscription_status !== null` calls `router.push('/dashboard')`; after 30s timeout shows fallback message and link; `vi.useFakeTimers()` for polling + timeout
+- `tests/unit/paywall/PaywallCancel.test.tsx` (vitest) — new: renders "Paiement annulé" + "Retour aux forfaits" link to `/paywall`
+- `tests/unit/api/stripe.test.ts` (vitest) — new: `createCheckoutSession` POST to correct path with tier slug; `fetchSubscriptionStatus` extracts `subscription_tier` + `subscription_status` from user response
+- `tests/e2e/paywall-checkout.spec.ts` (Playwright) — new: load `/paywall`; click Daily Bundle; confirm spinner visible; mock checkout URL redirect; visit success page; mock subscription status polling resolves; lands on `/dashboard`; visit cancel page; "Retour aux forfaits" navigates to `/paywall`
+
+#### Files Touched
+- `lib/api/stripe.ts` — new
+- `components/Paywall.tsx` — wire CTA buttons, loading state, error display, subscription badge
+- `app/paywall/success/page.tsx` — new
+- `app/paywall/cancel/page.tsx` — new
+- `tests/unit/paywall/Paywall.test.tsx` — update
+- `tests/unit/paywall/PaywallSuccess.test.tsx` — new
+- `tests/unit/paywall/PaywallCancel.test.tsx` — new
+- `tests/unit/api/stripe.test.ts` — new
+- `tests/e2e/paywall-checkout.spec.ts` — new
+
+#### Dependencies
+- BE-001 Shipped (auth — checkout session requires authenticated user on the BE; `fetchSubscriptionStatus` reads the authenticated user's record)
+- BE-006 Shipped recommended (onboarding flow navigates to `/diagnostic`; the old `/paywall` redirect from step 6 is removed; `/paywall` is now reached directly from landing CTA or explicit navigation)
+
+#### Notes
+- **`POST /api/stripe/checkout-session` BE contract**: this endpoint is not yet implemented (P-106). The FE caller in `createCheckoutSession()` documents the expected shape: `POST body { tier_slug: string }`, response `{ url: string }`. Until P-106 ships, this call will 404. The session gate in Paywall should handle the 404 gracefully (shows the error message) — beta cohort is on free trial and doesn't need Stripe until B-100 (Stripe Atlas LLC) completes.
+- **Stripe.js vs backend redirect**: we use `createCheckoutSession` → BE creates a Stripe `checkout.session` and returns the hosted URL → FE does `window.location.href = url`. This approach keeps Stripe credentials server-side and avoids exposing Price IDs in FE code. Do NOT use `stripe.redirectToCheckout` with hardcoded Price IDs in the FE bundle.
+- **Polling interval on success page**: 3-second interval, 30-second total cap. `clearInterval` on unmount. `vi.useFakeTimers()` in tests. The polling is a UX affordance — most Stripe webhooks fire within 2–5s of checkout completion in production.
+- **B-100 sequencing**: Stripe Atlas LLC formation + EIN + Mercury bank account are Section 6 work (LGL-001 to LGL-008). This FE entry wires the UI now so no FE work blocks B-100's completion. When P-106 lands on the BE, the FE is already deployed and functional.
+
+---
+
+### BE-008 — Recording upload + two-step transcription flow
+
+**Status:** Not Started
+**Branch:** `feat/be-008-recording-upload` (FE, from `main`)
+**Effort:** 1 session (~4–5h)
+
+**Two-step flow (F-002):** the BE implements a correction loop: `POST /api/recordings/transcribe` (step 1 — STT only, no AI analysis) → user reviews transcript in UI → `POST /api/recordings/{id}/confirm-transcript` (step 2 — triggers Claude analysis). This replaces the placeholder recording UI and is the core diagnostic interaction for Tâche 3 (monologue mode). Tâche 1 and Tâche 2 use the conversation API (BE-010).
+
+#### Scope
+**In:**
+- `pnpm add react-media-recorder` or implement raw `MediaRecorder` API via a custom hook — whichever is more testable; do NOT use any library that bundles its own audio processing beyond capture + encode to WebM/opus
+- `lib/hooks/useRecorder.ts` — custom hook encapsulating `MediaRecorder` + `getUserMedia` lifecycle:
+  - States: `Idle | RequestingPermission | Ready | Recording | Stopped | Uploading | Error`
+  - Exposes: `start()`, `stop()`, `reset()`, `audioBlob: Blob | null`, `durationSeconds: number`, `error: string | null`
+  - Permission pre-flight: on `start()` call, checks `navigator.permissions.query({ name: 'microphone' })`; on `denied` state returns the `RequestingPermission` state and surfaces the error without calling `getUserMedia`
+  - Respects `prefers-reduced-motion` for any visual waveform state (no animation code in the hook; that's the component's responsibility)
+- `lib/api/recordings.ts` — typed fetch helpers (sole import point for components):
+  - `transcribeRecording(formData: FormData): Promise<TranscribeResponse>` — calls `POST /api/recordings/transcribe` (multipart); `TranscribeResponse: { id, transcript, words: WordToken[], low_conf_count, low_conf_ratio, trigger_re_record, stt_confidence, total_words, context }` where `WordToken: { i, text, conf, low, suggestion?: string }`
+  - `confirmTranscript(recordingId: number, req: ConfirmTranscriptRequest): Promise<RecordingResult>` — calls `POST /api/recordings/{id}/confirm-transcript`; `ConfirmTranscriptRequest: { corrected_transcript: string; ui_language: string; exam_profile: string }`; `RecordingResult` is the full recording response shape including `diagnostic` block (see Notes for shape)
+  - `fetchTache3Topics(uiLanguage?: string): Promise<Tache3TopicResponse>` — calls `GET /api/recordings/tache3-topics`; used by Tâche 3 topic picker
+- **`RecordingPlaceholder.tsx` → `RecordingCapture.tsx`** — new component (replaces `RecordingPlaceholder.tsx` which remains but is only rendered when `tache_mode` is not yet wired or as a visual fallback on unsupported browsers):
+  - Uses `useRecorder` hook for state
+  - `Idle` state: large circular mic button ("Appuyez pour commencer") with the existing visual treatment from `RecordingPlaceholder`
+  - `RequestingPermission` state: shows "Accès au microphone requis" message with a `<a href="#">` guide link (placeholder — AI-XXX adds real browser guidance)
+  - `Recording` state: mic button red, timer running, waveform animation (the existing decorative CSS ripples from MOCK-010 are driven from local state, not real amplitude), "Appuyez pour arrêter" label
+  - `Stopped` state: "Enregistrement terminé." status + "Recommencer" (→ `reset()`) + "Soumettre la réponse" primary CTA (→ triggers upload)
+  - `Uploading` state: spinner + "Transcription en cours…" — CTA disabled
+  - `Error` state: error message + "Réessayer" button
+- **Transcript review UI** (`TranscriptReview.tsx`) — shown after `POST /api/recordings/transcribe` returns:
+  - Displays the raw transcript text in an editable `<textarea>` or rich inline editor with word-level confidence highlights:
+    - `low: true` words rendered with `--fp-butter` background highlight (warm-caution, not alarming)
+    - `suggestion` field (Claude Haiku suggestions for low-confidence words) shown as an inline tooltip on hover or a tap-reveal on mobile
+  - `trigger_re_record: true` path: if the STT confidence ratio is above threshold, show "La qualité audio était insuffisante — réenregistrez votre réponse." + "Réenregistrer" button (→ `reset()` hook); no transcript to review in this state
+  - "Confirmer et analyser" primary CTA — calls `confirmTranscript()` with the (possibly edited) transcript text; loading state on CTA; on success calls `onAnalysisComplete(recordingId)`
+  - "Modifier la transcription" affordance: a toggle that switches the transcript display from read-only (confidence-highlighted) to an editable textarea; default is read-only with highlights visible
+- **`TacheShell.tsx` integration** — `RecordingCapture` replaces `RecordingPlaceholder` for Tâche 3 (`tache_mode="tache_3"`); Tâche 1 and Tâche 2 continue to render `RecordingPlaceholder` until BE-010 wires the conversation flow:
+  - Pass `tache_mode` from the page's `fetchTache(n)` result to `TacheShell`; `tache_mode` maps: tâche_id=1 → `"tache_1"`, tâche_id=2 → `"tache_2"`, tâche_id=3 → `"tache_3"`
+  - For Tâche 3: show `RecordingCapture`; after analysis completes, navigate to `/diagnostic/results?recordingId=<id>`
+  - `topic_id` selection: for Tâche 3, add a topic picker above the recording UI using `fetchTache3Topics()`; shows a dropdown or card list of available topics; user must select a topic before recording is enabled; `topic_id` passed as a form field in the multipart upload
+  - `target_level`, `ui_language`, `exam_profile` (defaults: `"B2"`, `"en"`, `"tcf_canada"`) read from user session via `useSession()` (BE-001 pattern); passed as form fields
+- **`/diagnostic/results` route update** — replace the static placeholder values with a query param: `app/(app)/diagnostic/results/page.tsx` accepts `?recordingId=<id>` and calls `fetchRecording(recordingId)` (from `lib/api/recordings.ts`, to be added in BE-009) to populate the page; if `recordingId` is absent or the fetch fails, renders the existing static placeholder as a fallback (graceful degradation)
+
+**Out (deferred, do not add):**
+- Tâche 1 and Tâche 2 real recording via `RecordingCapture` — those tâche modes use the conversation API (BE-010), not the single-shot upload flow
+- `POST /api/recordings/upload` (legacy one-shot path) — the two-step flow (`/transcribe` → `/confirm-transcript`) is the target implementation; the one-shot endpoint exists and could serve as a fallback but is not wired in this entry
+- Real waveform driven by audio amplitude (Web Audio API + `AnalyserNode`) — the decorative CSS animation from MOCK-010 is preserved as-is; real amplitude waveform is AI-XXX scope
+- Detected modules panel (`GET /api/recordings/{id}/detected-modules`) — wired in BE-009
+- Full results page data (5-couche scores, per-tâche feedback, exam_profile block) — wired in BE-009
+- Playback of candidate's own recording — there is no public audio URL for candidate recordings in the current BE; this requires a pre-signed URL endpoint (future entry; the "Réécouter" button in results remains visual-only)
+- Re-take limits / diagnostic quota enforcement (the BE already applies `diagnostic_quota_required`; the FE should handle 429 with "Quota journalier atteint — réessayez demain." but no counter display in this entry)
+- Writing mode recordings (`tache_mode="writing"` — rejected by `/api/recordings` endpoints; handled by `/api/writing`)
+
+#### Acceptance (Given/When/Then)
+1. **Given** Tâche 3 shell loaded (`/diagnostic/tache/3`), **When** the user clicks the mic button for the first time, **Then** `getUserMedia` is called; if permission is granted, the button transitions to Recording state with a running timer and the waveform ripple animation activates.
+2. **Given** the recorder is in Recording state, **When** the user presses stop, **Then** the state transitions to Stopped; "Soumettre la réponse" CTA is enabled and "Recommencer" link is visible.
+3. **Given** the user presses "Soumettre la réponse", **When** `POST /api/recordings/transcribe` completes, **Then** the `TranscriptReview` component renders with the transcript text; low-confidence words are highlighted in `--fp-butter`; words with suggestions show a tooltip affordance.
+4. **Given** `trigger_re_record: true` in the transcribe response, **When** the review UI renders, **Then** the transcript is not shown; instead "La qualité audio était insuffisante — réenregistrez votre réponse." is displayed with a "Réenregistrer" button.
+5. **Given** the user has confirmed the transcript (optionally edited), **When** "Confirmer et analyser" is clicked, **Then** `POST /api/recordings/{id}/confirm-transcript` is called with the (possibly modified) transcript; on 200 the router navigates to `/diagnostic/results?recordingId=<id>`.
+6. **Given** the user's microphone permission is `denied`, **When** start() is called, **Then** `getUserMedia` is not invoked and the `RequestingPermission` error state renders with "Accès au microphone requis."
+7. **Given** mobile <768px on Tâche 3, **When** the recording UI renders, **Then** the mic button is ≥88×88px, "Soumettre la réponse" is full-width, and `TranscriptReview` is single-column with full-width textarea.
+
+#### Tests
+- `tests/unit/hooks/useRecorder.test.ts` (vitest) — new: mock `navigator.mediaDevices.getUserMedia` and `MediaRecorder`; test Idle→Recording→Stopped transition; test `error` state when getUserMedia rejects; test `durationSeconds` increments during recording; test reset() returns to Idle
+- `tests/unit/diagnostic/RecordingCapture.test.tsx` (vitest) — new: Idle state renders mic button; Recording state shows running timer + waveform; Stopped state enables "Soumettre la réponse"; component does NOT import `RecordingPlaceholder`; `MediaRecorder` / `getUserMedia` are mocked
+- `tests/unit/diagnostic/TranscriptReview.test.tsx` (vitest) — new: renders transcript text; low-confidence words have highlight class; `trigger_re_record=true` hides transcript and shows re-record message; "Confirmer et analyser" calls `confirmTranscript` mock with edited text; loading state during inflight
+- `tests/unit/api/recordings.test.ts` (vitest) — new: `transcribeRecording` POST to correct path with FormData; `confirmTranscript` POST to `/{id}/confirm-transcript`; `fetchTache3Topics` GET to correct path
+- `tests/e2e/diagnostic-tache3-recording.spec.ts` (Playwright) — new: load `/diagnostic/tache/3`; mock `getUserMedia`; click mic → Recording state; click stop → Stopped state; click "Soumettre" → mock transcribe response → `TranscriptReview` renders; click "Confirmer" → mock confirmTranscript → navigates to `/diagnostic/results?recordingId=42`; test `trigger_re_record` path shows re-record message
+
+#### Files Touched
+- `lib/hooks/useRecorder.ts` — new
+- `lib/api/recordings.ts` — new (partial: `transcribeRecording`, `confirmTranscript`, `fetchTache3Topics`; `fetchRecording` and `fetchHistory` added in BE-009)
+- `components/diagnostic/RecordingCapture.tsx` — new
+- `components/diagnostic/TranscriptReview.tsx` — new
+- `components/diagnostic/TacheShell.tsx` — update: swap `RecordingPlaceholder` for `RecordingCapture` on tâche_3; add topic picker; wire `onAnalysisComplete` callback to navigate with `recordingId`
+- `app/(app)/diagnostic/tache/[n]/page.tsx` — update: pass `tache_mode` derived from tâche id to `TacheShell`; keep `RecordingPlaceholder` for tâche 1+2 until BE-010
+- `app/(app)/diagnostic/results/page.tsx` — update: accept `recordingId` query param; call `fetchRecording` from `lib/api/recordings` when present; fall back to static placeholders when absent
+- `tests/unit/hooks/useRecorder.test.ts` — new
+- `tests/unit/diagnostic/RecordingCapture.test.tsx` — new
+- `tests/unit/diagnostic/TranscriptReview.test.tsx` — new
+- `tests/unit/api/recordings.test.ts` — new
+- `tests/e2e/diagnostic-tache3-recording.spec.ts` — new
+
+#### Dependencies
+- BE-001 Shipped (auth session needed; `tache_mode` + `target_level` read from session user profile)
+- BE-005 Shipped (`TacheShell` consumes tâche data including tâche id → tache_mode mapping)
+
+#### Notes
+- **`tache_mode` mapping**: the FE tâche id (1, 2, 3 from `lib/api/taches.ts`) maps to BE `tache_mode` values: `1 → "tache_1"`, `2 → "tache_2"`, `3 → "tache_3"`. The BE rejects `tache_mode="writing"` on `/api/recordings` — never send it from this flow.
+- **MediaRecorder codec**: prefer `audio/webm;codecs=opus` (Chrome/Firefox). Safari records in `audio/mp4` (AAC). The BE's STT service (AssemblyAI) accepts both. Test on Safari separately — `MediaRecorder.isTypeSupported("audio/webm;codecs=opus")` returns false on Safari; the hook should fall back to `audio/mp4` or `video/mp4`.
+- **`useRecorder` and SSR**: `MediaRecorder` and `navigator.mediaDevices` don't exist in Node.js. Guard all calls behind `typeof window !== "undefined"` checks; the hook must not execute its setup code during server-side rendering or vitest jsdom without explicit mocking.
+- **Two-step vs one-shot**: this entry wires the two-step flow exclusively. The one-shot `POST /api/recordings/upload` endpoint is not wired here. If the Transcript Review step proves confusing in beta, BE-XXX can add a "skip review" path that calls `confirmTranscript` immediately with the original transcript — but that decision belongs to a later entry.
+- **`target_level` default**: use `user.target_level` from the session profile (stored after onboarding submit, BE-006). If absent (user hasn't completed onboarding), default to `"B2"`. Do not prompt the user inline — the default is acceptable for beta.
+- **Quota 429 handling**: the BE applies a diagnostic quota (`diagnostic_quota_required`). If the user has exceeded their daily limit, `POST /api/recordings/transcribe` returns 429. The `RecordingCapture` or `TacheShell` must handle 429 with "Quota journalier atteint — réessayez demain." in the Error state. No quota counter display in this entry.
+
+---
+
+### BE-009 — Recording history + results wiring
+
+**Status:** Not Started
+**Branch:** `feat/be-009-recording-history` (FE, from `main`)
+**Effort:** 1 session (~3–4h)
+
+#### Scope
+**In:**
+- **`lib/api/recordings.ts` additions** (extends the file started in BE-008):
+  - `fetchRecording(id: number): Promise<RecordingResult>` — calls `GET /api/recordings/{id}`; returns full recording response including `diagnostic` block (see Notes for complete shape)
+  - `fetchRecordingHistory(): Promise<HistoryEntry[]>` — calls `GET /api/recordings/history`; returns `HistoryEntry[]` with `{ id, status, target_level, word_count, duration_seconds, created_at, transcript_preview, topic, theme, note_globale?, couches?: CoucheScore[], score_prononciation?, goulet_nom?, overall_score?, cefr_level?, clb_level? }`
+  - `fetchRecordingList(limit?: number): Promise<RecordingListEntry[]>` — calls `GET /api/recordings?limit=<n>`; lean shape `{ id, tache_mode, created_at, cefr_level, clb_level, couches }` for the dashboard widget
+  - `CoucheScore` type: `{ key: string; display_label_en: string; display_label_fr: string; score: number }` — matches the `couches_array()` output from the BE
+- **`/diagnostic/results` page wiring** — `app/(app)/diagnostic/results/page.tsx` updated (continues from the BE-008 `recordingId` param change):
+  - When `recordingId` present: call `fetchRecording(recordingId)`; wire all 5 surfaces:
+    1. **Results header**: `note_globale` as the overall score display; `exam_profile.cefr_level` as the CEFR level string; `exam_profile.clb_level` as the CLB sub-label; replace the static "C1" placeholder and date stamp with real values
+    2. **CouchesBreakdown**: replace static placeholder bars with `diagnostic.couches` array; each entry has `key`, `display_label_en`/`fr`, and `score` (0–5 scale) — map score to a percentage `(score / 5) * 100` for the bar width; use `display_label_fr` as the couche row label (already in `CEFR_PASTEL_MAP` logic from MOCK-011)
+    3. **TacheSummary**: replace static placeholder feedback with `diagnostic.ce_qui_marche` (what works) and `diagnostic.next_step` (next step); the three "tâche" rows in TacheSummary are currently uniform — for the single-recording results page, collapse them to a single "Votre réponse" row with `ce_qui_marche` as content
+    4. **RecommendationsStub**: replace static CTAs with `diagnostic.next_step` text in the first recommendation row; the other 2 rows keep their static content until AI-XXX generates real recommendations
+    5. **`le_goulet` spotlight block** — new panel between CouchesBreakdown and TacheSummary: shows `diagnostic.le_goulet.nom` as the heading ("Votre goulet d'étranglement : <nom>") and `diagnostic.le_goulet.explication` as the body text; only rendered when `le_goulet.nom` is non-empty; styled as an `--ed-paper` card with a 3px `--fp-lavender` left accent (decorative chip per F-200)
+- **Dashboard widgets wiring** (`app/(app)/dashboard/page.tsx`):
+  - `DiagnosticScoreWidget` — calls `fetchRecordingList(1)` (the single most-recent recording); replaces the static "C1" placeholder with `cefr_level` from the response; replaces "il y a 7 jours" with a formatted relative date derived from `created_at`
+  - `RecentActivityWidget` — calls `fetchRecordingHistory()` (limit 5); replaces the static 5-row fixture with real recording history rows; each row: `topic || tache_mode` as the label, formatted `created_at` as the relative time, category badge (tâche → `diagnostic`, lesson → `lesson`, vocab → `vocab` — all recordings from this route are `diagnostic`)
+  - Both widgets show `.ed-skeleton` loading rows (4 rows, same height as data rows) while fetching; graceful empty state if history is empty ("Pas encore d'activité — commencez votre premier diagnostic.")
+- **Detected modules panel** (`RecordingModules.tsx` — new optional panel in results page):
+  - Calls `GET /api/recordings/{id}/detected-modules`; response: `{ primary_module, secondary_modules, detections }`
+  - `primary_module` shape: `{ id, name_fr, name_en, category, severity, L1_interference_description_en, examples: [{wrong_utterance, corrected_utterance, explanation_fr}] }`
+  - Renders only when `primary_module !== null`; placed below the `le_goulet` panel in the results layout
+  - Shows: module name (`name_en`), 1-sentence `L1_interference_description_en`, the first `examples` entry with `wrong_utterance` → `corrected_utterance`
+  - Secondary modules: if `secondary_modules.length > 0`, shows a collapsed "Autres points détectés" section with module names only (expand-on-click is optional UX; collapsed by default)
+  - Loading state: `.ed-skeleton` placeholder; hide entirely if fetch returns 404 (recording predates detection) or if `primary_module === null`
+
+**Out (deferred, do not add):**
+- Full per-tâche turn-by-turn feedback for conversation recordings (the `conversation` field in `_format_recording` contains turn history; rendering it requires a separate "conversation replay" panel — defer to BE-010 follow-up)
+- Candidate audio playback / "Réécouter" button activation — there is no public `audio_url` for candidate recordings in the current BE; the "Réécouter" affordance remains `cursor: not-allowed` + `opacity: 0.5` as wired in MOCK-011
+- Examiner audio playback on the results page — examiner audio URLs (`/tts_audio/`) are on `ConversationTurn` rows, not on the Recording row; accessed via conversation fetch in BE-010
+- Full `feedback_grid` 2x2 breakdown display (the grid has `what_works`, `what_doesnt_work`, `english_habits`, `structure_quality` keys; rendering this 4-quadrant panel is a dedicated future entry)
+- `tache_rubric` pedagogical rubric panel (BE F-083 data; future entry)
+- `patterns_detectes` / `patterns_manquants` / `corrections` lists (future entry — these require dedicated UI surfaces)
+- Recharts radar/bar chart on the results or dashboard (CSS bars only)
+- Full recording list page (`/diagnostic/history` or `/recordings`) — no new route added in this entry; the dashboard widget is the only history surface
+
+#### Acceptance (Given/When/Then)
+1. **Given** `/diagnostic/results?recordingId=42` loaded with a real recording response, **When** the page renders, **Then** the results header shows the real `cefr_level` string (e.g. "B2") and the date from `created_at` formatted in French long format; the static "C1" placeholder is absent.
+2. **Given** the results page with `diagnostic.couches` data, **When** `CouchesBreakdown` renders, **Then** each of the 4 couche bars (Le Fond, Les Moules des Idées, Les Moules, Les Réflexes Anglais) has its width proportional to `(score / 5) * 100%`; the `display_label_fr` is shown as the row label.
+3. **Given** `diagnostic.le_goulet.nom` is non-empty, **When** the results page renders, **Then** a `le_goulet` spotlight panel is visible between `CouchesBreakdown` and `TacheSummary` showing the nom as heading and explication as body.
+4. **Given** `GET /api/recordings/{id}/detected-modules` returns a `primary_module`, **When** the results page renders, **Then** the `RecordingModules` panel is visible with the module's `name_en`, `L1_interference_description_en`, and first example `wrong_utterance → corrected_utterance`; if `primary_module` is null the panel is absent.
+5. **Given** `/dashboard` loaded, **When** `DiagnosticScoreWidget` renders, **Then** it displays the `cefr_level` from the most-recent recording (not the static "C1") and a relative date from `created_at`.
+6. **Given** `fetchRecordingHistory()` returns an empty array, **When** `RecentActivityWidget` renders, **Then** the "Pas encore d'activité — commencez votre premier diagnostic." empty state is shown; no 5-row skeleton or placeholder data.
+7. **Given** widgets are fetching, **When** the network request is in-flight, **Then** `.ed-skeleton` loading rows are visible in both `DiagnosticScoreWidget` and `RecentActivityWidget`.
+
+#### Tests
+- `tests/unit/diagnostic/Results.test.tsx` (vitest) — update: mock `fetchRecording(42)` with full response; assert header shows `cefr_level` "B2"; assert `CouchesBreakdown` bar widths match `score/5*100`; assert `le_goulet` panel renders when non-empty; assert `le_goulet` panel absent when `nom` is empty string
+- `tests/unit/diagnostic/RecordingModules.test.tsx` (vitest) — new: renders primary module `name_en` + description + first example; absent when `primary_module === null`; collapsed secondary modules section visible when `secondary_modules.length > 0`
+- `tests/unit/dashboard/DiagnosticScoreWidget.test.tsx` (vitest) — update: mock `fetchRecordingList(1)`; assert `cefr_level` rendered; assert skeleton visible during loading; assert empty-state text when array is empty
+- `tests/unit/dashboard/RecentActivityWidget.test.tsx` (vitest) — update: mock `fetchRecordingHistory()` with 5 rows; assert 5 rows render with topic/tache_mode as label; assert empty-state text when empty; assert skeleton during loading
+- `tests/unit/api/recordings.test.ts` (vitest) — update: `fetchRecording` GET to correct path; `fetchRecordingHistory` GET to `/history`; `fetchRecordingList` GET to `?limit=1`
+- `tests/e2e/diagnostic-results.spec.ts` (Playwright) — update: load with `?recordingId=42`; mock `GET /api/recordings/42` + `GET /api/recordings/42/detected-modules`; assert CEFR header renders; assert couche bars have non-zero widths; assert le_goulet panel visible; assert modules panel visible
+- `tests/e2e/dashboard.spec.ts` (Playwright) — update: mock `fetchRecordingList` + `fetchRecordingHistory`; assert `DiagnosticScoreWidget` shows real cefr_level; assert `RecentActivityWidget` shows real rows
+
+#### Files Touched
+- `lib/api/recordings.ts` — update: add `fetchRecording`, `fetchRecordingHistory`, `fetchRecordingList`; add `RecordingResult`, `HistoryEntry`, `RecordingListEntry`, `CoucheScore` TypeScript types
+- `app/(app)/diagnostic/results/page.tsx` — update: wire `recordingId` param to `fetchRecording`; add `le_goulet` spotlight panel
+- `components/diagnostic/CouchesBreakdown.tsx` — update: accept `couches: CoucheScore[]` prop instead of static values; derive bar widths from `(score/5)*100`
+- `components/diagnostic/Results.tsx` — update: pass `recordingId`-sourced data to sub-components; wire header score/CEFR/date
+- `components/diagnostic/TacheSummary.tsx` — update: accept `ceQuiMarche` and `nextStep` props; show single row in single-recording mode
+- `components/diagnostic/RecordingModules.tsx` — new
+- `app/(app)/dashboard/page.tsx` — update: add `fetchRecordingList(1)` + `fetchRecordingHistory()` Server Component fetches; pass to `DiagnosticScoreWidget` + `RecentActivityWidget`
+- `components/dashboard/DiagnosticScoreWidget.tsx` — update: accept `cefr_level` + `createdAt` props; show skeleton during null props
+- `components/dashboard/RecentActivityWidget.tsx` — update: accept `activities: HistoryEntry[]` prop; render real rows or empty state
+- `tests/unit/diagnostic/Results.test.tsx` — update
+- `tests/unit/diagnostic/RecordingModules.test.tsx` — new
+- `tests/unit/dashboard/DiagnosticScoreWidget.test.tsx` — update
+- `tests/unit/dashboard/RecentActivityWidget.test.tsx` — update
+- `tests/unit/api/recordings.test.ts` — update
+- `tests/e2e/diagnostic-results.spec.ts` — update
+- `tests/e2e/dashboard.spec.ts` — update
+
+#### Dependencies
+- BE-001 Shipped (auth — all recording endpoints require authenticated user)
+- BE-005 Shipped (tâche data API wired; results page already has `TacheShell` + `Results` component tree)
+- BE-008 Shipped (recording upload creates the `recordingId` that this entry consumes; `lib/api/recordings.ts` file exists and is extended here)
+
+#### Notes
+- **`CoucheScore` shape**: the BE `couches_array()` function returns `[{ key, display_label_en, display_label_fr, score }]` for the 4 main couches (Le Fond, Les Moules des Idées, Les Moules, Les Réflexes Anglais). `score` is on a 0–5 scale. Map to bar width: `(score / 5) * 100`. `display_label_fr` is the canonical French label — use it consistently in `CouchesBreakdown` so the labels never diverge from the BE's couche taxonomy.
+- **`le_goulet` panel**: this is a key pedagogical signal from the BE — it identifies the single "bottleneck" couche blocking the user's progress. The panel should feel premium and diagnostic: a single couche name + one explanatory sentence. Never show it when `nom` is empty string or null (legacy recordings may have empty `le_goulet`).
+- **Modules panel placement**: place `RecordingModules` below the `le_goulet` spotlight and above `TacheSummary`. It is conditionally rendered (absent when `primary_module === null`) so the layout should not leave a visible gap. Use a `min-h-0` / no min-height pattern on the container.
+- **`fetchRecording` response key reference**: the full `_format_recording` response has `diagnostic.couches`, `diagnostic.le_goulet`, `diagnostic.ce_qui_marche`, `diagnostic.next_step`, `exam_profile.cefr_level`, `exam_profile.clb_level`, `exam_profile.overall_score`. Write a TypeScript interface `RecordingResult` that covers all consumed fields; mark unconsumed fields as `unknown` to prevent over-typing.
+- **Dashboard Server Component pattern**: `app/(app)/dashboard/page.tsx` is already a Server Component (converted in BE-002). Add `fetchRecordingList(1)` and `fetchRecordingHistory()` as parallel `Promise.all` calls at the top of the component. Both calls require the auth token — pass the session from `auth()` as an Authorization header in the fetch helpers (same pattern established by BE-002 for `fetchMe()`).
+
+---
+
+### BE-010 — Conversation turn flow (Tâche 1 + Tâche 2)
+
+**Status:** Not Started
+**Branch:** `feat/be-010-conversation-flow` (FE, from `main`)
+**Effort:** 1 session (~5–6h)
+
+**Architecture:** Tâche 1 (Échange d'informations) and Tâche 2 (Échange d'opinions) are multi-turn dialogues, not monologue recordings. The BE has a full conversation engine: the examiner generates text + TTS audio per turn; the candidate submits audio; the FE plays the examiner turn and records the candidate turn. This entry replaces the static `RecordingPlaceholder` for tâche_1 and tâche_2 with a real conversation loop.
+
+#### Scope
+**In:**
+- `lib/api/conversations.ts` — typed fetch helpers (sole import point):
+  - `fetchScenarios(uiLanguage?: string): Promise<ScenariosResponse>` — calls `GET /api/conversations/scenarios`; returns `{ scenarios: Scenario[], gates: { above_a2: bool } }` where `Scenario: { id, code, title_fr, title_en, candidate_brief_fr, candidate_brief_en, register, difficulty, data_targets }`
+  - `startConversation(req: StartConversationRequest): Promise<StartConversationResponse>` — calls `POST /api/conversations/start`; `StartConversationRequest: { tache_mode: "tache_1" | "tache_2", topic_id?: number, scenario_code?: string, target_level: string, ui_language: string, exam_profile: string }`; `StartConversationResponse: { conversation_id, examiner_turn_text, examiner_turn_audio_url, turn_number, conversation_status, tache_mode, max_candidate_turns, min_candidate_turns?, max_candidate_turns_hard?, scenario? }`
+  - `submitTurn(conversationId: string, formData: FormData): Promise<TurnResponse>` — calls `POST /api/conversations/{id}/turn` (multipart); `TurnResponse: { candidate_transcript, candidate_turn_number, examiner_turn_text, examiner_turn_audio_url, examiner_turn_number, conversation_status, recording_id?, auto_ended, wrap_up_hint }`
+  - `supersedeTurn(conversationId: string, turnNumber: number): Promise<SupersedeResponse>` — calls `POST /api/conversations/{id}/turn/{n}/supersede` for the re-record flow
+  - `endConversation(conversationId: string): Promise<EndConversationResponse>` — calls `POST /api/conversations/{id}/end`; returns `{ conversation_status, recording_id, under_min_turns }`
+  - `fetchConversation(conversationId: string): Promise<ConversationState>` — calls `GET /api/conversations/{id}`; used for page-refresh resume
+- **Tâche 2 scenario picker** — new component `Tache2ScenarioPicker.tsx` shown on the `/diagnostic/tache/2` pre-screen before the conversation starts:
+  - Calls `fetchScenarios(uiLanguage)` on mount; shows a list of scenario cards (`title_en`, `register`, `difficulty` badge, `candidate_brief_en` as a 2-line teaser)
+  - Single-select; "Commencer avec ce scénario" CTA; passes `scenario_code` to `startConversation`
+  - `register` badge uses `--fp-lavender` (formel) or `--fp-sky` (informel) chip — decorative layer per F-200
+- **`ConversationShell.tsx` — new component** (replaces `RecordingPlaceholder` for tâche_1 and tâche_2):
+  - Client component; owns the full conversation state machine:
+    - `Idle` → user presses "Commencer la conversation" → `POST /api/conversations/start` → `ExaminerTurn`
+    - `ExaminerTurn` → display examiner text; if `examiner_turn_audio_url` present, auto-play the examiner audio via `<audio>` element + a "Rejouer" button; after audio ends (or after 3s auto-advance for text-only) → `CandidateRecording`
+    - `CandidateRecording` → `useRecorder` hook (reused from BE-008); mic button active; "Arrêter et envoyer" CTA → `Transcribing`
+    - `Transcribing` → `POST /api/conversations/{id}/turn` (multipart audio); show "Transcription en cours…" skeleton; on response → if `auto_ended: true` → `Completed`; if `examiner_turn_text` present → `ExaminerTurn` with the next turn; if `wrap_up_hint: true` → show a subtle "Vous approchez de la fin — commencez à conclure." banner
+    - `Completed` → navigate to `/diagnostic/results?recordingId=<id>` (same pattern as BE-008)
+    - `EndButton` always visible (except Completed): "Terminer la conversation" → `POST /api/conversations/{id}/end`; on `under_min_turns: true` → show inline warning "Votre réponse était courte — les résultats seront partiels." + confirm before navigating
+  - **Re-record flow** (F-062.3): in `CandidateRecording` state, after stopping recording, before sending, show a "Réécouter votre prise" toggle (plays the local blob via `URL.createObjectURL`) and a "Refaire cette prise" button; if "Refaire" pressed → call `supersedeTurn(conversationId, candidateTurnNumber)` then reset recorder to `CandidateRecording` state; the previously sent turn is marked superseded on the BE
+  - **Turn counter**: "Tour <n> sur <max>" label derived from `candidate_turns_count` local state and `max_candidate_turns` from start response
+  - **Timer integration**: reuse `Timer.tsx` from the tâche shell; start timer when `CandidateRecording` state begins; pause when in `ExaminerTurn`; the timer is advisory (does not auto-submit, consistent with the existing timer behavior)
+  - **Page-refresh resume**: on mount, if `conversationId` is in `sessionStorage`, call `fetchConversation(conversationId)` and restore state; if conversation status is `completed`, navigate immediately to results
+- **`TacheShell.tsx` update** — for tâche_1 and tâche_2: show `ConversationShell` instead of `RecordingPlaceholder`; for tâche_2 show `Tache2ScenarioPicker` as a pre-step before `ConversationShell` starts; `tache_1` skips the picker (examiner opens with a random greeting, no scenario selection)
+- **Examiner audio autoplay**: `<audio autoPlay ref={audioRef} src={examiner_turn_audio_url} />` with a `onEnded` handler that advances to `CandidateRecording` state; URLs are `/tts_audio/<hash>.mp3` — public paths served by the FastAPI backend; mobile browsers may block autoplay — provide a "Lecture" play button as fallback; `muted={false}` is required for the examiner voice to audibly play
+
+**Out (deferred, do not add):**
+- Tâche 3 conversation (Tâche 3 is a monologue; it uses the single-shot recording flow from BE-008, not the conversation API)
+- Live waveform driven by real audio amplitude for the examiner audio (the existing decorative waveform from MOCK-010 is fine)
+- Conversation history / replay on the results page (`conversation.turns` field is returned in `fetchRecording` response; rendering the full turn-by-turn replay is a dedicated future entry)
+- Text-only mode for the examiner turn (BE returns `examiner_turn_text` even when `examiner_turn_audio_url` is null; the UI falls back to text display automatically — no separate "text mode" toggle needed)
+- Tâche 2 scenario difficulty gating UI (BE gates by `above_a2` L'École flag; the FE can show all scenarios from `fetchScenarios()` but the BE will 403 if a locked scenario_code is used; in this entry, don't show locked scenarios — filter `scenarios` to only show `difficulty === "A2_B1"` unless `gates.above_a2` is true)
+- Writing pipeline (`tache_mode="writing"` — handled by `/api/writing`, not conversations)
+- Real-time streaming of examiner text via SSE (the current BE returns complete text per turn; streaming is future scope)
+
+#### Acceptance (Given/When/Then)
+1. **Given** `/diagnostic/tache/1` loaded, **When** the user presses "Commencer la conversation", **Then** `POST /api/conversations/start` is called with `tache_mode: "tache_1"`; the examiner's opening text and TTS audio URL are received; the examiner text is displayed and the audio auto-plays; the turn counter shows "Tour 1 sur <max>".
+2. **Given** the examiner audio has ended (or 3s auto-advance for text-only), **When** the `CandidateRecording` state activates, **Then** the mic button is enabled; the `Timer` starts counting; the `ConversationShell` renders "À vous — enregistrez votre réponse." status text.
+3. **Given** the candidate has recorded and pressed "Arrêter et envoyer", **When** `POST /api/conversations/{id}/turn` returns with `auto_ended: false`, **Then** the `Transcribing` skeleton is shown briefly; the next examiner turn text + audio loads and auto-plays; the turn counter increments.
+4. **Given** the candidate's last turn triggers `auto_ended: true` in the turn response, **When** the response is received, **Then** the router navigates to `/diagnostic/results?recordingId=<id>` (returned as `recording_id`).
+5. **Given** the user presses "Terminer la conversation" with fewer than `min_candidate_turns` turns, **When** the `POST /api/conversations/{id}/end` response has `under_min_turns: true`, **Then** a warning "Votre réponse était courte — les résultats seront partiels." is shown with a confirm CTA; confirming navigates to `/diagnostic/results?recordingId=<id>`.
+6. **Given** `/diagnostic/tache/2` loaded, **When** the `Tache2ScenarioPicker` renders, **Then** only scenarios matching the user's `above_a2` gate are shown; selecting a scenario and pressing "Commencer" calls `POST /api/conversations/start` with `tache_mode: "tache_2"` and the selected `scenario_code`.
+7. **Given** the candidate pressed "Refaire cette prise" after recording, **When** the re-record flow fires, **Then** `POST /api/conversations/{id}/turn/{n}/supersede` is called; the recorder resets to `CandidateRecording` state; the previous turn's audio blob is released.
+8. **Given** mobile <768px on Tâche 1, **When** the conversation is in `CandidateRecording` state, **Then** the mic button is ≥88×88px, the "Terminer" button is visible without scrolling, and the timer is full-width above the mic button.
+
+#### Tests
+- `tests/unit/diagnostic/ConversationShell.test.tsx` (vitest) — new: Idle → start → ExaminerTurn → CandidateRecording → Transcribing → ExaminerTurn cycle (mocked hooks + API); `auto_ended: true` triggers navigation; `under_min_turns: true` shows warning; re-record `supersedeTurn` called on "Refaire"; `audioRef` play() called when `examiner_turn_audio_url` present
+- `tests/unit/diagnostic/Tache2ScenarioPicker.test.tsx` (vitest) — new: renders scenarios from mock `fetchScenarios`; CTA disabled until selection; `above_a2: false` filters to A2_B1 only; CTA calls `onScenarioSelected` with `scenario_code`
+- `tests/unit/api/conversations.test.ts` (vitest) — new: each helper function calls the correct path with correct method + body; `submitTurn` builds FormData with audio + duration_seconds; `endConversation` calls `/{id}/end`
+- `tests/unit/diagnostic/TacheShell.test.tsx` (vitest) — update: tâche_1 renders `ConversationShell` instead of `RecordingPlaceholder`; tâche_3 renders `RecordingCapture` (from BE-008); tâche_2 renders `Tache2ScenarioPicker` then `ConversationShell` after selection
+- `tests/e2e/diagnostic-conversation.spec.ts` (Playwright) — new: load `/diagnostic/tache/1`; mock `POST /api/conversations/start`; click "Commencer"; mock examiner turn; assert examiner text visible; mock `POST .../turn`; assert turn counter increments; mock auto_ended response; assert navigation to `/diagnostic/results?recordingId=99`; test mobile viewport mic button ≥88px; test Tâche 2 scenario picker loads and selects scenario
+
+#### Files Touched
+- `lib/api/conversations.ts` — new
+- `components/diagnostic/ConversationShell.tsx` — new
+- `components/diagnostic/Tache2ScenarioPicker.tsx` — new
+- `components/diagnostic/TacheShell.tsx` — update: swap `RecordingPlaceholder` for `ConversationShell` on tâche_1 and tâche_2; add `Tache2ScenarioPicker` pre-step for tâche_2
+- `app/(app)/diagnostic/tache/[n]/page.tsx` — update: pass tâche_mode derived from id to TacheShell (same change as BE-008 for tâche_3; extend here for tâche_1/2)
+- `tests/unit/diagnostic/ConversationShell.test.tsx` — new
+- `tests/unit/diagnostic/Tache2ScenarioPicker.test.tsx` — new
+- `tests/unit/api/conversations.test.ts` — new
+- `tests/unit/diagnostic/TacheShell.test.tsx` — update
+- `tests/e2e/diagnostic-conversation.spec.ts` — new
+
+#### Dependencies
+- BE-001 Shipped (auth — all conversation endpoints require authenticated user)
+- BE-005 Shipped (tâche data API; TacheShell reads `tache_mode` from tâche fixture → conversation mode dispatch)
+- BE-008 Shipped (`useRecorder` hook reused here; same MediaRecorder lifecycle; `RecordingCapture` and `ConversationShell` share the hook but render differently)
+- BE-009 Shipped recommended (`/diagnostic/results?recordingId=<id>` must be wired to show real scores; otherwise after conversation ends the results page shows static placeholders)
+
+#### Notes
+- **Examiner audio autoplay and mobile policy**: mobile Safari and Chrome block autoplay of non-muted audio unless triggered by a user gesture. The "Commencer la conversation" button IS a user gesture — after its handler calls `startConversation` and receives `examiner_turn_audio_url`, calling `audioRef.current.play()` inside the same event handler's microtask should satisfy the gesture requirement. Verify in Playwright mobile emulation with `--enable-features=AutoplayPolicy`. If autoplay fails, the fallback "Lecture" button must be the first thing visible so the user is not blocked.
+- **`sessionStorage` resume**: store `conversationId` in `sessionStorage` after `startConversation` returns; clear it on navigate to results or on reset. On mount, read it and call `fetchConversation(conversationId)` to resume. This handles browser-tab refreshes mid-conversation without losing progress. Do not use `localStorage` (persistence across tabs would cause a stale conversation to appear in a fresh session).
+- **T1 vs T2 differences**:
+  - Tâche 1: examiner opens (first turn is examiner); `max_candidate_turns` + `min_candidate_turns` in start response; auto-ends when `candidate_count >= max`
+  - Tâche 2: candidate opens (first turn is candidate); `max_candidate_turns_hard` + `max_candidate_turns_hint`; `wrap_up_hint: true` after `hint` turns; scenario required; no `min_candidate_turns`
+  - The `ConversationShell` state machine must handle both without branching the component — use the `tache_mode` prop to configure turn order and cap values.
+- **`wrap_up_hint` UX**: render as a non-intrusive banner below the turn counter: "Commencez à conclure votre réponse." — `--fp-butter` background chip, dismissible via × button. Once shown, stays visible even if `wrap_up_hint` is false in subsequent turns.
+- **F-062.3 re-record detail**: `supersedeTurn` marks the candidate's turn + the immediately-following examiner turn as superseded. The FE must also visually remove the stale examiner turn from the conversation display and regenerate it (the next `submitTurn` call after a re-record will produce a fresh examiner response contextually aware of the new candidate transcript).
+
+---
+
 ## Section 4 — Content Pipeline (CON-001 to CON-014)
 
 **Goal:** real content lives behind the surfaces. F-321 vocab review (1,684 Phase 1 chunks awaiting Chadi triage) lands here. L'École 27 lessons get methodology-visible content. Le Diagnostic Tâche library expands to 50 scenarios (F-061.2 Livraison 2/2).
