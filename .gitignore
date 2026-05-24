@@ -28,5 +28,10 @@ yarn-error.log*
 next-env.d.ts
 
 # claude code (machine-local)
-.claude/settings.local.json
-.claude/
+.claude/*
+
+# Carve out authored Claude Code content
+!.claude/skills/
+!.claude/agents/
+!.claude/commands/
+!.claude/settings.json
