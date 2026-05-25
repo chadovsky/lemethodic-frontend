@@ -14,11 +14,11 @@ export interface ProgressLayer {
 }
 
 export const PROGRESS_LAYERS: readonly ProgressLayer[] = [
-  { slug: 'le-fond', name: 'Le Fond', percent: 80 },
-  { slug: 'les-moules-des-idees', name: 'Les Moules des Idées', percent: 60 },
-  { slug: 'les-moules', name: 'Les Moules', percent: 50 },
-  { slug: 'les-reflexes-anglais', name: 'Les Réflexes Anglais', percent: 35 },
-  { slug: 'la-voix', name: 'La Voix', percent: 20 },
+  { slug: 'le-fond', name: 'Le Propos', percent: 80 },
+  { slug: 'les-moules-des-idees', name: 'Le Plan', percent: 60 },
+  { slug: 'les-moules', name: 'La Construction', percent: 50 },
+  { slug: 'les-reflexes-anglais', name: 'Les Pièges Anglais', percent: 35 },
+  { slug: 'la-voix', name: 'La Musique', percent: 20 },
 ] as const
 
 // 5 rows covering 2 lesson completions, 1 vocab session, 1 diagnostic tâche, 1 vocab test
@@ -37,13 +37,13 @@ export const RECENT_ACTIVITY: readonly ActivityRow[] = [
   },
   {
     label: '10 chunks révisés',
-    detail: 'Le Vocabulaire',
+    detail: 'La Bibliothèque',
     relativeTime: 'il y a 3 jours',
     category: 'vocab',
   },
   {
     label: 'Diagnostic Tâche 1 essayée',
-    detail: 'Le Diagnostic',
+    detail: "L'Examen",
     relativeTime: 'il y a 5 jours',
     category: 'diagnostic',
   },

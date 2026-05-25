@@ -3,11 +3,11 @@ import { describe, expect, it } from 'vitest'
 import CouchesBreakdown from '@/components/diagnostic/CouchesBreakdown'
 
 const LOCKED_ORDER = [
-  'Le Fond',
-  'Les Moules des Idées',
-  'Les Moules',
-  'Les Réflexes Anglais',
-  'La Voix',
+  'Le Propos',
+  'Le Plan',
+  'La Construction',
+  'Les Pièges Anglais',
+  'La Musique',
 ] as const
 
 const EXPECTED_SCORES = ['C1', 'B2', 'B2', 'B1', 'B2'] as const

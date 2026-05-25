@@ -6,9 +6,9 @@ import SidebarLink from './SidebarLink'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Tableau de bord' },
-  { href: '/ecole', label: "L'École" },
-  { href: '/vocabulaire', label: 'Le Vocabulaire' },
-  { href: '/diagnostic', label: 'Le Diagnostic' },
+  { href: '/ecole', label: 'La Méthode' },
+  { href: '/vocabulaire', label: 'La Bibliothèque' },
+  { href: '/diagnostic', label: "L'Examen" },
   { href: '/account', label: 'Compte' },
 ] as const
 

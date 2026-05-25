@@ -13,11 +13,11 @@ vi.mock('next/link', () => ({
 import MethodologyPreview from '@/components/landing/MethodologyPreview'
 
 const LAYER_ORDER = [
-  'Le Fond',
-  'Les Moules des Idées',
-  'Les Moules',
-  'Les Réflexes Anglais',
-  'La Voix',
+  'Le Propos',
+  'Le Plan',
+  'La Construction',
+  'Les Pièges Anglais',
+  'La Musique',
 ]
 
 describe('MethodologyPreview', () => {

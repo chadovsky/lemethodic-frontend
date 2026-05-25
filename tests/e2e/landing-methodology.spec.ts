@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test'
 
 const LAYER_NAMES = [
-  'Le Fond',
-  'Les Moules des Idées',
-  'Les Moules',
-  'Les Réflexes Anglais',
-  'La Voix',
+  'Le Propos',
+  'Le Plan',
+  'La Construction',
+  'Les Pièges Anglais',
+  'La Musique',
 ]
 
 test.describe('Landing methodology — desktop (1280×800)', () => {

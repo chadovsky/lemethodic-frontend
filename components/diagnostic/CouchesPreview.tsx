@@ -1,11 +1,11 @@
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
 
 const COUCHE_NAMES = [
-  'Le Fond',
-  'Les Moules des Idées',
-  'Les Moules',
-  'Les Réflexes Anglais',
-  'La Voix',
+  'Le Propos',
+  'Le Plan',
+  'La Construction',
+  'Les Pièges Anglais',
+  'La Musique',
 ] as const
 
 export default function CouchesPreview() {

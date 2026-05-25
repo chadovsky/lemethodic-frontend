@@ -16,27 +16,27 @@ const COUCHES: {
   gloss: string
 }[] = [
   {
-    name: 'Le Fond',
+    name: 'Le Propos',
     score: 'C1',
     gloss: 'Vous maîtrisez les structures attendues.',
   },
   {
-    name: 'Les Moules des Idées',
+    name: 'Le Plan',
     score: 'B2',
     gloss: 'Vos idées sont articulées mais manquent encore de diversité lexicale.',
   },
   {
-    name: 'Les Moules',
+    name: 'La Construction',
     score: 'B2',
     gloss: 'Les structures de phrases sont globalement fluides.',
   },
   {
-    name: 'Les Réflexes Anglais',
+    name: 'Les Pièges Anglais',
     score: 'B1',
     gloss: "Quelques calques de l'anglais subsistent sous pression.",
   },
   {
-    name: 'La Voix',
+    name: 'La Musique',
     score: 'B2',
     gloss: 'Votre débit et votre intonation sont appropriés au contexte.',
   },

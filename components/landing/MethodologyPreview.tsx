@@ -5,37 +5,37 @@ import CouchesLayer from './CouchesLayer'
 
 const COUCHES = [
   {
-    name: 'Le Fond',
+    name: "Le Propos",
     description:
-      'The structural backbone of every oral response: a clear position, developed argument, and grounded conclusion.',
+      "The structural backbone of every oral response: a clear position, developed argument, and grounded conclusion.",
     backgroundColor: '#D4CBBA',
     accentColor: 'var(--fp-peach)',
   },
   {
-    name: 'Les Moules des Idées',
+    name: "Le Plan",
     description:
-      'Ready-made idea frameworks that let you generate relevant content instantly, without relying on memorized topics.',
+      "Ready-made idea frameworks that let you generate relevant content instantly, without relying on memorized topics.",
     backgroundColor: '#DDD6C4',
     accentColor: 'var(--fp-sage)',
   },
   {
-    name: 'Les Moules',
+    name: "La Construction",
     description:
-      'Sentence-level grammar templates that package your ideas into natural, examiner-recognized French structures.',
+      "Sentence-level grammar templates that package your ideas into natural, examiner-recognized French structures.",
     backgroundColor: '#E6E0D3',
     accentColor: 'var(--fp-butter)',
   },
   {
-    name: 'Les Réflexes Anglais',
+    name: "Les Pièges Anglais",
     description:
-      'A targeted inventory of anglophone interference patterns — the syntax, register, and reflex traps that cost English speakers points.',
+      "A targeted inventory of anglophone interference patterns — the syntax, register, and reflex traps that cost English speakers points.",
     backgroundColor: '#EEE9DF',
     accentColor: 'var(--fp-lavender)',
   },
   {
-    name: 'La Voix',
+    name: "La Musique",
     description:
-      'Prosody, pacing, and hesitation management: the delivery layer that carries your method into the examiner’s scoring grid.',
+      "Prosody, pacing, and hesitation management: the delivery layer that carries your method into the examiner scoring grid.",
     backgroundColor: '#F5F1EA',
     accentColor: 'var(--fp-sky)',
   },

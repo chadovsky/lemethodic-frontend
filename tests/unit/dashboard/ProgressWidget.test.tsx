@@ -5,11 +5,11 @@ import ProgressWidget from '@/components/dashboard/ProgressWidget'
 import { PROGRESS_LAYERS } from '@/lib/data/dashboard'
 
 const LOCKED_LAYER_ORDER = [
-  'Le Fond',
-  'Les Moules des Idées',
-  'Les Moules',
-  'Les Réflexes Anglais',
-  'La Voix',
+  'Le Propos',
+  'Le Plan',
+  'La Construction',
+  'Les Pièges Anglais',
+  'La Musique',
 ] as const
 
 describe('ProgressWidget', () => {

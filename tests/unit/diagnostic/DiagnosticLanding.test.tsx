@@ -4,11 +4,11 @@ import DiagnosticLanding from '@/components/diagnostic/DiagnosticLanding'
 import { TACHES } from '@/lib/data/taches'
 
 const COUCHE_NAMES = [
-  'Le Fond',
-  'Les Moules des Idées',
-  'Les Moules',
-  'Les Réflexes Anglais',
-  'La Voix',
+  'Le Propos',
+  'Le Plan',
+  'La Construction',
+  'Les Pièges Anglais',
+  'La Musique',
 ] as const
 
 describe('DiagnosticLanding', () => {

@@ -6,9 +6,9 @@ const COLUMNS = [
   {
     heading: 'Product',
     links: [
-      { label: "L'École", href: '/ecole' },
-      { label: 'Le Vocabulaire', href: '/vocabulaire' },
-      { label: 'Le Diagnostic', href: '/diagnostic' },
+      { label: 'La Méthode', href: '/ecole' },
+      { label: 'La Bibliothèque', href: '/vocabulaire' },
+      { label: "L'Examen", href: '/diagnostic' },
     ],
   },
   {

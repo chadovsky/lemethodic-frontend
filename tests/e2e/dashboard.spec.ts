@@ -27,11 +27,11 @@ test.describe('Dashboard — desktop (1280×800)', () => {
     await page.goto('/dashboard')
     const layers = page.getByTestId('progress-layer')
     await expect(layers).toHaveCount(5)
-    await expect(layers.nth(0)).toContainText('Le Fond')
-    await expect(layers.nth(1)).toContainText('Les Moules des Idées')
-    await expect(layers.nth(2)).toContainText('Les Moules')
-    await expect(layers.nth(3)).toContainText('Les Réflexes Anglais')
-    await expect(layers.nth(4)).toContainText('La Voix')
+    await expect(layers.nth(0)).toContainText('Le Propos')
+    await expect(layers.nth(1)).toContainText('Le Plan')
+    await expect(layers.nth(2)).toContainText('La Construction')
+    await expect(layers.nth(3)).toContainText('Les Pièges Anglais')
+    await expect(layers.nth(4)).toContainText('La Musique')
   })
 
   test('"Prochaine leçon" CTA navigates to /ecole/5', async ({ page }) => {
