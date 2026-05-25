@@ -28,7 +28,7 @@ const PAPER = '#FFFFFFCC'
 const LAVENDER = 'var(--fp-lavender)'
 const PEACH = 'var(--fp-peach)'
 const SAGE = 'var(--fp-sage)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface SnapshotSectionProps {
   level: LevelResponse | null

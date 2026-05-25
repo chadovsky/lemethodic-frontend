@@ -13,7 +13,7 @@ import {
 // ─── design tokens ───────────────────────────────────────────────────────────
 const INK        = 'var(--text-primary)'
 const INK_MUTED  = 'var(--text-muted)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // F-VISUAL-001 X.4.2 — daily-action card gets the attention-pulse loop
 // from lib/motion (scale 1 -> 1.02 -> 1, 1.5s active + 1.5s gap). This

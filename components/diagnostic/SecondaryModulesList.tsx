@@ -13,7 +13,7 @@ import ModuleExamples from './ModuleExamples'
 const INK          = 'var(--text-primary)'
 const INK_SOFT     = 'var(--text-secondary)'
 const INK_MUTED    = 'var(--text-muted)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 const CATEGORY_BG: Record<ModuleCategory, string> = {
   vocab_calque:        'var(--fp-peach)',

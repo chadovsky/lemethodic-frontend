@@ -4,7 +4,7 @@ import QuizClient from './QuizClient'
 import BottomNav from '@/components/home/BottomNav'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const INK = 'var(--text-primary)'
 const BG  = 'var(--fp-canvas)'
 

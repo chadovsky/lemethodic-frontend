@@ -27,7 +27,7 @@ const PEACH = 'var(--fp-peach)'
 const BUTTER = 'var(--fp-butter)'
 const LAVENDER = 'var(--fp-lavender)'
 const BLUSH = 'var(--fp-blush)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface ClusterHeaderProps {
   detail: ClusterDetailResponse

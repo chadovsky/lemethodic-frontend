@@ -22,7 +22,7 @@ const INK_SOFT     = 'var(--text-secondary)'
 const INK_MUTED    = 'var(--text-muted)'
 const LAVENDER     = 'var(--fp-lavender)'
 const BG           = 'var(--fp-canvas)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 const PREP_SECS      = 120 // 2 minutes
 const RECORD_SECS    = 180 // 3 minutes

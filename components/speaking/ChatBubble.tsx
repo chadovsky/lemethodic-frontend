@@ -7,7 +7,7 @@ const INK          = 'var(--text-primary)'
 const INK_MUTED    = 'var(--text-muted)'
 const PEACH        = 'var(--fp-peach)'
 const SAGE         = 'var(--fp-sage)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 export type BubbleSide = 'examiner' | 'user'
 

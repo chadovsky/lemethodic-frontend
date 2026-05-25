@@ -13,7 +13,7 @@ const INK          = 'var(--text-primary)'
 const INK_MUTED    = 'var(--text-muted)'
 const SAGE         = 'var(--fp-sage)'
 const TRACK        = 'var(--fp-track)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // ─── types ───────────────────────────────────────────────────────────────────
 // V-009 — `unscored` flag for the La Voix placeholder row. BE doesn't

@@ -24,8 +24,8 @@ const ED_FG = 'var(--ed-fg)'
 const ED_MUTED = 'var(--ed-muted)'
 const ED_RULE = 'var(--ed-rule)'
 const ED_ACCENT = 'var(--ed-accent)'
-const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
-const SERIF = 'var(--font-fraunces), Georgia, "Times New Roman", serif'
+const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+const SERIF = 'var(--font-source-serif), Georgia, "Times New Roman", serif'
 
 // ── Locked methodology copy ────────────────────────────────────────────────
 
@@ -137,7 +137,7 @@ const HOW = {
       },
       {
         head: 'You progress one Goulet at a time.',
-        body: 'Not "practice more." Not "try harder." Specific, layered work on the layer that needs it. Until you're solid across all five.',
+        body: "Not \"practice more.\" Not \"try harder.\" Specific, layered work on the layer that needs it. Until you're solid across all five.",
       },
     ],
   },

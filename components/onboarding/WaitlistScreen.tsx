@@ -185,7 +185,7 @@ export default function WaitlistScreen() {
         <h1
           className="text-balance mt-12"
           style={{
-            fontFamily: 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif',
+            fontFamily: 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 'clamp(28px, 4vw, 40px)',
             lineHeight: 1.15,
@@ -212,7 +212,7 @@ export default function WaitlistScreen() {
           <p
             className="text-pretty"
             style={{
-              fontFamily: 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif',
+              fontFamily: 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif',
               fontWeight: 400,
               fontSize: 16,
               lineHeight: 1.6,
@@ -227,7 +227,7 @@ export default function WaitlistScreen() {
             <p
               className="text-pretty"
               style={{
-                fontFamily: 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif',
+                fontFamily: 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif',
                 fontWeight: 400,
                 fontSize: 15,
                 lineHeight: 1.6,
@@ -242,7 +242,7 @@ export default function WaitlistScreen() {
           <p
             className="text-pretty"
             style={{
-              fontFamily: 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif',
+              fontFamily: 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif',
               fontWeight: 400,
               fontSize: 15,
               lineHeight: 1.6,

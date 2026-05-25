@@ -9,7 +9,7 @@ const INK_MUTED    = 'var(--text-muted)'
 const SAGE         = 'var(--fp-sage)'
 const BUTTER       = 'var(--fp-butter)'
 const PEACH        = 'var(--fp-peach)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface Moule {
   label: 'PYRAMIDE' | 'REBOND' | 'CIBLAGE'

@@ -15,8 +15,8 @@ import Link from 'next/link'
 import { api, ApiError } from '@/lib/api'
 
 const BG = 'var(--ed-bg)'
-const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
-const SERIF = 'var(--font-fraunces), Georgia, serif'
+const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+const SERIF = 'var(--font-source-serif), Georgia, serif'
 
 type ConfirmState =
   | { kind: 'idle' }

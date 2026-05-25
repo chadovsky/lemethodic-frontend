@@ -12,7 +12,7 @@ import Link from 'next/link'
 //   `lemethodic:unlocked-lesson` -> stringified lesson number (e.g. "6")
 const UNLOCK_STORAGE_KEY = 'lemethodic:unlocked-lesson'
 
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const INK        = 'var(--text-primary)'
 const INK_MUTED  = 'var(--text-muted)'
 const CTA_BG     = 'var(--text-primary)'

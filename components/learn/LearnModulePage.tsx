@@ -30,7 +30,7 @@ const INK          = 'var(--ed-fg)'
 const INK_SOFT     = 'var(--ed-muted)'
 const INK_MUTED    = 'var(--ed-muted)'
 const BG           = 'var(--ed-bg)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 const CATEGORY_BG: Record<ModuleCategory, string> = {
   vocab_calque:        'var(--fp-peach)',

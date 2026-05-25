@@ -25,8 +25,8 @@ const ED_MUTED = 'var(--ed-muted)'
 const ED_RULE = 'var(--ed-rule)'
 const ED_PAPER = 'var(--ed-paper)'
 const ED_ACCENT = 'var(--ed-accent)'
-const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
-const SERIF = 'var(--font-fraunces), Georgia, serif'
+const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+const SERIF = 'var(--font-source-serif), Georgia, serif'
 
 const TOTAL_LESSONS = 27
 

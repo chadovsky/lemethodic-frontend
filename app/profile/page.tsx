@@ -18,7 +18,7 @@ const SAGE         = 'var(--fp-sage)'
 const BUTTER       = 'var(--fp-butter)'
 const BG           = 'var(--ed-bg)'
 const CARD_BG      = 'var(--ed-paper)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SEPARATOR    = 'var(--ed-rule)'
 
 // ─── reusable card shell ──────────────────────────────────────────────────────

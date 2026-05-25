@@ -15,7 +15,7 @@ import { useState } from 'react'
 import { useRotatingText, ED_EASE_SPRING_CSS } from '@/lib/motion'
 import type { Lang } from './copy'
 
-const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const ED_FG_SOFT = 'var(--ed-fg-soft)'
 const ED_WARM_PEACH_DEEP = 'var(--ed-warm-peach-deep)'
 

@@ -65,7 +65,7 @@ const SAGE         = 'var(--fp-sage)'
 const PEACH        = 'var(--fp-peach)'
 const BUTTER       = 'var(--fp-butter)'
 const BG           = 'var(--fp-canvas)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 const TARGET_USER_TURNS = 6
 const TURN_CAP_MS       = 60_000

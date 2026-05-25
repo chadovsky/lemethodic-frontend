@@ -19,8 +19,8 @@ const ED_FG_SOFT = 'var(--ed-fg-soft)'
 const ED_MUTED = 'var(--ed-muted)'
 const ED_RULE = 'var(--ed-rule)'
 const ED_PAPER = 'var(--ed-paper)'
-const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
-const SERIF = 'var(--font-fraunces), Georgia, serif'
+const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+const SERIF = 'var(--font-source-serif), Georgia, serif'
 
 // V-013b — pinned. Bumped per release; reflects the soft-beta phase.
 const APP_VERSION = '0.1.0-soft-beta'

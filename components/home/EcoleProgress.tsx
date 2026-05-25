@@ -6,7 +6,7 @@ import { Check } from 'lucide-react'
 const INK        = 'var(--text-primary)'
 const INK_MUTED  = 'var(--text-muted)'
 const CTA_BG     = 'var(--text-primary)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface Milestone {
   label: string

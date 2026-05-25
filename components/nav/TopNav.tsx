@@ -18,8 +18,8 @@ const ED_BG = 'var(--ed-bg)'
 const ED_FG = 'var(--ed-fg)'
 const ED_FG_SOFT = 'var(--ed-fg-soft)'
 const ED_RULE = 'var(--ed-rule)'
-const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
-const SERIF = 'var(--font-fraunces), Georgia, serif'
+const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+const SERIF = 'var(--font-source-serif), Georgia, serif'
 
 // Routes that should NOT render the in-product top nav. Marketing,
 // conversion funnel, legal, and auth surfaces have their own chrome.

@@ -17,7 +17,7 @@ import ModuleExamples from './ModuleExamples'
 const INK          = 'var(--text-primary)'
 const INK_SOFT     = 'var(--text-secondary)'
 const INK_MUTED    = 'var(--text-muted)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // FluentPath pastels (mirrored from globals.css). One per category so the
 // badge becomes a visual cue. Pre-launch this is decorative; if/when the

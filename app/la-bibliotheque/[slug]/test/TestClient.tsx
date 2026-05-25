@@ -173,7 +173,7 @@ export default function TestClient({ slug }: { slug: string }) {
           href={`/la-bibliotheque/${encodeURIComponent(slug)}`}
           className="ed-btn-press inline-flex items-center gap-1.5 mb-6"
           style={{
-            fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 500,
             fontSize: 13,
             color: 'var(--ed-muted)',
@@ -293,7 +293,7 @@ function SessionConfigCard({
     >
       <h1
         style={{
-          fontFamily: 'var(--font-fraunces), Georgia, serif',
+          fontFamily: 'var(--font-source-serif), Georgia, serif',
           fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(28px, 3.6vw, 36px)',
@@ -308,7 +308,7 @@ function SessionConfigCard({
       </h1>
       <p
         style={{
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 400,
           fontSize: 15,
           lineHeight: 1.55,
@@ -359,7 +359,7 @@ function SessionConfigCard({
           border: 'none',
           backgroundColor: chunkCount < TEST_MIN_CHUNKS ? 'var(--ed-rule)' : 'var(--ed-accent)',
           color: chunkCount < TEST_MIN_CHUNKS ? 'var(--ed-muted)' : '#FFFFFF',
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
           fontSize: 15,
           letterSpacing: '0.01em',
@@ -413,7 +413,7 @@ function ToggleRow<T extends string | number>({
               border: '1px solid var(--ed-rule)',
               backgroundColor: isActive ? 'var(--ed-accent)' : 'var(--ed-paper)',
               color: isActive ? '#FFFFFF' : 'var(--ed-fg)',
-              fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
               fontWeight: 500,
               fontSize: 13,
               letterSpacing: '0.01em',
@@ -551,7 +551,7 @@ function optionStyle(
     border: '1px solid var(--ed-rule)',
     backgroundColor: 'var(--ed-paper)',
     color: 'var(--ed-fg)',
-    fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+    fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
     fontWeight: 500,
     fontSize: 14,
     lineHeight: 1.4,
@@ -599,7 +599,7 @@ function ExerciseCard({ prompt, body }: { prompt: string; body: string }) {
       </div>
       <p
         style={{
-          fontFamily: 'var(--font-fraunces), Georgia, serif',
+          fontFamily: 'var(--font-source-serif), Georgia, serif',
           fontWeight: 500,
           fontSize: 'clamp(20px, 2.6vw, 26px)',
           lineHeight: 1.3,
@@ -628,7 +628,7 @@ function FeedbackBlock({
     <div className="flex flex-col gap-3">
       <p
         style={{
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
           fontSize: 14,
           color: ok ? 'var(--ed-accent)' : 'var(--ed-fg)',
@@ -649,7 +649,7 @@ function FeedbackBlock({
           border: 'none',
           backgroundColor: 'var(--ed-accent)',
           color: '#FFFFFF',
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
           fontSize: 14,
           cursor: 'pointer',
@@ -698,7 +698,7 @@ function DropdownView({
           border: '1px solid var(--ed-rule)',
           backgroundColor: 'var(--ed-paper)',
           color: picked ? 'var(--ed-fg)' : 'var(--ed-muted)',
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 500,
           fontSize: 14,
         }}
@@ -725,7 +725,7 @@ function DropdownView({
             border: 'none',
             backgroundColor: !picked ? 'var(--ed-rule)' : 'var(--ed-accent)',
             color: !picked ? 'var(--ed-muted)' : '#FFFFFF',
-            fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 14,
             cursor: !picked ? 'not-allowed' : 'pointer',
@@ -785,7 +785,7 @@ function ExactView({
           border: '1px solid var(--ed-rule)',
           backgroundColor: 'var(--ed-paper)',
           color: 'var(--ed-fg)',
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 500,
           fontSize: 16,
           outline: 'none',
@@ -804,7 +804,7 @@ function ExactView({
             border: 'none',
             backgroundColor: !value.trim() ? 'var(--ed-rule)' : 'var(--ed-accent)',
             color: !value.trim() ? 'var(--ed-muted)' : '#FFFFFF',
-            fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 14,
             cursor: !value.trim() ? 'not-allowed' : 'pointer',
@@ -958,7 +958,7 @@ function MatchingView({
             border: 'none',
             backgroundColor: !allPaired ? 'var(--ed-rule)' : 'var(--ed-accent)',
             color: !allPaired ? 'var(--ed-muted)' : '#FFFFFF',
-            fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 14,
             cursor: !allPaired ? 'not-allowed' : 'pointer',
@@ -970,7 +970,7 @@ function MatchingView({
         <div className="mt-3 flex flex-col gap-3">
           <p
             style={{
-              fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
               fontWeight: 600,
               fontSize: 14,
               color: 'var(--ed-fg)',
@@ -991,7 +991,7 @@ function MatchingView({
               border: 'none',
               backgroundColor: 'var(--ed-accent)',
               color: '#FFFFFF',
-              fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
               fontWeight: 600,
               fontSize: 14,
               cursor: 'pointer',
@@ -1054,7 +1054,7 @@ function MatchItem({
         border: `1px solid ${borderColor}`,
         backgroundColor: bg,
         color: fg,
-        fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+        fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
         fontWeight: 500,
         fontSize: 13,
         lineHeight: 1.35,
@@ -1097,7 +1097,7 @@ function TestEndCard({
     >
       <h2
         style={{
-          fontFamily: 'var(--font-fraunces), Georgia, serif',
+          fontFamily: 'var(--font-source-serif), Georgia, serif',
           fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(26px, 3vw, 34px)',
@@ -1111,7 +1111,7 @@ function TestEndCard({
       </h2>
       <p
         style={{
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
           fontSize: 18,
           color: 'var(--ed-fg)',
@@ -1132,7 +1132,7 @@ function TestEndCard({
             border: 'none',
             backgroundColor: 'var(--ed-accent)',
             color: '#FFFFFF',
-            fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 14,
             cursor: 'pointer',
@@ -1152,7 +1152,7 @@ function TestEndCard({
             border: '1px solid var(--ed-rule)',
             backgroundColor: 'var(--ed-paper)',
             color: 'var(--ed-fg)',
-            fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 14,
             textDecoration: 'none',
@@ -1172,7 +1172,7 @@ function TestEndCard({
             border: '1px solid var(--ed-rule)',
             backgroundColor: 'var(--ed-paper)',
             color: 'var(--ed-fg)',
-            fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 14,
             textDecoration: 'none',
@@ -1213,7 +1213,7 @@ function TierLockedCard({
             padding: '4px 10px',
             borderRadius: 3,
             border: '1px dashed var(--ed-muted)',
-            fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 11,
             color: 'var(--ed-muted)',
@@ -1226,7 +1226,7 @@ function TierLockedCard({
       )}
       <h2
         style={{
-          fontFamily: 'var(--font-fraunces), Georgia, serif',
+          fontFamily: 'var(--font-source-serif), Georgia, serif',
           fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(24px, 2.8vw, 30px)',
@@ -1240,7 +1240,7 @@ function TierLockedCard({
       </h2>
       <p
         style={{
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 400,
           fontSize: 15,
           lineHeight: 1.55,
@@ -1265,7 +1265,7 @@ function TierLockedCard({
           border: 'none',
           backgroundColor: 'var(--ed-accent)',
           color: '#FFFFFF',
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
           fontSize: 14,
           cursor: 'pointer',
@@ -1297,7 +1297,7 @@ function ErrorCard({
     >
       <h2
         style={{
-          fontFamily: 'var(--font-fraunces), Georgia, serif',
+          fontFamily: 'var(--font-source-serif), Georgia, serif',
           fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 22,
@@ -1310,7 +1310,7 @@ function ErrorCard({
       </h2>
       <p
         style={{
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontSize: 14,
           color: 'var(--ed-muted)',
           margin: 0,
@@ -1330,7 +1330,7 @@ function ErrorCard({
           border: 'none',
           backgroundColor: 'var(--ed-accent)',
           color: '#FFFFFF',
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
           fontSize: 14,
           cursor: 'pointer',
@@ -1356,7 +1356,7 @@ function EmptyCard({ copy }: { copy: ReturnType<typeof vocabCopy> }) {
     >
       <h2
         style={{
-          fontFamily: 'var(--font-fraunces), Georgia, serif',
+          fontFamily: 'var(--font-source-serif), Georgia, serif',
           fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(22px, 2.4vw, 28px)',
@@ -1370,7 +1370,7 @@ function EmptyCard({ copy }: { copy: ReturnType<typeof vocabCopy> }) {
       </h2>
       <p
         style={{
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 400,
           fontSize: 15,
           lineHeight: 1.55,
@@ -1407,7 +1407,7 @@ function SoftEmptyCard({
     >
       <h2
         style={{
-          fontFamily: 'var(--font-fraunces), Georgia, serif',
+          fontFamily: 'var(--font-source-serif), Georgia, serif',
           fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(22px, 2.4vw, 28px)',
@@ -1421,7 +1421,7 @@ function SoftEmptyCard({
       </h2>
       <p
         style={{
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 400,
           fontSize: 15,
           lineHeight: 1.55,
@@ -1448,7 +1448,7 @@ function SoftEmptyCard({
           border: 'none',
           backgroundColor: 'var(--ed-accent)',
           color: '#FFFFFF',
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
           fontSize: 14,
           textDecoration: 'none',

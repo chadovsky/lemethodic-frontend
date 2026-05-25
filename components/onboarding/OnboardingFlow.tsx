@@ -93,7 +93,7 @@ function LanguageToggle({
   const ED_FG = 'var(--ed-fg)'
   const ED_MUTED = 'var(--ed-muted)'
   const ED_RULE = 'var(--ed-rule)'
-  const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+  const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
   return (
     <div className="flex items-center" style={{ gap: 4 }}>
       {langs.map((l, i) => {
@@ -367,8 +367,8 @@ export default function OnboardingFlow() {
   // F-327 — Cases B & C: another_exam user submitted but wasn't proxy-enrolled.
   // Local state survives the store reset so this renders after reset() runs.
   if (waitlistOutcome !== null) {
-    const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
-    const SERIF = 'var(--font-fraunces), Georgia, "Times New Roman", serif'
+    const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+    const SERIF = 'var(--font-source-serif), Georgia, "Times New Roman", serif'
     const isDeclined = waitlistOutcome.kind === 'waitlist_declined'
     const copy = interfaceLanguage === 'fr'
       ? {

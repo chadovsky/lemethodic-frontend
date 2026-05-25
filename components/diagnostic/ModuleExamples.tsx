@@ -12,7 +12,7 @@ const INK_SOFT     = 'var(--text-secondary)'
 const INK_MUTED    = 'var(--text-muted)'
 const RED_SOFT     = '#C84A3F'
 const GREEN_SOFT   = '#3F7A4A'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 const COPY = {
   fr: { context: 'Contexte', wrong: 'Évitez', right: 'Préférez', why: 'Pourquoi' },

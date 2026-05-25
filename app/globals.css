@@ -23,15 +23,9 @@
      One-accent rule:
        Sage is the only accent in the system. No secondary brand color.
        Visual variety comes from typography contrast + spacing rhythm
-       + Fraunces italic moments. Documented here to resist the
+       + Source Serif 4 italic accents. Documented here to resist the
        temptation of adding a second hue later.
 
-     Editorial h2 evaluation point (per C3):
-       Fraunces italic on display-1/display-2/h1 is locked editorial.
-       h2 across every card may over-rotate to italic serif — F-225
-       Batch 2 (paywall + ecole) is the natural decision point. If
-       h2-italic-serif feels mannered, swap h2 to Figtree weight 600
-       via a single edit in lib/typography.ts TYPE_SCALE.
      ────────────────────────────────────────────────────────────────────── */
 
   /* Surfaces */
@@ -76,11 +70,10 @@
   --neutral-900: hsl(30 18% 12%);
   --neutral-950: hsl(30 20%  6%);
 
-  /* F-VISUAL-001 — Figtree replaces Switzer; the --font-figtree CSS
-     variable is set on <html> by next/font in app/layout.tsx. The
-     fallback chain below mirrors what was on --font-switzer for
-     parity during the transition. */
-  --font-figtree: 'Figtree', -apple-system, "Segoe UI", system-ui, sans-serif;
+  /* M2 t6 — canonical font CSS variables. Set on <html> by next/font in
+     app/layout.tsx. Cabinet Grotesk: display/hero. Geist: UI/body.
+     Source Serif 4: lesson/editorial. */
+  --font-geist: 'Geist', -apple-system, "Segoe UI", system-ui, sans-serif;
 
   /* ──────────────────────────────────────────────────────────────────────
      Legacy aliases (kept through X.1-X.5; X.6 cleanup drops them).
@@ -127,11 +120,7 @@
   --fp-safe-left: env(safe-area-inset-left);
   --fp-safe-right: env(safe-area-inset-right);
 
-  /* V-005 — Switzer loaded via Fontshare <link> in app/layout.tsx <head>.
-     Defining `--font-switzer` here makes it parallel to next/font's
-     auto-injected `--font-fraunces`, so component code can reference both
-     uniformly via `var(--font-switzer)` / `var(--font-fraunces)`. */
-  --font-switzer: var(--font-figtree);  /* legacy alias — X.6 drops */
+  --font-switzer: var(--font-geist);  /* legacy alias — resolves to Geist */
 
   /* LeMethodic motion language (companion to lib/motion.ts) */
   --fp-ease-fp-default: cubic-bezier(0, 0, 0.2, 1);
@@ -258,12 +247,14 @@
 }
 
 @theme inline {
-  /* F-VISUAL-001 — Figtree (sans) + Fraunces (display/serif). Both set
-     on <html> by next/font in app/layout.tsx. Switzer retired (was
-     Fontshare CDN load; --font-switzer remains as legacy alias only). */
-  --font-sans: var(--font-figtree);
+  /* M2 t6 — canonical font stack per DESIGN.md v1.
+     Cabinet Grotesk (--font-cabinet): display/hero/marketing headings.
+     Geist (--font-geist): UI/body/interface chrome.
+     Source Serif 4 (--font-source-serif): lesson/editorial content. */
+  --font-sans: var(--font-geist);
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  --font-display: var(--font-fraunces);
+  --font-display: var(--font-cabinet);
+  --font-serif: var(--font-source-serif);
 
   /* F-VISUAL-001 — canonical token surface exposed as Tailwind
      utilities (bg-bg-canvas, text-text-primary, border-rule-default,
@@ -422,12 +413,12 @@
 .prose-legal {
   max-width: 720px;
   margin: 0 auto;
-  font-family: var(--font-switzer);
+  font-family: var(--font-geist);
   color: var(--fp-ink);
   line-height: 1.65;
 }
 .prose-legal h1 {
-  font-family: var(--font-switzer);
+  font-family: var(--font-geist);
   font-weight: 800;
   font-size: clamp(28px, 4vw, 40px);
   line-height: 1.15;
@@ -436,7 +427,7 @@
   margin: 0 0 12px;
 }
 .prose-legal h2 {
-  font-family: var(--font-switzer);
+  font-family: var(--font-geist);
   font-weight: 700;
   font-size: clamp(20px, 2.6vw, 26px);
   line-height: 1.25;
@@ -445,7 +436,7 @@
   margin: 40px 0 12px;
 }
 .prose-legal h3 {
-  font-family: var(--font-switzer);
+  font-family: var(--font-geist);
   font-weight: 700;
   font-size: 18px;
   line-height: 1.3;
@@ -487,7 +478,7 @@
 }
 .prose-legal th {
   text-align: left;
-  font-family: var(--font-switzer);
+  font-family: var(--font-geist);
   font-weight: 700;
   padding: 10px 12px;
   border-bottom: 2px solid var(--fp-ink);
@@ -861,10 +852,10 @@
 }
 
 /* V-003 — hero atmospheric typographic background. 5 French accent
-   glyphs in Fraunces at ~5% ed-fg opacity, drifting slowly behind hero
-   content. Pointer-events: none and aria-hidden so they're inert.
-   Parallax is JS-driven on the parent wrapper (.hero-atmosphere); each
-   character's drift is pure CSS keyframes here. */
+   glyphs in Cabinet Grotesk Black at ~5% ed-fg opacity, drifting slowly
+   behind hero content. Pointer-events: none and aria-hidden so they're
+   inert. Parallax is JS-driven on the parent wrapper (.hero-atmosphere);
+   each character's drift is pure CSS keyframes here. */
 .hero-atmosphere {
   position: absolute;
   inset: 0;
@@ -876,14 +867,12 @@
 }
 .hero-atmosphere-char {
   position: absolute;
-  font-family: var(--font-fraunces), Georgia, serif;
+  font-family: var(--font-cabinet), "Cabinet Grotesk", -apple-system, sans-serif;
   color: var(--ed-fg);
   opacity: 0.05;
   line-height: 0.85;
-  font-weight: 400;
+  font-weight: 900;
   user-select: none;
-  /* Variable-axis: large optical size + soft warmth for editorial feel */
-  font-variation-settings: "opsz" 144, "SOFT" 30;
 }
 .hero-atmosphere-char-inner {
   display: inline-block;

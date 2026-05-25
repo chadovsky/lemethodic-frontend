@@ -12,7 +12,7 @@ import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 const INK          = 'var(--text-primary)'
 const INK_SOFT     = 'var(--text-secondary)'
 const INK_MUTED    = 'var(--text-muted)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // Mirror of CATEGORY_BG in components/diagnostic/DetectedModuleCard.tsx.
 // Kept in sync manually — pre-launch the palette is small enough that

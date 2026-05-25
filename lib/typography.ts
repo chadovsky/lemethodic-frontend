@@ -1,23 +1,12 @@
-// F-VISUAL-001 X.1 — typography constants point at Figtree (sans) +
-// Fraunces (display + serif accents). Switzer retired (was Fontshare
-// CDN-loaded via V-005); Figtree replaces via next/font/google in
-// app/layout.tsx with subsets ['latin', 'latin-ext'] for French
-// diacritics + œ.
-//
-// SANS_FONT consumers: every editorial surface that inlines
-// font-family in style={{...}}, plus the prose-legal block in
-// globals.css. CSS variable indirection means a single source-of-truth
-// swap touches everywhere consistently.
+// M2 t6 — typography constants per DESIGN.md v1 canonical font stack.
+// Cabinet Grotesk (display/hero), Geist (UI/body), Source Serif 4 (lesson).
+// CSS variable indirection: a single source-of-truth swap in layout.tsx
+// touches every inline style={{...}} consumer consistently.
 
-export const SANS_FONT = 'var(--font-figtree), -apple-system, "Segoe UI", system-ui, sans-serif'
+export const DISPLAY_FONT = 'var(--font-cabinet), "Cabinet Grotesk", -apple-system, "Segoe UI", system-ui, sans-serif'
+export const SANS_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+export const SERIF_FONT = 'var(--font-source-serif), Georgia, "Times New Roman", serif'
 
-// Fraunces — variable serif with optical-size + SOFT axes. Used for
-// editorial accent typography (pull-quotes, methodology framing, hero
-// display). Used sparingly — restraint is the point.
-export const SERIF_FONT = 'var(--font-fraunces), Georgia, "Times New Roman", serif'
-
-// Legacy step names — kept for back-compat. Same family, values
-// aligned with the semantic TYPE_SCALE_SEMANTIC below.
 export const TYPE_SCALE = {
   caption: '0.875rem',  // 14px
   body: '1rem',         // 16px
@@ -30,49 +19,41 @@ export const TYPE_SCALE = {
   display: '6rem',      // 96px
 } as const
 
-// F-VISUAL-001 — semantic type scale per the design system.
-// Each entry carries size + weight + line-height + letter-spacing +
-// family + (optional) style. Surfaces consume TYPE.* and apply via
-// inline style. Values mirror the locked spec in BACKLOG F-VISUAL-001.
-//
-// C3 evaluation point: display1/display2/h1/h2 are locked to Fraunces
-// italic. F-225 Batch 2 (paywall + ecole) is the decision moment for
-// h2 specifically — if h2-italic-serif feels mannered across every
-// card, swap h2.family/style/weight here (single edit; all consumers
-// follow). Tracked in BACKLOG F-VISUAL-001 entry as "known evaluation
-// point."
+// M2 t6 — semantic type scale per DESIGN.md v1.
+// display1/display2/h1: Cabinet Grotesk (upright grotesque — no italic).
+// h2: Geist, product heading weight. h3+: Geist throughout.
 export const TYPE = {
   display1: {
     size: 'clamp(40px, 6vw, 88px)',
-    weight: 500,
+    weight: 900,
     lineHeight: 1.05,
     letterSpacing: '-0.025em',
-    family: SERIF_FONT,
-    style: 'italic',
+    family: DISPLAY_FONT,
+    style: 'normal',
   },
   display2: {
     size: 'clamp(32px, 4.5vw, 60px)',
-    weight: 400,
+    weight: 700,
     lineHeight: 1.1,
     letterSpacing: '-0.02em',
-    family: SERIF_FONT,
-    style: 'italic',
+    family: DISPLAY_FONT,
+    style: 'normal',
   },
   h1: {
     size: 'clamp(28px, 3.5vw, 44px)',
-    weight: 500,
+    weight: 700,
     lineHeight: 1.15,
     letterSpacing: '-0.015em',
-    family: SERIF_FONT,
-    style: 'italic',
+    family: DISPLAY_FONT,
+    style: 'normal',
   },
   h2: {
     size: 'clamp(22px, 2.6vw, 30px)',
-    weight: 500,
+    weight: 600,
     lineHeight: 1.2,
     letterSpacing: '-0.01em',
-    family: SERIF_FONT,
-    style: 'italic',
+    family: SANS_FONT,
+    style: 'normal',
   },
   h3: {
     size: 'clamp(18px, 2vw, 22px)',

@@ -71,7 +71,7 @@ export default function TopicDetail({ slug }: { slug: string }) {
           href="/la-bibliotheque"
           className="ed-btn-press inline-flex items-center gap-1.5 mb-6"
           style={{
-            fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+            fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 500,
             fontSize: 13,
             color: 'var(--ed-muted)',
@@ -84,7 +84,7 @@ export default function TopicDetail({ slug }: { slug: string }) {
         <header className="mb-7 md:mb-9 ed-hero-rise">
           <h1
             style={{
-              fontFamily: 'var(--font-fraunces), Georgia, serif',
+              fontFamily: 'var(--font-source-serif), Georgia, serif',
               fontStyle: 'italic',
               fontWeight: 400,
               fontSize: 'clamp(32px, 4vw, 44px)',
@@ -108,7 +108,7 @@ export default function TopicDetail({ slug }: { slug: string }) {
           {!chunksQuery.isLoading && total > 0 && (
             <p
               style={{
-                fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+                fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
                 fontWeight: 400,
                 fontSize: 14,
                 lineHeight: 1.5,
@@ -138,7 +138,7 @@ export default function TopicDetail({ slug }: { slug: string }) {
                 border: 'none',
                 backgroundColor: 'var(--ed-accent)',
                 color: '#FFFFFF',
-                fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+                fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
                 fontWeight: 600,
                 fontSize: 14,
                 letterSpacing: '0.01em',
@@ -157,7 +157,7 @@ export default function TopicDetail({ slug }: { slug: string }) {
                 border: '1px solid var(--ed-rule)',
                 backgroundColor: 'var(--ed-paper)',
                 color: 'var(--ed-fg)',
-                fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+                fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
                 fontWeight: 600,
                 fontSize: 14,
                 letterSpacing: '0.01em',
@@ -239,7 +239,7 @@ export default function TopicDetail({ slug }: { slug: string }) {
                       backgroundColor: 'var(--ed-paper)',
                       color: 'var(--ed-fg)',
                       fontFamily:
-                        'var(--font-switzer), -apple-system, system-ui, sans-serif',
+                        'var(--font-geist), -apple-system, system-ui, sans-serif',
                       fontWeight: 600,
                       fontSize: 14,
                       cursor: chunksQuery.isFetchingNextPage ? 'wait' : 'pointer',
@@ -302,7 +302,7 @@ function FilterRow<T extends string>({
                 border: '1px solid var(--ed-rule)',
                 backgroundColor: isActive ? 'var(--ed-accent)' : 'var(--ed-paper)',
                 color: isActive ? '#FFFFFF' : 'var(--ed-fg)',
-                fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+                fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
                 fontWeight: 500,
                 fontSize: 12,
                 letterSpacing: '0.01em',
@@ -338,7 +338,7 @@ function ChunkRow({
     >
       <p
         style={{
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 500,
           fontSize: 16,
           lineHeight: 1.45,
@@ -351,7 +351,7 @@ function ChunkRow({
       </p>
       <p
         style={{
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 400,
           fontSize: 14,
           lineHeight: 1.5,
@@ -385,7 +385,7 @@ function ChunkChip({ label, muted }: { label: string; muted?: boolean }) {
         border: '1px solid var(--ed-rule)',
         backgroundColor: 'var(--ed-bg)',
         color: muted ? 'var(--ed-muted)' : 'var(--ed-fg)',
-        fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+        fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
         fontWeight: 600,
         fontSize: 11,
         letterSpacing: '0.04em',
@@ -441,7 +441,7 @@ function EmptyCard({ title, body }: { title: string; body: string }) {
     >
       <h2
         style={{
-          fontFamily: 'var(--font-fraunces), Georgia, serif',
+          fontFamily: 'var(--font-source-serif), Georgia, serif',
           fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(22px, 2.4vw, 28px)',
@@ -455,7 +455,7 @@ function EmptyCard({ title, body }: { title: string; body: string }) {
       </h2>
       <p
         style={{
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 400,
           fontSize: 15,
           lineHeight: 1.55,
@@ -492,7 +492,7 @@ function ChunksError({
     >
       <h2
         style={{
-          fontFamily: 'var(--font-fraunces), Georgia, serif',
+          fontFamily: 'var(--font-source-serif), Georgia, serif',
           fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 22,
@@ -505,7 +505,7 @@ function ChunksError({
       </h2>
       <p
         style={{
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontSize: 14,
           color: 'var(--ed-muted)',
           margin: 0,
@@ -525,7 +525,7 @@ function ChunksError({
           border: 'none',
           backgroundColor: 'var(--ed-accent)',
           color: '#FFFFFF',
-          fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+          fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
           fontSize: 14,
           cursor: 'pointer',

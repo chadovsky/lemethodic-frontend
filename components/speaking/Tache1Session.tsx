@@ -49,7 +49,7 @@ const INK_SOFT     = 'var(--text-secondary)'
 const INK_MUTED    = 'var(--text-muted)'
 const PEACH        = 'var(--fp-peach)'
 const BG           = 'var(--fp-canvas)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 const TARGET_USER_TURNS = 4
 const TURN_CAP_MS       = 30_000

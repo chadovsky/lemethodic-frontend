@@ -16,7 +16,7 @@ const BUTTER       = 'var(--fp-butter)'
 const LAVENDER     = 'var(--fp-lavender)'
 const SKY          = 'var(--fp-sky)'
 const BG           = 'var(--fp-canvas)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface Scenario {
   /** URL slug — hyphen-cased, used in the /speaking/tache-2/<code> route. */

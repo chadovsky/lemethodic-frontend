@@ -27,7 +27,7 @@ const BUTTER      = 'var(--fp-butter)'
 const SAGE        = 'var(--fp-sage)'
 const LAVENDER    = 'var(--fp-lavender)'
 const BG          = 'var(--ed-bg)'
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // F-087 — 27 lessons total: Phase 1 Fondations (1-16) + Phase 2
 // Approfondissement (17-27). Visual separator inserted between lesson

@@ -46,8 +46,8 @@ const ED_FG_SOFT = 'var(--ed-fg-soft)'
 const ED_MUTED = 'var(--ed-muted)'
 const ED_RULE = 'var(--ed-rule)'
 const ED_PAPER = 'var(--ed-paper)'
-const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
-const SERIF = 'var(--font-fraunces), Georgia, serif'
+const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+const SERIF = 'var(--font-source-serif), Georgia, serif'
 
 const COPY = {
   en: {
@@ -397,7 +397,7 @@ function RadarTile({ couches, language }: { couches: Couche[]; language: 'en' | 
             dataKey="axis"
             tick={{
               fontSize: 11,
-              fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
+              fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
               fontWeight: 600,
               fill: 'rgba(26, 26, 26, 0.6)',
             }}

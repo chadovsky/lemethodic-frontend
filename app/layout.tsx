@@ -1,38 +1,56 @@
 import type { Metadata, Viewport } from 'next'
-import { Figtree, Fraunces } from 'next/font/google'
+import localFont from 'next/font/local'
+import { Geist, Source_Serif_4 } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import TopNav from '@/components/nav/TopNav'
 import StickyHeader from '@/components/layout/StickyHeader'
 import QueryProvider from '@/components/QueryProvider'
 
-// F-VISUAL-001 X.1 — font system pivot. Figtree replaces Switzer for
-// sans/UI/body (next/font/google self-hosts at build, removing the
-// Fontshare CDN third-party uptime dependency that V-005 introduced).
-// Fraunces stays for display + serif accents (variable axes: opsz +
-// SOFT + wght).
+// M2 t6 — Font stack migration per DESIGN.md v1:
+//   Cabinet Grotesk — display/hero/marketing headings (self-hosted woff2)
+//   Geist            — UI/body/interface chrome (next/font/google)
+//   Source Serif 4   — lesson content/editorial reading (next/font/google)
 //
-// Subset coverage for French (CRITICAL — per C2 callout):
-//   - 'latin' covers U+0000-00FF (Basic Latin + Latin-1 Supplement),
-//     which includes the accented letters é è à â ç î ô û ï ù ë and
-//     the French guillemets « ».
-//   - 'latin-ext' covers U+0100-024F (Latin Extended-A + Extended-B),
-//     which carries œ Œ (U+0153 / U+0152) — common French ligature
-//     in words like cœur, œuvre, sœur, bœuf. Without latin-ext, those
-//     glyphs would fall back to the system font and render with a
-//     visible style mismatch on a French-learning product.
-// Both fonts subset to 'latin' + 'latin-ext' so French content renders
-// in the brand typeface across all surfaces.
-const figtree = Figtree({
-  subsets: ['latin', 'latin-ext'],
-  variable: '--font-figtree',
-  weight: ['400', '500', '600', '700', '800'],
+// Subset coverage for French (CRITICAL):
+//   'latin'     — U+0000-00FF: é è à â ç î ô û ï ù ë and « »
+//   'latin-ext' — U+0100-024F: œ Œ (cœur, œuvre, sœur, bœuf)
+// All three fonts subset to 'latin' + 'latin-ext'.
+
+const cabinetGrotesk = localFont({
+  src: [
+    {
+      path: '../public/fonts/cabinet-grotesk/cabinet-grotesk-medium.woff2',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../public/fonts/cabinet-grotesk/cabinet-grotesk-bold.woff2',
+      weight: '700',
+      style: 'normal',
+    },
+    {
+      path: '../public/fonts/cabinet-grotesk/cabinet-grotesk-black.woff2',
+      weight: '900',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-cabinet',
   display: 'swap',
 })
-const fraunces = Fraunces({
+
+const geist = Geist({
   subsets: ['latin', 'latin-ext'],
-  variable: '--font-fraunces',
-  axes: ['SOFT', 'opsz'],
+  variable: '--font-geist',
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+})
+
+const sourceSerif4 = Source_Serif_4({
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-source-serif',
+  weight: ['400', '600', '700'],
+  style: ['normal', 'italic'],
   display: 'swap',
 })
 
@@ -73,7 +91,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${figtree.variable} ${fraunces.variable}`}>
+    <html lang="en" className={`${cabinetGrotesk.variable} ${geist.variable} ${sourceSerif4.variable}`}>
       <body className="font-sans antialiased">
         <QueryProvider>
           {/* UI-004 — marketing header (logo + Sign in). Shows on all paths;

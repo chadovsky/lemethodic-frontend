@@ -22,7 +22,7 @@ import { api } from '@/lib/api'
 import type { Lesson } from '@/lib/types'
 import BottomNav from '@/components/home/BottomNav'
 
-const DISPLAY_FONT = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const INK         = 'var(--text-primary)'
 const INK_SOFT    = 'var(--text-secondary)'
 const INK_MUTED   = 'var(--text-muted)'
