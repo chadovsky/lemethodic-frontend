@@ -42,3 +42,4 @@ test-results/
 
 # M0 audit auth state — contains JWT, never commit
 audit-auth.json
+audit-auth-verified.json
