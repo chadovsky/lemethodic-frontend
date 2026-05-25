@@ -190,7 +190,7 @@ export default function LessonListItem({ number, title, subline, descriptor, sta
 
   return (
     <Link
-      href={`/ecole/lesson/${number}`}
+      href={`/la-methode/lesson/${number}`}
       style={{ display: 'block', textDecoration: 'none' }}
     >
       {inner}

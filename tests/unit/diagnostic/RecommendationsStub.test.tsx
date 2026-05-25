@@ -8,25 +8,25 @@ describe('RecommendationsStub', () => {
     expect(screen.getAllByTestId('recommendation-row')).toHaveLength(3)
   })
 
-  it('first recommendation CTA links to /ecole', () => {
+  it('first recommendation CTA links to /la-methode', () => {
     render(<RecommendationsStub />)
     const rows = screen.getAllByTestId('recommendation-row')
     const cta = within(rows[0]).getByTestId('recommendation-cta')
-    expect(cta).toHaveAttribute('href', '/ecole')
+    expect(cta).toHaveAttribute('href', '/la-methode')
   })
 
-  it('second recommendation CTA links to /vocabulaire', () => {
+  it('second recommendation CTA links to /la-bibliotheque', () => {
     render(<RecommendationsStub />)
     const rows = screen.getAllByTestId('recommendation-row')
     const cta = within(rows[1]).getByTestId('recommendation-cta')
-    expect(cta).toHaveAttribute('href', '/vocabulaire')
+    expect(cta).toHaveAttribute('href', '/la-bibliotheque')
   })
 
-  it('third recommendation CTA links to /diagnostic/tache/1', () => {
+  it('third recommendation CTA links to /l-examen/tache/1', () => {
     render(<RecommendationsStub />)
     const rows = screen.getAllByTestId('recommendation-row')
     const cta = within(rows[2]).getByTestId('recommendation-cta')
-    expect(cta).toHaveAttribute('href', '/diagnostic/tache/1')
+    expect(cta).toHaveAttribute('href', '/l-examen/tache/1')
   })
 
   it('every row renders a layer name and a suggestion sentence', () => {

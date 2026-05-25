@@ -49,16 +49,16 @@ describe('Dashboard', () => {
     ).toBeInTheDocument()
   })
 
-  it('"Prochaine leçon" CTA links to /ecole/5', () => {
+  it('"Prochaine leçon" CTA links to /la-methode/5', () => {
     render(<Dashboard />)
     const cta = screen.getByRole('link', { name: /reprendre/i })
-    expect(cta).toHaveAttribute('href', '/ecole/5')
+    expect(cta).toHaveAttribute('href', '/la-methode/5')
   })
 
-  it('"Score Diagnostic" CTA links to /diagnostic', () => {
+  it('"Score Diagnostic" CTA links to /l-examen', () => {
     render(<Dashboard />)
     const cta = screen.getByRole('link', { name: /voir le détail/i })
-    expect(cta).toHaveAttribute('href', '/diagnostic')
+    expect(cta).toHaveAttribute('href', '/l-examen')
   })
 
   it('Score Diagnostic widget shows the placeholder score C1', () => {

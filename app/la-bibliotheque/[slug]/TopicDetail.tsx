@@ -68,7 +68,7 @@ export default function TopicDetail({ slug }: { slug: string }) {
     >
       <div className="mx-auto max-w-4xl px-5 md:px-8 lg:px-10 py-10 md:py-14 lg:py-16">
         <Link
-          href="/vocabulaire"
+          href="/la-bibliotheque"
           className="ed-btn-press inline-flex items-center gap-1.5 mb-6"
           style={{
             fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
@@ -129,7 +129,7 @@ export default function TopicDetail({ slug }: { slug: string }) {
         {!chunksQuery.isLoading && total > 0 && (
           <div className="mb-7 md:mb-9 ed-hero-rise ed-hero-rise-delay-1 flex flex-wrap gap-3">
             <Link
-              href={`/vocabulaire/${encodeURIComponent(slug)}/practice`}
+              href={`/la-bibliotheque/${encodeURIComponent(slug)}/practice`}
               className="ed-btn-press inline-flex items-center justify-center"
               style={{
                 height: 48,
@@ -148,7 +148,7 @@ export default function TopicDetail({ slug }: { slug: string }) {
               {copy.practice.startCta}
             </Link>
             <Link
-              href={`/vocabulaire/${encodeURIComponent(slug)}/test`}
+              href={`/la-bibliotheque/${encodeURIComponent(slug)}/test`}
               className="ed-btn-press inline-flex items-center justify-center"
               style={{
                 height: 48,

@@ -233,7 +233,7 @@ export default function ProgressDashboardDesktop() {
                   cta={
                     data.today
                       ? {
-                          href: '/ecole',
+                          href: '/la-methode',
                           label: copy.todayCta,
                         }
                       : null

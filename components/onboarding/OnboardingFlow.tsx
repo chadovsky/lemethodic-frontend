@@ -168,7 +168,7 @@ export default function OnboardingFlow() {
   useVerifyAuth()
   useEffect(() => {
     if (hydrated && token && verified && user?.targetLevel) {
-      router.replace('/ecole')
+      router.replace('/la-methode')
     }
   }, [hydrated, token, verified, user, router])
   const awaitingAuthRedirect =
@@ -310,15 +310,15 @@ export default function OnboardingFlow() {
       const enrichedUser = await api.users.getMe()
       auth.setAuth(auth.token, enrichedUser)
       useOnboardingStore.getState().reset()
-      router.push('/ecole/intro')
+      router.push('/la-methode/intro')
     } catch (flushErr) {
       if (isEmailNotVerifiedError(flushErr)) {
         router.push('/verify-email')
         return
       }
       // eslint-disable-next-line no-console
-      console.error('Onboarding flush from reveal failed — routing to /ecole anyway', flushErr)
-      router.push('/ecole')
+      console.error('Onboarding flush from reveal failed — routing to /la-methode anyway', flushErr)
+      router.push('/la-methode')
     }
   }
 
@@ -346,7 +346,7 @@ export default function OnboardingFlow() {
       auth.setAuth(auth.token, enrichedUser)
       useOnboardingStore.getState().reset()
       if (response.path_slug === 'b1_to_b2' && response.waitlist) {
-        router.push('/ecole')
+        router.push('/la-methode')
         return
       }
       setWaitlistOutcome(

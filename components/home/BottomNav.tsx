@@ -62,7 +62,7 @@ export default function BottomNav() {
           // treat /ecole/lesson/* as also "home" active
           const isActive =
             href === '/'
-              ? pathname === '/' || pathname.startsWith('/ecole')
+              ? pathname === '/' || pathname.startsWith('/la-methode')
               : pathname === href || pathname.startsWith(href + '/')
 
           return (

@@ -8,7 +8,7 @@ const ROWS = [
     chipColor: 'var(--fp-sky)',
     suggestion:
       'Renforcer les structures syntaxiques pour fluidifier vos réponses spontanées.',
-    cta: { label: 'Renforcer Les Moules', href: '/ecole' },
+    cta: { label: 'Renforcer Les Moules', href: '/la-methode' },
   },
   {
     layer: 'Le Fond',
@@ -16,7 +16,7 @@ const ROWS = [
     chipColor: 'var(--fp-sage)',
     suggestion:
       'Étoffer votre réservoir lexical sur les thèmes de la vie courante.',
-    cta: { label: 'Étoffer Le Fond', href: '/vocabulaire' },
+    cta: { label: 'Étoffer Le Fond', href: '/la-bibliotheque' },
   },
   {
     layer: 'La Voix',
@@ -24,7 +24,7 @@ const ROWS = [
     chipColor: 'var(--fp-butter)',
     suggestion:
       "Travailler l'intonation et le débit sur les tâches orales courtes.",
-    cta: { label: 'Travailler La Voix', href: '/diagnostic/tache/1' },
+    cta: { label: 'Travailler La Voix', href: '/l-examen/tache/1' },
   },
 ]
 

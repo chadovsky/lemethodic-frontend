@@ -57,11 +57,11 @@ describe('DiagnosticLanding', () => {
     }
   })
 
-  it('renders the primary CTA "Commencer le diagnostic" linking to /diagnostic/tache/1', () => {
+  it('renders the primary CTA "Commencer le diagnostic" linking to /l-examen/tache/1', () => {
     render(<DiagnosticLanding taches={TACHES} />)
     const cta = screen.getByTestId('diagnostic-cta-start')
     expect(cta).toHaveTextContent(/commencer le diagnostic/i)
-    expect(cta).toHaveAttribute('href', '/diagnostic/tache/1')
+    expect(cta).toHaveAttribute('href', '/l-examen/tache/1')
   })
 
   it('renders the past-score panel with placeholder C1 and "Voir les résultats" link', () => {
@@ -71,7 +71,7 @@ describe('DiagnosticLanding', () => {
     expect(within(panel).getByText('C1')).toBeInTheDocument()
     expect(within(panel).getByText(/il y a 7 jours/i)).toBeInTheDocument()
     const link = screen.getByTestId('diagnostic-past-score-link')
-    expect(link).toHaveAttribute('href', '/diagnostic/results')
+    expect(link).toHaveAttribute('href', '/l-examen/results')
     expect(link).toHaveTextContent(/voir les résultats/i)
   })
 

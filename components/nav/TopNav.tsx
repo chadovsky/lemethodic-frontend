@@ -79,10 +79,10 @@ const COPY = {
 } as const
 
 const NAV_LINKS = [
-  { key: 'ecole' as const, href: '/ecole', match: ['/ecole', '/cluster', '/learn'] },
+  { key: 'ecole' as const, href: '/la-methode', match: ['/la-methode', '/cluster', '/learn'] },
   { key: 'speaking' as const, href: '/speaking', match: ['/speaking'] },
   { key: 'writing' as const, href: '/writing', match: ['/writing'] },
-  { key: 'progress' as const, href: '/progress', match: ['/progress', '/diagnostic'] },
+  { key: 'progress' as const, href: '/progress', match: ['/progress', '/l-examen'] },
 ] as const
 
 function isLinkActive(href: string, match: readonly string[], pathname: string): boolean {
@@ -184,7 +184,7 @@ export default function TopNav() {
       >
         {/* LEFT — wordmark */}
         <Link
-          href="/ecole"
+          href="/la-methode"
           style={{
             fontFamily: SERIF,
             fontStyle: 'italic',

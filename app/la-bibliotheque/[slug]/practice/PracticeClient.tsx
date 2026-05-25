@@ -148,7 +148,7 @@ export default function PracticeClient({ slug }: { slug: string }) {
     >
       <div className="mx-auto max-w-2xl px-5 md:px-8 py-10 md:py-14 lg:py-16">
         <Link
-          href={`/vocabulaire/${encodeURIComponent(slug)}`}
+          href={`/la-bibliotheque/${encodeURIComponent(slug)}`}
           className="ed-btn-press inline-flex items-center gap-1.5 mb-6"
           style={{
             fontFamily: 'var(--font-switzer), -apple-system, system-ui, sans-serif',
@@ -670,7 +670,7 @@ function SessionEndCard({
           {copy.practice.practiceAgain}
         </button>
         <Link
-          href={`/vocabulaire/${encodeURIComponent(slug)}`}
+          href={`/la-bibliotheque/${encodeURIComponent(slug)}`}
           className="ed-btn-press"
           style={{
             height: 44,
@@ -690,7 +690,7 @@ function SessionEndCard({
           {copy.practice.backToTopic}
         </Link>
         <Link
-          href="/vocabulaire"
+          href="/la-bibliotheque"
           className="ed-btn-press"
           style={{
             height: 44,

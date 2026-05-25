@@ -44,11 +44,11 @@ describe('Sidebar', () => {
     expect(links[0]).toHaveTextContent('Tableau de bord')
     expect(links[0]).toHaveAttribute('href', '/dashboard')
     expect(links[1]).toHaveTextContent('La Méthode')
-    expect(links[1]).toHaveAttribute('href', '/ecole')
+    expect(links[1]).toHaveAttribute('href', '/la-methode')
     expect(links[2]).toHaveTextContent('La Bibliothèque')
-    expect(links[2]).toHaveAttribute('href', '/vocabulaire')
+    expect(links[2]).toHaveAttribute('href', '/la-bibliotheque')
     expect(links[3]).toHaveTextContent("L'Examen")
-    expect(links[3]).toHaveAttribute('href', '/diagnostic')
+    expect(links[3]).toHaveAttribute('href', '/l-examen')
     expect(links[4]).toHaveTextContent('Compte')
     expect(links[4]).toHaveAttribute('href', '/account')
   })
@@ -65,10 +65,10 @@ describe('Sidebar', () => {
     expect(account).not.toHaveAttribute('aria-current')
   })
 
-  it('marks /ecole link active when pathname is a nested ecole route', () => {
-    mockUsePathname.mockReturnValue('/ecole/lesson/3')
+  it('marks /la-methode link active when pathname is a nested la-methode route', () => {
+    mockUsePathname.mockReturnValue('/la-methode/lesson/3')
     render(<Sidebar drawerOpen={false} />)
-    expect(screen.getByTestId('sidebar-link-ecole')).toHaveAttribute('data-active', 'true')
+    expect(screen.getByTestId('sidebar-link-la-methode')).toHaveAttribute('data-active', 'true')
     expect(screen.getByTestId('sidebar-link-dashboard')).toHaveAttribute('data-active', 'false')
   })
 

@@ -435,7 +435,7 @@ export default function HomeScreen({
                   ]}
                   illustrationSrc="/illustration-level.jpg"
                   illustrationAlt="Lesson illustration"
-                  href={`/ecole/lesson/${nextLesson.lessonNumber}`}
+                  href={`/la-methode/lesson/${nextLesson.lessonNumber}`}
                 />
               ) : lessons === null && !fetchError ? (
                 <div
@@ -660,7 +660,7 @@ function LessonListEmpty({ hasExamDate }: { hasExamDate: boolean }) {
     ? 'The diagnostic takes a few minutes and unlocks the lesson sequence calibrated to your level.'
     : "Tell us when you sit the TCF and we'll calibrate the 27-lesson sequence to your timeline."
   const ctaLabel = hasExamDate ? 'Start diagnostic' : 'Set exam date'
-  const ctaHref = hasExamDate ? '/diagnostic' : '/profile'
+  const ctaHref = hasExamDate ? '/l-examen' : '/profile'
   return (
     <div
       style={{

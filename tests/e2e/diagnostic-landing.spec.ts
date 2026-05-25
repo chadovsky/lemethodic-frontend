@@ -12,7 +12,7 @@ test.describe('Le Diagnostic landing â€” desktop (1280Ã—800)', () => {
   test('renders header, sections, 3 tÃ¢che cards, 5-couche preview, CTA inside (app) shell', async ({
     page,
   }) => {
-    await page.goto('/diagnostic')
+    await page.goto('/l-examen')
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
     await expect(page.getByRole('heading', { level: 1, name: /l'examen/i })).toBeVisible()
     await expect(
@@ -27,29 +27,29 @@ test.describe('Le Diagnostic landing â€” desktop (1280Ã—800)', () => {
   })
 
   test('shows Le Diagnostic as active in the sidebar', async ({ page }) => {
-    await page.goto('/diagnostic')
-    await expect(page.getByTestId('sidebar-link-diagnostic')).toHaveAttribute(
+    await page.goto('/l-examen')
+    await expect(page.getByTestId('sidebar-link-l-examen')).toHaveAttribute(
       'aria-current',
       'page',
     )
   })
 
-  test('primary CTA navigates to /diagnostic/tache/1', async ({ page }) => {
-    await page.goto('/diagnostic')
+  test('primary CTA navigates to /l-examen/tache/1', async ({ page }) => {
+    await page.goto('/l-examen')
     const cta = page.getByTestId('diagnostic-cta-start')
-    await expect(cta).toHaveAttribute('href', '/diagnostic/tache/1')
+    await expect(cta).toHaveAttribute('href', '/l-examen/tache/1')
     await cta.click()
-    await expect(page).toHaveURL(/\/diagnostic\/tache\/1$/)
+    await expect(page).toHaveURL(/\/l-examen\/tache\/1$/)
   })
 
-  test('past-score link navigates to /diagnostic/results', async ({ page }) => {
-    await page.goto('/diagnostic')
+  test('past-score link navigates to /l-examen/results', async ({ page }) => {
+    await page.goto('/l-examen')
     const link = page.getByTestId('diagnostic-past-score-link')
-    await expect(link).toHaveAttribute('href', '/diagnostic/results')
+    await expect(link).toHaveAttribute('href', '/l-examen/results')
   })
 
   test('3 tÃ¢che cards render side-by-side at desktop width', async ({ page }) => {
-    await page.goto('/diagnostic')
+    await page.goto('/l-examen')
     const cards = page.getByTestId('tache-card')
     await expect(cards).toHaveCount(3)
     const boxes = await Promise.all(
@@ -63,21 +63,21 @@ test.describe('Le Diagnostic landing â€” desktop (1280Ã—800)', () => {
   })
 
   test('does not include any <audio> element', async ({ page }) => {
-    await page.goto('/diagnostic')
+    await page.goto('/l-examen')
     const audioCount = await page.locator('audio').count()
     expect(audioCount).toBe(0)
   })
 
   // MOCK-010 â€” dismiss button and tÃ¢che accent bars
   test('clicking the Ã— dismiss button removes the past-score panel', async ({ page }) => {
-    await page.goto('/diagnostic')
+    await page.goto('/l-examen')
     await expect(page.getByTestId('diagnostic-past-score')).toBeVisible()
     await page.getByTestId('past-score-dismiss').click()
     await expect(page.getByTestId('diagnostic-past-score')).not.toBeAttached()
   })
 
   test('tÃ¢che cards each have an accent bar element', async ({ page }) => {
-    await page.goto('/diagnostic')
+    await page.goto('/l-examen')
     const cards = page.getByTestId('tache-card')
     await expect(cards).toHaveCount(3)
     for (let i = 0; i < 3; i++) {
@@ -90,7 +90,7 @@ test.describe('Le Diagnostic landing â€” mobile (375Ã—667)', () => {
   test.use({ viewport: { width: 375, height: 667 } })
 
   test('3 tÃ¢che cards stack vertically on mobile', async ({ page }) => {
-    await page.goto('/diagnostic')
+    await page.goto('/l-examen')
     const cards = page.getByTestId('tache-card')
     await expect(cards).toHaveCount(3)
     const boxes = await Promise.all(
@@ -101,15 +101,15 @@ test.describe('Le Diagnostic landing â€” mobile (375Ã—667)', () => {
     expect(boxes[2].y).toBeGreaterThan(boxes[1].y + boxes[1].height - 2)
   })
 
-  test('no horizontal overflow on /diagnostic', async ({ page }) => {
-    await page.goto('/diagnostic')
+  test('no horizontal overflow on /l-examen', async ({ page }) => {
+    await page.goto('/l-examen')
     const scrollWidth = await page.evaluate(() => document.body.scrollWidth)
     const clientWidth = await page.evaluate(() => document.body.clientWidth)
     expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1)
   })
 
   test('primary CTA remains visible on mobile', async ({ page }) => {
-    await page.goto('/diagnostic')
+    await page.goto('/l-examen')
     await expect(page.getByTestId('diagnostic-cta-start')).toBeVisible()
   })
 })

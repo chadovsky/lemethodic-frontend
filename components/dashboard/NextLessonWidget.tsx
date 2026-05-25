@@ -46,7 +46,7 @@ export default function NextLessonWidget() {
       </p>
 
       <Link
-        href={`/ecole/${NEXT_LESSON.id}`}
+        href={`/la-methode/${NEXT_LESSON.id}`}
         className="ed-btn-press"
         style={{
           alignSelf: 'flex-start',

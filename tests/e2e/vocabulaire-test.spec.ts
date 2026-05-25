@@ -12,7 +12,7 @@ test.describe('Le Vocabulaire test â€” desktop (1280Ã—800)', () => {
   test('renders inside the (app) shell with header, question 1, 4 choices, disabled Submit', async ({
     page,
   }) => {
-    await page.goto('/vocabulaire/test')
+    await page.goto('/la-bibliotheque/test')
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
     await expect(page.getByRole('heading', { level: 1, name: /^test$/i })).toBeVisible()
     await expect(
@@ -25,9 +25,9 @@ test.describe('Le Vocabulaire test â€” desktop (1280Ã—800)', () => {
     await expect(page.getByTestId('quiz-submit')).toBeDisabled()
   })
 
-  test('shows Le Vocabulaire as active in the sidebar from /vocabulaire/test', async ({ page }) => {
-    await page.goto('/vocabulaire/test')
-    await expect(page.getByTestId('sidebar-link-vocabulaire')).toHaveAttribute(
+  test('shows La Bibliothèque as active in the sidebar from /la-bibliotheque/test', async ({ page }) => {
+    await page.goto('/la-bibliotheque/test')
+    await expect(page.getByTestId('sidebar-link-la-bibliotheque')).toHaveAttribute(
       'aria-current',
       'page',
     )
@@ -36,7 +36,7 @@ test.describe('Le Vocabulaire test â€” desktop (1280Ã—800)', () => {
   test('selecting a choice enables Submit; clicking Submit reveals feedback and Question suivante', async ({
     page,
   }) => {
-    await page.goto('/vocabulaire/test')
+    await page.goto('/la-bibliotheque/test')
     await page.getByTestId('quiz-choice-0').click()
     await expect(page.getByTestId('quiz-submit')).toBeEnabled()
     await page.getByTestId('quiz-submit').click()
@@ -49,7 +49,7 @@ test.describe('Le Vocabulaire test â€” desktop (1280Ã—800)', () => {
   test('navigating through all 10 questions reaches the results panel; Recommencer returns to Q1', async ({
     page,
   }) => {
-    await page.goto('/vocabulaire/test')
+    await page.goto('/la-bibliotheque/test')
     for (let i = 0; i < 10; i++) {
       await expect(page.getByTestId('quiz-progress')).toHaveText(
         new RegExp(`question ${i + 1} sur 10`, 'i'),
@@ -64,7 +64,7 @@ test.describe('Le Vocabulaire test â€” desktop (1280Ã—800)', () => {
     await expect(page.getByTestId('quiz-results-restart')).toBeVisible()
     await expect(page.getByTestId('quiz-results-back-to-list')).toHaveAttribute(
       'href',
-      '/vocabulaire',
+      '/la-bibliotheque',
     )
 
     await page.getByTestId('quiz-results-restart').click()
@@ -72,29 +72,29 @@ test.describe('Le Vocabulaire test â€” desktop (1280Ã—800)', () => {
     await expect(page.getByTestId('quiz-submit')).toBeDisabled()
   })
 
-  test('clicking "Tester" CTA from /vocabulaire lands on /vocabulaire/test', async ({ page }) => {
-    await page.goto('/vocabulaire')
+  test('clicking "Tester" CTA from /la-bibliotheque lands on /la-bibliotheque/test', async ({ page }) => {
+    await page.goto('/la-bibliotheque')
     await page.getByTestId('vocab-cta-test').click()
-    await expect(page).toHaveURL(/\/vocabulaire\/test$/)
+    await expect(page).toHaveURL(/\/la-bibliotheque\/test$/)
     await expect(page.getByTestId('quiz-question')).toBeVisible()
   })
 
-  test('back-to-list link from header navigates to /vocabulaire', async ({ page }) => {
-    await page.goto('/vocabulaire/test')
+  test('back-to-list link from header navigates to /la-bibliotheque', async ({ page }) => {
+    await page.goto('/la-bibliotheque/test')
     await page.getByTestId('quiz-back-to-list').click()
-    await expect(page).toHaveURL(/\/vocabulaire$/)
+    await expect(page).toHaveURL(/\/la-bibliotheque$/)
   })
 
   // MOCK-009 â€” delayed quiz-next, feedback border classes, flavor copy
   test('Question suivante appears after Submit (Playwright auto-waits)', async ({ page }) => {
-    await page.goto('/vocabulaire/test')
+    await page.goto('/la-bibliotheque/test')
     await page.getByTestId('quiz-choice-0').click()
     await page.getByTestId('quiz-submit').click()
     await expect(page.getByTestId('quiz-next')).toBeVisible()
   })
 
   test('correct choice has class quiz-choice-correct after Submit', async ({ page }) => {
-    await page.goto('/vocabulaire/test')
+    await page.goto('/la-bibliotheque/test')
     await page.getByTestId('quiz-choice-0').click()
     await page.getByTestId('quiz-submit').click()
     // Find whichever choice is correct
@@ -103,7 +103,7 @@ test.describe('Le Vocabulaire test â€” desktop (1280Ã—800)', () => {
   })
 
   test('quiz results show flavor copy text', async ({ page }) => {
-    await page.goto('/vocabulaire/test')
+    await page.goto('/la-bibliotheque/test')
     for (let i = 0; i < 10; i++) {
       await page.getByTestId('quiz-choice-0').click()
       await page.getByTestId('quiz-submit').click()
@@ -117,7 +117,7 @@ test.describe('Le Vocabulaire test â€” mobile (375Ã—667)', () => {
   test.use({ viewport: { width: 375, height: 667 } })
 
   test('renders the quiz single-column without horizontal overflow', async ({ page }) => {
-    await page.goto('/vocabulaire/test')
+    await page.goto('/la-bibliotheque/test')
     await expect(page.getByTestId('quiz-question')).toBeVisible()
     for (let i = 0; i < 4; i++) {
       await expect(page.getByTestId(`quiz-choice-${i}`)).toBeVisible()
@@ -128,7 +128,7 @@ test.describe('Le Vocabulaire test â€” mobile (375Ã—667)', () => {
   })
 
   test('each choice card has a tap target â‰¥ 44Ã—44px on mobile', async ({ page }) => {
-    await page.goto('/vocabulaire/test')
+    await page.goto('/la-bibliotheque/test')
     for (let i = 0; i < 4; i++) {
       const box = await page.getByTestId(`quiz-choice-${i}`).boundingBox()
       expect(box).not.toBeNull()

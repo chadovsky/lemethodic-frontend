@@ -68,7 +68,7 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
 
   return (
     <Link
-      href={`/ecole/${lesson.lessonNumber}`}
+      href={`/la-methode/${lesson.lessonNumber}`}
       data-testid="lesson-card"
       data-lesson-id={lesson.lessonNumber}
       data-lesson-state={vs}

@@ -505,7 +505,7 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
       if (result.recordingId == null) {
         throw new Error('Analysis returned no recording id.')
       }
-      router.push(`/diagnostic?session=${result.recordingId}`)
+      router.push(`/l-examen?session=${result.recordingId}`)
     } catch (err) {
       finalizingRef.current = false
       handleApiError(err, 'Could not finalize the session. Retry?')

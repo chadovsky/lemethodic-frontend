@@ -298,7 +298,7 @@ export default function EcoleIntro() {
         }}
       >
         <Link
-          href="/ecole"
+          href="/la-methode"
           aria-label="La Méthode"
           style={{
             color: ED_FG,
@@ -797,7 +797,7 @@ export default function EcoleIntro() {
           </p>
           <button
             type="button"
-            onClick={() => router.push('/ecole')}
+            onClick={() => router.push('/la-methode')}
             className="ed-btn-press"
             style={{
               fontFamily: SANS,

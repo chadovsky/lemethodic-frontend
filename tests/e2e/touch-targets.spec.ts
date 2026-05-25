@@ -10,12 +10,12 @@ test.beforeEach(async ({ page }) => {
 const ROUTES = [
   '/',
   '/dashboard',
-  '/diagnostic/results',
-  '/diagnostic/tache/1',
-  '/ecole',
-  '/ecole/lesson/1-1',
-  '/vocabulaire',
-  '/vocabulaire/practice',
+  '/l-examen/results',
+  '/l-examen/tache/1',
+  '/la-methode',
+  '/la-methode/lesson/1-1',
+  '/la-bibliotheque',
+  '/la-bibliotheque/practice',
   '/paywall',
 ]
 

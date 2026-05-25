@@ -142,7 +142,7 @@ export default function WaitlistScreen() {
   // submit response, send them to /ecole — they shouldn't see this screen.
   useEffect(() => {
     if (!response || !response.waitlist) {
-      router.replace('/ecole')
+      router.replace('/la-methode')
     }
   }, [response, router])
 

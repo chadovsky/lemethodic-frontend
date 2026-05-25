@@ -95,7 +95,7 @@ export default function Tache3Session({ topicSlug }: Tache3SessionProps) {
           uiLanguage: user?.interfaceLanguage ?? 'en',
           examProfile: user?.examProfile ?? 'tcf_canada',
         })
-        router.push(`/diagnostic?session=${recording.id}`)
+        router.push(`/l-examen?session=${recording.id}`)
       } catch (err) {
         setPhase('error')
         // Three shapes to distinguish:

@@ -69,7 +69,7 @@ test.describe('Le Vocabulaire browse — desktop (1280×800)', () => {
   test('renders page header inside the (app) shell with filter bar and 60 chunks', async ({
     page,
   }) => {
-    await page.goto('/vocabulaire')
+    await page.goto('/la-bibliotheque')
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
     await expect(page.getByRole('heading', { level: 1, name: /la bibliothèque/i })).toBeVisible()
     await expect(page.getByText(/les chunks qui font la différence\./i)).toBeVisible()
@@ -77,21 +77,21 @@ test.describe('Le Vocabulaire browse — desktop (1280×800)', () => {
     await expect(page.getByTestId('chunk-row')).toHaveCount(60)
   })
 
-  test('shows Le Vocabulaire as active in the sidebar', async ({ page }) => {
-    await page.goto('/vocabulaire')
-    await expect(page.getByTestId('sidebar-link-vocabulaire')).toHaveAttribute(
+  test('shows La Bibliothèque as active in the sidebar', async ({ page }) => {
+    await page.goto('/la-bibliotheque')
+    await expect(page.getByTestId('sidebar-link-la-bibliotheque')).toHaveAttribute(
       'aria-current',
       'page',
     )
   })
 
   test('count badge shows "60 chunks"', async ({ page }) => {
-    await page.goto('/vocabulaire')
+    await page.goto('/la-bibliotheque')
     await expect(page.getByTestId('vocab-count-badge')).toContainText('60 chunks')
   })
 
   test('deselecting A1 chip filters out A1 rows', async ({ page }) => {
-    await page.goto('/vocabulaire')
+    await page.goto('/la-bibliotheque')
     await page.getByTestId('cefr-chip-A1').click()
     await expect(page.getByTestId('chunk-row')).toHaveCount(48)
     const rows = await page.getByTestId('chunk-row').all()
@@ -101,7 +101,7 @@ test.describe('Le Vocabulaire browse — desktop (1280×800)', () => {
   })
 
   test('selecting source "Média" filters to Média rows only', async ({ page }) => {
-    await page.goto('/vocabulaire')
+    await page.goto('/la-bibliotheque')
     await page.getByTestId('source-select').selectOption('Média')
     const rows = await page.getByTestId('chunk-row').all()
     expect(rows.length).toBeGreaterThan(0)
@@ -113,7 +113,7 @@ test.describe('Le Vocabulaire browse — desktop (1280×800)', () => {
   test('search "tomber" filters to chunks containing tomber (case-insensitive)', async ({
     page,
   }) => {
-    await page.goto('/vocabulaire')
+    await page.goto('/la-bibliotheque')
     await page.getByTestId('search-input').fill('tomber')
     const rows = page.getByTestId('chunk-row')
     const count = await rows.count()
@@ -125,7 +125,7 @@ test.describe('Le Vocabulaire browse — desktop (1280×800)', () => {
   })
 
   test('empty filter combination shows empty state + reset button', async ({ page }) => {
-    await page.goto('/vocabulaire')
+    await page.goto('/la-bibliotheque')
     await page.getByTestId('cefr-chip-A2').click()
     await page.getByTestId('cefr-chip-B1').click()
     await page.getByTestId('cefr-chip-B2').click()
@@ -140,7 +140,7 @@ test.describe('Le Vocabulaire browse — desktop (1280×800)', () => {
 
   // MOCK-009 — save icon toggle, ed-card-lift on rows
   test('clicking save icon toggles data-saved attribute', async ({ page }) => {
-    await page.goto('/vocabulaire')
+    await page.goto('/la-bibliotheque')
     const saveBtn = page.getByTestId('chunk-row-save').first()
     await expect(saveBtn).toHaveAttribute('data-saved', 'false')
     await saveBtn.click()
@@ -150,7 +150,7 @@ test.describe('Le Vocabulaire browse — desktop (1280×800)', () => {
   })
 
   test('each ChunkRow has ed-card-lift class', async ({ page }) => {
-    await page.goto('/vocabulaire')
+    await page.goto('/la-bibliotheque')
     const firstRow = page.getByTestId('chunk-row').first()
     await expect(firstRow).toHaveClass(/ed-card-lift/)
   })
@@ -160,7 +160,7 @@ test.describe('Le Vocabulaire browse — mobile (375×667)', () => {
   test.use({ viewport: { width: 375, height: 667 } })
 
   test('filter bar collapses behind a "Filtres" button on mobile', async ({ page }) => {
-    await page.goto('/vocabulaire')
+    await page.goto('/la-bibliotheque')
     const filtresButton = page.getByTestId('vocab-mobile-filters-toggle')
     await expect(filtresButton).toBeVisible()
     await expect(page.getByTestId('cefr-chip-A1')).toBeHidden()
@@ -168,15 +168,15 @@ test.describe('Le Vocabulaire browse — mobile (375×667)', () => {
     await expect(page.getByTestId('cefr-chip-A1')).toBeVisible()
   })
 
-  test('no horizontal overflow on /vocabulaire', async ({ page }) => {
-    await page.goto('/vocabulaire')
+  test('no horizontal overflow on /la-bibliotheque', async ({ page }) => {
+    await page.goto('/la-bibliotheque')
     const scrollWidth = await page.evaluate(() => document.body.scrollWidth)
     const clientWidth = await page.evaluate(() => document.body.clientWidth)
     expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1)
   })
 
   test('all 60 chunk rows render on mobile (scrollable)', async ({ page }) => {
-    await page.goto('/vocabulaire')
+    await page.goto('/la-bibliotheque')
     await expect(page.getByTestId('chunk-row')).toHaveCount(60)
   })
 })

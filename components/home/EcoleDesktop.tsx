@@ -323,7 +323,7 @@ export default function EcoleDesktop() {
                   title={hasExamDate ? copy.emptyNoEnrollmentTitle : copy.emptyNoExamTitle}
                   body={hasExamDate ? copy.emptyNoEnrollmentBody : copy.emptyNoExamBody}
                   ctaLabel={hasExamDate ? copy.emptyNoEnrollmentCta : copy.emptyNoExamCta}
-                  ctaHref={hasExamDate ? '/diagnostic' : '/profile'}
+                  ctaHref={hasExamDate ? '/l-examen' : '/profile'}
                 />
               ) : (
                 <>
@@ -380,7 +380,7 @@ export default function EcoleDesktop() {
                       {nextLesson.title}
                     </p>
                     <Link
-                      href={`/ecole/lesson/${nextLesson.lessonNumber}`}
+                      href={`/la-methode/lesson/${nextLesson.lessonNumber}`}
                       className="ed-cta-warm-hover ed-btn-press"
                       style={{
                         display: 'inline-flex',
@@ -599,7 +599,7 @@ function LessonCard({ lesson, copy }: LessonCardProps) {
   )
   if (isLocked) return card
   return (
-    <Link href={`/ecole/lesson/${lesson.lessonNumber}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+    <Link href={`/la-methode/lesson/${lesson.lessonNumber}`} style={{ textDecoration: 'none', color: 'inherit' }}>
       {card}
     </Link>
   )

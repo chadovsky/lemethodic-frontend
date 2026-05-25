@@ -49,20 +49,20 @@ const ROUTES = [
   // protected
   { path: '/dashboard', slug: 'dashboard', type: 'protected' },
   { path: '/account', slug: 'account', type: 'protected' },
-  { path: '/diagnostic', slug: 'diagnostic', type: 'protected' },
-  { path: '/diagnostic/tache/1', slug: 'diagnostic-tache-1', type: 'protected' },
-  { path: '/diagnostic/tache/2', slug: 'diagnostic-tache-2', type: 'protected' },
-  { path: '/diagnostic/tache/3', slug: 'diagnostic-tache-3', type: 'protected' },
-  { path: '/diagnostic/results', slug: 'diagnostic-results', type: 'protected' },
-  { path: '/ecole', slug: 'ecole', type: 'protected', note: 'V-016c' },
-  { path: '/ecole/1', slug: 'ecole-1', type: 'protected' },
-  { path: '/vocabulaire', slug: 'vocabulaire', type: 'protected' },
-  { path: '/vocabulaire/practice', slug: 'vocabulaire-practice', type: 'protected' },
-  { path: '/vocabulaire/test', slug: 'vocabulaire-test', type: 'protected' },
-  { path: '/ecole/intro', slug: 'ecole-intro', type: 'protected' },
-  { path: '/ecole/lesson/1', slug: 'ecole-lesson-1', type: 'protected' },
-  { path: '/ecole/lesson/1/quiz', slug: 'ecole-lesson-1-quiz', type: 'protected' },
-  { path: '/vocabulaire/accord-du-participe', slug: 'vocabulaire-accord', type: 'protected' },
+  { path: '/l-examen', slug: 'l-examen', type: 'protected' },
+  { path: '/l-examen/tache/1', slug: 'l-examen-tache-1', type: 'protected' },
+  { path: '/l-examen/tache/2', slug: 'l-examen-tache-2', type: 'protected' },
+  { path: '/l-examen/tache/3', slug: 'l-examen-tache-3', type: 'protected' },
+  { path: '/l-examen/results', slug: 'l-examen-results', type: 'protected' },
+  { path: '/la-methode', slug: 'la-methode', type: 'protected', note: 'V-016c' },
+  { path: '/la-methode/1', slug: 'la-methode-1', type: 'protected' },
+  { path: '/la-bibliotheque', slug: 'la-bibliotheque', type: 'protected' },
+  { path: '/la-bibliotheque/practice', slug: 'la-bibliotheque-practice', type: 'protected' },
+  { path: '/la-bibliotheque/test', slug: 'la-bibliotheque-test', type: 'protected' },
+  { path: '/la-methode/intro', slug: 'la-methode-intro', type: 'protected' },
+  { path: '/la-methode/lesson/1', slug: 'la-methode-lesson-1', type: 'protected' },
+  { path: '/la-methode/lesson/1/quiz', slug: 'la-methode-lesson-1-quiz', type: 'protected' },
+  { path: '/la-bibliotheque/accord-du-participe', slug: 'la-bibliotheque-accord', type: 'protected' },
   { path: '/cluster/grammaire', slug: 'cluster-grammaire', type: 'protected' },
   { path: '/learn/1', slug: 'learn-1', type: 'protected' },
   { path: '/speaking', slug: 'speaking', type: 'protected' },
@@ -109,20 +109,20 @@ const V2_AUTH_STATES = {
   '/method': 'empty',
   '/dashboard': 'partial',
   '/account': 'empty',
-  '/diagnostic': 'complete',
-  '/diagnostic/tache/1': 'partial',
-  '/diagnostic/tache/2': 'empty',
-  '/diagnostic/tache/3': 'empty',
-  '/diagnostic/results': 'complete',
-  '/ecole': 'partial',
-  '/ecole/1': 'partial',
-  '/vocabulaire': 'partial',
-  '/vocabulaire/practice': 'empty',
-  '/vocabulaire/test': 'empty',
-  '/ecole/intro': 'complete',
-  '/ecole/lesson/1': 'partial',
-  '/ecole/lesson/1/quiz': 'empty',
-  '/vocabulaire/accord-du-participe': 'partial',
+  '/l-examen': 'complete',
+  '/l-examen/tache/1': 'partial',
+  '/l-examen/tache/2': 'empty',
+  '/l-examen/tache/3': 'empty',
+  '/l-examen/results': 'complete',
+  '/la-methode': 'partial',
+  '/la-methode/1': 'partial',
+  '/la-bibliotheque': 'partial',
+  '/la-bibliotheque/practice': 'empty',
+  '/la-bibliotheque/test': 'empty',
+  '/la-methode/intro': 'complete',
+  '/la-methode/lesson/1': 'partial',
+  '/la-methode/lesson/1/quiz': 'empty',
+  '/la-bibliotheque/accord-du-participe': 'partial',
   '/cluster/grammaire': 'partial',
   '/learn/1': 'partial',
   '/speaking': 'partial',
@@ -263,8 +263,8 @@ const STATE_RANK = { complete: 3, partial: 2, empty: 1, placeholder: 0 }
 
 function generateReport(results) {
   const v2WasVerifyGated = new Set([
-    '/ecole', '/ecole/1', '/vocabulaire', '/ecole/lesson/1',
-    '/vocabulaire/accord-du-participe', '/cluster/grammaire', '/learn/1',
+    '/la-methode', '/la-methode/1', '/la-bibliotheque', '/la-methode/lesson/1',
+    '/la-bibliotheque/accord-du-participe', '/cluster/grammaire', '/learn/1',
     '/speaking', '/speaking/tache-2', '/progress', '/onboarding/waitlist',
     '/exam-prep', '/fr/exam-prep', '/paywall',
   ])
@@ -283,13 +283,13 @@ function generateReport(results) {
   )
   const legacyTotal = results.reduce((s, r) => s + r.legacy_hits, 0)
 
-  const ecole = results.find(r => r.path === '/ecole')
+  const ecole = results.find(r => r.path === '/la-methode')
   const v016cVerdict = (() => {
     if (!ecole) return 'inconclusive (route missing)'
     if (ecole.auth_final_url.includes('/verify-email')) return 'inconclusive (verify-email gate still active — auth state may be wrong)'
-    if (ecole.auth_state === 'complete') return 'clean — /ecole renders fully with verified account'
-    if (ecole.auth_state === 'partial') return `broken — /ecole rendered partial (${ecole.auth_body_len} chars) after auth`
-    return `broken — /ecole state: ${ecole.auth_state}, final: ${ecole.auth_final_url}`
+    if (ecole.auth_state === 'complete') return 'clean — /la-methode renders fully with verified account'
+    if (ecole.auth_state === 'partial') return `broken — /la-methode rendered partial (${ecole.auth_body_len} chars) after auth`
+    return `broken — /la-methode state: ${ecole.auth_state}, final: ${ecole.auth_final_url}`
   })()
 
   const tableRows = results.map(r => {
@@ -406,7 +406,7 @@ async function main() {
   console.log(`Flipped:       ${flipped} (gate contamination cleared)`)
   console.log(`Still bad:     ${stillBad} (real M1 work)`)
   console.log(`Legacy hits:   ${legacy}`)
-  const ecole = results.find(r => r.path === '/ecole')
+  const ecole = results.find(r => r.path === '/la-methode')
   console.log(`V-016c:        ${ecole?.auth_state} | ${ecole?.auth_final_url}`)
   console.log(`Output:        ${outputPath}`)
 }

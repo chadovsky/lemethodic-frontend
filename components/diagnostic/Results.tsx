@@ -28,7 +28,7 @@ export default function Results() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 40, paddingTop: 8 }}>
       <Breadcrumb
         items={[
-          { label: "L'Examen", href: '/diagnostic' },
+          { label: "L'Examen", href: '/l-examen' },
           { label: 'Résultats' },
         ]}
       />
@@ -126,7 +126,7 @@ export default function Results() {
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', paddingTop: 8 }}>
         <Link
           data-testid="results-action-recommencer"
-          href="/diagnostic/tache/1"
+          href="/l-examen/tache/1"
           className="ed-btn-press"
           style={{
             fontFamily: SANS_FONT,

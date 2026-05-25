@@ -34,17 +34,17 @@ test.describe('Dashboard — desktop (1280×800)', () => {
     await expect(layers.nth(4)).toContainText('La Musique')
   })
 
-  test('"Prochaine leçon" CTA navigates to /ecole/5', async ({ page }) => {
+  test('"Prochaine leçon" CTA navigates to /la-methode/5', async ({ page }) => {
     await page.goto('/dashboard')
     await page.getByRole('link', { name: /reprendre/i }).click()
-    await expect(page).toHaveURL(/\/ecole\/5$/)
+    await expect(page).toHaveURL(/\/la-methode\/5$/)
   })
 
-  test('"Score Diagnostic" CTA links to /diagnostic', async ({ page }) => {
+  test('"Score Diagnostic" CTA links to /l-examen', async ({ page }) => {
     await page.goto('/dashboard')
     await expect(page.getByRole('link', { name: /voir le détail/i })).toHaveAttribute(
       'href',
-      '/diagnostic',
+      '/l-examen',
     )
   })
 

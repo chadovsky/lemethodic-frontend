@@ -11,7 +11,7 @@
 //
 // Route param `id` is a `lesson_number` (1-27), not a DB id — that's
 // the convention HomeScreen + LessonListItem already use when building
-// `/ecole/lesson/${nextLesson.lessonNumber}`. We fetch the full lesson
+// `/la-methode/lesson/${nextLesson.lessonNumber}`. We fetch the full lesson
 // list and filter client-side; the list is small (27 rows post-F-087)
 // and is already cached on most paths into this page.
 
@@ -213,7 +213,7 @@ export default function LessonDetailClient({ lessonNumber }: Props) {
                   still stub (separate ticket). */}
               <div style={{ marginTop: 40 }}>
                 <Link
-                  href={`/ecole/lesson/${lessonNumber}/quiz`}
+                  href={`/la-methode/lesson/${lessonNumber}/quiz`}
                   style={{
                     display: 'block',
                     width: '100%',

@@ -4,18 +4,18 @@ import { injectAuthToken } from '../helpers/auth-e2e'
 const ROUTES = [
   '/',
   '/dashboard',
-  '/diagnostic/results',
-  '/diagnostic/tache/1',
-  '/ecole',
-  '/ecole/lesson/1-1',
-  '/vocabulaire',
-  '/vocabulaire/practice',
+  '/l-examen/results',
+  '/l-examen/tache/1',
+  '/la-methode',
+  '/la-methode/lesson/1-1',
+  '/la-bibliotheque',
+  '/la-bibliotheque/practice',
   '/paywall',
 ]
 
 // Animated test-ids to check for suppressed animation in reduced-motion mode
 const ANIMATED_TESTIDS: Record<string, string[]> = {
-  '/diagnostic/results': ['results-score-block'],
+  '/l-examen/results': ['results-score-block'],
 }
 
 let rmCtx: BrowserContext
@@ -40,10 +40,10 @@ for (const route of ROUTES) {
   })
 }
 
-test('reduced-motion: results-score-block animation is suppressed on /diagnostic/results', async () => {
+test('reduced-motion: results-score-block animation is suppressed on /l-examen/results', async () => {
   const page = await rmCtx.newPage()
   await injectAuthToken(page)
-  await page.goto('/diagnostic/results')
+  await page.goto('/l-examen/results')
   const scoreBlock = page.getByTestId('results-score-block')
   await expect(scoreBlock).toBeVisible()
   const animName = await scoreBlock.evaluate(
@@ -71,7 +71,7 @@ test('reduced-motion: ed-hero-rise elements have no animation on /', async () =>
 test('reduced-motion: CSS transitions are instant on score block', async () => {
   const page = await rmCtx.newPage()
   await injectAuthToken(page)
-  await page.goto('/diagnostic/results')
+  await page.goto('/l-examen/results')
   const scoreBlock = page.getByTestId('results-score-block')
   await expect(scoreBlock).toBeVisible()
   // Under prefers-reduced-motion, transition-duration should be 0s or very short

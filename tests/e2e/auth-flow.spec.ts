@@ -7,13 +7,13 @@ test.describe('Auth flow — redirect gate', () => {
     await expect(page).toHaveURL('/')
   })
 
-  test('unauthenticated visitor on /ecole is redirected to /', async ({ page }) => {
-    await page.goto('/ecole')
+  test('unauthenticated visitor on /la-methode is redirected to /', async ({ page }) => {
+    await page.goto('/la-methode')
     await expect(page).toHaveURL('/')
   })
 
-  test('unauthenticated visitor on /vocabulaire is redirected to /', async ({ page }) => {
-    await page.goto('/vocabulaire')
+  test('unauthenticated visitor on /la-bibliotheque is redirected to /', async ({ page }) => {
+    await page.goto('/la-bibliotheque')
     await expect(page).toHaveURL('/')
   })
 
@@ -23,9 +23,9 @@ test.describe('Auth flow — redirect gate', () => {
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
   })
 
-  test('authenticated user on /ecole sees the app shell', async ({ page }) => {
+  test('authenticated user on /la-methode sees the app shell', async ({ page }) => {
     await injectAuthToken(page)
-    await page.goto('/ecole')
+    await page.goto('/la-methode')
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
   })
 

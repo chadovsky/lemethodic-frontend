@@ -23,7 +23,7 @@ export default function LessonNav({ currentId }: { currentId: number }) {
       {prevNumber !== null ? (
         <NavLink
           testId="lesson-nav-prev"
-          href={`/ecole/${prevNumber}`}
+          href={`/la-methode/${prevNumber}`}
           direction="prev"
           lessonNumber={prevNumber}
         />
@@ -33,7 +33,7 @@ export default function LessonNav({ currentId }: { currentId: number }) {
       {nextNumber !== null ? (
         <NavLink
           testId="lesson-nav-next"
-          href={`/ecole/${nextNumber}`}
+          href={`/la-methode/${nextNumber}`}
           direction="next"
           lessonNumber={nextNumber}
         />

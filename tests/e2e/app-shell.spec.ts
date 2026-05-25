@@ -21,12 +21,12 @@ test.describe('App shell — desktop (1280×800)', () => {
     await expect(tab).toBeVisible()
   })
 
-  test('navigating dashboard→ecole shifts active state', async ({ page }) => {
+  test('navigating dashboard→la-methode shifts active state', async ({ page }) => {
     await page.goto('/dashboard')
     await expect(page.getByTestId('sidebar-link-dashboard')).toHaveAttribute('aria-current', 'page')
-    await page.getByTestId('sidebar-link-ecole').click()
-    await expect(page).toHaveURL(/\/ecole/)
-    await expect(page.getByTestId('sidebar-link-ecole')).toHaveAttribute('aria-current', 'page')
+    await page.getByTestId('sidebar-link-la-methode').click()
+    await expect(page).toHaveURL(/\/la-methode/)
+    await expect(page.getByTestId('sidebar-link-la-methode')).toHaveAttribute('aria-current', 'page')
     await expect(page.getByTestId('sidebar-link-dashboard')).not.toHaveAttribute('aria-current', /.+/)
   })
 
@@ -34,9 +34,9 @@ test.describe('App shell — desktop (1280×800)', () => {
     await page.goto('/dashboard')
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
     await expect(page.getByTestId('sidebar-link-dashboard')).toBeVisible()
-    await expect(page.getByTestId('sidebar-link-ecole')).toBeVisible()
-    await expect(page.getByTestId('sidebar-link-vocabulaire')).toBeVisible()
-    await expect(page.getByTestId('sidebar-link-diagnostic')).toBeVisible()
+    await expect(page.getByTestId('sidebar-link-la-methode')).toBeVisible()
+    await expect(page.getByTestId('sidebar-link-la-bibliotheque')).toBeVisible()
+    await expect(page.getByTestId('sidebar-link-l-examen')).toBeVisible()
     await expect(page.getByTestId('sidebar-link-account')).toBeVisible()
   })
 
@@ -105,9 +105,9 @@ test.describe('App shell — mobile (375×667)', () => {
     )
     await expect(page.getByTestId('app-shell-backdrop')).toBeVisible()
     await expect(page.getByTestId('sidebar-link-dashboard')).toBeVisible()
-    await expect(page.getByTestId('sidebar-link-ecole')).toBeVisible()
-    await expect(page.getByTestId('sidebar-link-vocabulaire')).toBeVisible()
-    await expect(page.getByTestId('sidebar-link-diagnostic')).toBeVisible()
+    await expect(page.getByTestId('sidebar-link-la-methode')).toBeVisible()
+    await expect(page.getByTestId('sidebar-link-la-bibliotheque')).toBeVisible()
+    await expect(page.getByTestId('sidebar-link-l-examen')).toBeVisible()
     await expect(page.getByTestId('sidebar-link-account')).toBeVisible()
   })
 

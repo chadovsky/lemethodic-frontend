@@ -21,9 +21,9 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' && lesson.lessonNumber < TOTAL_LESSONS) {
-        router.push(`/ecole/${lesson.lessonNumber + 1}`)
+        router.push(`/la-methode/${lesson.lessonNumber + 1}`)
       } else if (e.key === 'ArrowLeft' && lesson.lessonNumber > 1) {
-        router.push(`/ecole/${lesson.lessonNumber - 1}`)
+        router.push(`/la-methode/${lesson.lessonNumber - 1}`)
       }
     }
     window.addEventListener('keydown', handler)
@@ -35,7 +35,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
       <Breadcrumb
         testId="lesson-breadcrumb"
         items={[
-          { label: "L'École", href: '/ecole' },
+          { label: "La Méthode", href: '/la-methode' },
           { label: `Leçon ${lesson.lessonNumber} : ${lesson.title}` },
         ]}
       />

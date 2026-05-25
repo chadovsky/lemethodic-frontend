@@ -147,7 +147,7 @@ export default function Paywall() {
   useVerifyAuth()
   useEffect(() => {
     if (hydrated && token && verified) {
-      router.replace('/ecole')
+      router.replace('/la-methode')
     }
   }, [hydrated, token, verified, router])
   // Any token at all (verified or not) means the redirect effect above will
