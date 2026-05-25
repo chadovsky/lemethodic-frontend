@@ -17,9 +17,16 @@ interface OnboardingState {
   data: OnboardingData
   currentStepIndex: number
   interfaceLanguage: UiLanguage
+  // F-327 — another_exam waitlist-moat fields. specificIntendedExam is
+  // written by ExamPickerQuestion when the user types a free-text exam name.
+  // acceptFallback is set by WaitlistOrProxyConfirmation before submit.
+  specificIntendedExam: string | null
+  acceptFallback: boolean
   setAnswer: (questionId: string, value: OnboardingAnswer) => void
   setStep: (i: number) => void
   setLanguage: (lang: UiLanguage) => void
+  setSpecificIntendedExam: (v: string | null) => void
+  setAcceptFallback: (v: boolean) => void
   reset: () => void
 }
 
@@ -29,12 +36,22 @@ export const useOnboardingStore = create<OnboardingState>()(
       data: {},
       currentStepIndex: 0,
       interfaceLanguage: 'en',
+      specificIntendedExam: null,
+      acceptFallback: false,
       setAnswer: (questionId, value) =>
         set((state) => ({ data: { ...state.data, [questionId]: value } })),
       setStep: (i) => set({ currentStepIndex: Math.max(0, i) }),
       setLanguage: (lang) => set({ interfaceLanguage: lang }),
+      setSpecificIntendedExam: (v) => set({ specificIntendedExam: v }),
+      setAcceptFallback: (v) => set({ acceptFallback: v }),
       reset: () => {
-        set({ data: {}, currentStepIndex: 0, interfaceLanguage: 'en' })
+        set({
+          data: {},
+          currentStepIndex: 0,
+          interfaceLanguage: 'en',
+          specificIntendedExam: null,
+          acceptFallback: false,
+        })
         // Persist middleware would rewrite the key with the cleared state;
         // drop the localStorage entry entirely so a reset leaves no trace.
         if (typeof window !== 'undefined') {

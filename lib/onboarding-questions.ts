@@ -45,7 +45,12 @@ export interface OnboardingQuestionsResponse {
 // q3 is split: q3_exam_date is the date or null, q3_no_exam_scheduled is the
 // boolean toggle (default false). interface_language was added in BE follow-up
 // to P-220 — optional, en/fr only.
+// F-327 adds q0_target_exam + q0_specific_intended_exam + q0_accept_fallback
+// for the another_exam waitlist-moat / proxy-continuation flow.
 export interface OnboardingSubmitRequest {
+  q0_target_exam?: string | null
+  q0_specific_intended_exam?: string | null
+  q0_accept_fallback?: boolean
   q1_current_level: 'a2' | 'b1' | 'b2' | 'c1' | 'not_sure'
   q2_target_level: 'b1' | 'b2' | 'c1' | 'c2' | 'not_sure'
   q3_exam_date?: string | null

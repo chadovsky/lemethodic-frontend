@@ -834,6 +834,10 @@ export function mapStoreToSubmitPayload(
   const noExamScheduled = q3Value === null
 
   return {
+    // F-327 — q0 fields. q0_target_exam is read from the store (set by
+    // ExamPickerQuestion). q0_specific_intended_exam and q0_accept_fallback
+    // are injected by the caller (OnboardingFlow) from separate store slices.
+    q0_target_exam: asNullableString(get('q0_target_exam')),
     q1_current_level: asString(get('q1_current_level')) as
       OnboardingSubmitRequest['q1_current_level'],
     q2_target_level: asString(get('q2_target_level')) as
