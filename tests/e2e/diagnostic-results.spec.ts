@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 
-test.describe('Le Diagnostic results â€” desktop (1280Ã—800)', () => {
+test.describe('Le Diagnostic results — desktop (1280×800)', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
   test('renders all sections inside the (app) shell', async ({ page }) => {
@@ -14,7 +14,7 @@ test.describe('Le Diagnostic results â€” desktop (1280Ã—800)', () => {
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
     await expect(page.getByTestId('breadcrumb')).toBeVisible()
     await expect(page.getByTestId('results-score')).toContainText('C1')
-    await expect(page.getByText(/niveau estimÃ© tcf canada/i)).toBeVisible()
+    await expect(page.getByText(/niveau estimé tcf canada/i)).toBeVisible()
     await expect(page.getByTestId('results-section-couches')).toBeVisible()
     await expect(page.getByTestId('results-section-taches')).toBeVisible()
     await expect(page.getByTestId('results-section-recommendations')).toBeVisible()
@@ -35,7 +35,7 @@ test.describe('Le Diagnostic results â€” desktop (1280Ã—800)', () => {
     await expect(page.getByTestId('couche-row')).toHaveCount(5)
   })
 
-  test('"Relire l\'Ã©noncÃ©" for TÃ¢che 2 links to /l-examen/tache/2', async ({
+  test('"Relire l\'énoncé" for Tâche 2 links to /l-examen/tache/2', async ({
     page,
   }) => {
     await page.goto('/l-examen/results')
@@ -109,7 +109,7 @@ test.describe('Le Diagnostic results â€” desktop (1280Ã—800)', () => {
   })
 })
 
-test.describe('Le Diagnostic results â€” mobile (375Ã—667)', () => {
+test.describe('Le Diagnostic results — mobile (375×667)', () => {
   test.use({ viewport: { width: 375, height: 667 } })
 
   test('no horizontal overflow', async ({ page }) => {

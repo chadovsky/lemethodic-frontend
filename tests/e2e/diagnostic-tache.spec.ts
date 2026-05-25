@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 
-test.describe('Le Diagnostic tÃ¢che shell â€” desktop (1280Ã—800)', () => {
+test.describe('Le Diagnostic tâche shell — desktop (1280×800)', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
   test('renders all elements on /l-examen/tache/1', async ({ page }) => {
@@ -22,7 +22,7 @@ test.describe('Le Diagnostic tÃ¢che shell â€” desktop (1280Ã—800)', ()
     await expect(page.getByTestId('tache-nav-prev')).toBeHidden()
   })
 
-  test('sidebar shows Le Diagnostic as active on tÃ¢che route', async ({ page }) => {
+  test('sidebar shows Le Diagnostic as active on tâche route', async ({ page }) => {
     await page.goto('/l-examen/tache/1')
     await expect(page.getByTestId('sidebar-link-l-examen')).toHaveAttribute(
       'aria-current',
@@ -30,29 +30,29 @@ test.describe('Le Diagnostic tÃ¢che shell â€” desktop (1280Ã—800)', ()
     )
   })
 
-  test('timer initialises to 03:30 on tÃ¢che 2', async ({ page }) => {
+  test('timer initialises to 03:30 on tâche 2', async ({ page }) => {
     await page.goto('/l-examen/tache/2')
     await expect(page.getByTestId('timer-display')).toContainText('03:30')
   })
 
-  test('timer initialises to 05:00 on tÃ¢che 3', async ({ page }) => {
+  test('timer initialises to 05:00 on tâche 3', async ({ page }) => {
     await page.goto('/l-examen/tache/3')
     await expect(page.getByTestId('timer-display')).toContainText('05:00')
   })
 
-  test('"TÃ¢che suivante" link navigates to /l-examen/tache/2', async ({ page }) => {
+  test('"Tâche suivante" link navigates to /l-examen/tache/2', async ({ page }) => {
     await page.goto('/l-examen/tache/1')
     await page.getByTestId('tache-nav-next').click()
     await expect(page).toHaveURL(/\/l-examen\/tache\/2$/)
   })
 
-  test('tÃ¢che 3 shows "Voir les rÃ©sultats" linking to /l-examen/results', async ({
+  test('tâche 3 shows "Voir les résultats" linking to /l-examen/results', async ({
     page,
   }) => {
     await page.goto('/l-examen/tache/3')
     const link = page.getByTestId('tache-nav-results')
     await expect(link).toHaveAttribute('href', '/l-examen/results')
-    await expect(link).toContainText(/voir les rÃ©sultats/i)
+    await expect(link).toContainText(/voir les résultats/i)
     await expect(page.getByTestId('tache-nav-next')).toBeHidden()
   })
 
@@ -61,21 +61,21 @@ test.describe('Le Diagnostic tÃ¢che shell â€” desktop (1280Ã—800)', ()
     expect(response?.status()).toBe(404)
   })
 
-  test('mic button cycles: Idle â†’ Recording â†’ Stopped', async ({ page }) => {
+  test('mic button cycles: Idle → Recording → Stopped', async ({ page }) => {
     await page.goto('/l-examen/tache/1')
     // Idle state
     await expect(page.getByTestId('recording-status')).toContainText(
       /cliquez pour commencer/i,
     )
-    // â†’ Recording
+    // → Recording
     await page.getByTestId('recording-mic-btn').click()
     await expect(page.getByTestId('recording-status')).toContainText(
       /enregistrement en cours/i,
     )
-    // â†’ Stopped
+    // → Stopped
     await page.getByTestId('recording-mic-btn').click()
     await expect(page.getByTestId('recording-status')).toContainText(
-      /enregistrement terminÃ©/i,
+      /enregistrement terminé/i,
     )
     await expect(page.getByTestId('recording-recommencer')).toBeVisible()
   })
@@ -85,12 +85,12 @@ test.describe('Le Diagnostic tÃ¢che shell â€” desktop (1280Ã—800)', ()
     expect(await page.locator('audio').count()).toBe(0)
   })
 
-  // MOCK-010 â€” timer urgency, ripple rings, reduced-motion
+  // MOCK-010 — timer urgency, ripple rings, reduced-motion
   test('timer display gets urgency class when running and < 60s remaining', async ({ page }) => {
     await page.clock.install()
     await page.goto('/l-examen/tache/1') // 180s timer
     await page.getByTestId('timer-toggle').click()
-    await page.clock.fastForward(121_000) // â†’ 59s remaining
+    await page.clock.fastForward(121_000) // → 59s remaining
     await expect(page.getByTestId('timer-display')).toHaveClass(/timer-urgency/)
   })
 
@@ -110,10 +110,10 @@ test.describe('Le Diagnostic tÃ¢che shell â€” desktop (1280Ã—800)', ()
   })
 })
 
-test.describe('Le Diagnostic tÃ¢che shell â€” mobile (375Ã—667)', () => {
+test.describe('Le Diagnostic tâche shell — mobile (375×667)', () => {
   test.use({ viewport: { width: 375, height: 667 } })
 
-  test('mic button has at least 88Ã—88px tap target on mobile', async ({ page }) => {
+  test('mic button has at least 88×88px tap target on mobile', async ({ page }) => {
     await page.goto('/l-examen/tache/1')
     const box = await page.getByTestId('recording-mic-btn').boundingBox()
     expect(box).not.toBeNull()
@@ -121,7 +121,7 @@ test.describe('Le Diagnostic tÃ¢che shell â€” mobile (375Ã—667)', () =
     expect(box!.height).toBeGreaterThanOrEqual(88)
   })
 
-  test('no horizontal overflow on tÃ¢che route', async ({ page }) => {
+  test('no horizontal overflow on tâche route', async ({ page }) => {
     await page.goto('/l-examen/tache/1')
     const scrollWidth = await page.evaluate(() => document.body.scrollWidth)
     const clientWidth = await page.evaluate(() => document.body.clientWidth)

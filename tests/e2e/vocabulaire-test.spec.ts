@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 
-test.describe('Le Vocabulaire test â€” desktop (1280Ã—800)', () => {
+test.describe('Le Vocabulaire test — desktop (1280×800)', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
   test('renders inside the (app) shell with header, question 1, 4 choices, disabled Submit', async ({
@@ -16,7 +16,7 @@ test.describe('Le Vocabulaire test â€” desktop (1280Ã—800)', () => {
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
     await expect(page.getByRole('heading', { level: 1, name: /^test$/i })).toBeVisible()
     await expect(
-      page.getByText(/10 chunks, Ã  vous de retrouver la traduction\./i),
+      page.getByText(/10 chunks, à vous de retrouver la traduction\./i),
     ).toBeVisible()
     await expect(page.getByTestId('quiz-progress')).toHaveText(/question 1 sur 10/i)
     for (let i = 0; i < 4; i++) {
@@ -85,7 +85,7 @@ test.describe('Le Vocabulaire test â€” desktop (1280Ã—800)', () => {
     await expect(page).toHaveURL(/\/la-bibliotheque$/)
   })
 
-  // MOCK-009 â€” delayed quiz-next, feedback border classes, flavor copy
+  // MOCK-009 — delayed quiz-next, feedback border classes, flavor copy
   test('Question suivante appears after Submit (Playwright auto-waits)', async ({ page }) => {
     await page.goto('/la-bibliotheque/test')
     await page.getByTestId('quiz-choice-0').click()
@@ -113,7 +113,7 @@ test.describe('Le Vocabulaire test â€” desktop (1280Ã—800)', () => {
   })
 })
 
-test.describe('Le Vocabulaire test â€” mobile (375Ã—667)', () => {
+test.describe('Le Vocabulaire test — mobile (375×667)', () => {
   test.use({ viewport: { width: 375, height: 667 } })
 
   test('renders the quiz single-column without horizontal overflow', async ({ page }) => {
@@ -127,7 +127,7 @@ test.describe('Le Vocabulaire test â€” mobile (375Ã—667)', () => {
     expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1)
   })
 
-  test('each choice card has a tap target â‰¥ 44Ã—44px on mobile', async ({ page }) => {
+  test('each choice card has a tap target ≥ 44×44px on mobile', async ({ page }) => {
     await page.goto('/la-bibliotheque/test')
     for (let i = 0; i < 4; i++) {
       const box = await page.getByTestId(`quiz-choice-${i}`).boundingBox()
