@@ -524,6 +524,7 @@ F-086 + F-087 + F-088 + F-089 shipped 2026-04-27. The F-086→F-089 rename pack 
 ---
 
 ## P-100 — Real Progress Dashboard (LEGACY SPEC — SUPERSEDED)
+Milestone: DONE
 
 **Status: Superseded by P-230 (LEMETHODIC-CURRICULUM v0.2 §10.4) on 2026-05-01.** Spec block kept below for historical reference only — do not implement against this. P-230 rebuilds /progress per §7.4 with calm/method modes, Block 2 (Goulet Stack), Block 5 (Dialogue Box), Block 8 (Confidence Visualizer).
 
@@ -670,6 +671,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### Foundation (§10.1) — must ship first, in order
 
 ### P-200 — Diagnostic engine: detector implementation
+Milestone: DONE
 
 **Priority:** HIGH (pre-launch blocker)
 **Status:** Shipped 2026-05-02 (BE-side, lemethodic-backend 3-commit set ending `554d824`). FE consumer pending §7 dashboard work.
@@ -680,6 +682,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Owner:** Engineering
 
 ### P-201 — Diagnostic engine: level assignment + confidence
+Milestone: DONE
 
 **Priority:** HIGH
 **Status:** Shipped 2026-05-02 (BE-side, lemethodic-backend 2-commit set ending `0d10d11`). FE consumer pending §7 dashboard work.
@@ -690,6 +693,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Owner:** Engineering
 
 ### P-202 — Cluster data model
+Milestone: DONE
 
 **Priority:** HIGH
 **Status:** Shipped 2026-05-01 (BE-side, lemethodic-backend commit `d5595b3`).
@@ -700,6 +704,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Owner:** Engineering
 
 ### P-203 — Path data model
+Milestone: DONE
 
 **Priority:** HIGH
 **Status:** Shipped 2026-05-01 (BE-side, lemethodic-backend commit `d5595b3`).
@@ -710,6 +715,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Owner:** Engineering
 
 ### P-204 — User progress model
+Milestone: DONE
 
 **Priority:** HIGH
 **Status:** Shipped 2026-05-01 (BE-side, lemethodic-backend commit `d5595b3`).
@@ -722,6 +728,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### Content scaffolding (§10.2)
 
 ### P-210 — B1→B2 path seed data
+Milestone: DONE
 
 **Priority:** HIGH (pre-launch blocker)
 **Status:** Shipped 2026-05-01 (BE-side, lemethodic-backend commit `79cd629`); production seeded same-day via `scripts/seed_b1_b2_path.py`.
@@ -732,6 +739,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Owner:** Engineering
 
 ### P-211 — Cluster content authoring
+Milestone: DONE
 
 **Priority:** HIGH (pre-launch blocker)
 **Status:** Shipped 2026-05-01 (BE-side, lemethodic-backend commit `d862794`); production ingested same-day via `scripts/ingest_b1_b2_cluster_content.py`.
@@ -742,6 +750,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Owner:** Chadi (content authoring, not engineering)
 
 ### P-212 — Starter cluster seed for A2 and B2 paths
+Milestone: DONE
 
 **Priority:** MEDIUM (pre-launch)
 **Status:** Superseded by P-210 + P-211 (shipped 2026-05-01). The 22-cluster B1→B2 path is in production with 13 clusters fully authored and 9 placeholders pending. Nothing in P-212's original scope remains uncovered.
@@ -752,6 +761,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Owner:** Engineering (schema seed); Chadi for the small starter content set
 
 ### P-213 — Dialogue Box template authoring
+Milestone: TBD
 
 **Priority:** MEDIUM (pre-launch)
 **Status:** Queued
@@ -764,6 +774,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 ### Onboarding (§10.3)
 
 ### P-220 — Onboarding questionnaire rebuild
+Milestone: DONE
 
 **Priority:** HIGH
 **Status:** Shipped 2026-05-02 (BE + FE + production verification complete).
@@ -774,6 +785,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Owner:** Engineering
 
 ### P-220.z — Onboarding per-question illustrations and pastels (Phase 1 polish)
+Milestone: polish-defer
 
 **Priority:** —
 **Status:** Closed 2026-05-05 (scope evaporated by F-201). Per-question pastel cycle dropped (clashed with F-200 editorial direction). Per-question illustrations dropped (type-led question screens). EcoleReveal hero asset re-tracked as P-228.
@@ -785,6 +797,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Note:** Closed by F-201 — the editorial direction (F-200) replaced the pastel-cycle approach with uniform `--ed-bg` across all 11 questions, type-led screens with no per-question illustrations. P-228 inherits the EcoleReveal-only asset scope.
 
 ### P-228 — EcoleReveal hero asset (art-directed illustration)
+Milestone: M2
 
 **Priority:** LOW (post-soft-beta; placeholder works)
 **Status:** Queued
@@ -795,6 +808,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Owner:** Chadi (art direction / commission) + Engineering (drop-in swap)
 
 ### F-213 — Page transitions + celebration moments
+Milestone: M2
 
 **Priority:** MEDIUM (soft-beta polish)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured screenshots + interaction trace per F-225 — verify route fade-in across /, /signup, /onboarding, /progress, /ecole, /cluster)
@@ -811,6 +825,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 - Inter-question transition within OnboardingFlow (between q1 and q2 etc.): out of scope — that's a state change, not a route change. Could be F-213.intra if user testing flags abrupt step swaps.
 
 ### F-213.celebration — Milestone + completion celebration moments
+Milestone: M2
 
 **Priority:** MEDIUM (post-soft-beta polish)
 **Status:** Queued
@@ -821,6 +836,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Owner:** Engineering + Chadi (celebration copy + design picks)
 
 ### F-210 — Icon system audit (lucide-react retention + custom marks plan)
+Milestone: M2
 
 **Priority:** MEDIUM (audit + filing)
 **Status:** Shipped 2026-05-04 — non-visual change, audit only. No code changes this turn. Filed P-229 for the custom marks Chadi-authoring task.
@@ -834,6 +850,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 **Cuts:** none — audit complete.
 
 ### P-229 — Custom brand marks (methodology + exam + milestone iconography)
+Milestone: M2
 
 **Priority:** LOW (post-soft-beta polish)
 **Status:** Queued
@@ -848,6 +865,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Chadi (art direction / commission) + Engineering (drop-in swap)
 
 ### F-211 — Loading states overhaul (skeleton shimmer migration)
+Milestone: M2
 
 **Priority:** MEDIUM (soft-beta polish)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured screenshots of /, /progress, /cluster, /ecole loading states per F-225)
@@ -869,6 +887,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 - shadcn `components/ui/skeleton.tsx` legacy primitive: leave as-is (used by other surfaces; per-consumer migration as F-2xx tickets touch them).
 
 ### F-214 — Visual depth + design system extension
+Milestone: M2
 
 **Priority:** MEDIUM (soft-beta polish)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` HowItWorks section flip + landing rhythm verification per F-225)
@@ -887,6 +906,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 - Wire TestimonialCard into a TestimonialSection on landing: filed as F-214.x — needs Chadi-authored quotes from beta cohort.
 
 ### F-212 — Micro-animations + interaction feedback system
+Milestone: M2
 
 **Priority:** HIGH (soft-beta polish — interaction language across the platform)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots + interaction trace per F-225 of /, /fr, /onboarding question screens, signup form interactions, and reduced-motion fallback verification)
@@ -915,6 +935,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 - Form-field per-input `ed-field` class application: deferred — existing :focus-visible global rule from F-200 (commit 14d0691) already gives inputs visible focus rings. F-212.field will swap to ed-accent ring + 18% opacity once a sweep across all 8+ form locations is justified.
 
 ### F-221 — Exam-target picker + brand-layer rewrite (multi-exam launch)
+Milestone: M1
 
 **Priority:** HIGH (launch — multi-exam onboarding gates which path the user enters)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production test BLOCKED on BE shipping `q0_target_exam` to `/onboarding/questions` response + `target_exam` field on User/UserPathEnrollment + accepting `q0_target_exam` in `/onboarding/submit`. Per Chadi 2026-05-05: BE migration in parallel; FE ready-to-fire when BE lands. Verification per F-225 once BE migration is live.)
@@ -939,6 +960,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Note:** picker dormant until BE adds q0_target_exam to questions endpoint. Once BE lands: picker fires as Q1 of questionnaire, "Another exam" routes to email capture, "Not sure" submits as `not_sure` (BE backfills to TCF Canada per Chadi). Existing user backfill (test users id IN 5,6,7) is BE's responsibility.
 
 ### F-203 — Auth flow surfaces editorial migration (signup full + paywall responsive)
+Milestone: M1
 
 **Priority:** HIGH (launch-blocking — auth surfaces are the conversion funnel)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/signup` and `/paywall` per F-225)
@@ -949,6 +971,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### F-203.paywall — Paywall full editorial migration
+Milestone: M1
 
 **Priority:** MEDIUM (post-soft-beta polish — F-203 minimal responsive fix unblocks launch)
 **Status:** Queued
@@ -959,6 +982,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### F-204 — Authenticated dashboard surfaces editorial migration (page chrome only)
+Milestone: M1
 
 **Priority:** HIGH (launch-blocking — desktop white-rails)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/progress` and `/cluster/[slug]` per F-225)
@@ -970,6 +994,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Note:** F-204 deliberately scope-cut to page chrome only because section internals carry data-display chips (status indicators on cluster header, confidence visualizer pips on Snapshot, Tâche+CEFR badges on RecentActivity) where ed-* migration without redesign would lose information. Full migration needs design pass on chip vocabulary.
 
 ### F-204.deep — Section-internal editorial migration on /progress + /cluster
+Milestone: M1
 
 **Priority:** MEDIUM (post-soft-beta polish — F-204 chrome fix unblocks launch)
 **Status:** Queued
@@ -980,6 +1005,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering + design pass on chip palette
 
 ### F-205 — User-state surfaces editorial migration (page chrome only)
+Milestone: M1
 
 **Priority:** HIGH (launch-blocking — desktop white-rails)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/profile` and `/diagnostic` per F-225)
@@ -991,6 +1017,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Note:** /profile's hardcoded mockup data ("Chadi", "chadi@example.com", 47 days) is F-222.x scope — F-205 just restyles chrome. /diagnostic's CouchesDiagnostic + DetectedModuleCard + ordonnance components carry P-088 layout invariants — chrome-only migration avoids breaking those.
 
 ### F-205.deep — Section-internal editorial migration on /profile + /diagnostic
+Milestone: M1
 
 **Priority:** MEDIUM (post-soft-beta polish)
 **Status:** Queued
@@ -1001,6 +1028,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering + design pass
 
 ### F-206 — Recording + module surfaces editorial migration (page chrome only)
+Milestone: M1
 
 **Priority:** HIGH (launch-blocking — desktop white-rails)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of all affected routes per F-225)
@@ -1012,6 +1040,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Note:** /speaking surfaces (SpeakingLanding + 3 Tâche sessions + feedback page) deferred to F-206.speaking — they have heavy interactive UI (PTT button, vu-meter, transcript review sheet, F-061/F-062/F-104 invariants). Editorial migration without invariant audit risks breaking core recording flow. /ecole/lesson/[id] surfaces (LessonDetailClient + quiz) deferred to F-206.lessons.
 
 ### F-206.speaking — /speaking surfaces editorial migration
+Milestone: M1
 
 **Priority:** MEDIUM (post-soft-beta polish)
 **Status:** Queued
@@ -1022,6 +1051,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering + careful audit
 
 ### F-206.lessons — /ecole/lesson/[id] + quiz editorial migration
+Milestone: M1
 
 **Priority:** MEDIUM (post-soft-beta polish)
 **Status:** Queued
@@ -1032,6 +1062,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### F-202 — L'École intro rebuild + methodology surface (post-signup destination)
+Milestone: M1
 
 **Priority:** HIGH (launch-blocking — was the empty pink-key placeholder per Block 3 critique)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/ecole/intro` (all 5 sections) + interaction trace `/signup` → register → `/ecole/intro` → CTA → `/ecole` per F-225)
@@ -1068,6 +1099,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 - Reveal opacity starts at 0 — if reduced-motion users want sections visible immediately, the IntersectionObserver fires on mount-near-viewport, so they see the same end state without animation.
 
 ### F-202.x — "À propos de L'École" header link from /ecole
+Milestone: M1
 
 **Priority:** LOW (post-launch UX polish)
 **Status:** Queued
@@ -1078,6 +1110,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### F-202.split — EcoleIntro sub-component decomposition
+Milestone: M1
 
 **Priority:** LOW (refactor)
 **Status:** Queued
@@ -1088,6 +1121,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### F-201 — Onboarding flow editorial migration (desktop responsive)
+Milestone: M1
 
 **Priority:** HIGH (launch-blocking — onboarding is the conversion funnel)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/onboarding` (multiple steps) + EcoleReveal step + `/onboarding/waitlist` per F-225)
@@ -1107,6 +1141,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 
 
 ### P-221 — Diagnostic flow integration
+Milestone: DONE
 
 **Priority:** HIGH
 **Status:** Shipped 2026-05-02 (BE-side, lemethodic-backend commit `c475bb7`). FE consumer: /ecole banner + /diagnostic/results screen, scope captured separately as follow-up.
@@ -1117,6 +1152,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### P-222 — Waitlist UX for A2 and B2+ paths
+Milestone: DONE
 
 **Priority:** HIGH (pre-launch)
 **Status:** Shipped 2026-05-03 (FE-side, lemethodic-frontend 3-commit set ending `820d788`; production verified at https://lemethodic.com/onboarding/waitlist).
@@ -1127,6 +1163,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### P-222.x — capacity_warning UX surface
+Milestone: TBD
 
 **Priority:** LOW (post-launch)
 **Status:** Queued
@@ -1137,6 +1174,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### P-222.y — EcoleReveal pre-signup waitlist-aware copy
+Milestone: TBD
 
 **Priority:** LOW (post-launch UX polish)
 **Status:** Queued
@@ -1147,6 +1185,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### P-106.x — /paywall waitlist-aware behavior
+Milestone: M6
 
 **Priority:** MEDIUM (Stripe-dependent)
 **Status:** Queued
@@ -1159,6 +1198,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 ### Dashboards (§10.4) — full §7 implementation
 
 ### P-230 — Overall Progress dashboard rebuild
+Milestone: DONE
 
 **Priority:** HIGH
 **Status:** Shipped 2026-05-03 (FE-side, lemethodic-frontend 3-commit set ending in cleanup commit). Calm mode 4 sections (Snapshot / Today's focus / Goulet Stack / Recent activity). Method mode toggle hidden — depends on P-235 + P-236.
@@ -1171,6 +1211,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Note:** v1 ships calm mode only. Method mode toggle deferred until Blocks 1 (Ceiling Marker Map, P-235) and 7 (Mistake Repository, P-236) land. dialogue_box always null in production today (P-240b + P-213 not shipped); FE renders reason_code-driven fallback copy with defensive `dialogue_box.text` rendering for when BE populates the field.
 
 ### P-230.x — Recent activity calendar view
+Milestone: TBD
 
 **Priority:** LOW (post-launch UX polish)
 **Status:** Queued
@@ -1181,6 +1222,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### P-230.consolidate — Goulet Stack + /ecole "Recommended for you" overlap
+Milestone: TBD
 
 **Priority:** LOW (post-launch UX polish)
 **Status:** Queued
@@ -1191,6 +1233,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering + Product
 
 ### P-230.unify — DailyActionCard vs Today's focus duplication
+Milestone: TBD
 
 **Priority:** LOW (post-launch UX polish)
 **Status:** Queued
@@ -1201,6 +1244,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering + Product
 
 ### P-231 — Speaking dashboard
+Milestone: TBD
 
 **Priority:** HIGH
 **Status:** Queued
@@ -1211,6 +1255,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### P-232 — Per-Tâche dashboards
+Milestone: TBD
 
 **Priority:** MEDIUM
 **Status:** Queued
@@ -1221,6 +1266,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### P-233 — Curriculum view (path surface)
+Milestone: TBD
 
 **Priority:** HIGH
 **Status:** Queued
@@ -1231,6 +1277,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### P-234 — Cluster detail view
+Milestone: DONE
 
 **Priority:** HIGH
 **Status:** Shipped 2026-05-03 (FE-side, lemethodic-frontend 3-commit set ending in re-routing commit). v1 ships 3 of 5 §7.8 sections: Cluster header, Lesson body (markdown/PDF), Practice CTA. exercise_set + recording_history are in the BE response but rendered post-launch (P-234.exercises / P-234.history).
@@ -1242,6 +1289,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Note:** v1 ships at /cluster/[slug]. Visual language paper-on-canvas (mirrors B-102 LegalPage), distinct from /learn/[id]'s category-tinted modules. No `locked` UserClusterStatus state — BE confirmed 4-value enum (not_started/in_progress/absorbed/needs_revisit). TodayFocusSection re-routed: cluster_practice actions now go to /cluster/{slug} instead of directly to /speaking/tache-{N} (cluster page's CTA forwards with ?promptCluster URL param).
 
 ### P-234.history — Cluster recording history surface
+Milestone: TBD
 
 **Priority:** LOW (post-launch)
 **Status:** Queued
@@ -1251,6 +1299,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Scope:** GET /api/users/me/clusters/{slug} already returns `recording_history` (last 10 newest-first, RecordingHistoryEntry items with detection_result + rubric_score). v1 doesn't render this. Add a "My history on this cluster" section: linear list with date / detection_result chip (clean/wobble/fail/not_observed) / rubric_score badge. Tap → /diagnostic?session={recording_id} per existing diagnostic deep-link convention.
 
 ### P-234.exercises — Cluster exercise set rendering + answer checking
+Milestone: TBD
 
 **Priority:** MEDIUM (post-launch)
 **Status:** Queued
@@ -1260,6 +1309,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Scope:** ClusterDetailResponse.exercise_set is a JSONB array shipped today but unrendered in v1. The authored shape is owned by the cluster authoring rubric (P-211 / P-211a). This ticket adds an Exercises section between Lesson body and Practice CTA: render each exercise per its authored type (multiple-choice / fill-blank / order-the-words / etc.), check answers client-side or via a new BE endpoint, surface scoring. Significant scope — needs schema lock-in from P-211a first.
 
 ### P-234.speaking-promptCluster — /speaking/* consume ?promptCluster URL param
+Milestone: TBD
 
 **Priority:** MEDIUM (post-launch)
 **Status:** Queued
@@ -1269,6 +1319,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Scope:** P-234's PracticeCTA emits `/speaking/tache-{N}?promptCluster={slug}`. /speaking/tache-{N} pages currently ignore this param and serve a default/random prompt. This ticket reads the param and either (a) uses the cluster's `practice_prompt` JSONB to override the default Tâche prompt (FE-side lookup), or (b) sends the slug to BE and lets the engine serve the cluster-specific prompt. (b) is cleaner — needs BE to accept the param on the recording-start endpoints.
 
 ### P-235 — Ceiling Marker Map
+Milestone: TBD
 
 **Priority:** HIGH (method mode visibility moat)
 **Status:** Queued
@@ -1279,6 +1330,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### P-236 — Mistake Repository
+Milestone: TBD
 
 **Priority:** MEDIUM
 **Status:** Queued
@@ -1289,6 +1341,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### P-237 — Time-Adaptive UI (lean version)
+Milestone: TBD
 
 **Priority:** HIGH (meta-ticket affecting all dashboards)
 **Status:** Queued
@@ -1301,6 +1354,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 ### Prescription engine (§10.5)
 
 ### P-240 — Today's recommended action
+Milestone: DONE
 
 **Priority:** HIGH
 **Status:** Queued
@@ -1311,6 +1365,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering
 
 ### P-241 — Cluster-level prescription
+Milestone: TBD
 
 **Priority:** MEDIUM
 **Status:** Queued
@@ -1323,6 +1378,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 ### Calibration & content ops (§10.6)
 
 ### P-250 — Threshold calibration
+Milestone: TBD
 
 **Priority:** HIGH
 **Status:** Queued
@@ -1333,6 +1389,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 **Owner:** Engineering (tuning); Chadi (ground-truth labels)
 
 ### P-251 — Lesson content delivery infrastructure
+Milestone: TBD
 
 **Priority:** MEDIUM
 **Status:** Queued
@@ -1347,6 +1404,7 @@ Editorial constraint per F-200: line drawings or geometric primitives, no mascot
 Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. Scope is the title only — full specs land when each ticket is taken up post-launch.
 
 ### P-260 — Writing analysis pipeline
+Milestone: TBD
 
 **Priority:** —
 **Status:** Phase 2 deferred
@@ -1357,6 +1415,7 @@ Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. S
 **Owner:** Engineering
 
 ### P-261 — Writing dashboard
+Milestone: TBD
 
 **Priority:** —
 **Status:** Phase 2 deferred
@@ -1367,6 +1426,7 @@ Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. S
 **Owner:** Engineering
 
 ### P-262 — Cross-modal prescription
+Milestone: TBD
 
 **Priority:** —
 **Status:** Phase 2 deferred
@@ -1377,6 +1437,7 @@ Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. S
 **Owner:** Engineering
 
 ### P-263 — A2 path full content
+Milestone: TBD
 
 **Priority:** —
 **Status:** Phase 2 deferred
@@ -1387,6 +1448,7 @@ Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. S
 **Owner:** Chadi
 
 ### P-264 — B2→C1 path full content
+Milestone: TBD
 
 **Priority:** —
 **Status:** Phase 2 deferred
@@ -1397,6 +1459,7 @@ Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. S
 **Owner:** Chadi
 
 ### P-265 — C1→C2 path
+Milestone: TBD
 
 **Priority:** —
 **Status:** Phase 2 deferred
@@ -1407,6 +1470,7 @@ Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. S
 **Owner:** Chadi (content); Engineering (structure)
 
 ### P-266 — Tense + conjugation + idiomaticity detectors
+Milestone: TBD
 
 **Priority:** —
 **Status:** Phase 2 deferred
@@ -1417,6 +1481,7 @@ Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. S
 **Owner:** Engineering
 
 ### P-267 — Time-Adaptive UI full mode redesigns
+Milestone: polish-defer
 
 **Priority:** —
 **Status:** Phase 2 deferred
@@ -1427,6 +1492,7 @@ Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. S
 **Owner:** Engineering
 
 ### P-268 — Audio-synced playback for Recording Replay
+Milestone: polish-defer
 
 **Priority:** —
 **Status:** Phase 2 deferred
@@ -1437,6 +1503,7 @@ Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. S
 **Owner:** Engineering
 
 ### P-269 — Streak system
+Milestone: polish-defer
 
 **Priority:** —
 **Status:** Phase 2 deferred
@@ -1448,6 +1515,7 @@ Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. S
 **Note:** F-067 (Queued — polish for real-feel) is now superseded by P-269.
 
 ### M-101.z — Landing page custom hero asset + per-section icons (Phase 1 polish)
+Milestone: polish-defer
 
 **Priority:** LOW (post-launch P1)
 **Status:** Queued
@@ -1459,6 +1527,7 @@ Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. S
 **Note:** filed per the P-220.z precedent (Phase 1 polish, illustrations not blocking ship).
 
 ### B-102 — Privacy + Terms + Refund pages with footer integration
+Milestone: DONE
 
 **Priority:** HIGH (pre-launch legal compliance)
 **Status:** Shipped 2026-05-03 (FE-side, lemethodic-frontend commit `3216d4d`; production verified at https://lemethodic.com/{privacy,terms,refund}).
@@ -1546,11 +1615,13 @@ F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end 
 - Filed 2026-04-27 from F-063 verification.
 
 ### F-110.1 — Migrate frontend reads from internal_key to key
+Milestone: DONE
 
 **Status:** Superseded by P-100.5 (2026-05-01) — same code change shipped as part of the dashboard rendering fix bundle. The migration originally specced here (RawCouche type rename + filter + mapDiagnosticBlock + mapRecordingSummary) shipped verbatim under P-100.5 because Section 2's missing render was caused by exactly this mismatch (frontend reading `internal_key` while F-110 list endpoint emitted `key` only).
 **Cleanup trigger:** F-110.2 backend cleanup is now safe to execute — notify backend to drop `internal_key` from `couches_array` dual-emission.
 
 ### P-104.x — Wall-clock setTimeout cap fallback for deep-throttle edge case
+Milestone: TBD
 
 **Priority:** Low (post-launch)
 **Status:** Queued
@@ -1566,6 +1637,7 @@ F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end 
 **When:** defer until real user data shows the long-hidden case happens. The Visa-Urgent persona is unlikely to background a TCF practice tab for 5+ min mid-recording. Pre-launch coverage of the brief and moderate cases via P-104 Step 1 is sufficient.
 
 ### P-115.x — Motion pass: remaining surfaces
+Milestone: M2
 
 **Priority:** Medium
 **Status:** Queued
@@ -2005,6 +2077,7 @@ _(F-091.0 shipped 2026-04-27 — see entry under "Shipped — Week 2 (April 27)"
 ## Process improvements
 
 ### EX-100 — Evaluate execution tooling for ticket-by-ticket efficiency
+Milestone: TBD
 
 **Priority:** Medium
 **Filed:** 2026-04-30
@@ -2029,6 +2102,7 @@ _(F-091.0 shipped 2026-04-27 — see entry under "Shipped — Week 2 (April 27)"
 ---
 
 ### F-108 — Fix pre-existing TS error in TargetScoreSelect.tsx
+Milestone: M1
 
 **Status:** OPEN
 **Priority:** Low — build pipeline tolerates via `typescript.ignoreBuildErrors: true`
@@ -2081,6 +2155,7 @@ P-230 ✅ Overall Progress dashboard rebuild (Shipped 2026-05-03). See §10.4 en
 P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 
 ### F-223 — "Le raccourci" / "The shortcut" copy cleanup (interim patch)
+Milestone: DONE
 
 **Priority:** MEDIUM (user-visible stale copy)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/onboarding` EcoleReveal step per F-225)
@@ -2092,6 +2167,7 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 **Note:** Interim only. F-202 (full L'École intro rebuild with methodology demo) supersedes this copy entirely.
 
 ### F-226 — FR voice audit (tu vs vous) full-app sweep
+Milestone: M2
 
 **Priority:** LOW (post-soft-beta polish)
 **Status:** Queued
@@ -2102,6 +2178,7 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 **Owner:** Engineering + Chadi (copy review)
 
 ### F-222 — Sign Out does nothing on click
+Milestone: M1
 
 **Priority:** HIGH (auth-state correctness)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit `4916d72`; production deploy pending Chadi-captured screenshots + interaction trace per F-225)
@@ -2113,6 +2190,7 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 **Note:** Verification requires interactive trace per F-225.5 — screenshots alone won't catch a Sign Out regression. Test plan: (1) sign in, (2) navigate to /profile, (3) click Sign Out, (4) verify localStorage has zero `lemethodic_*` keys, (5) verify URL is `/`, (6) verify subsequent visit to /profile redirects to `/` (ProtectedRoute kicks in). Same trace from /onboarding/waitlist sign-out link.
 
 ### F-222.x — /profile real-data wire-up
+Milestone: M1
 
 **Priority:** MEDIUM (Active LC, prioritize after responsive sweep starts)
 **Status:** Queued
@@ -2124,6 +2202,7 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 **Note:** Beta-credibility hit if a user opens /profile and sees someone else's name + exam date. Not a functional blocker (Sign Out works post-F-222) but a real perception issue.
 
 ### F-200 — Landing page desktop responsive + editorial design system foundation
+Milestone: M1
 
 **Priority:** HIGH (launch-blocking — establishes the design system F-201..F-214 inherit)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` and `/fr` per F-225)
@@ -2143,6 +2222,7 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - Sprint/Premium "Join the waitlist" CTAs use ghost button (transparent + ed-fg border, fills on hover) — visual hierarchy below Subscription's solid navy CTA. Confirmed conversion ladder.
 
 ### F-227 — Methodology breakout on landing (compressed 5-couche surface)
+Milestone: M2
 
 **Priority:** MEDIUM (post-F-202, public-side moat surface)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` (EN) + `/fr` (FR) showing MethodologySection with surrounding sections (Differentiation above + HowItWorks below) visible to verify bg rhythm + section ordering per F-225. F-225 interactive verification clause does NOT apply — F-227 is static typography with reveal animations only, no handlers/nav/forms/state mutation.)
@@ -2160,6 +2240,7 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
 ### V-016a.fix — Writing result rendering crash (couches shape mismatch)
+Milestone: DONE
 
 **Priority:** CRITICAL (production blocker — completed analyses crashed the result view)
 **Status:** ✅ Shipped + verified 2026-05-12
@@ -2184,6 +2265,7 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - `components/writing/WritingSubmissionClient.tsx` — ResultView refactored: array→Map lookup, defensive guards, "Coming soon" placeholder per missing couche
 
 ### V-016a.dashboard — Render BE rich feedback envelope on /writing dashboard
+Milestone: DONE
 
 **Priority:** HIGH (production: dashboard hid every per-layer feedback field BE returned; em-dashes for overall_score + CEFR; "No feedback" everywhere despite BE populating examiner remarks, coaching, transformations, and a full TCF rubric breakdown)
 **Status:** ✅ Shipped + verified 2026-05-12
@@ -2226,6 +2308,7 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - VERIFICATION: Hit `/writing/10` on prod with an authenticated session, submit a fresh response, wait for analysis. Per-couche cards should show numeric score (incl. `0` as `0`), examiner remark in serif italic French, Coaching block with EN primary + FR secondary, and a "Try this" sub-card. TCF rubric accordion appears below the couche stack — expand to see per-criterion label, `score / max_score`, examiner remark, and coaching. Top-card scores read from `exam_profile`; secondary-framework row renders only if BE supplies a non-null CLB-equivalent value. Regression: `/ecole` still renders both phase grids populated (V-016c.fix unaffected).
 
 ### V-016g — /library prefetch 404 cleanup (stub page)
+Milestone: DONE
 
 **Priority:** MEDIUM (production console noise; UX gap when users click directly)
 **Status:** ✅ Shipped (non-visual sweep verified 2026-05-12; visual verification routed to TARS — separate commit)
@@ -2246,6 +2329,7 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - `components/nav/TopNav.tsx` — EXCLUDED_EXACT extended to `/library`, `/fr/library` so the marketing chrome stays consistent (no in-product TopNav)
 
 ### V-016g.notify — BE library-notify email capture
+Milestone: TBD
 
 **Priority:** LOW (post-launch; FE has localStorage stash today)
 **Status:** Queued (BE-side; lemethodic-backend ticket)
@@ -2256,6 +2340,7 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 **Owner:** Backend Engineering
 
 ### F-300a — Platform-level / landing redesign
+Milestone: M1
 
 **Priority:** HIGH (strategic surface restructure; depends on F-300b having stabilized /exam-prep)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend pushed; production deploy on auto from main merge. 1440px desktop + 375px mobile screenshots of `/` (EN) + `/fr` (FR) end-to-end: hero with new H1 + sub + kicker + 2 CTAs (peach-deep button + ghost link), product cards (Option B layout — Exam Prep featured 2/3 + Library + Free Diagnostic stacked 1/3 at lg, 2-col at md, 1-col <md), compressed methodology (5 couches listed, attribution + see-full link), final CTA + footer with Exam Prep + Library nav links.)
@@ -2290,6 +2375,7 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - `app/globals.css` — .fp-platform-cards grid + breakpoint rules
 
 ### F-300a.proof — Platform landing social proof section
+Milestone: polish-defer
 
 **Priority:** LOW (post-launch UX polish)
 **Status:** Queued
@@ -2300,6 +2386,7 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 **Owner:** Chadi (copy) + Engineering (wire-up)
 
 ### F-300b — Move current landing to /exam-prep
+Milestone: M1
 
 **Priority:** HIGH (F-300 chain head; preserves existing funnel before / pivots)
 **Status:** Awaiting verification (FE-side, frontend commit pushed; production deploy on auto. 1440px desktop + 375px mobile of `/exam-prep` + `/fr/exam-prep` showing identical content to pre-F-300 / + /fr.)
@@ -2315,6 +2402,7 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 - `components/nav/TopNav.tsx` — EXCLUDED_EXACT extended
 
 ### F-300c — Library route + content
+Milestone: M1
 
 **Priority:** MEDIUM (post-F-300a; /library currently 404)
 **Status:** Queued
@@ -2325,6 +2413,7 @@ P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 **Owner:** Engineering (build) + Chadi (inventory + copy)
 
 ### V-016a.fe — Writing submit polling consumer
+Milestone: DONE
 
 **Priority:** HIGH (parallel to BE V-016a; FE ready before BE ships contract)
 **Status:** ✅ Shipped + verified 2026-05-12 — BE V-016a contract live on prod; FE polling consumer functional end-to-end (Chadi, 2026-05-12, manual post-deploy on `/writing/10`): submit fires, AnalyzingPanel renders during poll, result panel renders on completion with the full V-016a.dashboard rich envelope. Initial broken state during dashboard verification was browser cache (old bundle pre-deploy); hard refresh resolved.
@@ -2368,6 +2457,7 @@ interface WritingJob {
 - Pushing the FE code now per Chadi resume direction. Auto-deploy to Vercel will happen but will fail live (writing surface non-functional) until BE V-016a contract is on prod. The user explicitly accepted this risk: "Commit + push (don't deploy until BE V-016a contract live)" — interpreted as FE deploy is OK, BE is still being shipped.
 
 ### V-016c — /ecole desktop layout (lesson-grid Option C)
+Milestone: M1
 
 **Priority:** HIGH (V-016 chain mid; pre-launch desktop polish completes /ecole/speaking/progress trio)
 **Status:** Awaiting verification (1440px desktop screenshot of `/ecole` showing eyebrow + Fraunces italic title + progress strip + 2-phase lesson grid (auto-fill 220px columns) + right rail (Today's session warm-cream / days-until-exam / streak placeholder). Verify mobile <md keeps existing HomeScreen layout. F-225 interactive verification clause partially applies — Today's session CTA + lesson card click-throughs.)
@@ -2388,6 +2478,7 @@ interface WritingJob {
 **Skipped from this rev:** the existing HomeScreen DailyActionCard pastels are NOT carried into desktop (warm token-based today card replaces). Recommended modules section reduced to a count chip.
 
 ### V-016c.fix — /ecole desktop empty Fondations + Approfondissement (phase-filter regression)
+Milestone: DONE
 
 **Priority:** HIGH (production regression on V-016c desktop layout — visual verification on V-016c was blocked because the grids rendered with zero cards)
 **Status:** ✅ Shipped 2026-05-12 (non-visual sweep verified; visual verification routed to TARS — separate commit)
@@ -2419,6 +2510,7 @@ interface WritingJob {
 - VERIFICATION: Chadi/TARS hit `https://lemethodic.com/ecole` at 1440px desktop on an authenticated session; both Fondations (1-16) and Approfondissement (17-27) should render populated lesson card grids. Click a card in each phase to confirm `/ecole/lesson/{n}` navigation. On 375px mobile, HomeScreen still works — Phase 2 divider should now render between lessons 16 and 17 (it used to silently fail when BE phase was wrong; that's a side-benefit of the mapper hardening).
 
 ### V-016f — Differentiation Card 1 rebuild (text-anchored bottleneck)
+Milestone: M2
 
 **Priority:** HIGH (V-016 chain; landing card 1 read as decorative not data)
 **Status:** Awaiting verification (1440px desktop + 375px mobile of `/` + `/fr` Differentiation section showing Card 1 with "Your bottleneck" eyebrow + Fraunces italic couche name in warm-peach-deep + tail line. Hover trace: cycles through 5 couches.)
@@ -2436,6 +2528,7 @@ interface WritingJob {
 - Card 1 file gains a `language` prop; Cards 2/3 remain prop-less; mount switched to per-index render in DifferentiationSection.
 
 ### V-016e — Switzer font preload (landing FOUT fix)
+Milestone: M2
 
 **Priority:** HIGH (V-016 chain; landing H1 fell back to system sans on first paint)
 **Status:** Awaiting verification (1440px desktop + 375px mobile of `/` + `/fr` H1 + body — verify Switzer renders, not system sans-serif. Network tab: confirm preload link fires before stylesheet link.)
@@ -2449,6 +2542,7 @@ interface WritingJob {
 If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer via `next/font/local` with downloaded woff2 files. Filed as queued follow-up.
 
 ### V-016d — Hero kicker amendment (size, color split, spring)
+Milestone: M1
 
 **Priority:** MEDIUM (V-016 chain; landing hero polish)
 **Status:** Awaiting verification (1440px desktop + 375px mobile of `/` + `/fr` hero showing kicker at clamp(24-32px), prefix in ed-fg-soft, exam name in warm-peach-deep, continuous infinite cycle through TCF/TEF/DELF/DALF.)
@@ -2464,6 +2558,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 - Continuous infinite loop: `useRotatingText` already cycles forever via `setInterval`; no behavioral change needed. Hover-pause preserved (kicker pauses while focused / hovered for keyboard accessibility).
 
 ### V-016b — La Méthode en Couches copy revision
+Milestone: M2
 
 **Priority:** HIGH (V-016 chain; landing methodology copy didn't communicate value)
 **Status:** Awaiting verification (1440px desktop + 375px mobile of `/` + `/fr` methodology section showing the 5 couches with revised descriptions. EN: "Le Fond: Your ideas. Generic answers fail at B2. Specific examples score." etc. FR analogs.)
@@ -2477,6 +2572,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 **Out of scope:** EcoleIntro (`/ecole/intro` Section 2) keeps its longer methodology copy. The landing methodology is the compressed glance-form version; EcoleIntro is the deep version. V-016b applies only to the compressed copy on landing.
 
 ### V-015d — /progress desktop bento dashboard
+Milestone: M1
 
 **Priority:** HIGH (V-015 chain tail; pre-launch desktop polish)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop screenshot of `/progress` showing radar (2×2 tile) + Today's Focus + Bottleneck + Streak/days-to-exam + per-couche row + recent activity. Verify bento collapses to 2-col at md and to single column at <md. F-225 interactive verification clause partially applies — Today's Focus CTA + Recent Activity have hover/click affordance.)
@@ -2502,6 +2598,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 - **V-015d.streak** — proper streak counter (BE field needed)
 
 ### V-015c — /speaking desktop tab-driven layout
+Milestone: M1
 
 **Priority:** HIGH (V-015 chain mid; pre-launch desktop polish)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop screenshot of `/speaking` showing 3 tabs (Tâche 1/2/3) with peach-deep underline on Tâche 1 (default) + 60/40 detail panel showing format / tips / Start CTA + recent recordings. 375px mobile keeps existing 3-stacked-card layout. F-225 interactive verification clause applies — tab clicks should swap the detail panel + load tâche-filtered recordings.)
@@ -2529,6 +2626,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 **Mobile <md:** existing SpeakingLanding stays unchanged via `.fp-mobile-only`.
 
 ### V-015c.copy — Real format/tips/examples copy
+Milestone: polish-defer
 
 **Priority:** MEDIUM (post-V-015c v1)
 **Status:** Queued — Chadi authoring
@@ -2539,6 +2637,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 **Owner:** Chadi (copy) + Engineering (wire-up)
 
 ### V-015d.trend — BE diagnostic trend endpoint
+Milestone: TBD
 
 **Priority:** LOW (post-V-015d; FE has placeholder)
 **Status:** Queued (BE-side)
@@ -2549,6 +2648,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 **Owner:** Backend Engineering
 
 ### V-015d.streak — Streak counter (BE field + UI)
+Milestone: TBD
 
 **Priority:** LOW (post-launch UX)
 **Status:** Queued (BE-side first)
@@ -2559,6 +2659,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 **Owner:** Backend Engineering
 
 ### V-013c — Nav system overhaul (mobile BottomNav + desktop TopNav)
+Milestone: M1
 
 **Priority:** HIGH (V-013 chain tail; pre-launch surface completeness)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured screenshots: 1440px desktop on /ecole + /writing + /more + /progress + /diagnostic showing TopNav at top with active underline; 1440px desktop scrolled past 8px to capture backdrop-blur + ed-rule border state; 375px mobile on same routes showing BottomNav with TopNav hidden; verify TopNav DOES NOT render on /, /fr, /signup, /paywall, /onboarding, /privacy, /terms, /refund. Plus interaction trace: click profile avatar → dropdown opens → click outside → dismisses; click "Sign out" → logout fires → redirects to /. F-225 interactive verification clause applies.)
@@ -2583,6 +2684,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 - Mobile breakpoint: 768px (Tailwind md default)
 
 ### V-013b — /more page (Profile, Settings, Account, About)
+Milestone: M1
 
 **Priority:** HIGH (V-013 mid-chain; was F-058 placeholder)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/more` showing all 4 sections (Profile / Settings / Account / About). Plus interaction trace: language toggle → page re-renders in selected language; sign out button → logout flows to /. F-225 interactive verification clause applies.)
@@ -2598,6 +2700,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 - **About**: version (`APP_VERSION = '0.1.0-soft-beta'`), support email, terms/privacy/refund links
 
 ### V-013b.lang-pref — BE PATCH /api/users/me for interface_language
+Milestone: TBD
 
 **Priority:** MEDIUM (post-V-013b; language toggle currently client-only)
 **Status:** Queued (BE-side; lemethodic-backend ticket)
@@ -2608,6 +2711,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 **Owner:** Backend Engineering
 
 ### V-013b.notifications — Notification preferences UI + BE plumbing
+Milestone: TBD
 
 **Priority:** LOW (post-launch UX)
 **Status:** Queued
@@ -2618,6 +2722,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 **Owner:** Engineering (Chadi PM call on which categories)
 
 ### V-013b.password — Change password flow
+Milestone: TBD
 
 **Priority:** MEDIUM (account hygiene)
 **Status:** Queued
@@ -2628,6 +2733,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 **Owner:** Engineering
 
 ### V-013a — Wire /writing to F-224 (prompt picker, submission, history)
+Milestone: M1
 
 **Priority:** HIGH (V-013 chain head; production launch dependency)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/writing` (prompt library showing T1/T2/T3 sections + filter chips), `/writing/[id]` (submission view with prompt body + textarea + word counter + submit button), `/writing/[id]` post-submit result view (couche scores + per-layer feedback + actions), and `/writing/history` (list view OR empty state if BE 404). EN + FR for both. Plus interaction trace: click prompt → /writing/[id] → type response → word counter color shifts → submit → result renders → click "Submit another" → returns to picker. F-225 interactive verification clause applies.)
@@ -2658,6 +2764,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 - "Submit another" → /writing; "Try again" → reset state on same prompt
 
 ### V-013a.history — BE /api/writing/history endpoint
+Milestone: TBD
 
 **Priority:** MEDIUM (post-V-013a; FE renders empty state in the meantime)
 **Status:** Queued (BE-side; lemethodic-backend ticket)
@@ -2668,6 +2775,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 **Owner:** Backend Engineering
 
 ### V-012c — Whitespace + bento variation (warmth refit phase 3)
+Milestone: M2
 
 **Priority:** MEDIUM (V-012 chain tail; whitespace polish + bento exploration)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` (EN) + `/fr` (FR) end-to-end scroll showing the V-012 chain compositely: warm hero gradient, ed-fg/bg warmth, Methodology generous padding, Differentiation cards with peach/sage/peach-deep visuals, FAQ on paper, FinalCTA on warm-sand with B2 highlight + warm-hover CTA. Plus interaction trace for FinalCTA + Paywall CTA hover, onboarding step pastel rotation. F-225 interactive verification clause applies for the warm-hover CTAs.)
@@ -2688,6 +2796,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 - `components/landing/sections/FinalCTASection.tsx` (vertical padding cap)
 
 ### V-012c.bento — Differentiation cards bento variation (queued)
+Milestone: polish-defer
 
 **Priority:** LOW (post-V-012 polish; design taste pass)
 **Status:** Queued
@@ -2698,6 +2807,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 **Owner:** Engineering (Chadi taste pass on composition)
 
 ### V-012b — Per-surface warmth injection (warmth refit phase 2)
+Milestone: M2
 
 **Priority:** HIGH (V-012 mid-chain — hero/Paywall/FinalCTA/EcoleReveal/onboarding/Differentiation cards get warmth)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy verification deferred to end-of-V-012c per defer-verification mode. F-225 interactive verification clause partially applies — CTA warm-hover state is interactive; recorded hover trace required for FinalCTA + Paywall CTAs once Chadi captures end-state. All 8 smoke-test routes returned 200; warm tokens confirmed in landing HTML.)
@@ -2744,6 +2854,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 **V-011.color absorbed:** the FinalCTA bg shift + B2 highlight + button hover + trust line color all land here. V-011.color marked superseded; BE retiring from BACKLOG separately.
 
 ### V-012a — Token foundation + motion language (warmth refit phase 1)
+Milestone: M2
 
 **Priority:** HIGH (V-012 chain root — V-012b/c inherit tokens + spring motion)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy verification deferred to end-of-V-012c per defer-verification mode. Spot-check a single landing screenshot to verify new --ed-fg warmth (text reads slightly warmer dark, not near-black) and --ed-bg warmth (cream slightly warmer). All 8 routes (/`, /fr, /signup, /onboarding, /ecole, /ecole/intro, /paywall, /diagnostic) returned 200; --ease-spring confirmed in landing HTML output. F-225 interactive verification clause does NOT apply to phase a alone — pure token + motion-language plumbing. Awaiting verification batches with V-012b + V-012c.)
@@ -2785,6 +2896,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 - Card hover lifts get a subtle spring settle
 
 ### V-011 — FinalCTA centering fix
+Milestone: M2
 
 **Priority:** HIGH (verification-found; visual reads off-center on production)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` (EN) + `/fr` (FR) FinalCTA showing headline + body + button + trust line all visually centered, plus the FR headline breaking at "deviner | ce qui bloque..." or similar (NOT leaving "ce" as a 2-char orphan on line 1). F-225 interactive verification clause does NOT apply — pure typography centering + line-break fix.)
@@ -2804,6 +2916,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 - `components/landing/copy.ts` — FR FINAL_CTA.heading gains NBSP between "ce" and "qui"
 
 ### V-011.color — FinalCTA color treatment refresh (PLAN-FIRST, awaiting Chadi pick)
+Milestone: M2
 
 **Priority:** MEDIUM (verification-found; current treatment reads as flat per Chadi)
 **Status:** **Plan-first surfaced; awaiting Chadi color direction.** Three options proposed below.
@@ -2826,6 +2939,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 **Awaiting Chadi pick (or hybrid).** After direction lands, ship as the same V-011.color ticket (single PR), mark Awaiting Verification.
 
 ### V-010 — /ecole phase structure correction (3-button → 2-button)
+Milestone: M1
 
 **Priority:** HIGH (methodology-content alignment)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/ecole` showing the 2-button milestone row (Fondations 1–16 / Approfondissement 17–27) below the 0/27 progress bar. F-225 interactive verification clause does NOT apply — pure content/structure change, button taps were never wired beyond visual milestone state.)
@@ -2848,6 +2962,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 - `components/home/EcoleProgress.tsx` — MILESTONES 3-entry array → 2-entry array; ranges adjusted; comment block updated to V-010 reasoning.
 
 ### V-009 — CouchesDiagnostic 5-axis + brand labels
+Milestone: M2
 
 **Priority:** HIGH (methodology-content credibility — wrong axis count + legacy labels surfaced on /diagnostic + /paywall)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/diagnostic` (mock mode, then real-mode if a diagnostic is wired) showing 5 bars (4 scored + 1 unscored "Coming soon" Voix at bottom) plus `/paywall` showing the 5-axis radar with brand labels (Range / Coherence / Accuracy / Fluency / Voice). EN + FR for diagnostic; Paywall is EN-only. F-225 interactive verification clause does NOT apply — content-only change, no behavior change beyond the placeholder treatment for unscored Voix.)
@@ -2880,6 +2995,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 - `components/Paywall.tsx` — RADAR_DATA 4 axes (legacy labels) → 5 axes (brand labels EN)
 
 ### V-009.be — BE adds La Voix scoring
+Milestone: M3
 
 **Priority:** HIGH (BE-side dependency for V-009 to render real Voice data instead of placeholder)
 **Status:** Queued (BE-side; lemethodic-backend ticket)
@@ -2890,6 +3006,7 @@ If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer
 **Owner:** Backend Engineering
 
 ### V-008 — Card 2 interference example direction reversed
+Milestone: M2
 
 **Priority:** HIGH (verification-found; wrong audience direction shipped)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` (EN) + `/fr` (FR) showing Card 2 (Anglophone interference) with the reversed pair: `~~Je suis 25 ans~~ / J'ai 25 ans`. Plus a hover trace verifying the 4 pairs cycle through correctly.)
@@ -2911,6 +3028,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 - `components/landing/sections/DifferentiationSection.tsx` — INTERFERENCE_PAIRS shape changed from `{en, fr}[]` to `{wrong, correct}[]`; InterferenceVisual rewritten as 2-line; SANS_FONT span prefixes removed (no longer needed without EN/FR labels)
 
 ### V-007 — Final CTA trust line duplicate "Free."
+Milestone: M1
 
 **Priority:** HIGH (verification-found; user-visible duplication)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop screenshot of `/` showing FinalCTASection trust line under primary CTA. EN-only sufficient — bug was an EN-side string concatenation; FR side rendered correctly. F-225 interactive verification clause does NOT apply — copy fix only.)
@@ -2921,6 +3039,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 **Scope:** in `FinalCTASection.tsx` line 100, the trust span rendered `{FINAL_CTA.ctaSecondary[lang]} {HERO.ctaSecondary[lang].split('.')[0]}.` — concatenating FINAL_CTA's `"Free. No card. About 12 minutes."` with HERO.ctaSecondary's first sentence (which is `"Free"`), producing the duplicate. Removed the `HERO.ctaSecondary` suffix; trust line now reads exactly `FINAL_CTA.ctaSecondary[lang]` ("Free. No card. About 12 minutes." / "Gratuit. Sans carte. Environ 12 minutes."). HERO import removed (no longer used in this file).
 
 ### V-006 — Kicker container clipping (rotating word cut off)
+Milestone: M1
 
 **Priority:** HIGH (verification-found; layout bug clipped DELF/DALF)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots showing the kicker mid-rotation through all 4 exam names (TCF / TEF / DELF / DALF) with no character clipping and no container width-jitter between states. Plus a hover trace verifying smooth cycling.)
@@ -2933,6 +3052,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 **Side fix:** earlier V-001 edit only updated the reduced-motion branch's font size + marginBottom because the active-rotation branch had different indentation (10-space vs 8-space inside its parent), and the `replace_all` matched only one. V-006 brings the active branch into line — `clamp(20px, 1.8vw, 24px)` font, `clamp(16px, 2vw, 28px)` marginBottom — so both render paths agree.
 
 ### V-004 — Differentiation cards rebuild (per-card art-directed visuals)
+Milestone: M2
 
 **Priority:** MEDIUM (visual depth; differentiation cards were boring text-only templates)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` (EN) + `/fr` (FR) showing all three differentiation cards visible together (Diagnostic-driven / Anglophone interference / Real-time AI feedback) at idle state. Plus a recorded interaction trace per F-225: hover over each card and verify (1) Card 1 illuminated bar shifts on hover, (2) Card 2 EN/FR pair cycles through 4 pairs on repeated hovers, (3) Card 3 waveform amplifies on hover and pulses subtly idle. Reduced-motion pass: macOS Settings → Reduce motion ON, verify all three cards still respond to state changes (state still updates) but transitions/animations skip and end-state is shown.)
@@ -2964,6 +3084,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 - `app/globals.css` — added `@keyframes ed-pair-fade-in` + `.ed-pair-fade` class + `.ed-pair-fade-delay` class + `@keyframes ed-wave-pulse` + reduced-motion gate
 
 ### V-003 — Hero atmospheric typographic animation
+Milestone: M2
 
 **Priority:** MEDIUM (visual depth; F-200 editorial direction)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` showing hero with atmospheric glyphs visible behind H1+kicker, plus a recorded scroll trace verifying parallax fires at 0.2x scroll speed and disengages when hero leaves viewport. Reduced-motion pass: macOS Settings → Accessibility → Display → Reduce motion ON, verify drift animation halts and parallax stays at 0. F-225 interactive verification clause partially applies — atmospheric animation is decorative, but parallax + IntersectionObserver gate are behavioral; recorded scroll trace required.)
@@ -2982,6 +3103,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 **No-overlap discipline:** characters positioned in distinct viewport zones (top-left -12%/-8%, top-right -8%/-4%, mid-left 38%/-16%, mid-right 30%/-10%, bottom-center 38%-left/-14% bottom). Negative offsets push characters partially off-canvas so the eye reads them as atmospheric fragments rather than discrete shapes. At narrow viewports (mobile), character font-sizes drop to 240-300px floor, preserving the same off-canvas fragment effect.
 
 ### V-003.opacity — atmosphere opacity tuning
+Milestone: polish-defer
 
 **Priority:** LOW (post-V-003 polish)
 **Status:** Queued
@@ -2992,6 +3114,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 **Owner:** Engineering
 
 ### V-002 — Em-dash strip across FE copy
+Milestone: M2
 
 **Priority:** MEDIUM (editorial polish; em-dash overuse muddied prose voice)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/`, `/fr`, `/ecole/intro` (FR + EN), `/onboarding` EcoleReveal step (FR + EN level labels), `/signup` (Password label), `/privacy`, `/terms`, `/refund` (browser tab title) per F-225. F-225 interactive verification clause does NOT apply — pure typography swap, no behavior change.)
@@ -3016,6 +3139,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 **Note:** PROBLEM body (`landing/copy.ts:65,71`) used comma instead of proposed period; the original sentence structure (`But when X, when Y, — Z`) made `Z` the main clause. Replacing — with period would have created a fragment ("But when X, or when Y."). Comma preserves grammar and the editorial restraint of dropping the em-dash. EN + FR both adjusted.
 
 ### V-001 — Hero H1 + rotating kicker sizing
+Milestone: M1
 
 **Priority:** HIGH (verification-found; H1 overflow on production)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of `/` (EN) + `/fr` (FR) hero showing H1 fits within viewport at every breakpoint and kicker sized at the new clamp scale. F-225 interactive verification clause does NOT apply — pure typography size change, no behavior change. Rotation animation fluidity at the larger size verifiable via the screenshot's "Prep for [TCF/TEF/DELF/DALF]" position.)
@@ -3028,6 +3152,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 - Rotating kicker (`RotatingKicker.tsx`): `clamp(13px, 1.2vw, 15px)` → `clamp(20px, 1.8vw, 24px)`. Tracking (0.06em) + color (ed-muted) + uppercase preserved. Bottom margin nudged from `clamp(12px, 1.5vw, 20px)` to `clamp(16px, 2vw, 28px)` proportional to the size bump. Slide animation timing untouched — runs at same ED_DUR.rotateWord (600ms) which still reads smoothly at the larger size.
 
 ### V-005 — Font system upgrade (Switzer + Fraunces)
+Milestone: M2
 
 **Priority:** HIGH (V-series chain root — V-003 + V-004 inherit the new font system)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop + 375px mobile screenshots of every surface (`/`, `/fr`, `/signup`, `/login`, `/paywall`, `/onboarding` (multiple steps), `/onboarding/waitlist`, `/ecole`, `/ecole/intro`, `/progress`, `/more`, `/writing`, `/diagnostic`, `/profile`, `/learn/[id]`, `/cluster/[slug]`, `/ecole/lesson/[id]`) to verify Switzer renders for sans/UI/body and Fraunces renders for display/serif accents. F-225 interactive verification clause does NOT apply — pure font swap, no behavior change.)
@@ -3050,6 +3175,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 - Reading order on production check: H1s (Fraunces serif), body copy (Switzer sans), legal pages (Switzer sans for headers + body), button labels (Switzer sans)
 
 ### V-005.heading-axis — apply Fraunces SOFT axis to display headlines
+Milestone: polish-defer
 
 **Priority:** LOW (post-V-005 polish)
 **Status:** Queued
@@ -3060,6 +3186,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 **Owner:** Engineering
 
 ### F-227.rhythm — Pricing→FAQ same-bg adjacency (paired bg flip)
+Milestone: M2
 
 **Priority:** LOW (visual rhythm polish)
 **Status:** Awaiting verification (FE-side, lemethodic-frontend commit pending; production deploy pending Chadi-captured 1440px desktop screenshot of `/` showing Pricing → FAQ → FinalCTA visible together to confirm alternation rhythm. EN-only sufficient — bg-color change is language-independent. F-225 interactive verification clause does NOT apply — bg-color only, no behavior change.)
@@ -3071,6 +3198,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 **Owner:** Engineering
 
 ### F-225 — Desktop verification protocol (process change)
+Milestone: DONE
 
 **Priority:** HIGH (process gate, launch-blocking)
 **Status:** Shipped 2026-05-04 (FE-side, doc commit `3eb8902`; amended in commit pending — added interactive verification clause F-225.5). Non-visual change — verification skipped per the rule's own carve-out.
@@ -3082,6 +3210,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 **Note:** Tickets shipped before 2026-05-04 (P-220, P-222, B-102, P-230, P-234, etc.) are grandfathered. The rule applies prospectively. Until F-225's doc commit landed, no other ticket could be marked `Shipped` — F-223, F-222, and any other in-flight FE work waited.
 
 ### F-225.constraint — F-225 amendment: split visual vs non-visual verification
+Milestone: TBD
 
 **Priority:** LOW (doc-only; refines existing protocol)
 **Status:** Queued
@@ -3094,6 +3223,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 ## Strategic queue — 2026-05-12 session
 
 ### F-310 — Auth hardening (umbrella; supersedes F-072)
+Milestone: DONE
 
 **Priority:** HIGH (pre-launch blocker per Decision 4)
 **Status:** ✅ Shipped 2026-05-12 — BE half live (commits 4bb44fb..043167f on tcf-oral-tool); FE half in F-310.fe (commits 2fef9b7..b8f91ee on lemethodic-frontend). Production /openapi.json confirms 9 auth endpoints live, 5 new since F-072 plan (refresh, verify-email, verify-email/resend, password-reset/request, password-reset/confirm).
@@ -3113,6 +3243,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 **Related:** F-310.fe (FE half — entry below)
 
 ### F-310.fe — Auth hardening FE activation (5-commit chain)
+Milestone: DONE
 
 **Priority:** HIGH (FE half of F-310; gates the soft-beta hard cutoff + hCaptcha + email-verification + refresh-on-401)
 **Status:** ✅ Shipped 2026-05-12 (FE-side; commits 2fef9b7..b8f91ee on lemethodic-frontend; visual + interactive verification pending Chadi manual browser check per runbook below)
@@ -3169,6 +3300,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
   8. **Field-name sanity (only if step 4 refresh appears to silently fail):** Open the /refresh response in DevTools Network → Preview. Confirm the new access token comes back under `access_token` (FE default) or `token` (FE fallback). If it's a third field name, surface to FE-Claude as a follow-up — the interceptor needs that field name added.
 
 ### F-310.fe.coldreload — Route email_not_verified 403 from any protected page
+Milestone: TBD
 
 **Priority:** MEDIUM (cold-tab reload edge case; affects users who don't verify email immediately after register. Not blocking soft beta if verification is quick.)
 **Status:** Awaiting verification (F-225 — interactive change; needs 1440px + 375px screenshots of `/verify-email` empty state landed from a cold-tab `/ecole` hit + interaction trace per runbook below)
@@ -3208,6 +3340,7 @@ Edge cases handled:
   8. **Open-redirect safety** — manually visit `/verify-email?token=<any>&next=//evil.com` and `?next=https://evil.com`. Expected: post-confirm routes to `/login`, not the evil host.
 
 ### F-311 — Token control (Redis rate limiter + model routing + prompt caching)
+Milestone: DONE
 
 **Priority:** HIGH (pre-launch blocker per Decision 4 — at 5,000+ users Y1, uncapped diagnostic abuse blows API costs before revenue catches up)
 **Status:** Queued
@@ -3224,6 +3357,7 @@ Edge cases handled:
 **Owner:** Backend Engineering
 
 ### F-312.0 — RAG corpus licensing pre-flight (HARD GATE)
+Milestone: DONE
 
 **Priority:** CRITICAL (hard gate per Chadi 2026-05-12 push-back — no RAG schema work commits until this returns legal-clear)
 **Status:** Queued
@@ -3235,6 +3369,7 @@ Edge cases handled:
 **Owner:** Engineering (legal-adjacent; Chadi reviews conclusion)
 
 ### F-312 — OQLF + Académie française RAG retrieval layer
+Milestone: TBD
 
 **Priority:** HIGH (Decision 2 — diagnostic credibility through authoritative grounding; replaces "the AI thinks this is wrong" with "according to the OQLF, this is an anglicism")
 **Status:** Blocked on F-312.0
@@ -3247,6 +3382,7 @@ Edge cases handled:
 **Owner:** Backend Engineering
 
 ### F-319 — Le Vocabulaire (system; parent ticket)
+Milestone: M4
 
 **Priority:** HIGH (Decision 3 — Le Méthodic shifts from exam-prep-only to general-French + exam platform; one engine, two audiences)
 **Status:** Queued — MVP via F-320–F-323; V2 sub-tickets visible but deferred
@@ -3271,6 +3407,7 @@ Edge cases handled:
 **Owner:** Engineering (BE + FE; child tickets are layer-specific)
 
 ### F-320 — Le Vocabulaire DB schema
+Milestone: M4
 
 **Priority:** HIGH (F-319 MVP foundation)
 **Status:** Blocked on F-312.0 if corpus rows share table
@@ -3281,6 +3418,7 @@ Edge cases handled:
 **Owner:** Backend Engineering
 
 ### F-321 — Le Vocabulaire seed Phase 1 (3 topic sets, 500–800 entries from OQLF BDL)
+Milestone: M4
 
 **Priority:** HIGH (F-319 MVP content)
 **Status:** Blocked on F-312.0 + F-320
@@ -3291,6 +3429,7 @@ Edge cases handled:
 **Owner:** Backend Engineering (Chadi pedagogical topic pick)
 
 ### F-322 — Le Vocabulaire practice UI
+Milestone: M4
 
 **Priority:** MEDIUM (Sprint 2 — F-319 MVP FE-side)
 **Status:** Awaiting verification (F-225 — interactive change; needs 1440px + 375px screenshots of SessionConfigCard / FlashcardView pre-reveal / FlashcardView post-reveal / SessionEndCard / TierLockedCard (via dev `?devLock=tier`) + interaction trace per runbook below)
@@ -3360,6 +3499,7 @@ Edge cases handled:
 **Owner:** Frontend Engineering
 
 ### F-323 — Le Vocabulaire test UI
+Milestone: M4
 
 **Priority:** MEDIUM (Sprint 2 — F-319 MVP FE-side)
 **Status:** Awaiting verification (F-225 — interactive change; needs 1440px + 375px screenshots of SessionConfigCard, each of the four exercise views pre- and post-submit (MCQ / Dropdown / Exact / Matching), TestEndCard, TierLockedCard via `?devLock=tier`, SoftEmptyCard + interaction trace per runbook below)
@@ -3442,6 +3582,7 @@ Edge cases handled:
 **Owner:** Frontend Engineering
 
 ### F-324 — Diagnostic ↔ Vocabulaire linking (auto-suggest vocab topics from flagged errors)
+Milestone: M4
 
 **Priority:** MEDIUM (Sprint 2 — connects Le Diagnostic to Le Vocabulaire)
 **Status:** Queued
@@ -3452,6 +3593,7 @@ Edge cases handled:
 **Owner:** Engineering (BE + FE)
 
 ### F-325 — Le Vocabulaire browse UI (FE) — topic catalog + chunk detail
+Milestone: M4
 
 **Priority:** MEDIUM (Sprint 2 — corpus exploration surface; complements F-322 practice UI and F-323 test UI)
 **Status:** Awaiting verification (F-225 — interactive change; needs 1440px + 375px screenshots of /vocabulaire catalog + /vocabulaire/[slug] topic detail + locked-card variant via ?tier=free + interaction trace per runbook below)
@@ -3523,6 +3665,7 @@ Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split).
   9. **Runtime log sweep** — Vercel runtime logs for the F-325 deploy: 0 errors / 0 5xx in a 1h window after smoke.
 
 ### F-VISUAL-001 — design system audit + Wispr Flow benchmark rollout
+Milestone: M2
 
 **Priority:** HIGH (cross-cutting design refresh — touches every surface; the editorial system bones are in place but the palette/typography pair/motion conventions need consolidation against the Wispr Flow benchmark)
 **Status:** Plan locked 2026-05-13; X.0 in flight (X.1-X.6 follow; X.6 is post-F-225 cleanup)
@@ -3573,6 +3716,7 @@ Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split).
 **Owner:** Frontend Engineering
 
 ### BACKLOG-HYGIENE-001 — F-320 stale corpus_partition enum line (BACKLOG.md:3274)
+Milestone: TBD
 
 **Priority:** LOW (docs-only; doesn't affect shipped behavior)
 **Status:** Queued
@@ -3583,6 +3727,7 @@ Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split).
 **Owner:** Frontend Engineering (docs)
 
 ### F-BUGS-001-FE-A — Lessons load graceful degradation
+Milestone: M1
 
 **Priority:** HIGH (production dead-end on lessons API failure)
 **Status:** Shipped 2026-05-13 (commit `ba86e95`). **F-225 verification deferred — Chadi capture pending per 3-batch plan; screenshots + interaction trace to be attached retroactively (same batch as FE-B).**
@@ -3598,6 +3743,7 @@ Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split).
 **Owner:** Frontend Engineering
 
 ### F-BUGS-001-FE-B — Auth-flow 5-surface fix (completed-onboarding users on logged-out chrome)
+Milestone: M1
 
 **Priority:** HIGH (broken user-state routing — affected every returning authed user)
 **Status:** Shipped 2026-05-13 (merge `c896587`, push `ba86e95..c896587 main -> main`). **F-225 verification deferred — Chadi capture pending per 3-batch plan; screenshots + interaction trace to be attached retroactively.**
@@ -3616,6 +3762,7 @@ Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split).
 **Owner:** Frontend Engineering
 
 ### F-BUGS-001-FE-C — `/ecole` empty-state vs network-error differentiation
+Milestone: M1
 
 **Priority:** HIGH (regression introduced by FE-A soft-fail wrapper — no-lessons users saw network-error copy)
 **Status:** Shipped 2026-05-13 (commit `a066660` on worktree, merged to main via `d1fd33d`). **F-225 verification deferred — Chadi capture pending per 3-batch plan; screenshots + interaction trace to be attached retroactively.**
@@ -3631,6 +3778,7 @@ Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split).
 **Owner:** Frontend Engineering
 
 ### F-BUGS-001-FE-D — Tâche 2 candidate-brief language defaulting + FR/EN toggle
+Milestone: M1
 
 **Priority:** MEDIUM (UX polish — brief comprehension blocker for A1/A2 users)
 **Status:** Shipped 2026-05-13 (commit `341d567`, fast-forward to main from `d1fd33d`). **F-225 verification deferred — Chadi capture pending per 3-batch plan; screenshots + interaction trace to be attached retroactively.**
@@ -3647,6 +3795,7 @@ Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split).
 **Owner:** Frontend Engineering
 
 ### F-326 — subscriptionStatus on User (BE follow-up to F-BUGS-001-FE-B B.4)
+Milestone: M1
 
 **Priority:** MEDIUM (unblocks proper authed paywall UX)
 **Status:** Queued
@@ -3667,6 +3816,7 @@ Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split).
 These four tickets are the direct output of the `/impeccable critique` second pass on the onboarding flow. Address in priority order; P0 first next session.
 
 ### F-327 — [P0] another_exam funnel restoration + waitlist moat (BE + FE)
+Milestone: DONE
 
 **Priority:** P0 — conversion blocker + soft-beta moat
 **Status:** ✅ Shipped
@@ -3709,6 +3859,7 @@ These four tickets are the direct output of the `/impeccable critique` second pa
 ---
 
 ### F-328 — [P1] DateInputQuestion: date bounds enforced but never communicated
+Milestone: M1
 
 **Priority:** P1 — silent error on mobile
 **Status:** 📋 Queued
@@ -3728,6 +3879,7 @@ These four tickets are the direct output of the `/impeccable critique` second pa
 ---
 
 ### F-329 — [P2] MultiSelectQuestion: no affordance that multiple selections are allowed
+Milestone: M1
 
 **Priority:** P2 — answer quality
 **Status:** 📋 Queued
@@ -3747,6 +3899,7 @@ These four tickets are the direct output of the `/impeccable critique` second pa
 ---
 
 ### F-330 — [P3] EcoleReveal: persona label arrives without narrative bridge
+Milestone: M1
 
 **Priority:** P3 — trust layer
 **Status:** 📋 Queued
@@ -3767,6 +3920,7 @@ These four tickets are the direct output of the `/impeccable critique` second pa
 ---
 
 ### B-104 — [P1] Paywall: surface Exam Bundle tier for time-bounded users
+Milestone: M6
 
 **Priority:** P1 — merchandising bug, not pricing change
 **Status:** 📋 Queued
@@ -3792,6 +3946,28 @@ These four tickets are the direct output of the `/impeccable critique` second pa
 - Every completed ticket must be marked ✅ in this file with a brief summary of what shipped.
 - If this file conflicts with memory or a past conversation, this file wins.
 - External tracker equivalent: there isn't one. This file IS the tracker.
+
+---
+
+---
+
+## Mapping notes — M0 milestone tagging (2026-05-25)
+
+TBD tickets below have ambiguous milestone assignments. One-line questions for Chadi.
+
+- **P-222.x, P-222.y** — capacity_warning UX + EcoleReveal waitlist-aware copy: M1 (onboarding surface parity) or polish-defer?
+- **P-230.x, P-230.consolidate, P-230.unify** — Recent activity calendar + /progress de-duplication: M1 (dashboard completeness) or polish-defer?
+- **P-213** — Dialogue Box template authoring: M4 (La Bibliothèque content), M1 (L'École surface), or polish-defer?
+- **P-231, P-232, P-233, P-234.history, P-234.exercises, P-234.speaking-promptCluster, P-235, P-236, P-237, P-241** — Post-launch P1 dashboard + prescription surfaces: any of these required for soft-beta (M1/M7), or all polish-defer?
+- **P-250, P-251** — Threshold calibration + lesson content delivery: M4 (La Bibliothèque) or post-launch?
+- **P-260, P-261, P-262, P-263, P-264, P-265, P-266** — Phase 2 writing + content expansion: all polish-defer?
+- **P-104.x** — Wall-clock setTimeout cap fallback: M1 pre-launch blocker or polish-defer edge case?
+- **V-015d.trend, V-015d.streak, V-013b.lang-pref, V-013b.notifications, V-013b.password, V-013a.history, V-016g.notify** — BE endpoints called by shipped M1 FE surfaces: which are required for M1 sign-off vs. deferrable to V1.1+?
+- **F-312** — OQLF + Académie française RAG retrieval: M3 prerequisite (scorer quality) or separate infrastructure track outside V1.0 milestones?
+- **F-225.constraint** — F-225 amendment doc (non-visual change note): mark DONE (process doc only) or keep as M1 process gate?
+- **F-310.fe.coldreload** — Route email_not_verified 403 on cold reload: M1 edge case or polish-defer until a real user hits it?
+- **BACKLOG-HYGIENE-001** — F-320 stale corpus_partition enum line: DONE (one-line cleanup) or TBD?
+- **EX-100** — Execution tooling evaluation: not milestone-gated — close as ops or defer to M7 process review?
 
 ---
 
