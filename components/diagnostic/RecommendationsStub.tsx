@@ -3,28 +3,28 @@ import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
 
 const ROWS = [
   {
-    layer: 'Les Moules',
-    initials: 'LM',
+    layer: 'La Construction',
+    initials: 'LC',
     chipColor: 'var(--fp-sky)',
     suggestion:
       'Renforcer les structures syntaxiques pour fluidifier vos réponses spontanées.',
-    cta: { label: 'Renforcer Les Moules', href: '/la-methode' },
+    cta: { label: 'Renforcer La Construction', href: '/la-methode' },
   },
   {
-    layer: 'Le Fond',
-    initials: 'LF',
+    layer: 'Le Propos',
+    initials: 'LP',
     chipColor: 'var(--fp-sage)',
     suggestion:
       'Étoffer votre réservoir lexical sur les thèmes de la vie courante.',
-    cta: { label: 'Étoffer Le Fond', href: '/la-bibliotheque' },
+    cta: { label: 'Étoffer Le Propos', href: '/la-bibliotheque' },
   },
   {
-    layer: 'La Voix',
-    initials: 'LV',
+    layer: 'La Musique',
+    initials: 'LM',
     chipColor: 'var(--fp-butter)',
     suggestion:
       "Travailler l'intonation et le débit sur les tâches orales courtes.",
-    cta: { label: 'Travailler La Voix', href: '/l-examen/tache/1' },
+    cta: { label: 'Travailler La Musique', href: '/l-examen/tache/1' },
   },
 ]
 

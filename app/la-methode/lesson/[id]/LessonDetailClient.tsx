@@ -174,7 +174,7 @@ export default function LessonDetailClient({ lessonNumber }: Props) {
                   marginBottom: 32,
                 }}
               >
-                {lesson.estimatedDurationMinutes ?? 15} min · L'École
+                {lesson.estimatedDurationMinutes ?? 15} min · La Méthode
               </p>
 
               {/* Body */}

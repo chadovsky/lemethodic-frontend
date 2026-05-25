@@ -1,7 +1,7 @@
 import VocabBrowse from '@/components/vocabulaire/VocabBrowse'
 
 export const metadata = {
-  title: 'Le Vocabulaire — Le Méthodic',
+  title: 'La Bibliothèque — Le Méthodic',
 }
 
 export default function VocabulairePage() {

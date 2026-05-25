@@ -48,9 +48,9 @@ const RADAR_DATA = [
 ]
 
 const VALUE_ROWS: string[] = [
-  "L'École. 27 lessons unlocking B2 grammar",
+  "La Méthode. 27 lessons unlocking B2 grammar",
   "Unlimited Tâche 1, 2, 3 practice with AI examiner",
-  "Mock Exam mode (recommended after L'École)",
+  "Mock Exam mode (recommended after La Méthode)",
 ]
 
 const TRIAL_TIMELINE = [
@@ -61,7 +61,7 @@ const TRIAL_TIMELINE = [
 
 type CellVal = true | false | string
 const COMPARE_ROWS: { feature: string; free: CellVal; paid: CellVal }[] = [
-  { feature: "L'École lessons",     free: '1 of 27',  paid: true },
+  { feature: "La Méthode lessons",   free: '1 of 27',  paid: true },
   { feature: 'Tâche 1/2/3 practice',    free: '3/day',    paid: true },
   { feature: 'AI examiner feedback',     free: false,      paid: true },
   { feature: 'Mock Exam mode',           free: false,      paid: true },
@@ -332,7 +332,7 @@ export default function Paywall() {
               marginTop: 8,
             }}
           >
-            Daily practice, targeted to your weak spots. L'École + unlimited Tâche 1/2/3 sessions.
+            Daily practice, targeted to your weak spots. La Méthode + unlimited Tâche 1/2/3 sessions.
           </p>
         </div>
 

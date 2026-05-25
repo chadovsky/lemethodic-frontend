@@ -43,12 +43,12 @@ describe('RecommendationsStub', () => {
     expect(screen.getAllByTestId('recommendation-chip')).toHaveLength(3)
   })
 
-  it('chip initials are LM, LF, LV in row order', () => {
+  it('chip initials are LC, LP, LM in row order', () => {
     render(<RecommendationsStub />)
     const chips = screen.getAllByTestId('recommendation-chip')
-    expect(chips[0]).toHaveTextContent('LM')
-    expect(chips[1]).toHaveTextContent('LF')
-    expect(chips[2]).toHaveTextContent('LV')
+    expect(chips[0]).toHaveTextContent('LC')
+    expect(chips[1]).toHaveTextContent('LP')
+    expect(chips[2]).toHaveTextContent('LM')
   })
 
   it('every CTA link has ed-btn-press class', () => {

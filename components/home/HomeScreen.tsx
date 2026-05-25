@@ -288,7 +288,7 @@ export default function HomeScreen({
               margin: 0,
             }}
           >
-            L'École
+            La Méthode
           </h1>
 
           <button
@@ -523,8 +523,8 @@ export default function HomeScreen({
             </section>
           )}
 
-          {/* ── Zone 2: L'École journey ──────────────────────── */}
-          <section aria-label="L'École journey" style={{ marginTop: 48 }}>
+          {/* ── Zone 2: La Méthode journey ──────────────────────── */}
+          <section aria-label="La Méthode journey" style={{ marginTop: 48 }}>
             <EcoleProgress
               completedCount={effectiveCompleted}
               totalCount={TOTAL_LESSONS}

@@ -111,7 +111,7 @@ export interface VocabularyCopy {
 
 const EN: VocabularyCopy = {
   catalog: {
-    title: 'Le Vocabulaire',
+    title: 'La Bibliothèque',
     subtitle: 'Topic-organized French chunks. Browse by partition; open a topic to filter by level, exam, or register.',
     filterLabel: 'Filter by partition',
     filterAllOff: 'Showing all partitions',
@@ -128,7 +128,7 @@ const EN: VocabularyCopy = {
     sourcePrefix: 'Source: ',
   },
   empty: {
-    corpusTitle: 'Le Vocabulaire is coming.',
+    corpusTitle: 'La Bibliothèque is coming.',
     corpusBody: 'The corpus is being prepared. The first topic sets will land here once content is seeded.',
     topicFilteredTitle: 'No chunks match these filters.',
     topicFilteredBody: 'Try widening the CEFR range or clearing an exam tag.',
@@ -214,7 +214,7 @@ const EN: VocabularyCopy = {
 
 const FR: VocabularyCopy = {
   catalog: {
-    title: 'Le Vocabulaire',
+    title: 'La Bibliothèque',
     subtitle: 'Chunks français organisés par thème. Parcourez par partition ; ouvrez un thème pour filtrer par niveau, examen ou registre.',
     filterLabel: 'Filtrer par partition',
     filterAllOff: 'Toutes les partitions',
@@ -231,7 +231,7 @@ const FR: VocabularyCopy = {
     sourcePrefix: 'Source : ',
   },
   empty: {
-    corpusTitle: 'Le Vocabulaire arrive.',
+    corpusTitle: 'La Bibliothèque arrive.',
     corpusBody: 'Le corpus est en préparation. Les premiers ensembles thématiques apparaîtront ici dès que le contenu sera prêt.',
     topicFilteredTitle: 'Aucun chunk ne correspond à ces filtres.',
     topicFilteredBody: 'Essayez d’élargir la plage CEFR ou de retirer un tag d’examen.',

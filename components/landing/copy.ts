@@ -316,9 +316,9 @@ export const PRICING = {
 // F-227 — compressed methodology surface for landing. Reuses the F-202
 // /ecole/intro Section 2 framework in glance-form: 5 couches as one-line
 // entries, no deep blocks. Locked verbatim copy (khâgneux-reviewed; do
-// not paraphrase). Couche names match F-202 EXACTLY (Le Fond / Les Moules
-// des Idées / Les Moules / Les Réflexes Anglais / La Voix) — these are
-// the named in-product concepts and must stay consistent across surfaces.
+// not paraphrase). Couche names match the canonical M2 rename EXACTLY
+// (Le Propos / Le Plan / La Construction / Les Pièges Anglais / La Musique) —
+// these are the named in-product concepts and must stay consistent across surfaces.
 export interface CoucheCopy {
   name: I18nString
   description: I18nString
@@ -338,35 +338,35 @@ export const METHODOLOGY = {
   // by MethodologySection between name and description.
   couches: [
     {
-      name: { en: 'Le Fond', fr: 'Le Fond' },
+      name: { en: 'Le Propos', fr: 'Le Propos' },
       description: {
         en: 'Your ideas. Generic answers fail at B2. Specific examples score.',
         fr: 'Vos idées. Les réponses génériques échouent au B2. Les exemples précis font la différence.',
       },
     },
     {
-      name: { en: 'Les Moules des Idées', fr: 'Les Moules des Idées' },
+      name: { en: 'Le Plan', fr: 'Le Plan' },
       description: {
         en: 'The French way of organizing thought. Retraining unconscious English structures.',
         fr: 'La manière dont le français organise la pensée. Réentraîner les structures anglaises inconscientes.',
       },
     },
     {
-      name: { en: 'Les Moules', fr: 'Les Moules' },
+      name: { en: 'La Construction', fr: 'La Construction' },
       description: {
         en: 'The grammar of French sentences. Not what a textbook teaches, how French actually works.',
         fr: "La grammaire des phrases françaises. Pas ce qu'un manuel enseigne ; comment le français fonctionne vraiment.",
       },
     },
     {
-      name: { en: 'Les Réflexes Anglais', fr: 'Les Réflexes Anglais' },
+      name: { en: 'Les Pièges Anglais', fr: 'Les Pièges Anglais' },
       description: {
         en: 'The English habits that bleed into your French. We diagnose each one.',
         fr: "Les habitudes anglaises qui s'infiltrent dans votre français. On en diagnostique chacune.",
       },
     },
     {
-      name: { en: 'La Voix', fr: 'La Voix' },
+      name: { en: 'La Musique', fr: 'La Musique' },
       description: {
         en: 'How French sounds. Vowels, liaisons, rhythm. The gap between intelligible and credible.',
         fr: 'Comment le français sonne. Voyelles, liaisons, rythme. La différence entre intelligible et crédible.',

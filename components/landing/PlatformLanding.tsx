@@ -125,7 +125,7 @@ const PLATFORM_COPY = {
   },
 } as const
 
-const COUCHE_NAMES = ['Le Fond', 'Les Moules des Idées', 'Les Moules', 'Les Réflexes Anglais', 'La Voix']
+const COUCHE_NAMES = ['Le Propos', 'Le Plan', 'La Construction', 'Les Pièges Anglais', 'La Musique']
 
 interface Props {
   lang: Lang
@@ -761,7 +761,7 @@ function DiagnosticCard({ copy }: { copy: typeof PLATFORM_COPY[keyof typeof PLAT
 // Bottleneck cycle — adapted from V-016f Card 1. Hover advances index;
 // keyed remount triggers spring fade-up via ed-pair-fade-in keyframe.
 
-const BOTTLENECK_LAYERS = ['Le Fond', 'Les Moules des Idées', 'Les Moules', 'Les Réflexes Anglais', 'La Voix']
+const BOTTLENECK_LAYERS = ['Le Propos', 'Le Plan', 'La Construction', 'Les Pièges Anglais', 'La Musique']
 const BOTTLENECK_COPY = {
   en: { eyebrow: 'Diagnose your bottleneck', tail: "is what's blocking your B2." },
   fr: { eyebrow: 'Identifiez votre goulet', tail: 'freine votre B2.' },

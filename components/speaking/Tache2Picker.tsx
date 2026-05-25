@@ -72,7 +72,7 @@ const SCENARIOS: Scenario[] = [
     register: 'Informel',
     descriptor: 'A new colleague from Quebec joined the team. Get to know them.',
     locked: true,
-    lockedReason: "Complete L'École to unlock",
+    lockedReason: "Complete La Méthode to unlock",
   },
   {
     code: 'agence-immobiliere',
@@ -83,7 +83,7 @@ const SCENARIOS: Scenario[] = [
     register: 'Formel',
     descriptor: "You're moving to Canada and looking for an apartment. Get all the info you need.",
     locked: true,
-    lockedReason: "Complete L'École to unlock",
+    lockedReason: "Complete La Méthode to unlock",
   },
 ]
 

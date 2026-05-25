@@ -55,7 +55,7 @@ export default function EcoleProgress({
           marginBottom: 6,
         }}
       >
-        L'École
+        La Méthode
       </p>
 
       {/* Subtitle */}

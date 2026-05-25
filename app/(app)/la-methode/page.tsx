@@ -1,7 +1,7 @@
 import LessonList from '@/components/ecole/LessonList'
 
 export const metadata = {
-  title: "L'École — Le Méthodic",
+  title: "La Méthode — Le Méthodic",
 }
 
 export default function EcolePage() {

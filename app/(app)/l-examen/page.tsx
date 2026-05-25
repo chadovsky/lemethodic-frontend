@@ -2,7 +2,7 @@ import { fetchTaches } from '@/lib/api/taches'
 import DiagnosticLanding from '@/components/diagnostic/DiagnosticLanding'
 
 export const metadata = {
-  title: 'Le Diagnostic — Le Méthodic',
+  title: "L'Examen — Le Méthodic",
 }
 
 export default async function DiagnosticPage() {

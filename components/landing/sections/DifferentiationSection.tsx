@@ -31,16 +31,16 @@ function useReducedMotion(): boolean {
 // ── Card 1 — text-anchored bottleneck cycle (V-016f Option B) ─────────────
 // V-016f rebuild — replaced the 5-bar decorative stack with a typographic
 // frame that names the bottleneck directly. Cycles through the 5 couches
-// on hover. Default focus on Les Réflexes Anglais (most thematically
+// on hover. Default focus on Les Pièges Anglais (most thematically
 // resonant for an anglophone audience). The new layout reads as data
 // (a diagnosis), not as a pattern.
 
 const COUCHE_NAMES_FR = [
-  'Le Fond',
-  'Les Moules des Idées',
-  'Les Moules',
-  'Les Réflexes Anglais',
-  'La Voix',
+  'Le Propos',
+  'Le Plan',
+  'La Construction',
+  'Les Pièges Anglais',
+  'La Musique',
 ] as const
 
 const BOTTLENECK_COPY = {
@@ -49,7 +49,7 @@ const BOTTLENECK_COPY = {
 } as const
 
 function CoucheStackVisual({ language }: { language: 'en' | 'fr' }) {
-  // Default cycle position on Couche 4 (Les Réflexes Anglais). Hover →
+  // Default cycle position on Couche 4 (Les Pièges Anglais). Hover →
   // next couche, modulo 5 so the loop is endless. Reduced-motion users
   // see the same end state without the spring transition.
   const [active, setActive] = useState(3)

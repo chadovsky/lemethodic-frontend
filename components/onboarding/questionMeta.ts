@@ -11,5 +11,5 @@
 // `--ed-paper` (set inline in EcoleReveal.tsx) so the reveal moment
 // reads as a "page turn" against the surrounding `--ed-bg` flow.
 export const ECOLE_REVEAL_ILLUSTRATION = '/illustration-ecole.png'
-export const ECOLE_REVEAL_ILLUSTRATION_ALT_EN = "L'École illustration"
-export const ECOLE_REVEAL_ILLUSTRATION_ALT_FR = "Illustration L'École"
+export const ECOLE_REVEAL_ILLUSTRATION_ALT_EN = "La Méthode illustration"
+export const ECOLE_REVEAL_ILLUSTRATION_ALT_FR = "Illustration La Méthode"
