@@ -4,7 +4,7 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute'
 const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const INK          = 'var(--text-primary)'
 const INK_MUTED    = 'var(--text-muted)'
-const BG           = 'var(--fp-canvas)'
+const BG           = 'var(--lm-bg-base)'
 
 export default function FeedbackPlaceholderPage() {
   return (

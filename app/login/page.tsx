@@ -15,7 +15,7 @@ import {
 
 // F-206 — bg migrated to editorial system. Inner card chrome left in
 // place for v1 (matches signup pattern; full editorial pass is F-206.deep).
-const BG = 'var(--ed-bg)'
+const BG = 'var(--lm-bg-base)'
 
 function validate(email: string, password: string): string | null {
   const trimmed = email.trim()

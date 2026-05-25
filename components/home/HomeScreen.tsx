@@ -19,14 +19,14 @@ import type { Lesson, RecurringModule } from '@/lib/types'
 // pastels (peach/butter/sage/lavender) preserved as accent layer per
 // F-200 rule. F-202 (L'École intro rebuild) eventually supersedes this
 // surface entirely; F-206 is the interim chrome fix.
-const INK         = 'var(--ed-fg)'
-const INK_SOFT    = 'var(--ed-muted)'
-const INK_MUTED   = 'var(--ed-muted)'
-const PEACH       = 'var(--fp-peach)'
-const BUTTER      = 'var(--fp-butter)'
-const SAGE        = 'var(--fp-sage)'
-const LAVENDER    = 'var(--fp-lavender)'
-const BG          = 'var(--ed-bg)'
+const INK         = 'var(--lm-text-primary)'
+const INK_SOFT    = 'var(--lm-text-tertiary)'
+const INK_MUTED   = 'var(--lm-text-tertiary)'
+const PEACH       = 'var(--lm-pastel-peach)'
+const BUTTER      = 'var(--lm-pastel-butter)'
+const SAGE        = 'var(--lm-pastel-sage)'
+const LAVENDER    = 'var(--lm-pastel-lavender)'
+const BG          = 'var(--lm-bg-base)'
 const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // F-087 — 27 lessons total: Phase 1 Fondations (1-16) + Phase 2
@@ -239,13 +239,13 @@ export default function HomeScreen({
             position: 'sticky',
             top: 0,
             zIndex: 40,
-            height: 'calc(56px + var(--fp-safe-top))',
+            height: 'calc(56px + var(--lm-safe-top))',
             backgroundColor: BG,
             borderBottom: '1px solid #1A1A1A0A',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: 'var(--fp-safe-top) 16px 0 16px',
+            padding: 'var(--lm-safe-top) 16px 0 16px',
           }}
         >
           <Link
@@ -590,7 +590,7 @@ export default function HomeScreen({
                     className="ed-skeleton"
                     style={{
                       height: 56,
-                      borderBottom: '1px solid var(--ed-rule)',
+                      borderBottom: '1px solid var(--lm-border-subtle)',
                     }}
                   />
                 ))
@@ -670,8 +670,8 @@ function LessonListEmpty({ hasExamDate }: { hasExamDate: boolean }) {
         flexDirection: 'column',
         alignItems: 'center',
         gap: 10,
-        backgroundColor: 'var(--ed-paper)',
-        border: '1px solid var(--ed-rule)',
+        backgroundColor: 'var(--lm-bg-surface)',
+        border: '1px solid var(--lm-border-subtle)',
         borderRadius: 4,
       }}
     >

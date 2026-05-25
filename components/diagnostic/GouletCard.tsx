@@ -12,7 +12,7 @@ import { duration, ease } from '@/lib/motion'
 const INK          = 'var(--text-primary)'
 const INK_SOFT     = 'var(--text-secondary)'
 const INK_MUTED    = 'var(--text-muted)'
-const PEACH        = 'var(--fp-peach)'
+const PEACH        = 'var(--lm-pastel-peach)'
 const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface Props {

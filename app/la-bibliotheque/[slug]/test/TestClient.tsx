@@ -166,7 +166,7 @@ export default function TestClient({ slug }: { slug: string }) {
   return (
     <main
       className="min-h-screen w-full ed-page-enter"
-      style={{ backgroundColor: 'var(--ed-bg)' }}
+      style={{ backgroundColor: 'var(--lm-bg-base)' }}
     >
       <div className="mx-auto max-w-2xl px-5 md:px-8 py-10 md:py-14 lg:py-16">
         <Link
@@ -176,7 +176,7 @@ export default function TestClient({ slug }: { slug: string }) {
             fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 500,
             fontSize: 13,
-            color: 'var(--ed-muted)',
+            color: 'var(--lm-text-tertiary)',
             textDecoration: 'none',
           }}
         >
@@ -285,8 +285,8 @@ function SessionConfigCard({
   return (
     <div
       style={{
-        backgroundColor: 'var(--ed-paper)',
-        border: '1px solid var(--ed-rule)',
+        backgroundColor: 'var(--lm-bg-surface)',
+        border: '1px solid var(--lm-border-subtle)',
         borderRadius: 4,
         padding: 'clamp(28px, 4vw, 44px)',
       }}
@@ -299,7 +299,7 @@ function SessionConfigCard({
           fontSize: 'clamp(28px, 3.6vw, 36px)',
           lineHeight: 1.15,
           letterSpacing: '-0.015em',
-          color: 'var(--ed-fg)',
+          color: 'var(--lm-text-primary)',
           margin: 0,
           marginBottom: 12,
         }}
@@ -312,7 +312,7 @@ function SessionConfigCard({
           fontWeight: 400,
           fontSize: 15,
           lineHeight: 1.55,
-          color: 'var(--ed-muted)',
+          color: 'var(--lm-text-tertiary)',
           margin: 0,
           marginBottom: 24,
         }}
@@ -357,8 +357,8 @@ function SessionConfigCard({
           height: 52,
           borderRadius: 4,
           border: 'none',
-          backgroundColor: chunkCount < TEST_MIN_CHUNKS ? 'var(--ed-rule)' : 'var(--ed-accent)',
-          color: chunkCount < TEST_MIN_CHUNKS ? 'var(--ed-muted)' : '#FFFFFF',
+          backgroundColor: chunkCount < TEST_MIN_CHUNKS ? 'var(--lm-border-subtle)' : 'var(--cta-primary)',
+          color: chunkCount < TEST_MIN_CHUNKS ? 'var(--lm-text-tertiary)' : '#FFFFFF',
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
           fontSize: 15,
@@ -377,7 +377,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div className="mb-5">
       <div
         className="text-[12px] uppercase tracking-[0.12em] font-semibold mb-2"
-        style={{ color: 'var(--ed-muted)' }}
+        style={{ color: 'var(--lm-text-tertiary)' }}
       >
         {label}
       </div>
@@ -410,16 +410,16 @@ function ToggleRow<T extends string | number>({
               height: 38,
               padding: '0 14px',
               borderRadius: 4,
-              border: '1px solid var(--ed-rule)',
-              backgroundColor: isActive ? 'var(--ed-accent)' : 'var(--ed-paper)',
-              color: isActive ? '#FFFFFF' : 'var(--ed-fg)',
+              border: '1px solid var(--lm-border-subtle)',
+              backgroundColor: isActive ? 'var(--cta-primary)' : 'var(--lm-bg-surface)',
+              color: isActive ? '#FFFFFF' : 'var(--lm-text-primary)',
               fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
               fontWeight: 500,
               fontSize: 13,
               letterSpacing: '0.01em',
               cursor: 'pointer',
               transition:
-                'background-color var(--ed-duration-hover) var(--ed-ease), color var(--ed-duration-hover) var(--ed-ease)',
+                'background-color var(--lm-duration-hover) var(--lm-ease), color var(--lm-duration-hover) var(--lm-ease)',
             }}
           >
             {opt.label}
@@ -454,7 +454,7 @@ function QuestionView({
     <div className="flex flex-col gap-6">
       <div
         className="text-[12px] uppercase tracking-[0.12em] font-semibold text-center"
-        style={{ color: 'var(--ed-muted)' }}
+        style={{ color: 'var(--lm-text-tertiary)' }}
       >
         {copy.test.progressLabel(i, n)}
       </div>
@@ -548,9 +548,9 @@ function optionStyle(
     minHeight: 56,
     padding: '12px 16px',
     borderRadius: 4,
-    border: '1px solid var(--ed-rule)',
-    backgroundColor: 'var(--ed-paper)',
-    color: 'var(--ed-fg)',
+    border: '1px solid var(--lm-border-subtle)',
+    backgroundColor: 'var(--lm-bg-surface)',
+    color: 'var(--lm-text-primary)',
     fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
     fontWeight: 500,
     fontSize: 14,
@@ -558,22 +558,22 @@ function optionStyle(
     textAlign: 'left',
     cursor: submitted ? 'default' : 'pointer',
     transition:
-      'background-color var(--ed-duration-hover) var(--ed-ease), color var(--ed-duration-hover) var(--ed-ease)',
+      'background-color var(--lm-duration-hover) var(--lm-ease), color var(--lm-duration-hover) var(--lm-ease)',
   }
   if (!submitted) return base
   if (opt === correct) {
     return {
       ...base,
-      backgroundColor: 'var(--ed-accent)',
+      backgroundColor: 'var(--cta-primary)',
       color: '#FFFFFF',
-      borderColor: 'var(--ed-accent)',
+      borderColor: 'var(--cta-primary)',
     }
   }
   if (opt === picked) {
     return {
       ...base,
-      backgroundColor: 'var(--ed-bg)',
-      color: 'var(--ed-muted)',
+      backgroundColor: 'var(--lm-bg-base)',
+      color: 'var(--lm-text-tertiary)',
       textDecoration: 'line-through',
     }
   }
@@ -584,8 +584,8 @@ function ExerciseCard({ prompt, body }: { prompt: string; body: string }) {
   return (
     <div
       style={{
-        backgroundColor: 'var(--ed-paper)',
-        border: '1px solid var(--ed-rule)',
+        backgroundColor: 'var(--lm-bg-surface)',
+        border: '1px solid var(--lm-border-subtle)',
         borderRadius: 4,
         padding: 'clamp(24px, 3vw, 36px) clamp(20px, 3vw, 32px)',
         textAlign: 'center',
@@ -593,7 +593,7 @@ function ExerciseCard({ prompt, body }: { prompt: string; body: string }) {
     >
       <div
         className="text-[12px] uppercase tracking-[0.12em] font-semibold mb-3"
-        style={{ color: 'var(--ed-muted)' }}
+        style={{ color: 'var(--lm-text-tertiary)' }}
       >
         {prompt}
       </div>
@@ -603,7 +603,7 @@ function ExerciseCard({ prompt, body }: { prompt: string; body: string }) {
           fontWeight: 500,
           fontSize: 'clamp(20px, 2.6vw, 26px)',
           lineHeight: 1.3,
-          color: 'var(--ed-fg)',
+          color: 'var(--lm-text-primary)',
           margin: 0,
         }}
       >
@@ -631,7 +631,7 @@ function FeedbackBlock({
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
           fontSize: 14,
-          color: ok ? 'var(--ed-accent)' : 'var(--ed-fg)',
+          color: ok ? 'var(--cta-primary)' : 'var(--lm-text-primary)',
           textAlign: 'center',
           margin: 0,
         }}
@@ -647,7 +647,7 @@ function FeedbackBlock({
           height: 48,
           borderRadius: 4,
           border: 'none',
-          backgroundColor: 'var(--ed-accent)',
+          backgroundColor: 'var(--cta-primary)',
           color: '#FFFFFF',
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
@@ -695,9 +695,9 @@ function DropdownView({
           height: 52,
           padding: '0 14px',
           borderRadius: 4,
-          border: '1px solid var(--ed-rule)',
-          backgroundColor: 'var(--ed-paper)',
-          color: picked ? 'var(--ed-fg)' : 'var(--ed-muted)',
+          border: '1px solid var(--lm-border-subtle)',
+          backgroundColor: 'var(--lm-bg-surface)',
+          color: picked ? 'var(--lm-text-primary)' : 'var(--lm-text-tertiary)',
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 500,
           fontSize: 14,
@@ -723,8 +723,8 @@ function DropdownView({
             height: 48,
             borderRadius: 4,
             border: 'none',
-            backgroundColor: !picked ? 'var(--ed-rule)' : 'var(--ed-accent)',
-            color: !picked ? 'var(--ed-muted)' : '#FFFFFF',
+            backgroundColor: !picked ? 'var(--lm-border-subtle)' : 'var(--cta-primary)',
+            color: !picked ? 'var(--lm-text-tertiary)' : '#FFFFFF',
             fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 14,
@@ -782,9 +782,9 @@ function ExactView({
           height: 52,
           padding: '0 14px',
           borderRadius: 4,
-          border: '1px solid var(--ed-rule)',
-          backgroundColor: 'var(--ed-paper)',
-          color: 'var(--ed-fg)',
+          border: '1px solid var(--lm-border-subtle)',
+          backgroundColor: 'var(--lm-bg-surface)',
+          color: 'var(--lm-text-primary)',
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 500,
           fontSize: 16,
@@ -802,8 +802,8 @@ function ExactView({
             height: 48,
             borderRadius: 4,
             border: 'none',
-            backgroundColor: !value.trim() ? 'var(--ed-rule)' : 'var(--ed-accent)',
-            color: !value.trim() ? 'var(--ed-muted)' : '#FFFFFF',
+            backgroundColor: !value.trim() ? 'var(--lm-border-subtle)' : 'var(--cta-primary)',
+            color: !value.trim() ? 'var(--lm-text-tertiary)' : '#FFFFFF',
             fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 14,
@@ -910,7 +910,7 @@ function MatchingView({
     <>
       <div
         className="text-[12px] uppercase tracking-[0.12em] font-semibold mb-1"
-        style={{ color: 'var(--ed-muted)', textAlign: 'center' }}
+        style={{ color: 'var(--lm-text-tertiary)', textAlign: 'center' }}
       >
         {copy.test.matchingPrompt}
       </div>
@@ -956,8 +956,8 @@ function MatchingView({
             height: 48,
             borderRadius: 4,
             border: 'none',
-            backgroundColor: !allPaired ? 'var(--ed-rule)' : 'var(--ed-accent)',
-            color: !allPaired ? 'var(--ed-muted)' : '#FFFFFF',
+            backgroundColor: !allPaired ? 'var(--lm-border-subtle)' : 'var(--cta-primary)',
+            color: !allPaired ? 'var(--lm-text-tertiary)' : '#FFFFFF',
             fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 14,
@@ -973,7 +973,7 @@ function MatchingView({
               fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
               fontWeight: 600,
               fontSize: 14,
-              color: 'var(--ed-fg)',
+              color: 'var(--lm-text-primary)',
               textAlign: 'center',
               margin: 0,
             }}
@@ -989,7 +989,7 @@ function MatchingView({
               height: 48,
               borderRadius: 4,
               border: 'none',
-              backgroundColor: 'var(--ed-accent)',
+              backgroundColor: 'var(--cta-primary)',
               color: '#FFFFFF',
               fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
               fontWeight: 600,
@@ -1022,25 +1022,25 @@ function MatchItem({
   // for wrong. Pre-submit: ed-accent fill on selected, paper + slight
   // tint when paired (so the user can see which items are already in
   // a pair vs free to select).
-  let bg = 'var(--ed-paper)'
-  let fg: React.CSSProperties['color'] = 'var(--ed-fg)'
-  let borderColor: React.CSSProperties['borderColor'] = 'var(--ed-rule)'
+  let bg = 'var(--lm-bg-surface)'
+  let fg: React.CSSProperties['color'] = 'var(--lm-text-primary)'
+  let borderColor: React.CSSProperties['borderColor'] = 'var(--lm-border-subtle)'
   let textDecoration: React.CSSProperties['textDecoration'] = 'none'
   if (correct === true) {
-    bg = 'var(--ed-accent)'
+    bg = 'var(--cta-primary)'
     fg = '#FFFFFF'
-    borderColor = 'var(--ed-accent)'
+    borderColor = 'var(--cta-primary)'
   } else if (correct === false) {
-    bg = 'var(--ed-bg)'
-    fg = 'var(--ed-muted)'
+    bg = 'var(--lm-bg-base)'
+    fg = 'var(--lm-text-tertiary)'
     textDecoration = 'line-through'
   } else if (selected) {
-    bg = 'var(--ed-accent)'
+    bg = 'var(--cta-primary)'
     fg = '#FFFFFF'
-    borderColor = 'var(--ed-accent)'
+    borderColor = 'var(--cta-primary)'
   } else if (paired) {
-    bg = 'var(--ed-bg)'
-    fg = 'var(--ed-fg)'
+    bg = 'var(--lm-bg-base)'
+    fg = 'var(--lm-text-primary)'
   }
   return (
     <button
@@ -1062,7 +1062,7 @@ function MatchItem({
         cursor: 'pointer',
         textDecoration,
         transition:
-          'background-color var(--ed-duration-hover) var(--ed-ease), color var(--ed-duration-hover) var(--ed-ease)',
+          'background-color var(--lm-duration-hover) var(--lm-ease), color var(--lm-duration-hover) var(--lm-ease)',
       }}
     >
       {text}
@@ -1088,8 +1088,8 @@ function TestEndCard({
   return (
     <div
       style={{
-        backgroundColor: 'var(--ed-paper)',
-        border: '1px solid var(--ed-rule)',
+        backgroundColor: 'var(--lm-bg-surface)',
+        border: '1px solid var(--lm-border-subtle)',
         borderRadius: 4,
         padding: 'clamp(28px, 4vw, 48px)',
         textAlign: 'center',
@@ -1102,7 +1102,7 @@ function TestEndCard({
           fontWeight: 400,
           fontSize: 'clamp(26px, 3vw, 34px)',
           lineHeight: 1.15,
-          color: 'var(--ed-fg)',
+          color: 'var(--lm-text-primary)',
           margin: 0,
           marginBottom: 16,
         }}
@@ -1114,7 +1114,7 @@ function TestEndCard({
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
           fontSize: 18,
-          color: 'var(--ed-fg)',
+          color: 'var(--lm-text-primary)',
           margin: 0,
           marginBottom: 24,
         }}
@@ -1130,7 +1130,7 @@ function TestEndCard({
             height: 48,
             borderRadius: 4,
             border: 'none',
-            backgroundColor: 'var(--ed-accent)',
+            backgroundColor: 'var(--cta-primary)',
             color: '#FFFFFF',
             fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
@@ -1149,9 +1149,9 @@ function TestEndCard({
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 4,
-            border: '1px solid var(--ed-rule)',
-            backgroundColor: 'var(--ed-paper)',
-            color: 'var(--ed-fg)',
+            border: '1px solid var(--lm-border-subtle)',
+            backgroundColor: 'var(--lm-bg-surface)',
+            color: 'var(--lm-text-primary)',
             fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 14,
@@ -1169,9 +1169,9 @@ function TestEndCard({
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 4,
-            border: '1px solid var(--ed-rule)',
-            backgroundColor: 'var(--ed-paper)',
-            color: 'var(--ed-fg)',
+            border: '1px solid var(--lm-border-subtle)',
+            backgroundColor: 'var(--lm-bg-surface)',
+            color: 'var(--lm-text-primary)',
             fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 14,
@@ -1199,8 +1199,8 @@ function TierLockedCard({
   return (
     <div
       style={{
-        backgroundColor: 'var(--ed-paper)',
-        border: '1px solid var(--ed-rule)',
+        backgroundColor: 'var(--lm-bg-surface)',
+        border: '1px solid var(--lm-border-subtle)',
         borderRadius: 4,
         padding: 'clamp(28px, 4vw, 48px)',
         textAlign: 'center',
@@ -1212,11 +1212,11 @@ function TierLockedCard({
             display: 'inline-block',
             padding: '4px 10px',
             borderRadius: 3,
-            border: '1px dashed var(--ed-muted)',
+            border: '1px dashed var(--lm-text-tertiary)',
             fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
             fontSize: 11,
-            color: 'var(--ed-muted)',
+            color: 'var(--lm-text-tertiary)',
             letterSpacing: '0.08em',
             marginBottom: 16,
           }}
@@ -1231,7 +1231,7 @@ function TierLockedCard({
           fontWeight: 400,
           fontSize: 'clamp(24px, 2.8vw, 30px)',
           lineHeight: 1.15,
-          color: 'var(--ed-fg)',
+          color: 'var(--lm-text-primary)',
           margin: 0,
           marginBottom: 10,
         }}
@@ -1244,7 +1244,7 @@ function TierLockedCard({
           fontWeight: 400,
           fontSize: 15,
           lineHeight: 1.55,
-          color: 'var(--ed-muted)',
+          color: 'var(--lm-text-tertiary)',
           margin: 0,
           marginBottom: 22,
           maxWidth: 420,
@@ -1263,7 +1263,7 @@ function TierLockedCard({
           padding: '0 24px',
           borderRadius: 4,
           border: 'none',
-          backgroundColor: 'var(--ed-accent)',
+          backgroundColor: 'var(--cta-primary)',
           color: '#FFFFFF',
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
@@ -1288,8 +1288,8 @@ function ErrorCard({
     <div
       role="alert"
       style={{
-        backgroundColor: 'var(--ed-paper)',
-        border: '1px solid var(--ed-rule)',
+        backgroundColor: 'var(--lm-bg-surface)',
+        border: '1px solid var(--lm-border-subtle)',
         borderRadius: 4,
         padding: 'clamp(28px, 4vw, 44px)',
         textAlign: 'center',
@@ -1301,7 +1301,7 @@ function ErrorCard({
           fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 22,
-          color: 'var(--ed-fg)',
+          color: 'var(--lm-text-primary)',
           margin: 0,
           marginBottom: 8,
         }}
@@ -1312,7 +1312,7 @@ function ErrorCard({
         style={{
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontSize: 14,
-          color: 'var(--ed-muted)',
+          color: 'var(--lm-text-tertiary)',
           margin: 0,
           marginBottom: 18,
         }}
@@ -1328,7 +1328,7 @@ function ErrorCard({
           padding: '0 20px',
           borderRadius: 4,
           border: 'none',
-          backgroundColor: 'var(--ed-accent)',
+          backgroundColor: 'var(--cta-primary)',
           color: '#FFFFFF',
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
@@ -1347,8 +1347,8 @@ function EmptyCard({ copy }: { copy: ReturnType<typeof vocabCopy> }) {
     <div
       role="status"
       style={{
-        backgroundColor: 'var(--ed-paper)',
-        border: '1px solid var(--ed-rule)',
+        backgroundColor: 'var(--lm-bg-surface)',
+        border: '1px solid var(--lm-border-subtle)',
         borderRadius: 4,
         padding: 'clamp(28px, 4vw, 48px)',
         textAlign: 'center',
@@ -1361,7 +1361,7 @@ function EmptyCard({ copy }: { copy: ReturnType<typeof vocabCopy> }) {
           fontWeight: 400,
           fontSize: 'clamp(22px, 2.4vw, 28px)',
           lineHeight: 1.15,
-          color: 'var(--ed-fg)',
+          color: 'var(--lm-text-primary)',
           margin: 0,
           marginBottom: 10,
         }}
@@ -1374,7 +1374,7 @@ function EmptyCard({ copy }: { copy: ReturnType<typeof vocabCopy> }) {
           fontWeight: 400,
           fontSize: 15,
           lineHeight: 1.55,
-          color: 'var(--ed-muted)',
+          color: 'var(--lm-text-tertiary)',
           margin: 0,
           maxWidth: 420,
           marginLeft: 'auto',
@@ -1398,8 +1398,8 @@ function SoftEmptyCard({
     <div
       role="status"
       style={{
-        backgroundColor: 'var(--ed-paper)',
-        border: '1px solid var(--ed-rule)',
+        backgroundColor: 'var(--lm-bg-surface)',
+        border: '1px solid var(--lm-border-subtle)',
         borderRadius: 4,
         padding: 'clamp(28px, 4vw, 48px)',
         textAlign: 'center',
@@ -1412,7 +1412,7 @@ function SoftEmptyCard({
           fontWeight: 400,
           fontSize: 'clamp(22px, 2.4vw, 28px)',
           lineHeight: 1.15,
-          color: 'var(--ed-fg)',
+          color: 'var(--lm-text-primary)',
           margin: 0,
           marginBottom: 10,
         }}
@@ -1425,7 +1425,7 @@ function SoftEmptyCard({
           fontWeight: 400,
           fontSize: 15,
           lineHeight: 1.55,
-          color: 'var(--ed-muted)',
+          color: 'var(--lm-text-tertiary)',
           margin: 0,
           marginBottom: 22,
           maxWidth: 420,
@@ -1446,7 +1446,7 @@ function SoftEmptyCard({
           justifyContent: 'center',
           borderRadius: 4,
           border: 'none',
-          backgroundColor: 'var(--ed-accent)',
+          backgroundColor: 'var(--cta-primary)',
           color: '#FFFFFF',
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
@@ -1465,8 +1465,8 @@ function TestSkeleton() {
     <div
       className="ed-skeleton"
       style={{
-        backgroundColor: 'var(--ed-paper)',
-        border: '1px solid var(--ed-rule)',
+        backgroundColor: 'var(--lm-bg-surface)',
+        border: '1px solid var(--lm-border-subtle)',
         borderRadius: 4,
         height: 260,
       }}

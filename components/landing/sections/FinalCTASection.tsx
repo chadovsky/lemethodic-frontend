@@ -22,7 +22,7 @@ function highlightB2(text: string): ReactNode[] {
   const parts = text.split(/(B2)/g)
   return parts.map((part, i) =>
     part === 'B2' ? (
-      <span key={i} style={{ color: 'var(--ed-warm-peach-deep)' }}>
+      <span key={i} style={{ color: 'var(--lm-warm-peach-deep)' }}>
         {part}
       </span>
     ) : (
@@ -40,7 +40,7 @@ export default function FinalCTASection({ lang }: { lang: Lang }) {
         // conversion-moment warmth Chadi specified ("the colors before
         // were much better"). Absorbs V-011.color. Headline gets a "B2"
         // highlight in warm-peach-deep below; CTA gains warm hover state.
-        backgroundColor: 'var(--ed-warm-sand)',
+        backgroundColor: 'var(--lm-warm-sand)',
         padding: 'clamp(96px, 14vw, 180px) clamp(24px, 4vw, 64px)',
       }}
     >
@@ -119,7 +119,7 @@ export default function FinalCTASection({ lang }: { lang: Lang }) {
                 fontWeight: 400,
                 fontSize: '0.875rem',
                 lineHeight: 1.5,
-                color: 'var(--ed-fg-soft)',
+                color: 'var(--lm-text-secondary)',
               }}
             >
               {FINAL_CTA.ctaSecondary[lang]}

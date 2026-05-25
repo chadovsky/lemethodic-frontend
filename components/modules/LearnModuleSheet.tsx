@@ -140,7 +140,7 @@ export default function LearnModuleSheet({ module: m, lessonTitle, lessonSubline
           transform: 'translateX(-50%)',
           width: '100%',
           maxWidth: 440,
-          backgroundColor: 'var(--fp-canvas)',
+          backgroundColor: 'var(--lm-bg-base)',
           borderTopLeftRadius: 28,
           borderTopRightRadius: 28,
           zIndex: 70,
@@ -225,7 +225,7 @@ export default function LearnModuleSheet({ module: m, lessonTitle, lessonSubline
 
         <div
           style={{
-            padding: '4px 22px calc(32px + var(--fp-safe-bottom)) 22px',
+            padding: '4px 22px calc(32px + var(--lm-safe-bottom)) 22px',
             display: 'flex',
             flexDirection: 'column',
             gap: 10,

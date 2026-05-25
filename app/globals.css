@@ -75,101 +75,72 @@
      Source Serif 4: lesson/editorial. */
   --font-geist: 'Geist', -apple-system, "Segoe UI", system-ui, sans-serif;
 
-  /* ──────────────────────────────────────────────────────────────────────
-     Legacy aliases (kept through X.1-X.5; X.6 cleanup drops them).
-     Editorial chrome tokens point at the new canonical set above so
-     every existing consumer keeps resolving without an explicit edit.
-     ────────────────────────────────────────────────────────────────────── */
+  /* ── DESIGN.md v1 — Le Méthodic canonical tokens (M2 t7, 2026-05-25) ──── */
 
-  /* LeMethodic onboarding pastel palette */
-  --fp-peach: #FFD8C2;
-  --fp-sage: #D4E4D0;
-  --fp-butter: #FFF0C2;
-  --fp-lavender: #E0D4F0;
-  --fp-sky: #CFE4F5;
-  --fp-blush: #F5D6D6;
+  /* Brand (warm ochre) */
+  --lm-brand: #C49A3A;
+  --lm-brand-deep: #8B6914;
+  --lm-brand-tint: #F5E8C0;
+  --lm-brand-glow: #E8C77A;
 
-  /* LeMethodic neutrals */
-  --fp-ink: var(--text-primary);
-  --fp-ink-soft: var(--text-secondary);
-  --fp-ink-muted: var(--text-muted);
-  --fp-paper: #FFFFFFCC;
-  --fp-paper-solid: #FFFFFF;
+  /* Per-couche colors (light mode) */
+  --lm-couche-propos: #BC4F2A;
+  --lm-couche-plan: #A66A2E;
+  --lm-couche-construction: #8E5A1F;
+  --lm-couche-pieges: #E0701D;
+  --lm-couche-musique: #D4A431;
 
-  /* LeMethodic CTA */
-  --fp-cta-bg: var(--cta-primary);
-  --fp-cta-text: #FFFFFF;
-  --fp-cta-disabled: #1A1A1A4D;
+  /* Functional */
+  --lm-success: #6B8E3B;
+  --lm-success-25: rgba(107, 142, 59, 0.25);
+  --lm-warning: #C8841B;
+  --lm-error: #A8341B;
+  --lm-info: #7B6A8B;
 
-  /* LeMethodic promoted tokens (formerly inline one-offs, promoted 2026-05-01) */
-  --fp-canvas: var(--bg-canvas);   /* aliased to F-VISUAL-001 warm cream */
-  --fp-track: #E8E8E5;        /* empty bar / progress-track surface */
-  --fp-peach-deep: #E0A890;   /* saturated peach — paywall radar only */
-  --fp-sage-deep: var(--success);  /* "win" microcopy badges — aliased to success state-signal */
-  /* Alpha variants — naming convention "<token>-NN" where NN is the alpha % */
-  --fp-sage-deep-25: #2D8B5540;  /* 25% alpha — free-tier check icon background */
+  /* Background / text / border (light mode defaults) */
+  --lm-bg-base: #FAF7F0;
+  --lm-bg-surface: #FFFFFF;
+  --lm-bg-subtle: #F0EBE0;
+  --lm-text-primary: #1E1A14;
+  --lm-text-secondary: #5C544A;
+  --lm-text-tertiary: #8B8275;
+  --lm-border-subtle: #E5DFD2;
 
-  /* LeMethodic error — gentle redirect, not system failure
-     (decision log #2, 2026-05-01) */
-  --fp-error: var(--error);  /* aliased to F-VISUAL-001 muted red */
+  /* Warm editorial palette */
+  --lm-warm-peach: #FFD8C2;
+  --lm-warm-peach-deep: #E0A890;
+  --lm-warm-sage: #B8C4A8;
+  --lm-warm-sage-deep: var(--accent-primary);
+  --lm-warm-espresso: #4A3528;
+  --lm-warm-cream: #FDFBF7;
+  --lm-warm-sand: #F5E6D8;
 
-  /* LeMethodic safe-area passthroughs — apply via inline style or CSS class
-     wherever a fixed/sticky element touches a viewport edge. */
-  --fp-safe-top: env(safe-area-inset-top);
-  --fp-safe-bottom: env(safe-area-inset-bottom);
-  --fp-safe-left: env(safe-area-inset-left);
-  --fp-safe-right: env(safe-area-inset-right);
+  /* Onboarding pastel chip palette */
+  --lm-pastel-peach: #FFD8C2;
+  --lm-pastel-sage: #D4E4D0;
+  --lm-pastel-butter: #FFF0C2;
+  --lm-pastel-lavender: #E0D4F0;
+  --lm-pastel-sky: #CFE4F5;
+  --lm-pastel-blush: #F5D6D6;
 
-  --font-switzer: var(--font-geist);  /* legacy alias — resolves to Geist */
+  /* Motion */
+  --lm-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --lm-ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --lm-ease-default: cubic-bezier(0, 0, 0.2, 1);
+  --lm-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --lm-ease-exit: cubic-bezier(0.33, 1, 0.68, 1);
+  --lm-duration-fast: 200ms;
+  --lm-duration-base: 300ms;
+  --lm-duration-slow: 400ms;
+  --lm-duration-hover: 200ms;
+  --lm-duration-state: 600ms;
+  --lm-duration-reveal: 700ms;
 
-  /* LeMethodic motion language (companion to lib/motion.ts) */
-  --fp-ease-fp-default: cubic-bezier(0, 0, 0.2, 1);
-  --fp-ease-fp-enter: cubic-bezier(0.16, 1, 0.3, 1);
-  --fp-ease-fp-exit: cubic-bezier(0.33, 1, 0.68, 1);
-  --fp-duration-fast: 200ms;
-  --fp-duration-base: 300ms;
-  --fp-duration-slow: 400ms;
-
-  /* F-200 — editorial design system. V-012a softened toward warm-editorial:
-     --ed-bg slightly warmer cream, --ed-fg warm dark instead of near-black,
-     +1 secondary text token (--ed-fg-soft), +7 Editorial Luxury palette
-     tokens for chrome-level warmth (peach/sage/espresso/cream/sand), and
-     a spring easing curve for soft state transitions. The legacy --ed-ease
-     stays available — V-012a replaces it as default for color/bg/border
-     transitions but transforms on buttons keep short ease-out for tactile
-     snap. The --fp-* pastel palette is unchanged; --ed-warm-* tokens
-     overlap some hex values but namespace separation reflects role
-     (--fp-* = decorative chip layer per F-200; --ed-warm-* = chrome). */
-  --ed-bg: var(--bg-canvas);          /* F-VISUAL-001 alias */
-  --ed-fg: var(--text-primary);       /* F-VISUAL-001 alias */
-  --ed-fg-soft: var(--text-secondary);  /* F-VISUAL-001 alias */
-  --ed-accent: var(--cta-primary);      /* F-VISUAL-001 alias — editorial navy */
-  --ed-muted: var(--text-muted);        /* F-VISUAL-001 alias */
-  --ed-rule: var(--rule-default);       /* F-VISUAL-001 alias */
-  --ed-paper: var(--bg-elevated);       /* F-VISUAL-001 alias */
-
-  /* V-012a — Editorial Luxury palette additions. Per-surface chrome-level
-     warmth, distinct from --fp-* decorative chips. Consumers in V-012b
-     wire these into Hero, Paywall, FinalCTA, EcoleReveal, onboarding
-     question screens, and differentiation cards. */
-  --ed-warm-peach: #FFD8C2;
-  --ed-warm-peach-deep: #E0A890;
-  --ed-warm-sage: #B8C4A8;
-  --ed-warm-sage-deep: var(--accent-primary);  /* F-VISUAL-001 — promoted to accent-primary (Q1) */
-  --ed-warm-espresso: #4A3528;
-  --ed-warm-cream: #FDFBF7;
-  --ed-warm-sand: #F5E6D8;
-
-  /* Editorial motion — V-012a adds --ease-spring for soft state shifts.
-     Default rule going forward: transform = short ease-out (tactile snap),
-     color/bg/border/shadow = spring (soft state). --ed-ease stays for
-     surfaces with their own motion contracts (V-003 hero atmosphere
-     keyframes, hero-rise, kicker-slide). */
-  --ed-ease: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
-  --ed-duration-hover: 200ms;
-  --ed-duration-state: 600ms;
-  --ed-duration-reveal: 700ms;
+  /* Safe area passthroughs */
+  --lm-safe-top: env(safe-area-inset-top);
+  --lm-safe-bottom: env(safe-area-inset-bottom);
+  --lm-safe-left: env(safe-area-inset-left);
+  --lm-safe-right: env(safe-area-inset-right);
 
   /* F-VISUAL-001 X.2 — shadcn token rewire. components/ui/* sources
      unchanged (per Q4); the rewire happens at the token level here so
@@ -244,6 +215,29 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+
+  /* DESIGN.md v1 dark mode overrides */
+  --lm-brand: #D4A847;
+  --lm-brand-deep: #A88830;
+  --lm-brand-tint: #3A2F18;
+  --lm-brand-glow: #C9A04A;
+  --lm-couche-propos: #D66A47;
+  --lm-couche-plan: #BC8447;
+  --lm-couche-construction: #B07A38;
+  --lm-couche-pieges: #F08940;
+  --lm-couche-musique: #E0BC50;
+  --lm-success: #8FB058;
+  --lm-success-25: rgba(143, 176, 88, 0.25);
+  --lm-warning: #E2A040;
+  --lm-error: #D45A3A;
+  --lm-info: #9B8AAB;
+  --lm-bg-base: #1A1612;
+  --lm-bg-surface: #241F1A;
+  --lm-bg-subtle: #2C2620;
+  --lm-text-primary: #F5F0E5;
+  --lm-text-secondary: #B5AC9C;
+  --lm-text-tertiary: #857D70;
+  --lm-border-subtle: #3A332B;
 }
 
 @theme inline {
@@ -289,48 +283,38 @@
   --color-neutral-900: var(--neutral-900);
   --color-neutral-950: var(--neutral-950);
 
-  /* LeMethodic legacy design tokens (kept as Tailwind utilities through
-     X.1-X.5; X.6 cleanup drops these in lockstep with the :root aliases) */
-  --color-fp-peach: var(--fp-peach);
-  --color-fp-sage: var(--fp-sage);
-  --color-fp-butter: var(--fp-butter);
-  --color-fp-lavender: var(--fp-lavender);
-  --color-fp-sky: var(--fp-sky);
-  --color-fp-blush: var(--fp-blush);
-  --color-fp-ink: var(--fp-ink);
-  --color-fp-ink-soft: var(--fp-ink-soft);
-  --color-fp-ink-muted: var(--fp-ink-muted);
-  --color-fp-paper: var(--fp-paper);
-  --color-fp-paper-solid: var(--fp-paper-solid);
-  --color-fp-cta-bg: var(--fp-cta-bg);
-  --color-fp-cta-text: var(--fp-cta-text);
-  --color-fp-cta-disabled: var(--fp-cta-disabled);
-  --color-fp-canvas: var(--fp-canvas);
-  --color-fp-track: var(--fp-track);
-  --color-fp-peach-deep: var(--fp-peach-deep);
-  --color-fp-sage-deep: var(--fp-sage-deep);
-  --color-fp-sage-deep-25: var(--fp-sage-deep-25);
-  --color-fp-error: var(--fp-error);
-  --ease-fp-default: var(--fp-ease-fp-default);
-  --ease-fp-enter: var(--fp-ease-fp-enter);
-  --ease-fp-exit: var(--fp-ease-fp-exit);
-  --animate-duration-fp-fast: var(--fp-duration-fast);
-  --animate-duration-fp-base: var(--fp-duration-base);
-  --animate-duration-fp-slow: var(--fp-duration-slow);
-
-  /* F-200 — editorial palette as Tailwind utilities (bg-ed-bg, text-ed-fg,
-     border-ed-rule, etc). The bg-ed-bg ergonomics are awkward but namespaced
-     deliberately to avoid collision with shadcn --color-accent. */
-  --color-ed-bg: var(--ed-bg);
-  --color-ed-fg: var(--ed-fg);
-  --color-ed-accent: var(--ed-accent);
-  --color-ed-muted: var(--ed-muted);
-  --color-ed-rule: var(--ed-rule);
-  --color-ed-paper: var(--ed-paper);
-  --ease-ed-default: var(--ed-ease);
-  --animate-duration-ed-hover: var(--ed-duration-hover);
-  --animate-duration-ed-state: var(--ed-duration-state);
-  --animate-duration-ed-reveal: var(--ed-duration-reveal);
+  /* DESIGN.md v1 — Le Méthodic canonical Tailwind utilities */
+  --color-lm-brand: var(--lm-brand);
+  --color-lm-brand-deep: var(--lm-brand-deep);
+  --color-lm-brand-tint: var(--lm-brand-tint);
+  --color-lm-brand-glow: var(--lm-brand-glow);
+  --color-lm-couche-propos: var(--lm-couche-propos);
+  --color-lm-couche-plan: var(--lm-couche-plan);
+  --color-lm-couche-construction: var(--lm-couche-construction);
+  --color-lm-couche-pieges: var(--lm-couche-pieges);
+  --color-lm-couche-musique: var(--lm-couche-musique);
+  --color-lm-success: var(--lm-success);
+  --color-lm-warning: var(--lm-warning);
+  --color-lm-error: var(--lm-error);
+  --color-lm-info: var(--lm-info);
+  --color-lm-bg-base: var(--lm-bg-base);
+  --color-lm-bg-surface: var(--lm-bg-surface);
+  --color-lm-bg-subtle: var(--lm-bg-subtle);
+  --color-lm-text-primary: var(--lm-text-primary);
+  --color-lm-text-secondary: var(--lm-text-secondary);
+  --color-lm-text-tertiary: var(--lm-text-tertiary);
+  --color-lm-border-subtle: var(--lm-border-subtle);
+  --color-lm-warm-peach: var(--lm-warm-peach);
+  --color-lm-warm-peach-deep: var(--lm-warm-peach-deep);
+  --color-lm-warm-espresso: var(--lm-warm-espresso);
+  --color-lm-warm-cream: var(--lm-warm-cream);
+  --color-lm-warm-sand: var(--lm-warm-sand);
+  --color-lm-pastel-peach: var(--lm-pastel-peach);
+  --color-lm-pastel-sage: var(--lm-pastel-sage);
+  --color-lm-pastel-butter: var(--lm-pastel-butter);
+  --color-lm-pastel-lavender: var(--lm-pastel-lavender);
+  --color-lm-pastel-sky: var(--lm-pastel-sky);
+  --color-lm-pastel-blush: var(--lm-pastel-blush);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -387,7 +371,7 @@
   textarea:focus-visible,
   select:focus-visible,
   [role='button']:focus-visible {
-    outline: 2px solid var(--fp-ink);
+    outline: 2px solid var(--lm-text-primary);
     outline-offset: 2px;
     border-radius: 6px;
   }
@@ -414,7 +398,7 @@
   max-width: 720px;
   margin: 0 auto;
   font-family: var(--font-geist);
-  color: var(--fp-ink);
+  color: var(--lm-text-primary);
   line-height: 1.65;
 }
 .prose-legal h1 {
@@ -423,7 +407,7 @@
   font-size: clamp(28px, 4vw, 40px);
   line-height: 1.15;
   letter-spacing: -0.01em;
-  color: var(--fp-ink);
+  color: var(--lm-text-primary);
   margin: 0 0 12px;
 }
 .prose-legal h2 {
@@ -432,7 +416,7 @@
   font-size: clamp(20px, 2.6vw, 26px);
   line-height: 1.25;
   letter-spacing: -0.005em;
-  color: var(--fp-ink);
+  color: var(--lm-text-primary);
   margin: 40px 0 12px;
 }
 .prose-legal h3 {
@@ -440,18 +424,18 @@
   font-weight: 700;
   font-size: 18px;
   line-height: 1.3;
-  color: var(--fp-ink);
+  color: var(--lm-text-primary);
   margin: 24px 0 8px;
 }
 .prose-legal p {
   margin: 0 0 16px;
   font-size: 15px;
-  color: var(--fp-ink-soft);
+  color: var(--lm-text-secondary);
 }
 .prose-legal p strong,
 .prose-legal li strong,
 .prose-legal td strong {
-  color: var(--fp-ink);
+  color: var(--lm-text-primary);
   font-weight: 700;
 }
 .prose-legal ul,
@@ -459,13 +443,13 @@
   margin: 0 0 16px;
   padding-left: 24px;
   font-size: 15px;
-  color: var(--fp-ink-soft);
+  color: var(--lm-text-secondary);
 }
 .prose-legal li {
   margin-bottom: 6px;
 }
 .prose-legal a {
-  color: var(--fp-ink);
+  color: var(--lm-text-primary);
   text-decoration: underline;
   text-underline-offset: 2px;
   font-weight: 600;
@@ -481,26 +465,26 @@
   font-family: var(--font-geist);
   font-weight: 700;
   padding: 10px 12px;
-  border-bottom: 2px solid var(--fp-ink);
-  color: var(--fp-ink);
+  border-bottom: 2px solid var(--lm-text-primary);
+  color: var(--lm-text-primary);
   background-color: rgba(0, 0, 0, 0.02);
 }
 .prose-legal td {
   padding: 10px 12px;
-  border-bottom: 1px solid var(--fp-ink-muted);
-  color: var(--fp-ink-soft);
+  border-bottom: 1px solid var(--lm-text-tertiary);
+  color: var(--lm-text-secondary);
   vertical-align: top;
 }
 .prose-legal hr {
   border: none;
-  border-top: 1px solid var(--fp-ink-muted);
+  border-top: 1px solid var(--lm-text-tertiary);
   margin: 32px 0;
 }
 .prose-legal blockquote {
   margin: 16px 0;
   padding: 8px 16px;
-  border-left: 3px solid var(--fp-ink);
-  color: var(--fp-ink-soft);
+  border-left: 3px solid var(--lm-text-primary);
+  color: var(--lm-text-secondary);
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
@@ -516,9 +500,9 @@
    tactile snap). */
 .ed-card-lift {
   transition:
-    transform var(--ed-duration-hover) var(--ease-spring),
-    box-shadow var(--ed-duration-hover) var(--ease-spring),
-    border-color var(--ed-duration-hover) var(--ease-spring);
+    transform var(--lm-duration-hover) var(--lm-ease-spring),
+    box-shadow var(--lm-duration-hover) var(--lm-ease-spring),
+    border-color var(--lm-duration-hover) var(--lm-ease-spring);
 }
 @media (hover: hover) {
   .ed-card-lift:hover {
@@ -533,7 +517,7 @@
 /* MOCK-004 — Daily Bundle popular card: accent border + hover transition */
 .pricing-popular-card { border: 2px solid var(--cta-primary); }
 @media (hover: hover) {
-  .pricing-popular-card:hover { border-color: var(--ed-accent); }
+  .pricing-popular-card:hover { border-color: var(--cta-primary); }
 }
 
 /* Button press feedback: scale 0.97 on :active (V-012a — was 0.98).
@@ -542,20 +526,20 @@
    state. Only fires for pointer/keyboard activation, not hover. */
 .ed-btn-press {
   transition: transform 160ms ease-out,
-    background-color var(--ed-duration-hover) var(--ease-spring),
-    color var(--ed-duration-hover) var(--ease-spring);
+    background-color var(--lm-duration-hover) var(--lm-ease-spring),
+    color var(--lm-duration-hover) var(--lm-ease-spring);
 }
 .ed-btn-press:active {
   transform: scale(0.97);
 }
 
 /* MOCK-009 — quiz choice left-border feedback */
-.quiz-choice-correct { border-left: 4px solid var(--fp-sage); }
-.quiz-choice-incorrect { border-left: 4px solid var(--fp-blush); }
+.quiz-choice-correct { border-left: 4px solid var(--lm-pastel-sage); }
+.quiz-choice-incorrect { border-left: 4px solid var(--lm-pastel-blush); }
 
 /* MOCK-010 — timer urgency color states */
-.timer-urgency { color: var(--fp-blush); }
-.timer-elapsed-display { color: var(--ed-muted); }
+.timer-urgency { color: var(--lm-pastel-blush); }
+.timer-elapsed-display { color: var(--lm-text-tertiary); }
 
 /* MOCK-010 — recording ripple rings (Airlearn mic-active signature) */
 @keyframes recording-ripple {
@@ -590,7 +574,7 @@
   to   { opacity: 1; transform: scale(1); }
 }
 .results-score-enter {
-  animation: results-score-enter 400ms var(--ed-ease, ease) both;
+  animation: results-score-enter 400ms var(--lm-ease, ease) both;
 }
 @media (prefers-reduced-motion: reduce) {
   .results-score-enter { animation: none; }
@@ -626,8 +610,8 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: var(--ed-warm-sage-deep);
-  animation: ed-spinner-dot 1200ms var(--ease-spring) infinite both;
+  background-color: var(--lm-warm-sage-deep);
+  animation: ed-spinner-dot 1200ms var(--lm-ease-spring) infinite both;
 }
 .ed-spinner-dot-1 { animation-delay: 0ms; }
 .ed-spinner-dot-2 { animation-delay: 160ms; }
@@ -737,12 +721,12 @@
    the soft state warmth Chadi specified. Pair with .ed-btn-press for
    the active scale(0.97) snap. */
 .ed-cta-warm-hover {
-  transition: background-color var(--ed-duration-hover) var(--ease-spring),
-              color var(--ed-duration-hover) var(--ease-spring);
+  transition: background-color var(--lm-duration-hover) var(--lm-ease-spring),
+              color var(--lm-duration-hover) var(--lm-ease-spring);
 }
 @media (hover: hover) {
   .ed-cta-warm-hover:hover {
-    background-color: var(--ed-warm-peach-deep);
+    background-color: var(--lm-warm-peach-deep);
   }
 }
 
@@ -750,12 +734,12 @@
    --ease-spring for soft border + ring transition. */
 .ed-field {
   transition:
-    border-color var(--ed-duration-hover) var(--ease-spring),
-    box-shadow var(--ed-duration-hover) var(--ease-spring);
+    border-color var(--lm-duration-hover) var(--lm-ease-spring),
+    box-shadow var(--lm-duration-hover) var(--lm-ease-spring);
 }
 .ed-field:focus-visible {
   outline: none;
-  border-color: var(--ed-accent);
+  border-color: var(--cta-primary);
   box-shadow: 0 0 0 3px rgba(31, 45, 74, 0.18); /* ed-accent at ~18% */
 }
 
@@ -769,9 +753,9 @@
 .ed-skeleton {
   background: linear-gradient(
     90deg,
-    var(--ed-rule) 0%,
+    var(--lm-border-subtle) 0%,
     rgba(229, 224, 216, 0.4) 50%,
-    var(--ed-rule) 100%
+    var(--lm-border-subtle) 100%
   );
   background-size: 200% 100%;
   animation: ed-shimmer 1.5s ease-in-out infinite;
@@ -779,7 +763,7 @@
 @media (prefers-reduced-motion: reduce) {
   .ed-skeleton {
     animation: none;
-    background: var(--ed-rule);
+    background: var(--lm-border-subtle);
   }
 }
 
@@ -802,7 +786,7 @@
   to { opacity: 1; transform: translateY(0); }
 }
 .ed-hero-rise {
-  animation: ed-hero-rise 600ms var(--ed-ease) both;
+  animation: ed-hero-rise 600ms var(--lm-ease) both;
 }
 .ed-hero-rise-delay-1 { animation-delay: 200ms; }
 .ed-hero-rise-delay-2 { animation-delay: 300ms; }
@@ -820,7 +804,7 @@
   to { opacity: 1; transform: translateY(0); }
 }
 .ed-page-enter {
-  animation: ed-page-enter 250ms var(--ed-ease) both;
+  animation: ed-page-enter 250ms var(--lm-ease) both;
 }
 @media (prefers-reduced-motion: reduce) {
   .ed-page-enter { animation: none; }
@@ -839,7 +823,7 @@
   50% { opacity: 0.7; }
 }
 .ed-pair-fade {
-  animation: ed-pair-fade-in 600ms var(--ed-ease) both;
+  animation: ed-pair-fade-in 600ms var(--lm-ease) both;
 }
 .ed-pair-fade-delay {
   animation-delay: 80ms;
@@ -868,7 +852,7 @@
 .hero-atmosphere-char {
   position: absolute;
   font-family: var(--font-cabinet), "Cabinet Grotesk", -apple-system, sans-serif;
-  color: var(--ed-fg);
+  color: var(--lm-text-primary);
   opacity: 0.05;
   line-height: 0.85;
   font-weight: 900;
@@ -971,7 +955,7 @@
   gap: clamp(32px, 4vw, 48px);
 }
 .ecole-intro-block {
-  border-left: 1px solid var(--ed-rule);
+  border-left: 1px solid var(--lm-border-subtle);
   padding-left: 20px;
 }
 @media (min-width: 768px) {
@@ -989,7 +973,7 @@
 .app-shell-main { margin-left: 0; }
 .app-shell-sidebar {
   transform: translateX(-100%);
-  transition: transform 300ms var(--ed-ease, cubic-bezier(0.16, 1, 0.3, 1));
+  transition: transform 300ms var(--lm-ease);
 }
 .app-shell-sidebar[data-drawer-open="true"] { transform: translateX(0); }
 @media (min-width: 1024px) {
@@ -1049,7 +1033,7 @@
 /* MOCK-007 — mobile bottom separator between stacked widgets */
 @media (max-width: 639px) {
   .dashboard-grid > * {
-    border-bottom: 1px solid var(--ed-rule);
+    border-bottom: 1px solid var(--lm-border-subtle);
   }
   .dashboard-grid > *:last-child {
     border-bottom: none;
@@ -1057,7 +1041,7 @@
 }
 /* MOCK-007 — progress bar fill animation; respects prefers-reduced-motion */
 .progress-bar-fill {
-  transition: width 600ms var(--ed-ease, cubic-bezier(0.16, 1, 0.3, 1)) both;
+  transition: width 600ms var(--lm-ease) both;
 }
 @media (prefers-reduced-motion: reduce) {
   .progress-bar-fill { transition: none; }

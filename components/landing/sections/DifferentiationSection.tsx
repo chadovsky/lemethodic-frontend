@@ -92,9 +92,9 @@ function CoucheStackVisual({ language }: { language: 'en' | 'fr' }) {
           fontSize: 'clamp(28px, 3vw, 36px)',
           lineHeight: 1.1,
           letterSpacing: '-0.012em',
-          color: 'var(--ed-warm-peach-deep)',
+          color: 'var(--lm-warm-peach-deep)',
           margin: 0,
-          animation: reduced ? 'none' : 'ed-pair-fade-in 400ms var(--ease-spring) both',
+          animation: reduced ? 'none' : 'ed-pair-fade-in 400ms var(--lm-ease-spring) both',
         }}
       >
         {couche}
@@ -160,7 +160,7 @@ function InterferenceVisual() {
           textDecoration: 'line-through',
           // V-012b — strikethrough color shifts to warm-peach for the
           // "wrong attempt" warmth signal (was neutral ed-muted).
-          textDecorationColor: 'var(--ed-warm-peach)',
+          textDecorationColor: 'var(--lm-warm-peach)',
           textDecorationThickness: '1.5px',
         }}
       >
@@ -217,17 +217,17 @@ function WaveformVisual() {
           style={{
             width: 4,
             height: h,
-            backgroundColor: 'var(--ed-warm-sage-deep)',
+            backgroundColor: 'var(--lm-warm-sage-deep)',
             opacity: 0.45,
             borderRadius: 1,
             transform: !reduced && hovered ? `scaleY(${1.4 + (i % 3) * 0.1})` : 'scaleY(1)',
             transformOrigin: 'center',
             transition: reduced
               ? 'none'
-              : `transform 400ms var(--ed-ease) ${(i % 8) * 18}ms, opacity 400ms var(--ed-ease)`,
+              : `transform 400ms var(--lm-ease) ${(i % 8) * 18}ms, opacity 400ms var(--lm-ease)`,
             animation: reduced || hovered
               ? 'none'
-              : `ed-wave-pulse 1800ms var(--ed-ease) ${i * 50}ms infinite`,
+              : `ed-wave-pulse 1800ms var(--lm-ease) ${i * 50}ms infinite`,
           }}
         />
       ))}

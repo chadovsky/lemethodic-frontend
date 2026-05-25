@@ -27,12 +27,12 @@ import {
 // Section bg shifts to ed-warm-sage; persona label uses ed-warm-espresso
 // for the warm-dark celebration accent (was ed-accent navy). Plan card
 // stays ed-paper with 1px ed-rule (chrome preserved per V-012 spec).
-const ED_BG = 'var(--ed-warm-sage)'
-const ED_FG = 'var(--ed-fg)'
-const ED_MUTED = 'var(--ed-muted)'
-const ED_RULE = 'var(--ed-rule)'
-const ED_PAPER = 'var(--ed-paper)'
-const ED_ACCENT = 'var(--ed-warm-espresso)'
+const ED_BG = 'var(--lm-warm-sage)'
+const ED_FG = 'var(--lm-text-primary)'
+const ED_MUTED = 'var(--lm-text-tertiary)'
+const ED_RULE = 'var(--lm-border-subtle)'
+const ED_PAPER = 'var(--lm-bg-surface)'
+const ED_ACCENT = 'var(--lm-warm-espresso)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SERIF = 'var(--font-source-serif), Georgia, "Times New Roman", serif'
 
@@ -367,7 +367,7 @@ export default function EcoleReveal({ data, language, onContinue }: EcoleRevealP
         <div className="flex-1" style={{ minHeight: 'clamp(24px, 4vw, 48px)' }} />
 
         {/* CTA */}
-        <div style={{ paddingBottom: 'calc(20px + var(--fp-safe-bottom))' }}>
+        <div style={{ paddingBottom: 'calc(20px + var(--lm-safe-bottom))' }}>
           <button
             onClick={onContinue}
             className="w-full"

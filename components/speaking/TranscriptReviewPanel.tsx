@@ -6,9 +6,9 @@ import { Mic } from 'lucide-react'
 const INK          = 'var(--text-primary)'
 const INK_SOFT     = 'var(--text-secondary)'
 const INK_MUTED    = 'var(--text-muted)'
-const SAGE         = 'var(--fp-sage)'
-const BUTTER       = 'var(--fp-butter)'
-const PEACH        = 'var(--fp-peach)'
+const SAGE         = 'var(--lm-pastel-sage)'
+const BUTTER       = 'var(--lm-pastel-butter)'
+const PEACH        = 'var(--lm-pastel-peach)'
 const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface Moule {
@@ -84,7 +84,7 @@ export default function TranscriptReviewPanel({
             : 'translateX(-50%) translateY(100%)',
           width: '100%',
           maxWidth: 440,
-          backgroundColor: 'var(--fp-canvas)',
+          backgroundColor: 'var(--lm-bg-base)',
           borderTopLeftRadius: 28,
           borderTopRightRadius: 28,
           zIndex: 70,
@@ -244,9 +244,9 @@ export default function TranscriptReviewPanel({
         {/* Sticky bottom actions */}
         <div
           style={{
-            padding: '16px 20px calc(32px + var(--fp-safe-bottom)) 20px',
+            padding: '16px 20px calc(32px + var(--lm-safe-bottom)) 20px',
             borderTop: '1px solid #1A1A1A0A',
-            backgroundColor: 'var(--fp-canvas)',
+            backgroundColor: 'var(--lm-bg-base)',
             flexShrink: 0,
           }}
         >

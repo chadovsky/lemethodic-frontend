@@ -13,10 +13,10 @@ import { readDateInputMeta } from '@/lib/onboarding-questions'
 import type { UiLanguage } from '@/lib/types'
 
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
-const ED_FG = 'var(--ed-fg)'
-const ED_MUTED = 'var(--ed-muted)'
-const ED_RULE = 'var(--ed-rule)'
-const ED_PAPER = 'var(--ed-paper)'
+const ED_FG = 'var(--lm-text-primary)'
+const ED_MUTED = 'var(--lm-text-tertiary)'
+const ED_RULE = 'var(--lm-border-subtle)'
+const ED_PAPER = 'var(--lm-bg-surface)'
 
 interface DateInputQuestionProps {
   question: OnboardingQuestion
@@ -162,7 +162,7 @@ export default function DateInputQuestion({
               outline: 'none',
               width: '100%',
               cursor: 'pointer',
-              transition: 'border-color var(--ed-duration-hover) var(--ease-spring)',
+              transition: 'border-color var(--lm-duration-hover) var(--lm-ease-spring)',
             }}
           />
         </div>

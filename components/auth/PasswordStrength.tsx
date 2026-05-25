@@ -5,9 +5,9 @@ interface Props {
 // 0 chars → 0 filled; 1–4 → 1 (blush/red); 5–7 → 2 (butter/amber); 8+ → 3 (sage/green)
 const SEGMENT_COLORS = [
   '',
-  'var(--fp-blush, #F5D6D6)',
-  'var(--fp-butter, #FFF0C2)',
-  'var(--fp-sage, #D4E4D0)',
+  'var(--lm-pastel-blush, #F5D6D6)',
+  'var(--lm-pastel-butter, #FFF0C2)',
+  'var(--lm-pastel-sage, #D4E4D0)',
 ]
 
 export default function PasswordStrength({ password }: Props) {
@@ -31,7 +31,7 @@ export default function PasswordStrength({ password }: Props) {
             height: 4,
             borderRadius: 2,
             backgroundColor: n <= filled ? activeColor : 'var(--rule-default)',
-            transition: 'background-color 200ms var(--ed-ease, ease)',
+            transition: 'background-color 200ms var(--lm-ease, ease)',
           }}
         />
       ))}

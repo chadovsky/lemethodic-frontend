@@ -102,7 +102,7 @@ export default function ChunkRow({ chunk }: { chunk: VocabularyChunk }) {
           height: 44,
           borderRadius: 4,
           border: '1px solid var(--rule-default)',
-          backgroundColor: saved ? 'var(--fp-blush)' : 'transparent',
+          backgroundColor: saved ? 'var(--lm-pastel-blush)' : 'transparent',
           color: saved ? 'var(--error)' : 'var(--text-muted)',
           display: 'flex',
           alignItems: 'center',

@@ -80,7 +80,7 @@ function NumberCircle({ number, status }: { number: number; status: LessonStatus
 
 // Status icon on the right
 function StatusIcon({ status }: { status: LessonStatus }) {
-  if (status === 'complete')    return <Check size={18} strokeWidth={2.5} color="var(--fp-sage-deep)" />
+  if (status === 'complete')    return <Check size={18} strokeWidth={2.5} color="var(--lm-success)" />
   if (status === 'in-progress') return <Play  size={18} strokeWidth={2}   color={CTA_BG}  fill={CTA_BG} />
   return <Lock size={16} strokeWidth={1.75} color={INK_MUTED} />
 }

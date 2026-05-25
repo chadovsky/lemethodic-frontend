@@ -14,12 +14,12 @@ import { api, ApiError } from '@/lib/api'
 import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 import type { WritingPrompt } from '@/lib/types'
 
-const ED_BG = 'var(--ed-bg)'
-const ED_FG = 'var(--ed-fg)'
-const ED_FG_SOFT = 'var(--ed-fg-soft)'
-const ED_MUTED = 'var(--ed-muted)'
-const ED_RULE = 'var(--ed-rule)'
-const ED_PAPER = 'var(--ed-paper)'
+const ED_BG = 'var(--lm-bg-base)'
+const ED_FG = 'var(--lm-text-primary)'
+const ED_FG_SOFT = 'var(--lm-text-secondary)'
+const ED_MUTED = 'var(--lm-text-tertiary)'
+const ED_RULE = 'var(--lm-border-subtle)'
+const ED_PAPER = 'var(--lm-bg-surface)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SERIF = 'var(--font-source-serif), Georgia, serif'
 
@@ -207,7 +207,7 @@ export default function WritingPromptPicker() {
                       fontWeight: 400,
                       fontSize: 'clamp(22px, 2.6vw, 28px)',
                       letterSpacing: '-0.01em',
-                      color: 'var(--ed-warm-espresso)',
+                      color: 'var(--lm-warm-espresso)',
                       margin: 0,
                       marginBottom: 16,
                     }}
@@ -266,7 +266,7 @@ function FilterRow({ options, value, onChange }: FilterRowProps) {
             onClick={() => onChange(opt.value)}
             className="ed-btn-press"
             onMouseEnter={(e) => {
-              if (!active) e.currentTarget.style.backgroundColor = 'var(--ed-warm-cream)'
+              if (!active) e.currentTarget.style.backgroundColor = 'var(--lm-warm-cream)'
             }}
             onMouseLeave={(e) => {
               if (!active) e.currentTarget.style.backgroundColor = ED_PAPER
@@ -277,12 +277,12 @@ function FilterRow({ options, value, onChange }: FilterRowProps) {
               fontSize: 13,
               padding: '8px 14px',
               borderRadius: 4,
-              border: `1px solid ${active ? 'var(--ed-warm-peach-deep)' : ED_RULE}`,
-              backgroundColor: active ? 'var(--ed-warm-peach-deep)' : ED_PAPER,
+              border: `1px solid ${active ? 'var(--lm-warm-peach-deep)' : ED_RULE}`,
+              backgroundColor: active ? 'var(--lm-warm-peach-deep)' : ED_PAPER,
               color: active ? '#FFFFFF' : ED_FG,
               cursor: 'pointer',
               textTransform: 'capitalize',
-              transition: 'background-color var(--ed-duration-hover) var(--ease-spring), border-color var(--ed-duration-hover) var(--ease-spring), color var(--ed-duration-hover) var(--ease-spring)',
+              transition: 'background-color var(--lm-duration-hover) var(--lm-ease-spring), border-color var(--lm-duration-hover) var(--lm-ease-spring), color var(--lm-duration-hover) var(--lm-ease-spring)',
             }}
           >
             {opt.label}
@@ -326,7 +326,7 @@ function PromptCard({
             fontSize: 11,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            color: 'var(--ed-warm-peach-deep)',
+            color: 'var(--lm-warm-peach-deep)',
           }}
         >
           {prompt.level}
@@ -339,7 +339,7 @@ function PromptCard({
             color: ED_MUTED,
             padding: '2px 8px',
             borderRadius: 999,
-            backgroundColor: 'var(--ed-warm-cream)',
+            backgroundColor: 'var(--lm-warm-cream)',
           }}
         >
           {prompt.topic_tag}
@@ -446,7 +446,7 @@ function ErrorRetry({
           fontWeight: 600,
           fontSize: 14,
           color: '#FFFFFF',
-          backgroundColor: 'var(--ed-accent)',
+          backgroundColor: 'var(--cta-primary)',
           padding: '8px 18px',
           borderRadius: 4,
           border: 'none',

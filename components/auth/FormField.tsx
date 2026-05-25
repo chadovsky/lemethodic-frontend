@@ -51,7 +51,7 @@ export default function FormField({
           height: 52,
           borderRadius: 4,
           border: error
-            ? '1px solid var(--fp-error, #B91C1C)'
+            ? '1px solid var(--lm-error, #A8341B)'
             : '1px solid var(--rule-default)',
           backgroundColor: 'var(--bg-elevated)',
           padding: '0 16px',
@@ -72,7 +72,7 @@ export default function FormField({
             fontFamily: SANS_FONT,
             fontWeight: 500,
             fontSize: '0.8125rem',
-            color: 'var(--ed-accent)',
+            color: 'var(--cta-primary)',
             margin: 0,
             display: 'flex',
             alignItems: 'center',

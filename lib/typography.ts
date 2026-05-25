@@ -126,19 +126,19 @@ export const LETTER_SPACING = {
 // single :root edit cascades to inline-style consumers without code
 // touches. F-VISUAL-001 — ED.* aliases the new canonical tokens.
 export const ED = {
-  bg: 'var(--bg-canvas)',          // canonical (was var(--ed-bg))
-  fg: 'var(--text-primary)',       // canonical (was var(--ed-fg))
-  accent: 'var(--cta-primary)',    // canonical (was var(--ed-accent))
-  muted: 'var(--text-muted)',      // canonical (was var(--ed-muted))
-  rule: 'var(--rule-default)',     // canonical (was var(--ed-rule))
-  paper: 'var(--bg-elevated)',     // canonical (was var(--ed-paper))
+  bg: 'var(--bg-canvas)',          // canonical (was var(--lm-bg-base))
+  fg: 'var(--text-primary)',       // canonical (was var(--lm-text-primary))
+  accent: 'var(--cta-primary)',    // canonical (was var(--cta-primary))
+  muted: 'var(--text-muted)',      // canonical (was var(--lm-text-tertiary))
+  rule: 'var(--rule-default)',     // canonical (was var(--lm-border-subtle))
+  paper: 'var(--bg-elevated)',     // canonical (was var(--lm-bg-surface))
 } as const
 
 // Editorial motion as JS constants (companion to lib/motion.ts which
 // holds the FluentPath spring system).
 export const ED_MOTION = {
-  ease: 'var(--ed-ease)',
-  durationHover: 'var(--ed-duration-hover)',
-  durationState: 'var(--ed-duration-state)',
-  durationReveal: 'var(--ed-duration-reveal)',
+  ease: 'var(--lm-ease)',
+  durationHover: 'var(--lm-duration-hover)',
+  durationState: 'var(--lm-duration-state)',
+  durationReveal: 'var(--lm-duration-reveal)',
 } as const

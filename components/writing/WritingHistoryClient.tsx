@@ -11,12 +11,12 @@ import { api, ApiError } from '@/lib/api'
 import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 import type { WritingHistoryItem } from '@/lib/types'
 
-const ED_BG = 'var(--ed-bg)'
-const ED_FG = 'var(--ed-fg)'
-const ED_FG_SOFT = 'var(--ed-fg-soft)'
-const ED_MUTED = 'var(--ed-muted)'
-const ED_RULE = 'var(--ed-rule)'
-const ED_PAPER = 'var(--ed-paper)'
+const ED_BG = 'var(--lm-bg-base)'
+const ED_FG = 'var(--lm-text-primary)'
+const ED_FG_SOFT = 'var(--lm-text-secondary)'
+const ED_MUTED = 'var(--lm-text-tertiary)'
+const ED_RULE = 'var(--lm-border-subtle)'
+const ED_PAPER = 'var(--lm-bg-surface)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SERIF = 'var(--font-source-serif), Georgia, serif'
 
@@ -114,7 +114,7 @@ export default function WritingHistoryClient() {
                 fontWeight: 600,
                 fontSize: 14,
                 color: '#FFFFFF',
-                backgroundColor: 'var(--ed-accent)',
+                backgroundColor: 'var(--cta-primary)',
                 padding: '8px 18px',
                 borderRadius: 4,
                 border: 'none',
@@ -175,7 +175,7 @@ export default function WritingHistoryClient() {
                     </p>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 22, color: 'var(--ed-warm-espresso)', margin: 0, lineHeight: 1 }}>
+                    <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 22, color: 'var(--lm-warm-espresso)', margin: 0, lineHeight: 1 }}>
                       {item.overall_score}
                     </p>
                     <p style={{ fontFamily: SANS, fontWeight: 500, fontSize: 11, color: ED_MUTED, margin: 0, marginTop: 2 }}>

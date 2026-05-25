@@ -13,12 +13,12 @@ import { useOnboardingStore } from '@/lib/onboarding'
 import { useSubmitResponseStore } from '@/lib/submitResponse'
 import { useInterfaceLanguage, type InterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 
-const ED_BG = 'var(--ed-bg)'
-const ED_FG = 'var(--ed-fg)'
-const ED_FG_SOFT = 'var(--ed-fg-soft)'
-const ED_MUTED = 'var(--ed-muted)'
-const ED_RULE = 'var(--ed-rule)'
-const ED_PAPER = 'var(--ed-paper)'
+const ED_BG = 'var(--lm-bg-base)'
+const ED_FG = 'var(--lm-text-primary)'
+const ED_FG_SOFT = 'var(--lm-text-secondary)'
+const ED_MUTED = 'var(--lm-text-tertiary)'
+const ED_RULE = 'var(--lm-border-subtle)'
+const ED_PAPER = 'var(--lm-bg-surface)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SERIF = 'var(--font-source-serif), Georgia, serif'
 
@@ -171,14 +171,14 @@ export default function MorePageClient() {
                 width: 56,
                 height: 56,
                 borderRadius: '50%',
-                backgroundColor: 'var(--ed-warm-peach)',
+                backgroundColor: 'var(--lm-warm-peach)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
               }}
             >
-              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 24, color: 'var(--ed-warm-espresso)' }}>
+              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 24, color: 'var(--lm-warm-espresso)' }}>
                 {avatarInitial}
               </span>
             </div>
@@ -238,7 +238,7 @@ export default function MorePageClient() {
               <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: ED_MUTED }}>
                 {copy.profile.daysLabel}
               </span>
-              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 18, color: 'var(--ed-warm-espresso)' }}>
+              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 18, color: 'var(--lm-warm-espresso)' }}>
                 {examDays}
               </span>
             </div>
@@ -264,11 +264,11 @@ export default function MorePageClient() {
                       fontSize: 13,
                       padding: '6px 14px',
                       borderRadius: 999,
-                      border: `1px solid ${active ? 'var(--ed-warm-peach-deep)' : ED_RULE}`,
-                      backgroundColor: active ? 'var(--ed-warm-peach)' : 'transparent',
+                      border: `1px solid ${active ? 'var(--lm-warm-peach-deep)' : ED_RULE}`,
+                      backgroundColor: active ? 'var(--lm-warm-peach)' : 'transparent',
                       color: active ? ED_FG : ED_FG_SOFT,
                       cursor: 'pointer',
-                      transition: 'background-color var(--ed-duration-hover) var(--ease-spring), border-color var(--ed-duration-hover) var(--ease-spring), color var(--ed-duration-hover) var(--ease-spring)',
+                      transition: 'background-color var(--lm-duration-hover) var(--lm-ease-spring), border-color var(--lm-duration-hover) var(--lm-ease-spring), color var(--lm-duration-hover) var(--lm-ease-spring)',
                     }}
                   >
                     {l === 'en' ? copy.settings.langEn : copy.settings.langFr}
@@ -298,11 +298,11 @@ export default function MorePageClient() {
               alignItems: 'center',
               cursor: 'pointer',
               textAlign: 'left',
-              color: 'var(--fp-error)',
+              color: 'var(--lm-error)',
               fontFamily: SANS,
               fontWeight: 600,
               fontSize: 14,
-              transition: 'background-color var(--ed-duration-hover) var(--ease-spring)',
+              transition: 'background-color var(--lm-duration-hover) var(--lm-ease-spring)',
             }}
           >
             <LogOut size={16} strokeWidth={2} />
@@ -409,7 +409,7 @@ function RowLink({ label, href, value, external = false }: { label: string; href
     borderBottom: `1px solid ${ED_RULE}`,
     color: ED_FG,
     textDecoration: 'none',
-    transition: 'background-color var(--ed-duration-hover) var(--ease-spring)',
+    transition: 'background-color var(--lm-duration-hover) var(--lm-ease-spring)',
   }
   if (external) {
     return (

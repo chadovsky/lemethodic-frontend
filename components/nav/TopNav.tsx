@@ -14,10 +14,10 @@ import { useOnboardingStore } from '@/lib/onboarding'
 import { useSubmitResponseStore } from '@/lib/submitResponse'
 import { useInterfaceLanguage, type InterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 
-const ED_BG = 'var(--ed-bg)'
-const ED_FG = 'var(--ed-fg)'
-const ED_FG_SOFT = 'var(--ed-fg-soft)'
-const ED_RULE = 'var(--ed-rule)'
+const ED_BG = 'var(--lm-bg-base)'
+const ED_FG = 'var(--lm-text-primary)'
+const ED_FG_SOFT = 'var(--lm-text-secondary)'
+const ED_RULE = 'var(--lm-border-subtle)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SERIF = 'var(--font-source-serif), Georgia, serif'
 
@@ -164,7 +164,7 @@ export default function TopNav() {
         backdropFilter: scrolled ? 'blur(12px)' : 'none',
         WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
         borderBottom: scrolled ? `1px solid ${ED_RULE}` : '1px solid transparent',
-        transition: 'background-color var(--ed-duration-hover) var(--ease-spring), border-color var(--ed-duration-hover) var(--ease-spring), backdrop-filter var(--ed-duration-hover) var(--ease-spring)',
+        transition: 'background-color var(--lm-duration-hover) var(--lm-ease-spring), border-color var(--lm-duration-hover) var(--lm-ease-spring), backdrop-filter var(--lm-duration-hover) var(--lm-ease-spring)',
         alignItems: 'center',
         fontFamily: SANS,
       }}
@@ -226,7 +226,7 @@ export default function TopNav() {
                     letterSpacing: '0.01em',
                     color: active ? ED_FG : ED_FG_SOFT,
                     textDecoration: 'none',
-                    transition: 'color var(--ed-duration-hover) var(--ease-spring)',
+                    transition: 'color var(--lm-duration-hover) var(--lm-ease-spring)',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.color = ED_FG
@@ -246,7 +246,7 @@ export default function TopNav() {
                         right: 4,
                         bottom: -6,
                         height: 2,
-                        backgroundColor: 'var(--ed-warm-peach-deep)',
+                        backgroundColor: 'var(--lm-warm-peach-deep)',
                         borderRadius: 2,
                       }}
                     />
@@ -280,7 +280,7 @@ export default function TopNav() {
                       fontSize: 12,
                       letterSpacing: '0.06em',
                       textTransform: 'uppercase',
-                      transition: 'color var(--ed-duration-hover) var(--ease-spring)',
+                      transition: 'color var(--lm-duration-hover) var(--lm-ease-spring)',
                     }}
                   >
                     {l}
@@ -306,7 +306,7 @@ export default function TopNav() {
                 width: 32,
                 height: 32,
                 borderRadius: '50%',
-                backgroundColor: 'var(--ed-warm-peach)',
+                backgroundColor: 'var(--lm-warm-peach)',
                 border: 'none',
                 cursor: 'pointer',
                 display: 'flex',
@@ -321,7 +321,7 @@ export default function TopNav() {
                   fontStyle: 'italic',
                   fontWeight: 400,
                   fontSize: 14,
-                  color: 'var(--ed-warm-espresso)',
+                  color: 'var(--lm-warm-espresso)',
                   lineHeight: 1,
                 }}
               >
@@ -336,7 +336,7 @@ export default function TopNav() {
                   top: 'calc(100% + 8px)',
                   right: 0,
                   minWidth: 200,
-                  backgroundColor: 'var(--ed-paper)',
+                  backgroundColor: 'var(--lm-bg-surface)',
                   border: `1px solid ${ED_RULE}`,
                   borderRadius: 4,
                   boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04)',
@@ -382,7 +382,7 @@ export default function TopNav() {
                     fontFamily: SANS,
                     fontWeight: 500,
                     fontSize: 13,
-                    color: 'var(--fp-error)',
+                    color: 'var(--lm-error)',
                     backgroundColor: 'transparent',
                     border: 'none',
                     cursor: 'pointer',

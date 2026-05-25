@@ -15,13 +15,13 @@ import { api, ApiError } from '@/lib/api'
 import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 import type { RecordingSummary, TacheMode } from '@/lib/types'
 
-const ED_BG = 'var(--ed-bg)'
-const ED_FG = 'var(--ed-fg)'
-const ED_FG_SOFT = 'var(--ed-fg-soft)'
-const ED_MUTED = 'var(--ed-muted)'
-const ED_RULE = 'var(--ed-rule)'
-const ED_PAPER = 'var(--ed-paper)'
-const ED_ACCENT = 'var(--ed-accent)'
+const ED_BG = 'var(--lm-bg-base)'
+const ED_FG = 'var(--lm-text-primary)'
+const ED_FG_SOFT = 'var(--lm-text-secondary)'
+const ED_MUTED = 'var(--lm-text-tertiary)'
+const ED_RULE = 'var(--lm-border-subtle)'
+const ED_PAPER = 'var(--lm-bg-surface)'
+const ED_ACCENT = 'var(--cta-primary)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SERIF = 'var(--font-source-serif), Georgia, serif'
 
@@ -265,7 +265,7 @@ export default function SpeakingDesktop() {
                   fontWeight: active ? 600 : 500,
                   fontSize: 16,
                   color: active ? ED_FG : ED_FG_SOFT,
-                  transition: 'color var(--ed-duration-hover) var(--ease-spring)',
+                  transition: 'color var(--lm-duration-hover) var(--lm-ease-spring)',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = ED_FG
@@ -284,7 +284,7 @@ export default function SpeakingDesktop() {
                       right: 0,
                       bottom: -1,
                       height: 2,
-                      backgroundColor: 'var(--ed-warm-peach-deep)',
+                      backgroundColor: 'var(--lm-warm-peach-deep)',
                     }}
                   />
                 )}
@@ -313,7 +313,7 @@ export default function SpeakingDesktop() {
                 fontSize: 11,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
-                color: 'var(--ed-warm-peach-deep)',
+                color: 'var(--lm-warm-peach-deep)',
                 margin: 0,
                 marginBottom: 8,
               }}
@@ -381,7 +381,7 @@ export default function SpeakingDesktop() {
                         width: 6,
                         height: 6,
                         borderRadius: '50%',
-                        backgroundColor: 'var(--ed-warm-peach-deep)',
+                        backgroundColor: 'var(--lm-warm-peach-deep)',
                       }}
                     />
                     {tip}
@@ -446,7 +446,7 @@ export default function SpeakingDesktop() {
                           day: 'numeric',
                         })}
                       </span>
-                      <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 14, color: 'var(--ed-warm-espresso)' }}>
+                      <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 14, color: 'var(--lm-warm-espresso)' }}>
                         {r.cefrLevel ?? '—'}
                       </span>
                     </li>

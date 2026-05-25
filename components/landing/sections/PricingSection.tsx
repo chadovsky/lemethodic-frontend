@@ -237,7 +237,7 @@ export default function PricingSection({ lang }: { lang: Lang }) {
                         letterSpacing: LETTER_SPACING.body,
                         cursor: 'pointer',
                         outline: 'none',
-                        transition: `background-color var(--ed-duration-hover) var(--ease-spring), color var(--ed-duration-hover) var(--ease-spring)`,
+                        transition: `background-color var(--lm-duration-hover) var(--lm-ease-spring), color var(--lm-duration-hover) var(--lm-ease-spring)`,
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.backgroundColor = ED.fg

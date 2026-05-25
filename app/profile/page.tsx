@@ -10,16 +10,16 @@ import { ArrowLeft, ChevronRight, Pencil } from 'lucide-react'
 // F-205 — page chrome migrated to editorial system. Inner cards (Preply
 // CTA on sage, Stats on butter, avatar on peach) preserved as decorative
 // accents per F-200 rule. Hardcoded mockup data still F-222.x scope.
-const INK          = 'var(--ed-fg)'
-const INK_SOFT     = 'var(--ed-muted)'
-const INK_MUTED    = 'var(--ed-muted)'
-const PEACH        = 'var(--fp-peach)'
-const SAGE         = 'var(--fp-sage)'
-const BUTTER       = 'var(--fp-butter)'
-const BG           = 'var(--ed-bg)'
-const CARD_BG      = 'var(--ed-paper)'
+const INK          = 'var(--lm-text-primary)'
+const INK_SOFT     = 'var(--lm-text-tertiary)'
+const INK_MUTED    = 'var(--lm-text-tertiary)'
+const PEACH        = 'var(--lm-pastel-peach)'
+const SAGE         = 'var(--lm-pastel-sage)'
+const BUTTER       = 'var(--lm-pastel-butter)'
+const BG           = 'var(--lm-bg-base)'
+const CARD_BG      = 'var(--lm-bg-surface)'
 const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
-const SEPARATOR    = 'var(--ed-rule)'
+const SEPARATOR    = 'var(--lm-border-subtle)'
 
 // ─── reusable card shell ──────────────────────────────────────────────────────
 function Card({
@@ -142,13 +142,13 @@ export default function ProfilePage() {
             position: 'sticky',
             top: 0,
             zIndex: 40,
-            height: 'calc(56px + var(--fp-safe-top))',
+            height: 'calc(56px + var(--lm-safe-top))',
             backgroundColor: BG,
             borderBottom: `1px solid ${SEPARATOR}`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: 'var(--fp-safe-top) 16px 0 16px',
+            padding: 'var(--lm-safe-top) 16px 0 16px',
           }}
         >
           <Link

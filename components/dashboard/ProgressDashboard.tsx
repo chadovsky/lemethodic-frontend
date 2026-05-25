@@ -33,9 +33,9 @@ import type {
 // (Snapshot/TodayFocus/Goulet/RecentActivity) keep their FluentPath pastel
 // accents as the chip layer per F-200 rule (pastels survive as decoration,
 // not chrome). Full section-level editorial migration tracked as F-204.deep.
-const INK = 'var(--ed-fg)'
-const INK_MUTED = 'var(--ed-muted)'
-const BG = 'var(--ed-bg)'
+const INK = 'var(--lm-text-primary)'
+const INK_MUTED = 'var(--lm-text-tertiary)'
+const BG = 'var(--lm-bg-base)'
 const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface DashboardData {
@@ -98,13 +98,13 @@ export default function ProgressDashboard() {
             position: 'sticky',
             top: 0,
             zIndex: 40,
-            height: 'calc(56px + var(--fp-safe-top))',
+            height: 'calc(56px + var(--lm-safe-top))',
             backgroundColor: BG,
-            borderBottom: '1px solid var(--ed-rule)',
+            borderBottom: '1px solid var(--lm-border-subtle)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: 'var(--fp-safe-top) clamp(16px, 3vw, 32px) 0',
+            padding: 'var(--lm-safe-top) clamp(16px, 3vw, 32px) 0',
           }}
         >
           <h1

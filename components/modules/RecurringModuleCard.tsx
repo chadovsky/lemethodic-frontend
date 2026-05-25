@@ -18,12 +18,12 @@ const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, s
 // Kept in sync manually — pre-launch the palette is small enough that
 // hoisting into a shared constants file isn't worth the import churn.
 const CATEGORY_BG: Record<ModuleCategory, string> = {
-  vocab_calque:        'var(--fp-peach)',
-  discourse_structure: 'var(--fp-lavender)',
-  grammar_interference:'var(--fp-butter)',
+  vocab_calque:        'var(--lm-pastel-peach)',
+  discourse_structure: 'var(--lm-pastel-lavender)',
+  grammar_interference:'var(--lm-pastel-butter)',
   pronunciation:       '#C7DFEA',
-  register_mismatch:   'var(--fp-blush)',
-  word_order:          'var(--fp-sage)',
+  register_mismatch:   'var(--lm-pastel-blush)',
+  word_order:          'var(--lm-pastel-sage)',
   verb_aspect:         '#E8E4D8',
   other:               '#1A1A1A0F',
 }

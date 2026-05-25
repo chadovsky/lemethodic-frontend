@@ -25,9 +25,9 @@ const INK = 'var(--text-primary)'
 const INK_SOFT = 'var(--text-secondary)'
 const INK_MUTED = 'var(--text-muted)'
 const PAPER = '#FFFFFFCC'
-const LAVENDER = 'var(--fp-lavender)'
-const PEACH = 'var(--fp-peach)'
-const SAGE = 'var(--fp-sage)'
+const LAVENDER = 'var(--lm-pastel-lavender)'
+const PEACH = 'var(--lm-pastel-peach)'
+const SAGE = 'var(--lm-pastel-sage)'
 const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface SnapshotSectionProps {

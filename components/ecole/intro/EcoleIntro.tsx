@@ -18,12 +18,12 @@ import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 import { useInViewOnce } from '@/lib/motion'
 import type { ReactNode } from 'react'
 
-const ED_BG = 'var(--ed-bg)'
-const ED_PAPER = 'var(--ed-paper)'
-const ED_FG = 'var(--ed-fg)'
-const ED_MUTED = 'var(--ed-muted)'
-const ED_RULE = 'var(--ed-rule)'
-const ED_ACCENT = 'var(--ed-accent)'
+const ED_BG = 'var(--lm-bg-base)'
+const ED_PAPER = 'var(--lm-bg-surface)'
+const ED_FG = 'var(--lm-text-primary)'
+const ED_MUTED = 'var(--lm-text-tertiary)'
+const ED_RULE = 'var(--lm-border-subtle)'
+const ED_ACCENT = 'var(--cta-primary)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SERIF = 'var(--font-source-serif), Georgia, "Times New Roman", serif'
 
@@ -289,12 +289,12 @@ export default function EcoleIntro() {
           position: 'sticky',
           top: 0,
           zIndex: 40,
-          height: 'calc(56px + var(--fp-safe-top))',
+          height: 'calc(56px + var(--lm-safe-top))',
           backgroundColor: ED_BG,
           borderBottom: `1px solid ${ED_RULE}`,
           display: 'flex',
           alignItems: 'center',
-          padding: 'var(--fp-safe-top) clamp(16px, 3vw, 32px) 0',
+          padding: 'var(--lm-safe-top) clamp(16px, 3vw, 32px) 0',
         }}
       >
         <Link
@@ -811,7 +811,7 @@ export default function EcoleIntro() {
               cursor: 'pointer',
               outline: 'none',
               letterSpacing: '0',
-              transition: 'background-color var(--ed-duration-hover) var(--ease-spring)',
+              transition: 'background-color var(--lm-duration-hover) var(--lm-ease-spring)',
             }}
           >
             {cta.button}

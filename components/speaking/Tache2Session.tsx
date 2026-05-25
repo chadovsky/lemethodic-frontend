@@ -61,10 +61,10 @@ function defaultBriefLangFromLevel(level: string | null | undefined): BriefLang 
 const INK          = 'var(--text-primary)'
 const INK_SOFT     = 'var(--text-secondary)'
 const INK_MUTED    = 'var(--text-muted)'
-const SAGE         = 'var(--fp-sage)'
-const PEACH        = 'var(--fp-peach)'
-const BUTTER       = 'var(--fp-butter)'
-const BG           = 'var(--fp-canvas)'
+const SAGE         = 'var(--lm-pastel-sage)'
+const PEACH        = 'var(--lm-pastel-peach)'
+const BUTTER       = 'var(--lm-pastel-butter)'
+const BG           = 'var(--lm-bg-base)'
 const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 const TARGET_USER_TURNS = 6
@@ -1201,7 +1201,7 @@ function BottomBar({
         maxWidth: 440,
         backgroundColor: '#FFFFFF',
         borderTop: '1px solid #1A1A1A14',
-        padding: '20px 24px calc(20px + var(--fp-safe-bottom)) 24px',
+        padding: '20px 24px calc(20px + var(--lm-safe-bottom)) 24px',
         zIndex: 30,
       }}
     >
@@ -1311,7 +1311,7 @@ function TurnReviewSheet({
           transform: 'translateX(-50%)',
           width: '100%',
           maxWidth: 440,
-          backgroundColor: 'var(--fp-canvas)',
+          backgroundColor: 'var(--lm-bg-base)',
           borderTopLeftRadius: 28,
           borderTopRightRadius: 28,
           zIndex: 70,
@@ -1394,9 +1394,9 @@ function TurnReviewSheet({
         </div>
         <div
           style={{
-            padding: '16px 20px calc(32px + var(--fp-safe-bottom)) 20px',
+            padding: '16px 20px calc(32px + var(--lm-safe-bottom)) 20px',
             borderTop: '1px solid #1A1A1A0A',
-            backgroundColor: 'var(--fp-canvas)',
+            backgroundColor: 'var(--lm-bg-base)',
             flexShrink: 0,
           }}
         >

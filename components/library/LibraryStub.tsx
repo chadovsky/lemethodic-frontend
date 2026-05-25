@@ -13,7 +13,7 @@ import RevealOnScroll from '@/components/landing/RevealOnScroll'
 import { ED, LETTER_SPACING, LINE_HEIGHT, SANS_FONT, SERIF_FONT } from '@/lib/typography'
 import type { Lang } from '@/components/landing/copy'
 
-const PAGE_BG = 'var(--ed-bg)'
+const PAGE_BG = 'var(--lm-bg-base)'
 
 const COPY = {
   en: {
@@ -79,7 +79,7 @@ export default function LibraryStub({ lang }: Props) {
         className="w-full"
         style={{
           backgroundColor: ED.bg,
-          backgroundImage: 'linear-gradient(180deg, var(--ed-bg) 0%, var(--ed-warm-sand) 100%)',
+          backgroundImage: 'linear-gradient(180deg, var(--lm-bg-base) 0%, var(--lm-warm-sand) 100%)',
           padding: 'clamp(80px, 14vw, 160px) clamp(24px, 4vw, 64px) clamp(96px, 12vw, 180px)',
         }}
       >
@@ -92,7 +92,7 @@ export default function LibraryStub({ lang }: Props) {
                 fontSize: 12,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                color: 'var(--ed-warm-peach-deep)',
+                color: 'var(--lm-warm-peach-deep)',
                 margin: 0,
                 marginBottom: 16,
               }}
@@ -155,7 +155,7 @@ export default function LibraryStub({ lang }: Props) {
                     fontWeight: 500,
                     fontSize: 14,
                     lineHeight: 1.55,
-                    color: 'var(--ed-warm-espresso)',
+                    color: 'var(--lm-warm-espresso)',
                     margin: 0,
                   }}
                   role="status"
@@ -216,8 +216,8 @@ export default function LibraryStub({ lang }: Props) {
                         height: 48,
                         padding: '0 22px',
                         borderRadius: 4,
-                        backgroundColor: 'var(--ed-warm-peach-deep)',
-                        color: 'var(--ed-warm-cream)',
+                        backgroundColor: 'var(--lm-warm-peach-deep)',
+                        color: 'var(--lm-warm-cream)',
                         fontFamily: SANS_FONT,
                         fontWeight: 600,
                         fontSize: 14,
@@ -234,7 +234,7 @@ export default function LibraryStub({ lang }: Props) {
                       style={{
                         fontFamily: SANS_FONT,
                         fontSize: 12,
-                        color: 'var(--fp-error)',
+                        color: 'var(--lm-error)',
                         margin: 0,
                         marginTop: 8,
                         textAlign: 'left',
@@ -263,7 +263,7 @@ export default function LibraryStub({ lang }: Props) {
                 textDecoration: 'underline',
                 textUnderlineOffset: 4,
                 textDecorationThickness: 1,
-                textDecorationColor: 'var(--ed-rule)',
+                textDecorationColor: 'var(--lm-border-subtle)',
               }}
             >
               ← {copy.backCta}

@@ -31,7 +31,7 @@ export default function SidebarLink({ href, label, onClick }: SidebarLinkProps) 
           style={{
             width: 4,
             flexShrink: 0,
-            backgroundColor: 'var(--ed-accent)',
+            backgroundColor: 'var(--cta-primary)',
             borderRadius: '0 2px 2px 0',
           }}
         />
@@ -56,7 +56,7 @@ export default function SidebarLink({ href, label, onClick }: SidebarLinkProps) 
           color: active ? 'var(--text-primary)' : 'var(--text-muted)',
           textDecoration: 'none',
           transition:
-            'color var(--ed-duration-hover, 200ms) ease',
+            'color var(--lm-duration-hover) ease',
         }}
       >
         {label}

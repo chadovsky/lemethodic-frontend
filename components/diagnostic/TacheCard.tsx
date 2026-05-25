@@ -2,9 +2,9 @@ import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
 import type { Tache } from '@/lib/data/taches'
 
 const TACHE_ACCENT: Record<number, string> = {
-  1: 'var(--fp-lavender)',
-  2: 'var(--fp-sky)',
-  3: 'var(--fp-peach)',
+  1: 'var(--lm-pastel-lavender)',
+  2: 'var(--lm-pastel-sky)',
+  3: 'var(--lm-pastel-peach)',
 }
 
 export default function TacheCard({ tache }: { tache: Tache }) {

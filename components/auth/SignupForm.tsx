@@ -98,8 +98,8 @@ export default function SignupForm({ tier }: SignupFormProps) {
         style={{
           width: '100%',
           maxWidth: 440,
-          backgroundColor: 'var(--ed-paper, var(--bg-elevated))',
-          border: '1px solid var(--ed-rule)',
+          backgroundColor: 'var(--lm-bg-surface)',
+          border: '1px solid var(--lm-border-subtle)',
           borderRadius: 8,
           padding: 'clamp(32px, 4vw, 48px) clamp(24px, 3vw, 40px)',
         }}
@@ -264,7 +264,7 @@ export default function SignupForm({ tier }: SignupFormProps) {
         <Link
           href="/login"
           style={{
-            color: 'var(--ed-accent)',
+            color: 'var(--cta-primary)',
             fontWeight: 600,
             textDecoration: 'underline',
             textUnderlineOffset: 2,

@@ -26,7 +26,7 @@ const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, s
 const INK         = 'var(--text-primary)'
 const INK_SOFT    = 'var(--text-secondary)'
 const INK_MUTED   = 'var(--text-muted)'
-const BG          = 'var(--fp-canvas)'
+const BG          = 'var(--lm-bg-base)'
 const CTA_BG      = 'var(--text-primary)'
 
 interface Props {
@@ -67,12 +67,12 @@ export default function LessonDetailClient({ lessonNumber }: Props) {
             position: 'sticky',
             top: 0,
             zIndex: 40,
-            height: 'calc(56px + var(--fp-safe-top))',
+            height: 'calc(56px + var(--lm-safe-top))',
             backgroundColor: BG,
             borderBottom: '1px solid #1A1A1A0A',
             display: 'flex',
             alignItems: 'center',
-            padding: 'var(--fp-safe-top) 16px 0 16px',
+            padding: 'var(--lm-safe-top) 16px 0 16px',
             gap: 12,
           }}
         >

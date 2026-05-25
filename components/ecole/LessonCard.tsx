@@ -20,21 +20,21 @@ function stateBadgeStyle(vs: VisualState): React.CSSProperties {
   switch (vs) {
     case 'completed':
       return {
-        backgroundColor: 'var(--fp-sage)',
-        color: 'var(--ed-bg)',
+        backgroundColor: 'var(--lm-pastel-sage)',
+        color: 'var(--lm-bg-base)',
         border: '1px solid transparent',
       }
     case 'available':
       return {
-        backgroundColor: 'var(--ed-accent)',
+        backgroundColor: 'var(--cta-primary)',
         color: '#fff',
         border: '1px solid transparent',
       }
     case 'locked':
       return {
         backgroundColor: 'transparent',
-        color: 'var(--ed-muted)',
-        border: '1px solid var(--ed-rule)',
+        color: 'var(--lm-text-tertiary)',
+        border: '1px solid var(--lm-border-subtle)',
       }
   }
 }
@@ -48,7 +48,7 @@ function LockIcon() {
       viewBox="0 0 16 16"
       fill="none"
       aria-hidden="true"
-      style={{ flexShrink: 0, color: 'var(--ed-muted)' }}
+      style={{ flexShrink: 0, color: 'var(--lm-text-tertiary)' }}
     >
       <rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
       <path
@@ -79,8 +79,8 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
         gap: 14,
         height: '100%',
         padding: 'clamp(20px, 2vw, 24px)',
-        backgroundColor: 'var(--ed-paper)',
-        border: '1px solid var(--ed-rule)',
+        backgroundColor: 'var(--lm-bg-surface)',
+        border: '1px solid var(--lm-border-subtle)',
         borderRadius: 4,
         textDecoration: 'none',
         opacity: isLocked ? 0.65 : 1,
@@ -96,7 +96,7 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
             fontSize: '1.5rem',
             lineHeight: 1,
             letterSpacing: '-0.01em',
-            color: 'var(--ed-muted)',
+            color: 'var(--lm-text-tertiary)',
             fontVariantNumeric: 'tabular-nums',
           }}
         >
@@ -132,7 +132,7 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
           fontSize: 'clamp(18px, 1.6vw, 22px)',
           lineHeight: 1.2,
           letterSpacing: '-0.01em',
-          color: 'var(--ed-fg)',
+          color: 'var(--lm-text-primary)',
           margin: 0,
         }}
       >
@@ -145,7 +145,7 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
           fontWeight: 400,
           fontSize: '0.875rem',
           lineHeight: 1.5,
-          color: 'var(--ed-muted)',
+          color: 'var(--lm-text-tertiary)',
           margin: 0,
         }}
       >

@@ -60,7 +60,7 @@ export default function StickyHeader() {
         top: 0,
         zIndex: 100,
         height: 64,
-        backgroundColor: scrolled ? 'var(--ed-paper)' : 'transparent',
+        backgroundColor: scrolled ? 'var(--lm-bg-surface)' : 'transparent',
         borderBottom: scrolled ? '1px solid var(--rule-default)' : 'none',
         transition: 'background-color 200ms ease, border-color 200ms ease',
         display: 'flex',

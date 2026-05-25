@@ -11,8 +11,8 @@ import {
 // ─── design tokens (self-contained) ─────────────────────────────────────────
 const INK          = 'var(--text-primary)'
 const INK_MUTED    = 'var(--text-muted)'
-const SAGE         = 'var(--fp-sage)'
-const TRACK        = 'var(--fp-track)'
+const SAGE         = 'var(--lm-pastel-sage)'
+const TRACK        = 'var(--lm-border-subtle)'
 const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // ─── types ───────────────────────────────────────────────────────────────────
@@ -142,7 +142,7 @@ function CoucheBarRow({ name, score, cefr, unscored, index, animate }: CoucheRow
                 height: 10,
                 borderRadius: '50%',
                 backgroundColor: INK,
-                border: '2px solid var(--fp-canvas)',
+                border: '2px solid var(--lm-bg-base)',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.18)',
                 zIndex: 2,
               }}

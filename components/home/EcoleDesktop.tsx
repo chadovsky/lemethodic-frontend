@@ -18,13 +18,13 @@ import { useAuthStore } from '@/lib/auth'
 import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 import type { Lesson, RecurringModule } from '@/lib/types'
 
-const ED_BG = 'var(--ed-bg)'
-const ED_FG = 'var(--ed-fg)'
-const ED_FG_SOFT = 'var(--ed-fg-soft)'
-const ED_MUTED = 'var(--ed-muted)'
-const ED_RULE = 'var(--ed-rule)'
-const ED_PAPER = 'var(--ed-paper)'
-const ED_ACCENT = 'var(--ed-accent)'
+const ED_BG = 'var(--lm-bg-base)'
+const ED_FG = 'var(--lm-text-primary)'
+const ED_FG_SOFT = 'var(--lm-text-secondary)'
+const ED_MUTED = 'var(--lm-text-tertiary)'
+const ED_RULE = 'var(--lm-border-subtle)'
+const ED_PAPER = 'var(--lm-bg-surface)'
+const ED_ACCENT = 'var(--cta-primary)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SERIF = 'var(--font-source-serif), Georgia, serif'
 
@@ -259,7 +259,7 @@ export default function EcoleDesktop() {
                 minWidth: 240,
                 height: 8,
                 borderRadius: 100,
-                backgroundColor: 'var(--ed-warm-cream)',
+                backgroundColor: 'var(--lm-warm-cream)',
                 border: `1px solid ${ED_RULE}`,
                 overflow: 'hidden',
               }}
@@ -268,9 +268,9 @@ export default function EcoleDesktop() {
                 style={{
                   width: `${progressPct}%`,
                   height: '100%',
-                  backgroundColor: 'var(--ed-warm-peach-deep)',
+                  backgroundColor: 'var(--lm-warm-peach-deep)',
                   borderRadius: 100,
-                  transition: 'width 600ms var(--ease-spring)',
+                  transition: 'width 600ms var(--lm-ease-spring)',
                 }}
               />
             </div>
@@ -358,7 +358,7 @@ export default function EcoleDesktop() {
                         fontSize: 11,
                         letterSpacing: '0.06em',
                         textTransform: 'uppercase',
-                        color: 'var(--ed-warm-peach-deep)',
+                        color: 'var(--lm-warm-peach-deep)',
                         margin: 0,
                         marginBottom: 6,
                       }}
@@ -372,7 +372,7 @@ export default function EcoleDesktop() {
                         fontWeight: 400,
                         fontSize: 22,
                         lineHeight: 1.2,
-                        color: 'var(--ed-warm-espresso)',
+                        color: 'var(--lm-warm-espresso)',
                         margin: 0,
                         marginBottom: 16,
                       }}
@@ -413,7 +413,7 @@ export default function EcoleDesktop() {
                       fontWeight: 400,
                       fontSize: 36,
                       lineHeight: 1,
-                      color: 'var(--ed-warm-espresso)',
+                      color: 'var(--lm-warm-espresso)',
                       margin: 0,
                     }}
                   >
@@ -465,7 +465,7 @@ function PhaseSection({ title, rangeLabel, lessons, language, copy }: PhaseSecti
             fontWeight: 400,
             fontSize: 'clamp(22px, 2.4vw, 28px)',
             letterSpacing: '-0.01em',
-            color: 'var(--ed-warm-espresso)',
+            color: 'var(--lm-warm-espresso)',
             margin: 0,
           }}
         >
@@ -518,8 +518,8 @@ function LessonCard({ lesson, copy }: LessonCardProps) {
   const statusColor = isLocked
     ? ED_MUTED
     : isCompleted
-      ? 'var(--ed-warm-sage-deep)'
-      : 'var(--ed-warm-peach-deep)'
+      ? 'var(--lm-warm-sage-deep)'
+      : 'var(--lm-warm-peach-deep)'
   const card = (
     <div
       className="ed-card-lift"
@@ -543,7 +543,7 @@ function LessonCard({ lesson, copy }: LessonCardProps) {
             fontStyle: 'italic',
             fontWeight: 400,
             fontSize: 18,
-            color: 'var(--ed-warm-espresso)',
+            color: 'var(--lm-warm-espresso)',
           }}
         >
           {String(lesson.lessonNumber).padStart(2, '0')}
@@ -611,7 +611,7 @@ function RailCard({ label, warm, children }: { label: string; warm?: boolean; ch
   return (
     <div
       style={{
-        backgroundColor: warm ? 'var(--ed-warm-cream)' : ED_PAPER,
+        backgroundColor: warm ? 'var(--lm-warm-cream)' : ED_PAPER,
         border: `1px solid ${ED_RULE}`,
         borderRadius: 4,
         padding: '18px 22px',
@@ -730,7 +730,7 @@ function LessonGridEmpty({
           fontWeight: 400,
           fontSize: 22,
           lineHeight: 1.25,
-          color: 'var(--ed-warm-espresso)',
+          color: 'var(--lm-warm-espresso)',
           margin: 0,
           maxWidth: 480,
         }}

@@ -16,9 +16,9 @@ const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, s
 const INK        = 'var(--text-primary)'
 const INK_MUTED  = 'var(--text-muted)'
 const CTA_BG     = 'var(--text-primary)'
-const SAGE       = 'var(--fp-sage)'
-const BLUSH      = 'var(--fp-blush)'
-const BG         = 'var(--fp-canvas)'
+const SAGE       = 'var(--lm-pastel-sage)'
+const BLUSH      = 'var(--lm-pastel-blush)'
+const BG         = 'var(--lm-bg-base)'
 
 interface Question {
   question: string
@@ -223,7 +223,7 @@ export default function QuizClient({ lessonId }: { lessonId: string }) {
           if (confirmed) {
             if (isThisCorrect) {
               bg = SAGE
-              border = `2px solid var(--fp-sage-deep)`
+              border = `2px solid var(--lm-success)`
               textColor = '#1A4A2E'
             } else if (isSelected && !isThisCorrect) {
               bg = BLUSH

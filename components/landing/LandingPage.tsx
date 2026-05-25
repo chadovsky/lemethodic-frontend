@@ -36,7 +36,7 @@ import type { Lang } from './copy'
 // F-200 — landing now uses the editorial system bg (warm off-white).
 // The original peach (`#FFD8C2`) was the M-101a hero bg; F-200 retires
 // it from the landing in favor of the more restrained `--ed-bg`.
-const PAGE_BG = 'var(--ed-bg)'
+const PAGE_BG = 'var(--lm-bg-base)'
 
 interface LandingPageProps {
   lang: Lang

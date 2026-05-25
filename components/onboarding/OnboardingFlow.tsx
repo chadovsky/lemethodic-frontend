@@ -39,7 +39,7 @@ import { DISPLAY_FONT, INK, INK_MUTED } from './OnboardingScreen'
 
 // F-201 — loader bg migrated to editorial system. The previous peach
 // (#FFD8C2) was the M-101a default; ed-bg unifies with the new system.
-const LOADER_BG = 'var(--ed-bg)'
+const LOADER_BG = 'var(--lm-bg-base)'
 
 // V-012b — Editorial Luxury pastel rotation for the onboarding flow.
 // Promova-style per-step warmth: each visible step gets its own warm
@@ -47,12 +47,12 @@ const LOADER_BG = 'var(--ed-bg)'
 // than 6 steps. The OnboardingScreen wrapper accepts a `bg` prop and
 // inherits V-012a's --ease-spring transitions for soft step shifts.
 const STEP_PASTELS = [
-  'var(--ed-warm-peach)',      // step 0 — warm welcome
-  'var(--ed-warm-sand)',       // step 1 — transition
-  'var(--ed-warm-sage)',       // step 2 — calm, focus
-  'var(--ed-warm-cream)',      // step 3 — breathing room
-  'var(--ed-warm-peach-deep)', // step 4 — warm pre-reveal
-  'var(--ed-warm-sage-deep)',  // step 5 — commitment moment
+  'var(--lm-warm-peach)',      // step 0 — warm welcome
+  'var(--lm-warm-sand)',       // step 1 — transition
+  'var(--lm-warm-sage)',       // step 2 — calm, focus
+  'var(--lm-warm-cream)',      // step 3 — breathing room
+  'var(--lm-warm-peach-deep)', // step 4 — warm pre-reveal
+  'var(--lm-warm-sage-deep)',  // step 5 — commitment moment
 ] as const
 
 // Synthetic step IDs that aren't BE questions but are rendered as standalone
@@ -90,9 +90,9 @@ function LanguageToggle({
   onChange: (lang: UiLanguage) => void
 }) {
   const langs: UiLanguage[] = ['en', 'fr']
-  const ED_FG = 'var(--ed-fg)'
-  const ED_MUTED = 'var(--ed-muted)'
-  const ED_RULE = 'var(--ed-rule)'
+  const ED_FG = 'var(--lm-text-primary)'
+  const ED_MUTED = 'var(--lm-text-tertiary)'
+  const ED_RULE = 'var(--lm-border-subtle)'
   const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
   return (
     <div className="flex items-center" style={{ gap: 4 }}>
@@ -115,7 +115,7 @@ function LanguageToggle({
                 fontSize: 13,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
-                transition: 'color var(--ed-duration-hover) var(--ease-spring)',
+                transition: 'color var(--lm-duration-hover) var(--lm-ease-spring)',
               }}
             >
               {l}
@@ -251,7 +251,7 @@ export default function OnboardingFlow() {
           style={{
             height: 48,
             padding: '0 28px',
-            backgroundColor: 'var(--ed-accent)',
+            backgroundColor: 'var(--cta-primary)',
             color: '#FFFFFF',
             borderRadius: 4,
             fontFamily: DISPLAY_FONT,
@@ -388,7 +388,7 @@ export default function OnboardingFlow() {
     return (
       <div
         className="min-h-screen w-full flex flex-col items-center ed-page-enter"
-        style={{ backgroundColor: 'var(--ed-warm-peach-deep)' }}
+        style={{ backgroundColor: 'var(--lm-warm-peach-deep)' }}
       >
         <div
           className="w-full flex flex-col flex-1 min-h-screen"
@@ -403,7 +403,7 @@ export default function OnboardingFlow() {
               fontSize: 'clamp(2rem, 4.5vw, 3rem)',
               lineHeight: 1.15,
               letterSpacing: '-0.015em',
-              color: 'var(--ed-fg)',
+              color: 'var(--lm-text-primary)',
               margin: 0,
               marginBottom: 'clamp(16px, 2vw, 24px)',
             }}
@@ -416,21 +416,21 @@ export default function OnboardingFlow() {
               fontWeight: 400,
               fontSize: 'clamp(15px, 1.6vw, 17px)',
               lineHeight: 1.6,
-              color: 'var(--ed-muted)',
+              color: 'var(--lm-text-tertiary)',
               margin: 0,
             }}
           >
             {copy.body}
           </p>
           <div className="flex-1" />
-          <div style={{ paddingBottom: 'calc(32px + var(--fp-safe-bottom, 0px))' }}>
+          <div style={{ paddingBottom: 'calc(32px + var(--lm-safe-bottom, 0px))' }}>
             <button
               type="button"
               onClick={() => router.push('/')}
               style={{
                 height: 56,
                 width: '100%',
-                backgroundColor: 'var(--ed-accent)',
+                backgroundColor: 'var(--cta-primary)',
                 color: '#FFFFFF',
                 borderRadius: 4,
                 fontFamily: SANS,

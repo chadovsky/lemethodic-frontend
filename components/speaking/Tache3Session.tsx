@@ -20,8 +20,8 @@ import {
 const INK          = 'var(--text-primary)'
 const INK_SOFT     = 'var(--text-secondary)'
 const INK_MUTED    = 'var(--text-muted)'
-const LAVENDER     = 'var(--fp-lavender)'
-const BG           = 'var(--fp-canvas)'
+const LAVENDER     = 'var(--lm-pastel-lavender)'
+const BG           = 'var(--lm-bg-base)'
 const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 const PREP_SECS      = 120 // 2 minutes
@@ -255,7 +255,7 @@ export default function Tache3Session({ topicSlug }: Tache3SessionProps) {
           </button>
         </header>
 
-        <main style={{ padding: '24px 20px', paddingBottom: 'calc(40px + var(--fp-safe-bottom))' }}>
+        <main style={{ padding: '24px 20px', paddingBottom: 'calc(40px + var(--lm-safe-bottom))' }}>
           {/* Topic card (hidden in error state so the help is front-and-center) */}
           {phase !== 'error' && (
             <div

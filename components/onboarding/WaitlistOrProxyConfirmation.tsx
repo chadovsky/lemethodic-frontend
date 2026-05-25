@@ -16,10 +16,10 @@ import type { UiLanguage } from '@/lib/types'
 
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SERIF = 'var(--font-source-serif), Georgia, "Times New Roman", serif'
-const ED_FG = 'var(--ed-fg)'
-const ED_MUTED = 'var(--ed-muted)'
-const ED_RULE = 'var(--ed-rule)'
-const ED_ACCENT = 'var(--ed-accent)'
+const ED_FG = 'var(--lm-text-primary)'
+const ED_MUTED = 'var(--lm-text-tertiary)'
+const ED_RULE = 'var(--lm-border-subtle)'
+const ED_ACCENT = 'var(--cta-primary)'
 
 const COPY = {
   en: {
@@ -63,7 +63,7 @@ export default function WaitlistOrProxyConfirmation({
   return (
     <div
       className="min-h-screen w-full flex flex-col items-center ed-page-enter"
-      style={{ backgroundColor: bg ?? 'var(--ed-warm-peach-deep)' }}
+      style={{ backgroundColor: bg ?? 'var(--lm-warm-peach-deep)' }}
     >
       <div
         className="w-full flex flex-col flex-1 min-h-screen"
@@ -126,7 +126,7 @@ export default function WaitlistOrProxyConfirmation({
             display: 'flex',
             flexDirection: 'column',
             gap: 12,
-            paddingBottom: 'calc(32px + var(--fp-safe-bottom, 0px))',
+            paddingBottom: 'calc(32px + var(--lm-safe-bottom, 0px))',
           }}
         >
           {/* Primary: accept the La Méthode proxy offer */}

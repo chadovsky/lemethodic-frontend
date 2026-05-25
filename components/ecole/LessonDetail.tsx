@@ -50,9 +50,9 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
             fontSize: '0.6875rem',
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: 'var(--ed-accent)',
-            backgroundColor: 'var(--ed-bg)',
-            border: '1px solid var(--ed-rule)',
+            color: 'var(--cta-primary)',
+            backgroundColor: 'var(--lm-bg-base)',
+            border: '1px solid var(--lm-border-subtle)',
             padding: '4px 10px',
             borderRadius: 999,
           }}
@@ -69,7 +69,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
               fontSize: 'clamp(28px, 3vw, 40px)',
               lineHeight: 1,
               letterSpacing: '-0.01em',
-              color: 'var(--ed-muted)',
+              color: 'var(--lm-text-tertiary)',
               fontVariantNumeric: 'tabular-nums',
             }}
           >
@@ -83,7 +83,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
               fontSize: 'clamp(28px, 3.5vw, 44px)',
               lineHeight: 1.15,
               letterSpacing: '-0.015em',
-              color: 'var(--ed-fg)',
+              color: 'var(--lm-text-primary)',
               margin: 0,
             }}
           >
@@ -96,7 +96,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
             fontWeight: 400,
             fontSize: '1rem',
             lineHeight: 1.55,
-            color: 'var(--ed-muted)',
+            color: 'var(--lm-text-tertiary)',
             margin: 0,
             maxWidth: 680,
           }}
@@ -170,7 +170,7 @@ function ContentSection({
           fontSize: 'clamp(22px, 2.6vw, 30px)',
           lineHeight: 1.2,
           letterSpacing: '-0.01em',
-          color: 'var(--ed-fg)',
+          color: 'var(--lm-text-primary)',
           margin: 0,
         }}
       >
@@ -185,7 +185,7 @@ function ContentSection({
               fontWeight: 400,
               fontSize: '1rem',
               lineHeight: 1.6,
-              color: 'var(--ed-fg)',
+              color: 'var(--lm-text-primary)',
               margin: 0,
             }}
           >
@@ -213,10 +213,10 @@ function ContentSection({
                 fontWeight: 400,
                 fontSize: '0.9375rem',
                 lineHeight: 1.55,
-                color: 'var(--ed-fg)',
+                color: 'var(--lm-text-primary)',
                 padding: '12px 14px',
-                backgroundColor: 'var(--ed-bg)',
-                border: '1px solid var(--ed-rule)',
+                backgroundColor: 'var(--lm-bg-base)',
+                border: '1px solid var(--lm-border-subtle)',
                 borderRadius: 4,
               }}
             >

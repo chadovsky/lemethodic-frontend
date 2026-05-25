@@ -24,10 +24,10 @@ import type { OnboardingQuestion } from '@/lib/onboarding-questions'
 import type { UiLanguage } from '@/lib/types'
 
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
-const ED_FG = 'var(--ed-fg)'
-const ED_MUTED = 'var(--ed-muted)'
-const ED_RULE = 'var(--ed-rule)'
-const ED_PAPER = 'var(--ed-paper)'
+const ED_FG = 'var(--lm-text-primary)'
+const ED_MUTED = 'var(--lm-text-tertiary)'
+const ED_RULE = 'var(--lm-border-subtle)'
+const ED_PAPER = 'var(--lm-bg-surface)'
 
 interface ExamPickerQuestionProps {
   question: OnboardingQuestion
@@ -243,7 +243,7 @@ export default function ExamPickerQuestion({
                 fontFamily: SANS,
                 fontWeight: 500,
                 fontSize: 13,
-                color: 'var(--fp-error)',
+                color: 'var(--lm-error)',
                 margin: 0,
               }}
             >

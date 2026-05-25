@@ -90,7 +90,7 @@ export default function LandingFooter({ lang }: LandingFooterProps) {
                   fontSize: '0.875rem',
                   color: ED.muted,
                   textDecoration: 'none',
-                  transition: 'color var(--ed-duration-hover) var(--ease-spring)',
+                  transition: 'color var(--lm-duration-hover) var(--lm-ease-spring)',
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.color = ED.fg }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = ED.muted }}
@@ -124,7 +124,7 @@ export default function LandingFooter({ lang }: LandingFooterProps) {
               fontSize: '0.8125rem',
               color: ED.muted,
               textDecoration: 'none',
-              transition: 'color var(--ed-duration-hover) var(--ease-spring)',
+              transition: 'color var(--lm-duration-hover) var(--lm-ease-spring)',
             }}
             onMouseEnter={(e) => { e.currentTarget.style.color = ED.fg }}
             onMouseLeave={(e) => { e.currentTarget.style.color = ED.muted }}

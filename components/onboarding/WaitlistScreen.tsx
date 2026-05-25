@@ -30,7 +30,7 @@ type Lang = 'en' | 'fr'
 
 // F-201 — bg migrated from blush pastel to editorial system. The "pause
 // moment" framing now reads via typography restraint rather than color.
-const BG = 'var(--ed-bg)'
+const BG = 'var(--lm-bg-base)'
 
 // ── Slug → display ───────────────────────────────────────────────────────────
 
@@ -190,7 +190,7 @@ export default function WaitlistScreen() {
             fontSize: 'clamp(28px, 4vw, 40px)',
             lineHeight: 1.15,
             letterSpacing: '-0.015em',
-            color: 'var(--ed-fg)',
+            color: 'var(--lm-text-primary)',
           }}
         >
           {copy.heading}
@@ -200,8 +200,8 @@ export default function WaitlistScreen() {
         <div
           className="mt-8"
           style={{
-            backgroundColor: 'var(--ed-paper)',
-            border: '1px solid var(--ed-rule)',
+            backgroundColor: 'var(--lm-bg-surface)',
+            border: '1px solid var(--lm-border-subtle)',
             borderRadius: 4,
             padding: 'clamp(24px, 3vw, 36px)',
             display: 'flex',
@@ -216,7 +216,7 @@ export default function WaitlistScreen() {
               fontWeight: 400,
               fontSize: 16,
               lineHeight: 1.6,
-              color: 'var(--ed-fg)',
+              color: 'var(--lm-text-primary)',
               margin: 0,
             }}
           >
@@ -231,7 +231,7 @@ export default function WaitlistScreen() {
                 fontWeight: 400,
                 fontSize: 15,
                 lineHeight: 1.6,
-                color: 'var(--ed-muted)',
+                color: 'var(--lm-text-tertiary)',
                 margin: 0,
               }}
             >
@@ -246,7 +246,7 @@ export default function WaitlistScreen() {
               fontWeight: 400,
               fontSize: 15,
               lineHeight: 1.6,
-              color: 'var(--ed-muted)',
+              color: 'var(--lm-text-tertiary)',
               margin: 0,
             }}
           >

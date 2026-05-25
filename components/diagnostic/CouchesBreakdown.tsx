@@ -116,7 +116,7 @@ export default function CouchesBreakdown() {
                 width: mounted ? `${CEFR_PCT[couche.score]}%` : '0%',
                 borderRadius: 3,
                 backgroundColor: 'var(--cta-primary)',
-                transition: 'width 600ms var(--ed-ease, ease)',
+                transition: 'width 600ms var(--lm-ease, ease)',
               }}
             />
           </div>

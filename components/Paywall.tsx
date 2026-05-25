@@ -156,7 +156,7 @@ export default function Paywall() {
   if (awaitingAuthRedirect) {
     return (
       <div
-        style={{ minHeight: '100dvh', backgroundColor: 'var(--ed-warm-cream)' }}
+        style={{ minHeight: '100dvh', backgroundColor: 'var(--lm-warm-cream)' }}
       />
     )
   }
@@ -186,7 +186,7 @@ export default function Paywall() {
       // editorial system. Full editorial typography pass tracked as
       // F-203.paywall (Recharts radar + comparison table styling needs care).
       // F-VISUAL-001 X.4.1 — ed-page-enter class added for soft route-entry fade.
-      style={{ backgroundColor: 'var(--ed-warm-cream)' }}
+      style={{ backgroundColor: 'var(--lm-warm-cream)' }}
     >
       <div
         className="w-full flex flex-col px-5"
@@ -199,7 +199,7 @@ export default function Paywall() {
           paddingLeft: 'clamp(20px, 4vw, 40px)',
           paddingRight: 'clamp(20px, 4vw, 40px)',
           paddingTop: 'clamp(48px, 8vw, 96px)',
-          paddingBottom: 'calc(80px + var(--fp-safe-bottom))',
+          paddingBottom: 'calc(80px + var(--lm-safe-bottom))',
         }}
       >
 
@@ -266,7 +266,7 @@ export default function Paywall() {
               <Radar
                 name="Target"
                 dataKey="target"
-                stroke="var(--ed-warm-sage-deep)"
+                stroke="var(--lm-warm-sage-deep)"
                 strokeDasharray="4 3"
                 fill="transparent"
                 strokeWidth={1.5}
@@ -277,8 +277,8 @@ export default function Paywall() {
               <Radar
                 name="You"
                 dataKey="user"
-                stroke="var(--ed-warm-peach-deep)"
-                fill="var(--ed-warm-peach)"
+                stroke="var(--lm-warm-peach-deep)"
+                fill="var(--lm-warm-peach)"
                 fillOpacity={0.5}
                 strokeWidth={2}
               />
@@ -299,12 +299,12 @@ export default function Paywall() {
         {/* Legend */}
         <div className="flex items-center gap-5 mt-3 justify-center">
           <div className="flex items-center gap-2">
-            <div style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: 'var(--ed-warm-peach-deep)', opacity: 0.8 }} />
+            <div style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: 'var(--lm-warm-peach-deep)', opacity: 0.8 }} />
             <span style={{ fontSize: 12, fontWeight: 600, color: INK_SOFT }}>You</span>
           </div>
           <div className="flex items-center gap-2">
             <svg width="16" height="8" viewBox="0 0 16 8" aria-hidden="true">
-              <line x1="0" y1="4" x2="16" y2="4" stroke="var(--ed-warm-sage-deep)" strokeWidth="1.5" strokeDasharray="4 3" />
+              <line x1="0" y1="4" x2="16" y2="4" stroke="var(--lm-warm-sage-deep)" strokeWidth="1.5" strokeDasharray="4 3" />
             </svg>
             <span style={{ fontSize: 12, fontWeight: 600, color: INK_SOFT }}>Target</span>
           </div>
@@ -398,7 +398,7 @@ export default function Paywall() {
                       fontSize: 10,
                       fontWeight: 800,
                       color: '#FFFFFF',
-                      backgroundColor: 'var(--fp-sage-deep)',
+                      backgroundColor: 'var(--lm-success)',
                       borderRadius: 20,
                       padding: '1px 6px',
                       letterSpacing: '0.02em',
@@ -532,7 +532,7 @@ export default function Paywall() {
           )}
 
           {/* CTA — V-012b: bg switched from legacy INK constant to
-              var(--ed-accent) navy, gains .ed-cta-warm-hover class for
+              var(--cta-primary) navy, gains .ed-cta-warm-hover class for
               the spring-eased warm-peach-deep hover state. The inline
               transform handlers preserve the press scale snap. */}
           <button
@@ -543,7 +543,7 @@ export default function Paywall() {
               marginTop: 20,
               width: '100%',
               height: 58,
-              backgroundColor: 'var(--ed-accent)',
+              backgroundColor: 'var(--cta-primary)',
               color: '#FFFFFF',
               borderRadius: 16,
               border: 'none',
@@ -791,10 +791,10 @@ function CellDisplay({ val, highlight = false }: { val: boolean | string; highli
     return (
       <div className="flex justify-center">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-label="Included">
-          <circle cx="9" cy="9" r="9" fill={highlight ? INK : 'var(--fp-sage-deep-25)'} />
+          <circle cx="9" cy="9" r="9" fill={highlight ? INK : 'var(--lm-success-25)'} />
           <path
             d="M5 9.2L7.8 12L13 6.5"
-            stroke={highlight ? '#FFFFFF' : 'var(--fp-sage-deep)'}
+            stroke={highlight ? '#FFFFFF' : 'var(--lm-success)'}
             strokeWidth="1.75"
             strokeLinecap="round"
             strokeLinejoin="round"

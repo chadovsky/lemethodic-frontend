@@ -67,7 +67,7 @@ export const DIAGNOSTIC_SCORE = {
 
 // Category → dot color token
 export const ACTIVITY_DOT_COLOR: Record<ActivityCategory, string> = {
-  lesson: 'var(--fp-sage)',
-  vocab: 'var(--fp-sky)',
-  diagnostic: 'var(--fp-lavender)',
+  lesson: 'var(--lm-pastel-sage)',
+  vocab: 'var(--lm-pastel-sky)',
+  diagnostic: 'var(--lm-pastel-lavender)',
 }

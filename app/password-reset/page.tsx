@@ -24,7 +24,7 @@ const HCaptcha = dynamic(() => import('@hcaptcha/react-hcaptcha'), {
   ssr: false,
 })
 
-const BG = 'var(--ed-bg)'
+const BG = 'var(--lm-bg-base)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SERIF = 'var(--font-source-serif), Georgia, serif'
 
@@ -41,8 +41,8 @@ function PasswordResetInner() {
         style={{
           width: '100%',
           maxWidth: 440,
-          backgroundColor: 'var(--ed-paper)',
-          border: '1px solid var(--ed-rule)',
+          backgroundColor: 'var(--lm-bg-surface)',
+          border: '1px solid var(--lm-border-subtle)',
           borderRadius: 4,
           padding: 'clamp(32px, 4vw, 48px) clamp(28px, 3vw, 40px)',
         }}
@@ -52,7 +52,7 @@ function PasswordResetInner() {
             fontFamily: SANS,
             fontWeight: 600,
             fontSize: 12,
-            color: 'var(--ed-muted)',
+            color: 'var(--lm-text-tertiary)',
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             marginBottom: 24,
@@ -71,7 +71,7 @@ function PasswordResetInner() {
           fontWeight: 400,
           fontSize: 14,
           lineHeight: 1.5,
-          color: 'var(--ed-muted)',
+          color: 'var(--lm-text-tertiary)',
           textAlign: 'center',
         }}
       >
@@ -79,7 +79,7 @@ function PasswordResetInner() {
         <Link
           href="/login"
           style={{
-            color: 'var(--ed-fg)',
+            color: 'var(--lm-text-primary)',
             fontWeight: 600,
             textDecoration: 'underline',
             textUnderlineOffset: 2,
@@ -167,7 +167,7 @@ function RequestForm() {
             fontFamily: SANS,
             fontWeight: 600,
             fontSize: 12,
-            color: 'var(--ed-muted)',
+            color: 'var(--lm-text-tertiary)',
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
           }}
@@ -210,8 +210,8 @@ function RequestForm() {
           marginTop: 20,
           width: '100%',
           height: 56,
-          backgroundColor: isLoading ? 'var(--ed-rule)' : 'var(--ed-accent)',
-          color: isLoading ? 'var(--ed-muted)' : '#FFFFFF',
+          backgroundColor: isLoading ? 'var(--lm-border-subtle)' : 'var(--cta-primary)',
+          color: isLoading ? 'var(--lm-text-tertiary)' : '#FFFFFF',
           borderRadius: 4,
           border: 'none',
           fontFamily: SANS,
@@ -219,7 +219,7 @@ function RequestForm() {
           fontSize: 15,
           cursor: isLoading ? 'not-allowed' : 'pointer',
           outline: 'none',
-          transition: 'background-color var(--ed-duration-hover) var(--ease-spring)',
+          transition: 'background-color var(--lm-duration-hover) var(--lm-ease-spring)',
         }}
       >
         {isLoading ? 'Sending…' : 'Send reset link'}
@@ -340,8 +340,8 @@ function ConfirmForm({ token }: { token: string }) {
           marginTop: 28,
           width: '100%',
           height: 56,
-          backgroundColor: isLoading ? 'var(--ed-rule)' : 'var(--ed-accent)',
-          color: isLoading ? 'var(--ed-muted)' : '#FFFFFF',
+          backgroundColor: isLoading ? 'var(--lm-border-subtle)' : 'var(--cta-primary)',
+          color: isLoading ? 'var(--lm-text-tertiary)' : '#FFFFFF',
           borderRadius: 4,
           border: 'none',
           fontFamily: SANS,
@@ -349,7 +349,7 @@ function ConfirmForm({ token }: { token: string }) {
           fontSize: 15,
           cursor: isLoading ? 'not-allowed' : 'pointer',
           outline: 'none',
-          transition: 'background-color var(--ed-duration-hover) var(--ease-spring)',
+          transition: 'background-color var(--lm-duration-hover) var(--lm-ease-spring)',
         }}
       >
         {isLoading ? 'Updating…' : 'Update password'}
@@ -366,7 +366,7 @@ const labelStyle: React.CSSProperties = {
   fontFamily: SANS,
   fontWeight: 600,
   fontSize: 12,
-  color: 'var(--ed-muted)',
+  color: 'var(--lm-text-tertiary)',
   letterSpacing: '0.08em',
   textTransform: 'uppercase',
 }
@@ -374,16 +374,16 @@ const labelStyle: React.CSSProperties = {
 const fieldStyle: React.CSSProperties = {
   height: 56,
   borderRadius: 4,
-  border: '1px solid var(--ed-rule)',
-  backgroundColor: 'var(--ed-paper)',
+  border: '1px solid var(--lm-border-subtle)',
+  backgroundColor: 'var(--lm-bg-surface)',
   padding: '0 18px',
   fontFamily: SANS,
   fontWeight: 400,
   fontSize: 15,
-  color: 'var(--ed-fg)',
+  color: 'var(--lm-text-primary)',
   width: '100%',
   outline: 'none',
-  transition: 'border-color var(--ed-duration-hover) var(--ease-spring)',
+  transition: 'border-color var(--lm-duration-hover) var(--lm-ease-spring)',
 }
 
 function Heading({ children }: { children: React.ReactNode }) {
@@ -395,7 +395,7 @@ function Heading({ children }: { children: React.ReactNode }) {
         fontWeight: 400,
         fontSize: 'clamp(28px, 3.6vw, 36px)',
         lineHeight: 1.15,
-        color: 'var(--ed-fg)',
+        color: 'var(--lm-text-primary)',
         letterSpacing: '-0.015em',
         margin: 0,
         marginBottom: 12,
@@ -414,7 +414,7 @@ function Subtext({ children }: { children: React.ReactNode }) {
         fontWeight: 400,
         fontSize: 15,
         lineHeight: 1.6,
-        color: 'var(--ed-muted)',
+        color: 'var(--lm-text-tertiary)',
         margin: 0,
       }}
     >
@@ -432,7 +432,7 @@ function InlineError({ message }: { message: string }) {
         fontFamily: SANS,
         fontWeight: 500,
         fontSize: 13,
-        color: 'var(--fp-error)',
+        color: 'var(--lm-error)',
         textAlign: 'center',
       }}
     >

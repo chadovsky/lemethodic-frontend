@@ -64,7 +64,7 @@ export default function TopicDetail({ slug }: { slug: string }) {
   return (
     <main
       className="min-h-screen w-full ed-page-enter"
-      style={{ backgroundColor: 'var(--ed-bg)' }}
+      style={{ backgroundColor: 'var(--lm-bg-base)' }}
     >
       <div className="mx-auto max-w-4xl px-5 md:px-8 lg:px-10 py-10 md:py-14 lg:py-16">
         <Link
@@ -74,7 +74,7 @@ export default function TopicDetail({ slug }: { slug: string }) {
             fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 500,
             fontSize: 13,
-            color: 'var(--ed-muted)',
+            color: 'var(--lm-text-tertiary)',
             textDecoration: 'none',
           }}
         >
@@ -90,7 +90,7 @@ export default function TopicDetail({ slug }: { slug: string }) {
               fontSize: 'clamp(32px, 4vw, 44px)',
               lineHeight: 1.1,
               letterSpacing: '-0.015em',
-              color: 'var(--ed-fg)',
+              color: 'var(--lm-text-primary)',
               margin: 0,
               marginBottom: 8,
               wordBreak: 'break-word',
@@ -112,7 +112,7 @@ export default function TopicDetail({ slug }: { slug: string }) {
                 fontWeight: 400,
                 fontSize: 14,
                 lineHeight: 1.5,
-                color: 'var(--ed-muted)',
+                color: 'var(--lm-text-tertiary)',
                 margin: 0,
               }}
             >
@@ -136,7 +136,7 @@ export default function TopicDetail({ slug }: { slug: string }) {
                 padding: '0 22px',
                 borderRadius: 4,
                 border: 'none',
-                backgroundColor: 'var(--ed-accent)',
+                backgroundColor: 'var(--cta-primary)',
                 color: '#FFFFFF',
                 fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
                 fontWeight: 600,
@@ -154,9 +154,9 @@ export default function TopicDetail({ slug }: { slug: string }) {
                 height: 48,
                 padding: '0 22px',
                 borderRadius: 4,
-                border: '1px solid var(--ed-rule)',
-                backgroundColor: 'var(--ed-paper)',
-                color: 'var(--ed-fg)',
+                border: '1px solid var(--lm-border-subtle)',
+                backgroundColor: 'var(--lm-bg-surface)',
+                color: 'var(--lm-text-primary)',
                 fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
                 fontWeight: 600,
                 fontSize: 14,
@@ -235,9 +235,9 @@ export default function TopicDetail({ slug }: { slug: string }) {
                       height: 44,
                       padding: '0 22px',
                       borderRadius: 4,
-                      border: '1px solid var(--ed-rule)',
-                      backgroundColor: 'var(--ed-paper)',
-                      color: 'var(--ed-fg)',
+                      border: '1px solid var(--lm-border-subtle)',
+                      backgroundColor: 'var(--lm-bg-surface)',
+                      color: 'var(--lm-text-primary)',
                       fontFamily:
                         'var(--font-geist), -apple-system, system-ui, sans-serif',
                       fontWeight: 600,
@@ -281,7 +281,7 @@ function FilterRow<T extends string>({
     <section aria-label={label} className="mb-4">
       <div
         className="text-[12px] uppercase tracking-[0.12em] font-semibold mb-2"
-        style={{ color: 'var(--ed-muted)' }}
+        style={{ color: 'var(--lm-text-tertiary)' }}
       >
         {label}
       </div>
@@ -299,16 +299,16 @@ function FilterRow<T extends string>({
                 height: 32,
                 padding: '0 12px',
                 borderRadius: 4,
-                border: '1px solid var(--ed-rule)',
-                backgroundColor: isActive ? 'var(--ed-accent)' : 'var(--ed-paper)',
-                color: isActive ? '#FFFFFF' : 'var(--ed-fg)',
+                border: '1px solid var(--lm-border-subtle)',
+                backgroundColor: isActive ? 'var(--cta-primary)' : 'var(--lm-bg-surface)',
+                color: isActive ? '#FFFFFF' : 'var(--lm-text-primary)',
                 fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
                 fontWeight: 500,
                 fontSize: 12,
                 letterSpacing: '0.01em',
                 cursor: 'pointer',
                 transition:
-                  'background-color var(--ed-duration-hover) var(--ed-ease), color var(--ed-duration-hover) var(--ed-ease)',
+                  'background-color var(--lm-duration-hover) var(--lm-ease), color var(--lm-duration-hover) var(--lm-ease)',
               }}
             >
               {v}
@@ -330,8 +330,8 @@ function ChunkRow({
   return (
     <li
       style={{
-        backgroundColor: 'var(--ed-paper)',
-        border: '1px solid var(--ed-rule)',
+        backgroundColor: 'var(--lm-bg-surface)',
+        border: '1px solid var(--lm-border-subtle)',
         borderRadius: 4,
         padding: '16px 20px',
       }}
@@ -342,7 +342,7 @@ function ChunkRow({
           fontWeight: 500,
           fontSize: 16,
           lineHeight: 1.45,
-          color: 'var(--ed-fg)',
+          color: 'var(--lm-text-primary)',
           margin: 0,
           marginBottom: 6,
         }}
@@ -355,7 +355,7 @@ function ChunkRow({
           fontWeight: 400,
           fontSize: 14,
           lineHeight: 1.5,
-          color: 'var(--ed-muted)',
+          color: 'var(--lm-text-tertiary)',
           margin: 0,
           marginBottom: 10,
         }}
@@ -382,9 +382,9 @@ function ChunkChip({ label, muted }: { label: string; muted?: boolean }) {
         height: 22,
         padding: '0 8px',
         borderRadius: 3,
-        border: '1px solid var(--ed-rule)',
-        backgroundColor: 'var(--ed-bg)',
-        color: muted ? 'var(--ed-muted)' : 'var(--ed-fg)',
+        border: '1px solid var(--lm-border-subtle)',
+        backgroundColor: 'var(--lm-bg-base)',
+        color: muted ? 'var(--lm-text-tertiary)' : 'var(--lm-text-primary)',
         fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
         fontWeight: 600,
         fontSize: 11,
@@ -406,8 +406,8 @@ function ChunksSkeleton() {
           key={i}
           className="ed-skeleton"
           style={{
-            backgroundColor: 'var(--ed-paper)',
-            border: '1px solid var(--ed-rule)',
+            backgroundColor: 'var(--lm-bg-surface)',
+            border: '1px solid var(--lm-border-subtle)',
             borderRadius: 4,
             height: 100,
           }}
@@ -432,8 +432,8 @@ function EmptyCard({ title, body }: { title: string; body: string }) {
     <div
       role="status"
       style={{
-        backgroundColor: 'var(--ed-paper)',
-        border: '1px solid var(--ed-rule)',
+        backgroundColor: 'var(--lm-bg-surface)',
+        border: '1px solid var(--lm-border-subtle)',
         borderRadius: 4,
         padding: 'clamp(28px, 3vw, 48px)',
         textAlign: 'center',
@@ -446,7 +446,7 @@ function EmptyCard({ title, body }: { title: string; body: string }) {
           fontWeight: 400,
           fontSize: 'clamp(22px, 2.4vw, 28px)',
           lineHeight: 1.15,
-          color: 'var(--ed-fg)',
+          color: 'var(--lm-text-primary)',
           margin: 0,
           marginBottom: 10,
         }}
@@ -459,7 +459,7 @@ function EmptyCard({ title, body }: { title: string; body: string }) {
           fontWeight: 400,
           fontSize: 15,
           lineHeight: 1.55,
-          color: 'var(--ed-muted)',
+          color: 'var(--lm-text-tertiary)',
           margin: 0,
           maxWidth: 460,
           marginLeft: 'auto',
@@ -483,8 +483,8 @@ function ChunksError({
     <div
       role="alert"
       style={{
-        backgroundColor: 'var(--ed-paper)',
-        border: '1px solid var(--ed-rule)',
+        backgroundColor: 'var(--lm-bg-surface)',
+        border: '1px solid var(--lm-border-subtle)',
         borderRadius: 4,
         padding: 'clamp(24px, 3vw, 36px)',
         textAlign: 'center',
@@ -496,7 +496,7 @@ function ChunksError({
           fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 22,
-          color: 'var(--ed-fg)',
+          color: 'var(--lm-text-primary)',
           margin: 0,
           marginBottom: 8,
         }}
@@ -507,7 +507,7 @@ function ChunksError({
         style={{
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontSize: 14,
-          color: 'var(--ed-muted)',
+          color: 'var(--lm-text-tertiary)',
           margin: 0,
           marginBottom: 16,
         }}
@@ -523,7 +523,7 @@ function ChunksError({
           padding: '0 18px',
           borderRadius: 4,
           border: 'none',
-          backgroundColor: 'var(--ed-accent)',
+          backgroundColor: 'var(--cta-primary)',
           color: '#FFFFFF',
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,

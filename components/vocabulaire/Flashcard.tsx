@@ -26,15 +26,15 @@ export default function Flashcard({ chunk, flipped, onFlip }: FlashcardProps) {
         minHeight: 240,
         margin: '0 auto',
         padding: 0,
-        backgroundColor: 'var(--ed-paper)',
-        border: '1px solid var(--ed-rule)',
+        backgroundColor: 'var(--lm-bg-surface)',
+        border: '1px solid var(--lm-border-subtle)',
         borderRadius: 12,
         cursor: 'pointer',
         fontFamily: 'inherit',
         color: 'inherit',
         transformStyle: 'preserve-3d',
         transform: `perspective(1000px) rotateY(${flipped ? 180 : 0}deg)`,
-        transition: `transform 0.45s var(--ed-ease)`,
+        transition: `transform 0.45s var(--lm-ease)`,
       }}
     >
       {/* Front face */}

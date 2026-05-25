@@ -112,7 +112,7 @@ export default function PricingTeaser() {
                     alignSelf: 'flex-start',
                     padding: '3px 9px',
                     borderRadius: 4,
-                    backgroundColor: 'var(--ed-accent)',
+                    backgroundColor: 'var(--cta-primary)',
                     color: '#ffffff',
                     fontFamily: SANS_FONT,
                     fontWeight: 600,

@@ -15,8 +15,8 @@ export default function AudioPlayerPlaceholder({ cefr }: { cefr?: string }) {
         alignItems: 'center',
         gap: 14,
         padding: 'clamp(14px, 1.5vw, 18px) clamp(16px, 2vw, 22px)',
-        backgroundColor: 'var(--ed-paper)',
-        border: '1px solid var(--ed-rule)',
+        backgroundColor: 'var(--lm-bg-surface)',
+        border: '1px solid var(--lm-border-subtle)',
         borderRadius: 8,
         width: '100%',
       }}
@@ -37,7 +37,7 @@ export default function AudioPlayerPlaceholder({ cefr }: { cefr?: string }) {
             style={{
               width: 3,
               height: h,
-              backgroundColor: 'var(--ed-muted)',
+              backgroundColor: 'var(--lm-text-tertiary)',
               borderRadius: 1.5,
               opacity: 0.45,
             }}
@@ -58,7 +58,7 @@ export default function AudioPlayerPlaceholder({ cefr }: { cefr?: string }) {
           width: 44,
           height: 44,
           borderRadius: '50%',
-          backgroundColor: 'var(--ed-accent)',
+          backgroundColor: 'var(--cta-primary)',
           border: 'none',
           color: '#fff',
           display: 'flex',
@@ -95,7 +95,7 @@ export default function AudioPlayerPlaceholder({ cefr }: { cefr?: string }) {
             position: 'relative',
             height: 4,
             borderRadius: 999,
-            backgroundColor: 'var(--ed-bg)',
+            backgroundColor: 'var(--lm-bg-base)',
             overflow: 'hidden',
           }}
         >
@@ -104,7 +104,7 @@ export default function AudioPlayerPlaceholder({ cefr }: { cefr?: string }) {
               position: 'absolute',
               inset: 0,
               width: '0%',
-              backgroundColor: 'var(--ed-accent)',
+              backgroundColor: 'var(--cta-primary)',
               borderRadius: 999,
             }}
           />
@@ -114,7 +114,7 @@ export default function AudioPlayerPlaceholder({ cefr }: { cefr?: string }) {
             fontFamily: SANS_FONT,
             fontSize: '0.9375rem',
             fontWeight: 500,
-            color: 'var(--ed-fg)',
+            color: 'var(--lm-text-primary)',
             fontVariantNumeric: 'tabular-nums',
           }}
         >
@@ -132,9 +132,9 @@ export default function AudioPlayerPlaceholder({ cefr }: { cefr?: string }) {
             fontSize: '0.6875rem',
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            color: 'var(--ed-accent)',
-            backgroundColor: 'var(--ed-bg)',
-            border: '1px solid var(--ed-rule)',
+            color: 'var(--cta-primary)',
+            backgroundColor: 'var(--lm-bg-base)',
+            border: '1px solid var(--lm-border-subtle)',
             padding: '3px 8px',
             borderRadius: 999,
           }}
@@ -150,7 +150,7 @@ export default function AudioPlayerPlaceholder({ cefr }: { cefr?: string }) {
           flexShrink: 0,
           width: 24,
           height: 24,
-          color: 'var(--ed-muted)',
+          color: 'var(--lm-text-tertiary)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

@@ -14,7 +14,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { api, ApiError } from '@/lib/api'
 
-const BG = 'var(--ed-bg)'
+const BG = 'var(--lm-bg-base)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SERIF = 'var(--font-source-serif), Georgia, serif'
 
@@ -115,8 +115,8 @@ function VerifyEmailInner() {
         style={{
           width: '100%',
           maxWidth: 440,
-          backgroundColor: 'var(--ed-paper)',
-          border: '1px solid var(--ed-rule)',
+          backgroundColor: 'var(--lm-bg-surface)',
+          border: '1px solid var(--lm-border-subtle)',
           borderRadius: 4,
           padding: 'clamp(32px, 4vw, 48px) clamp(28px, 3vw, 40px)',
         }}
@@ -126,7 +126,7 @@ function VerifyEmailInner() {
             fontFamily: SANS,
             fontWeight: 600,
             fontSize: 12,
-            color: 'var(--ed-muted)',
+            color: 'var(--lm-text-tertiary)',
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             marginBottom: 24,
@@ -153,7 +153,7 @@ function VerifyEmailInner() {
           fontWeight: 400,
           fontSize: 14,
           lineHeight: 1.5,
-          color: 'var(--ed-muted)',
+          color: 'var(--lm-text-tertiary)',
           textAlign: 'center',
         }}
       >
@@ -161,7 +161,7 @@ function VerifyEmailInner() {
         <Link
           href="/login"
           style={{
-            color: 'var(--ed-fg)',
+            color: 'var(--lm-text-primary)',
             fontWeight: 600,
             textDecoration: 'underline',
             textUnderlineOffset: 2,
@@ -200,7 +200,7 @@ function ConfirmFlow({ state }: { state: ConfirmState }) {
           style={{
             fontFamily: SANS,
             fontSize: 14,
-            color: 'var(--ed-fg-soft)',
+            color: 'var(--lm-text-secondary)',
             marginTop: 20,
             lineHeight: 1.6,
           }}
@@ -235,7 +235,7 @@ function EmptyState({ resendState, resendError, onResend }: EmptyStateProps) {
         style={{
           fontFamily: SANS,
           fontSize: 14,
-          color: 'var(--ed-fg-soft)',
+          color: 'var(--lm-text-secondary)',
           marginTop: 20,
           lineHeight: 1.6,
         }}
@@ -253,11 +253,11 @@ function EmptyState({ resendState, resendError, onResend }: EmptyStateProps) {
           height: 56,
           backgroundColor:
             resendState === 'sending' || resendState === 'sent'
-              ? 'var(--ed-rule)'
-              : 'var(--ed-accent)',
+              ? 'var(--lm-border-subtle)'
+              : 'var(--cta-primary)',
           color:
             resendState === 'sending' || resendState === 'sent'
-              ? 'var(--ed-muted)'
+              ? 'var(--lm-text-tertiary)'
               : '#FFFFFF',
           borderRadius: 4,
           border: 'none',
@@ -266,7 +266,7 @@ function EmptyState({ resendState, resendError, onResend }: EmptyStateProps) {
           fontSize: 15,
           cursor: resendState === 'sending' || resendState === 'sent' ? 'not-allowed' : 'pointer',
           outline: 'none',
-          transition: 'background-color var(--ed-duration-hover) var(--ease-spring)',
+          transition: 'background-color var(--lm-duration-hover) var(--lm-ease-spring)',
         }}
       >
         {resendState === 'sending'
@@ -283,7 +283,7 @@ function EmptyState({ resendState, resendError, onResend }: EmptyStateProps) {
             fontFamily: SANS,
             fontWeight: 500,
             fontSize: 13,
-            color: 'var(--fp-error)',
+            color: 'var(--lm-error)',
             textAlign: 'center',
           }}
         >
@@ -303,7 +303,7 @@ function Heading({ children }: { children: React.ReactNode }) {
         fontWeight: 400,
         fontSize: 'clamp(28px, 3.6vw, 36px)',
         lineHeight: 1.15,
-        color: 'var(--ed-fg)',
+        color: 'var(--lm-text-primary)',
         letterSpacing: '-0.015em',
         margin: 0,
         marginBottom: 12,
@@ -322,7 +322,7 @@ function Subtext({ children }: { children: React.ReactNode }) {
         fontWeight: 400,
         fontSize: 15,
         lineHeight: 1.6,
-        color: 'var(--ed-muted)',
+        color: 'var(--lm-text-tertiary)',
         margin: 0,
       }}
     >

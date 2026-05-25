@@ -26,19 +26,19 @@ import type { Lesson, ModuleCategory, ModuleWithContext } from '@/lib/types'
 
 // F-206 — page chrome migrated to editorial system. CATEGORY_BG pastels
 // preserved per F-200 rule (data-display chip layer for module category).
-const INK          = 'var(--ed-fg)'
-const INK_SOFT     = 'var(--ed-muted)'
-const INK_MUTED    = 'var(--ed-muted)'
-const BG           = 'var(--ed-bg)'
+const INK          = 'var(--lm-text-primary)'
+const INK_SOFT     = 'var(--lm-text-tertiary)'
+const INK_MUTED    = 'var(--lm-text-tertiary)'
+const BG           = 'var(--lm-bg-base)'
 const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 const CATEGORY_BG: Record<ModuleCategory, string> = {
-  vocab_calque:        'var(--fp-peach)',
-  discourse_structure: 'var(--fp-lavender)',
-  grammar_interference:'var(--fp-butter)',
+  vocab_calque:        'var(--lm-pastel-peach)',
+  discourse_structure: 'var(--lm-pastel-lavender)',
+  grammar_interference:'var(--lm-pastel-butter)',
   pronunciation:       '#C7DFEA',
-  register_mismatch:   'var(--fp-blush)',
-  word_order:          'var(--fp-sage)',
+  register_mismatch:   'var(--lm-pastel-blush)',
+  word_order:          'var(--lm-pastel-sage)',
   verb_aspect:         '#E8E4D8',
   other:               '#1A1A1A0F',
 }

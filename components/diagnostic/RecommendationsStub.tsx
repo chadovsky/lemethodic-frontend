@@ -5,7 +5,7 @@ const ROWS = [
   {
     layer: 'La Construction',
     initials: 'LC',
-    chipColor: 'var(--fp-sky)',
+    chipColor: 'var(--lm-pastel-sky)',
     suggestion:
       'Renforcer les structures syntaxiques pour fluidifier vos réponses spontanées.',
     cta: { label: 'Renforcer La Construction', href: '/la-methode' },
@@ -13,7 +13,7 @@ const ROWS = [
   {
     layer: 'Le Propos',
     initials: 'LP',
-    chipColor: 'var(--fp-sage)',
+    chipColor: 'var(--lm-pastel-sage)',
     suggestion:
       'Étoffer votre réservoir lexical sur les thèmes de la vie courante.',
     cta: { label: 'Étoffer Le Propos', href: '/la-bibliotheque' },
@@ -21,7 +21,7 @@ const ROWS = [
   {
     layer: 'La Musique',
     initials: 'LM',
-    chipColor: 'var(--fp-butter)',
+    chipColor: 'var(--lm-pastel-butter)',
     suggestion:
       "Travailler l'intonation et le débit sur les tâches orales courtes.",
     cta: { label: 'Travailler La Musique', href: '/l-examen/tache/1' },
@@ -43,8 +43,8 @@ export default function RecommendationsStub() {
             gap: 16,
             flexWrap: 'wrap',
             padding: 'clamp(12px, 1.5vw, 16px) clamp(14px, 2vw, 20px)',
-            backgroundColor: 'var(--ed-paper)',
-            border: '1px solid var(--ed-rule)',
+            backgroundColor: 'var(--lm-bg-surface)',
+            border: '1px solid var(--lm-border-subtle)',
             borderRadius: 8,
           }}
         >
@@ -110,8 +110,8 @@ export default function RecommendationsStub() {
               fontSize: '0.875rem',
               color: '#fff',
               textDecoration: 'none',
-              backgroundColor: 'var(--ed-accent)',
-              border: '1px solid var(--ed-accent)',
+              backgroundColor: 'var(--cta-primary)',
+              border: '1px solid var(--cta-primary)',
               borderRadius: 4,
               padding: '8px 16px',
               flexShrink: 0,

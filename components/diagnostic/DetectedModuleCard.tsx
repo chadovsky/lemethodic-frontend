@@ -23,12 +23,12 @@ const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, s
 // badge becomes a visual cue. Pre-launch this is decorative; if/when the
 // library grows past 8 categories we'd switch to a hash-based palette.
 const CATEGORY_BG: Record<ModuleCategory, string> = {
-  vocab_calque:        'var(--fp-peach)', // peach
-  discourse_structure: 'var(--fp-lavender)', // lavender
-  grammar_interference:'var(--fp-butter)', // butter
+  vocab_calque:        'var(--lm-pastel-peach)', // peach
+  discourse_structure: 'var(--lm-pastel-lavender)', // lavender
+  grammar_interference:'var(--lm-pastel-butter)', // butter
   pronunciation:       '#C7DFEA', // sky
-  register_mismatch:   'var(--fp-blush)', // blush
-  word_order:          'var(--fp-sage)', // sage
+  register_mismatch:   'var(--lm-pastel-blush)', // blush
+  word_order:          'var(--lm-pastel-sage)', // sage
   verb_aspect:         '#E8E4D8', // warm gray
   other:               '#1A1A1A0F',
 }

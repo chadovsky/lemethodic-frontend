@@ -32,12 +32,12 @@ export const DISPLAY_FONT = 'var(--font-cabinet), "Cabinet Grotesk", -apple-syst
 // ── Editorial chrome tokens (F-201 — local re-exports of lib/typography) ───
 // Inlined refs to CSS variables so primitives below don't need to import
 // from lib/typography on every render. Same values, locally-scoped names.
-const ED_BG = 'var(--ed-bg)'
-const ED_FG = 'var(--ed-fg)'
-const ED_MUTED = 'var(--ed-muted)'
-const ED_RULE = 'var(--ed-rule)'
-const ED_PAPER = 'var(--ed-paper)'
-const ED_ACCENT = 'var(--ed-accent)'
+const ED_BG = 'var(--lm-bg-base)'
+const ED_FG = 'var(--lm-text-primary)'
+const ED_MUTED = 'var(--lm-text-tertiary)'
+const ED_RULE = 'var(--lm-border-subtle)'
+const ED_PAPER = 'var(--lm-bg-surface)'
+const ED_ACCENT = 'var(--cta-primary)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // ── Progress dots ─────────────────────────────────────────────────────────────
@@ -68,7 +68,7 @@ export function ProgressDots({ total, filledUpTo, current }: ProgressDotsProps) 
               backgroundColor: isFilled ? ED_FG : 'transparent',
               border: isFilled ? 'none' : `1px solid ${ED_RULE}`,
               transitionDuration: '300ms',
-              transitionTimingFunction: 'var(--ease-spring)',
+              transitionTimingFunction: 'var(--lm-ease-spring)',
             }}
             aria-hidden="true"
           />
@@ -111,7 +111,7 @@ export function OnboardingCard({
         border: `1px solid ${isSelected ? ED_FG : ED_RULE}`,
         outline: 'none',
         cursor: 'pointer',
-        transition: `background-color var(--ed-duration-state) var(--ease-spring), border-color var(--ed-duration-state) var(--ease-spring), color var(--ed-duration-state) var(--ease-spring), transform var(--ed-duration-hover) var(--ease-spring), box-shadow var(--ed-duration-hover) var(--ease-spring)`,
+        transition: `background-color var(--lm-duration-state) var(--lm-ease-spring), border-color var(--lm-duration-state) var(--lm-ease-spring), color var(--lm-duration-state) var(--lm-ease-spring), transform var(--lm-duration-hover) var(--lm-ease-spring), box-shadow var(--lm-duration-hover) var(--lm-ease-spring)`,
         fontFamily: SANS,
       }}
     >
@@ -177,7 +177,7 @@ interface CTAButtonProps {
 
 export function CTAButton({ label, enabled, onClick }: CTAButtonProps) {
   return (
-    <div style={{ paddingBottom: 'calc(20px + var(--fp-safe-bottom))' }}>
+    <div style={{ paddingBottom: 'calc(20px + var(--lm-safe-bottom))' }}>
       <button
         type="button"
         onClick={onClick}
@@ -196,7 +196,7 @@ export function CTAButton({ label, enabled, onClick }: CTAButtonProps) {
           border: 'none',
           cursor: enabled ? 'pointer' : 'not-allowed',
           outline: 'none',
-          transition: `background-color var(--ed-duration-hover) var(--ease-spring)`,
+          transition: `background-color var(--lm-duration-hover) var(--lm-ease-spring)`,
         }}
       >
         {label}
@@ -223,7 +223,7 @@ export function BackButton({ onClick }: { onClick: () => void }) {
         padding: 0,
         outline: 'none',
         color: ED_FG,
-        transition: `opacity var(--ed-duration-hover) var(--ease-spring)`,
+        transition: `opacity var(--lm-duration-hover) var(--lm-ease-spring)`,
       }}
       onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.6' }}
       onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}

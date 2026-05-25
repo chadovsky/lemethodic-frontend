@@ -26,7 +26,7 @@ import { useReducedMotion } from 'framer-motion'
 import { ED, LETTER_SPACING, LINE_HEIGHT, SANS_FONT, SERIF_FONT } from '@/lib/typography'
 import type { Lang } from './copy'
 
-const PAGE_BG = 'var(--ed-bg)'
+const PAGE_BG = 'var(--lm-bg-base)'
 
 // ── Locked copy ──────────────────────────────────────────────────────────
 
@@ -175,7 +175,7 @@ export default function PlatformLanding({ lang }: Props) {
         className="w-full"
         style={{
           backgroundColor: ED.bg,
-          backgroundImage: 'linear-gradient(180deg, var(--ed-bg) 0%, var(--ed-warm-sand) 100%)',
+          backgroundImage: 'linear-gradient(180deg, var(--lm-bg-base) 0%, var(--lm-warm-sand) 100%)',
           padding: 'clamp(80px, 14vw, 160px) clamp(24px, 4vw, 64px) clamp(64px, 10vw, 140px)',
           position: 'relative',
           overflow: 'hidden',
@@ -244,8 +244,8 @@ export default function PlatformLanding({ lang }: Props) {
                   height: 64,
                   padding: '0 36px',
                   borderRadius: 4,
-                  backgroundColor: 'var(--ed-warm-peach-deep)',
-                  color: 'var(--ed-warm-cream)',
+                  backgroundColor: 'var(--lm-warm-peach-deep)',
+                  color: 'var(--lm-warm-cream)',
                   fontFamily: SANS_FONT,
                   fontWeight: 600,
                   fontSize: '1.0625rem',
@@ -265,8 +265,8 @@ export default function PlatformLanding({ lang }: Props) {
                   textDecoration: 'underline',
                   textUnderlineOffset: 4,
                   textDecorationThickness: 1,
-                  textDecorationColor: 'var(--ed-rule)',
-                  transition: 'color var(--ed-duration-hover) var(--ease-spring), text-decoration-color var(--ed-duration-hover) var(--ease-spring)',
+                  textDecorationColor: 'var(--lm-border-subtle)',
+                  transition: 'color var(--lm-duration-hover) var(--lm-ease-spring), text-decoration-color var(--lm-duration-hover) var(--lm-ease-spring)',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = ED.fg
@@ -274,7 +274,7 @@ export default function PlatformLanding({ lang }: Props) {
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.color = ED.muted
-                  e.currentTarget.style.textDecorationColor = 'var(--ed-rule)'
+                  e.currentTarget.style.textDecorationColor = 'var(--lm-border-subtle)'
                 }}
               >
                 {copy.hero.ctaSecondary}
@@ -376,7 +376,7 @@ export default function PlatformLanding({ lang }: Props) {
                 fontFamily: SANS_FONT,
                 fontWeight: 600,
                 fontSize: '0.9375rem',
-                color: 'var(--ed-warm-espresso)',
+                color: 'var(--lm-warm-espresso)',
                 textDecoration: 'none',
               }}
             >
@@ -390,7 +390,7 @@ export default function PlatformLanding({ lang }: Props) {
       <section
         className="w-full"
         style={{
-          backgroundColor: 'var(--ed-warm-sand)',
+          backgroundColor: 'var(--lm-warm-sand)',
           padding: 'clamp(96px, 14vw, 180px) clamp(24px, 4vw, 64px)',
         }}
       >
@@ -448,8 +448,8 @@ export default function PlatformLanding({ lang }: Props) {
                   height: 64,
                   padding: '0 36px',
                   borderRadius: 4,
-                  backgroundColor: 'var(--ed-warm-peach-deep)',
-                  color: 'var(--ed-warm-cream)',
+                  backgroundColor: 'var(--lm-warm-peach-deep)',
+                  color: 'var(--lm-warm-cream)',
                   fontFamily: SANS_FONT,
                   fontWeight: 600,
                   fontSize: '1.0625rem',
@@ -464,7 +464,7 @@ export default function PlatformLanding({ lang }: Props) {
                   fontWeight: 400,
                   fontSize: '0.875rem',
                   lineHeight: 1.5,
-                  color: 'var(--ed-fg-soft)',
+                  color: 'var(--lm-text-secondary)',
                 }}
               >
                 {copy.finalCta.trust}
@@ -551,7 +551,7 @@ function CardCta({ href, label, emphasis = false }: CardCtaProps) {
         fontFamily: SANS_FONT,
         fontWeight: 600,
         fontSize: emphasis ? '1rem' : '0.9375rem',
-        color: emphasis ? 'var(--ed-warm-peach-deep)' : 'var(--ed-warm-espresso)',
+        color: emphasis ? 'var(--lm-warm-peach-deep)' : 'var(--lm-warm-espresso)',
         textDecoration: 'none',
         alignSelf: 'flex-start',
       }}
@@ -589,7 +589,7 @@ function ExamPrepCard({ lang, copy }: { lang: Lang; copy: typeof PLATFORM_COPY[k
               fontSize: 11,
               letterSpacing: '0.06em',
               textTransform: 'uppercase',
-              color: 'var(--ed-warm-peach-deep)',
+              color: 'var(--lm-warm-peach-deep)',
               margin: 0,
             }}
           >
@@ -635,7 +635,7 @@ function LibraryCard({ copy }: { copy: typeof PLATFORM_COPY[keyof typeof PLATFOR
       <div
         className="ed-card-lift fp-platform-card-secondary"
         style={{
-          backgroundColor: 'var(--ed-warm-cream)',
+          backgroundColor: 'var(--lm-warm-cream)',
           border: `1px solid ${ED.rule}`,
           borderRadius: 4,
           padding: 'clamp(28px, 3vw, 40px)',
@@ -654,7 +654,7 @@ function LibraryCard({ copy }: { copy: typeof PLATFORM_COPY[keyof typeof PLATFOR
               fontSize: 11,
               letterSpacing: '0.06em',
               textTransform: 'uppercase',
-              color: 'var(--ed-warm-espresso)',
+              color: 'var(--lm-warm-espresso)',
               margin: 0,
             }}
           >
@@ -718,7 +718,7 @@ function DiagnosticCard({ copy }: { copy: typeof PLATFORM_COPY[keyof typeof PLAT
               fontSize: 11,
               letterSpacing: '0.06em',
               textTransform: 'uppercase',
-              color: 'var(--ed-warm-sage-deep)',
+              color: 'var(--lm-warm-sage-deep)',
               margin: 0,
             }}
           >
@@ -805,9 +805,9 @@ function BottleneckVisual({ language }: { language: Lang }) {
           fontSize: 'clamp(2rem, 3.5vw, 2.75rem)',
           lineHeight: 1.05,
           letterSpacing: '-0.015em',
-          color: 'var(--ed-warm-peach-deep)',
+          color: 'var(--lm-warm-peach-deep)',
           margin: 0,
-          animation: reduced ? 'none' : 'ed-pair-fade-in 400ms var(--ease-spring) both',
+          animation: reduced ? 'none' : 'ed-pair-fade-in 400ms var(--lm-ease-spring) both',
         }}
       >
         {BOTTLENECK_LAYERS[active]}
@@ -845,7 +845,7 @@ function BookStackVisual() {
         style={{
           width: 48,
           height: 80,
-          backgroundColor: 'var(--ed-warm-peach-deep)',
+          backgroundColor: 'var(--lm-warm-peach-deep)',
           borderRadius: '2px 2px 0 0',
           boxShadow: 'inset -2px 0 0 rgba(0,0,0,0.04)',
         }}
@@ -854,7 +854,7 @@ function BookStackVisual() {
         style={{
           width: 48,
           height: 92,
-          backgroundColor: 'var(--ed-warm-sage-deep)',
+          backgroundColor: 'var(--lm-warm-sage-deep)',
           borderRadius: '2px 2px 0 0',
           boxShadow: 'inset -2px 0 0 rgba(0,0,0,0.04)',
         }}
@@ -863,7 +863,7 @@ function BookStackVisual() {
         style={{
           width: 48,
           height: 72,
-          backgroundColor: 'var(--ed-warm-espresso)',
+          backgroundColor: 'var(--lm-warm-espresso)',
           borderRadius: '2px 2px 0 0',
           opacity: 0.85,
           boxShadow: 'inset -2px 0 0 rgba(0,0,0,0.04)',
@@ -903,19 +903,19 @@ function MiniRadarVisual() {
       <polygon
         points={outerPath}
         fill="transparent"
-        stroke="var(--ed-warm-sage-deep)"
+        stroke="var(--lm-warm-sage-deep)"
         strokeWidth="1.25"
         strokeDasharray="3 2"
       />
       <polygon
         points={innerPath}
-        fill="var(--ed-warm-peach)"
+        fill="var(--lm-warm-peach)"
         fillOpacity="0.55"
-        stroke="var(--ed-warm-peach-deep)"
+        stroke="var(--lm-warm-peach-deep)"
         strokeWidth="1.5"
       />
       {points.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r="1.5" fill="var(--ed-warm-sage-deep)" />
+        <circle key={i} cx={p.x} cy={p.y} r="1.5" fill="var(--lm-warm-sage-deep)" />
       ))}
     </svg>
   )

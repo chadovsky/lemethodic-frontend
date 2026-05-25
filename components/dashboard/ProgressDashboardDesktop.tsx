@@ -40,12 +40,12 @@ import type {
   TodayActionResponse,
 } from '@/lib/types'
 
-const ED_BG = 'var(--ed-bg)'
-const ED_FG = 'var(--ed-fg)'
-const ED_FG_SOFT = 'var(--ed-fg-soft)'
-const ED_MUTED = 'var(--ed-muted)'
-const ED_RULE = 'var(--ed-rule)'
-const ED_PAPER = 'var(--ed-paper)'
+const ED_BG = 'var(--lm-bg-base)'
+const ED_FG = 'var(--lm-text-primary)'
+const ED_FG_SOFT = 'var(--lm-text-secondary)'
+const ED_MUTED = 'var(--lm-text-tertiary)'
+const ED_RULE = 'var(--lm-border-subtle)'
+const ED_PAPER = 'var(--lm-bg-surface)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SERIF = 'var(--font-source-serif), Georgia, serif'
 
@@ -311,7 +311,7 @@ function Tile({ label, warm, cta, children }: TileProps) {
   return (
     <div
       style={{
-        backgroundColor: warm ? 'var(--ed-warm-cream)' : ED_PAPER,
+        backgroundColor: warm ? 'var(--lm-warm-cream)' : ED_PAPER,
         border: `1px solid ${ED_RULE}`,
         borderRadius: 4,
         padding: 'clamp(20px, 2.4vw, 28px)',
@@ -348,7 +348,7 @@ function Tile({ label, warm, cta, children }: TileProps) {
             fontFamily: SANS,
             fontWeight: 600,
             fontSize: 13,
-            color: 'var(--ed-warm-espresso)',
+            color: 'var(--lm-warm-espresso)',
             textDecoration: 'none',
             alignSelf: 'flex-start',
           }}
@@ -405,7 +405,7 @@ function RadarTile({ couches, language }: { couches: Couche[]; language: 'en' | 
           <Radar
             name="Target"
             dataKey="target"
-            stroke="var(--ed-warm-sage-deep)"
+            stroke="var(--lm-warm-sage-deep)"
             strokeDasharray="4 3"
             fill="transparent"
             strokeWidth={1.25}
@@ -413,8 +413,8 @@ function RadarTile({ couches, language }: { couches: Couche[]; language: 'en' | 
           <Radar
             name="You"
             dataKey="user"
-            stroke="var(--ed-warm-peach-deep)"
-            fill="var(--ed-warm-peach)"
+            stroke="var(--lm-warm-peach-deep)"
+            fill="var(--lm-warm-peach)"
             fillOpacity={0.5}
             strokeWidth={2}
           />
@@ -450,7 +450,7 @@ function TodayBody({ today, language }: { today: TodayActionResponse; language: 
           fontWeight: 400,
           fontSize: 'clamp(20px, 2vw, 26px)',
           lineHeight: 1.25,
-          color: 'var(--ed-warm-espresso)',
+          color: 'var(--lm-warm-espresso)',
           margin: 0,
         }}
       >
@@ -480,7 +480,7 @@ function BottleneckBody({ couche, language }: { couche: Couche; language: 'en' |
       >
         {brandLabel}
       </p>
-      <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: 13, color: 'var(--ed-warm-peach-deep)', margin: 0 }}>
+      <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: 13, color: 'var(--lm-warm-peach-deep)', margin: 0 }}>
         {toPercent(couche.score)} / 100
       </p>
     </div>
@@ -499,7 +499,7 @@ function DaysToExamBody({ days, language }: { days: number; language: 'en' | 'fr
           fontWeight: 400,
           fontSize: 36,
           lineHeight: 1,
-          color: 'var(--ed-warm-espresso)',
+          color: 'var(--lm-warm-espresso)',
           margin: 0,
           marginBottom: 6,
         }}
@@ -544,7 +544,7 @@ function PerCoucheRow({
               padding: '14px 16px',
               borderRadius: 4,
               border: `1px solid ${ED_RULE}`,
-              backgroundColor: 'var(--ed-warm-cream)',
+              backgroundColor: 'var(--lm-warm-cream)',
               opacity: isVoix ? 0.6 : 1,
             }}
           >
@@ -572,7 +572,7 @@ function PerCoucheRow({
                   fontWeight: 400,
                   fontSize: 22,
                   lineHeight: 1,
-                  color: 'var(--ed-warm-espresso)',
+                  color: 'var(--lm-warm-espresso)',
                   margin: 0,
                 }}
               >
@@ -611,7 +611,7 @@ function RecentActivityList({
             alignItems: 'baseline',
           }}
         >
-          <span style={{ fontFamily: SANS, fontWeight: 600, fontSize: 12, color: 'var(--ed-warm-peach-deep)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+          <span style={{ fontFamily: SANS, fontWeight: 600, fontSize: 12, color: 'var(--lm-warm-peach-deep)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
             {r.tacheMode.replace('tache_', 'Tâche ')}
           </span>
           <span style={{ fontFamily: SANS, fontSize: 13, color: ED_FG_SOFT }}>
@@ -620,7 +620,7 @@ function RecentActivityList({
               day: 'numeric',
             })}
           </span>
-          <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 16, color: 'var(--ed-warm-espresso)' }}>
+          <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 16, color: 'var(--lm-warm-espresso)' }}>
             {r.cefrLevel ?? '—'}
           </span>
         </li>
@@ -660,7 +660,7 @@ function ErrorRetry({ message, retryLabel, onRetry }: { message: string; retryLa
           fontWeight: 600,
           fontSize: 14,
           color: '#FFFFFF',
-          backgroundColor: 'var(--ed-accent)',
+          backgroundColor: 'var(--cta-primary)',
           padding: '8px 18px',
           borderRadius: 4,
           border: 'none',

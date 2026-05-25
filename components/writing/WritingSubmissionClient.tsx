@@ -15,13 +15,13 @@ import { BRAND_LABEL } from '@/lib/coucheBrandLabels'
 import { usePollJob } from '@/lib/polling'
 import type { WritingPrompt, WritingSubmissionResult } from '@/lib/types'
 
-const ED_BG = 'var(--ed-bg)'
-const ED_FG = 'var(--ed-fg)'
-const ED_FG_SOFT = 'var(--ed-fg-soft)'
-const ED_MUTED = 'var(--ed-muted)'
-const ED_RULE = 'var(--ed-rule)'
-const ED_PAPER = 'var(--ed-paper)'
-const ED_ACCENT = 'var(--ed-accent)'
+const ED_BG = 'var(--lm-bg-base)'
+const ED_FG = 'var(--lm-text-primary)'
+const ED_FG_SOFT = 'var(--lm-text-secondary)'
+const ED_MUTED = 'var(--lm-text-tertiary)'
+const ED_RULE = 'var(--lm-border-subtle)'
+const ED_PAPER = 'var(--lm-bg-surface)'
+const ED_ACCENT = 'var(--cta-primary)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SERIF = 'var(--font-source-serif), Georgia, serif'
 
@@ -263,10 +263,10 @@ export default function WritingSubmissionClient({ promptId }: Props) {
     wordRangeState === 'unknown'
       ? ED_MUTED
       : wordRangeState === 'under'
-        ? 'var(--fp-error)'
+        ? 'var(--lm-error)'
         : wordRangeState === 'over'
-          ? 'var(--ed-warm-peach-deep)'
-          : 'var(--ed-warm-sage-deep)'
+          ? 'var(--lm-warm-peach-deep)'
+          : 'var(--lm-warm-sage-deep)'
   // V-015b — submit gated only on non-empty text + active prompt + not
   // mid-submit. Word count thresholds no longer block.
   const canSubmit = prompt != null && count > 0
@@ -476,7 +476,7 @@ function SubmissionForm({
             fontSize: 11,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            color: 'var(--ed-warm-peach-deep)',
+            color: 'var(--lm-warm-peach-deep)',
             margin: 0,
             marginBottom: 8,
           }}
@@ -667,9 +667,9 @@ function SubmissionForm({
               fontSize: 12,
               color:
                 wordRangeState === 'under'
-                  ? 'var(--fp-error)'
+                  ? 'var(--lm-error)'
                   : wordRangeState === 'over'
-                    ? 'var(--ed-warm-peach-deep)'
+                    ? 'var(--lm-warm-peach-deep)'
                     : ED_MUTED,
               fontWeight: 500,
               margin: 0,
@@ -687,7 +687,7 @@ function SubmissionForm({
           style={{
             fontFamily: SANS,
             fontSize: 13,
-            color: 'var(--fp-error)',
+            color: 'var(--lm-error)',
             marginTop: 12,
             textAlign: 'right',
           }}
@@ -779,7 +779,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
           fontSize: 11,
           letterSpacing: '0.06em',
           textTransform: 'uppercase',
-          color: 'var(--ed-warm-peach-deep)',
+          color: 'var(--lm-warm-peach-deep)',
           margin: 0,
           marginBottom: 8,
         }}
@@ -821,7 +821,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
           <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: ED_MUTED, margin: 0, marginBottom: 6 }}>
             {copy.resultScore}
           </p>
-          <p style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: 'italic', fontSize: 36, color: 'var(--ed-warm-espresso)', margin: 0 }}>
+          <p style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: 'italic', fontSize: 36, color: 'var(--lm-warm-espresso)', margin: 0 }}>
             {overallScore != null ? overallScore : '—'}
           </p>
         </div>
@@ -829,7 +829,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
           <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: ED_MUTED, margin: 0, marginBottom: 6 }}>
             {copy.resultBand}
           </p>
-          <p style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: 'italic', fontSize: 36, color: 'var(--ed-warm-espresso)', margin: 0 }}>
+          <p style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: 'italic', fontSize: 36, color: 'var(--lm-warm-espresso)', margin: 0 }}>
             {cefrBand != null ? cefrBand : '—'}
           </p>
         </div>
@@ -855,7 +855,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
           <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: ED_MUTED, margin: 0 }}>
             {secondaryLabel ?? ''}
           </p>
-          <p style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: 'italic', fontSize: 22, color: 'var(--ed-warm-espresso)', margin: 0 }}>
+          <p style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: 'italic', fontSize: 22, color: 'var(--lm-warm-espresso)', margin: 0 }}>
             {secondaryValue}
           </p>
         </div>
@@ -917,7 +917,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
                   {BRAND_LABEL[key][language]}
                 </h3>
                 {score != null ? (
-                  <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 16, color: 'var(--ed-warm-peach-deep)' }}>
+                  <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 16, color: 'var(--lm-warm-peach-deep)' }}>
                     {score}
                   </span>
                 ) : (
@@ -954,7 +954,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
               {hasTransformation && (
                 <div
                   style={{
-                    backgroundColor: 'var(--ed-warm-cream)',
+                    backgroundColor: 'var(--lm-warm-cream)',
                     border: `1px solid ${ED_RULE}`,
                     borderRadius: 4,
                     padding: '12px 14px',
@@ -963,10 +963,10 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
                     gap: 4,
                   }}
                 >
-                  <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ed-warm-peach-deep)', margin: 0 }}>
+                  <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--lm-warm-peach-deep)', margin: 0 }}>
                     {copy.resultTransformationLabel}
                   </p>
-                  <p style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.55, color: 'var(--ed-warm-espresso)', margin: 0 }}>
+                  <p style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.55, color: 'var(--lm-warm-espresso)', margin: 0 }}>
                     {coaching!.transformation}
                   </p>
                 </div>
@@ -1007,7 +1007,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
               outline: 'none',
             }}
           >
-            <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--ed-warm-peach-deep)', margin: 0 }}>
+            <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--lm-warm-peach-deep)', margin: 0 }}>
               {copy.resultRubricLabel}
             </p>
             <p style={{ fontFamily: SANS, fontSize: 13, color: ED_FG_SOFT, margin: 0 }}>
@@ -1040,7 +1040,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
                     <h4 style={{ fontFamily: SANS, fontWeight: 600, fontSize: 14, color: ED_FG, margin: 0 }}>
                       {label}
                     </h4>
-                    <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 14, color: 'var(--ed-warm-peach-deep)' }}>
+                    <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 14, color: 'var(--lm-warm-peach-deep)' }}>
                       {copy.resultScoreSlash(criterion.score, criterion.max_score)}
                     </span>
                   </div>
@@ -1072,7 +1072,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
                   {cHasTransformation && (
                     <div
                       style={{
-                        backgroundColor: 'var(--ed-warm-cream)',
+                        backgroundColor: 'var(--lm-warm-cream)',
                         border: `1px solid ${ED_RULE}`,
                         borderRadius: 4,
                         padding: '10px 12px',
@@ -1081,10 +1081,10 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
                         gap: 4,
                       }}
                     >
-                      <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ed-warm-peach-deep)', margin: 0 }}>
+                      <p style={{ fontFamily: SANS, fontWeight: 600, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--lm-warm-peach-deep)', margin: 0 }}>
                         {copy.resultTransformationLabel}
                       </p>
-                      <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.55, color: 'var(--ed-warm-espresso)', margin: 0 }}>
+                      <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.55, color: 'var(--lm-warm-espresso)', margin: 0 }}>
                         {coach!.transformation}
                       </p>
                     </div>
@@ -1163,7 +1163,7 @@ function AnalyzingPanel({ pollCount, copy, onCancel }: AnalyzingPanelProps) {
       aria-live="polite"
       style={{
         // Warm-cream panel with sage accent — V-012 calm-pride tone.
-        backgroundColor: 'var(--ed-warm-cream)',
+        backgroundColor: 'var(--lm-warm-cream)',
         border: `1px solid ${ED_RULE}`,
         borderRadius: 4,
         padding: 'clamp(48px, 8vw, 96px) clamp(24px, 4vw, 48px)',
@@ -1186,7 +1186,7 @@ function AnalyzingPanel({ pollCount, copy, onCancel }: AnalyzingPanelProps) {
           fontWeight: 400,
           fontSize: 'clamp(22px, 2.6vw, 30px)',
           lineHeight: 1.2,
-          color: 'var(--ed-warm-espresso)',
+          color: 'var(--lm-warm-espresso)',
           margin: 0,
         }}
       >

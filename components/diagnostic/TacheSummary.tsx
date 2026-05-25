@@ -72,7 +72,7 @@ export default function TacheSummary() {
                 fontSize: '0.8125rem',
                 color: 'var(--text-muted)',
                 background: 'none',
-                border: '1px solid var(--ed-rule)',
+                border: '1px solid var(--lm-border-subtle)',
                 borderRadius: 999,
                 padding: '5px 14px',
                 cursor: 'not-allowed',
