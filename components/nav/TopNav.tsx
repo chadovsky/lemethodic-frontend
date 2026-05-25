@@ -13,6 +13,7 @@ import { useAuthStore } from '@/lib/auth'
 import { useOnboardingStore } from '@/lib/onboarding'
 import { useSubmitResponseStore } from '@/lib/submitResponse'
 import { useInterfaceLanguage, type InterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
 const ED_BG = 'var(--lm-bg-base)'
 const ED_FG = 'var(--lm-text-primary)'
@@ -160,7 +161,7 @@ export default function TopNav() {
         height: 64,
         // V-013c — backdrop-blur(12px) when scrolled past 8px. Solid bg
         // baseline so the nav still has a fill when scroll is at top.
-        backgroundColor: scrolled ? 'rgba(251, 248, 244, 0.78)' : ED_BG,
+        backgroundColor: scrolled ? 'var(--lm-bg-blur)' : ED_BG,
         backdropFilter: scrolled ? 'blur(12px)' : 'none',
         WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
         borderBottom: scrolled ? `1px solid ${ED_RULE}` : '1px solid transparent',
@@ -257,8 +258,9 @@ export default function TopNav() {
           })}
         </ul>
 
-        {/* RIGHT — language toggle + profile */}
+        {/* RIGHT — language toggle + theme toggle + profile */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <ThemeToggle />
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             {(['en', 'fr'] as const).map((l, i) => {
               const active = l === language

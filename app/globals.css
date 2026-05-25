@@ -142,6 +142,10 @@
   --lm-safe-left: env(safe-area-inset-left);
   --lm-safe-right: env(safe-area-inset-right);
 
+  /* t5 — nav backdrop-blur bg: warm cream at 78% opacity. Defined here
+     so dark mode can override without touching JS. */
+  --lm-bg-blur: rgba(250, 247, 240, 0.78);
+
   /* F-VISUAL-001 X.2 — shadcn token rewire. components/ui/* sources
      unchanged (per Q4); the rewire happens at the token level here so
      <Button variant="default"> / <Card> / <Input> / etc. inherit the
@@ -215,6 +219,30 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+
+  /* t5 — legacy token dark aliases. Components still using --bg-elevated,
+     --text-primary, --rule-default etc. flip correctly via these.
+     Long-term: migrate callsites to --lm-* tokens directly. */
+  --bg-canvas:      var(--lm-bg-base);
+  --bg-elevated:    var(--lm-bg-surface);
+  --bg-subtle:      var(--lm-bg-subtle);
+  --text-primary:   var(--lm-text-primary);
+  --text-secondary: var(--lm-text-secondary);
+  --text-muted:     var(--lm-text-tertiary);
+  --text-disabled:  var(--lm-text-tertiary);
+  --rule-default:   var(--lm-border-subtle);
+  --rule-strong:    var(--lm-border-subtle);
+  --cta-primary:    hsl(220 40% 58%);
+
+  /* nav backdrop-blur bg for dark mode */
+  --lm-bg-blur: rgba(26, 22, 18, 0.82);
+
+  /* warm editorial palette dark overrides */
+  --lm-warm-peach:      #5C3A28;
+  --lm-warm-peach-deep: #8B5A42;
+  --lm-warm-espresso:   #C8B89A;
+  --lm-warm-cream:      #1E1A14;
+  --lm-warm-sand:       #2A2018;
 
   /* DESIGN.md v1 dark mode overrides */
   --lm-brand: #D4A847;

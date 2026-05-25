@@ -5,9 +5,9 @@ import { usePathname } from 'next/navigation'
 import { Home, Mic, PenLine, BarChart2, MoreHorizontal } from 'lucide-react'
 
 // ─── design tokens ───────────────────────────────────────────────────────────
-const INK        = 'var(--text-primary)'
-const INK_MUTED  = 'var(--text-muted)'
-const PAPER      = '#FFFFFF'
+const INK        = 'var(--lm-text-primary)'
+const INK_MUTED  = 'var(--lm-text-tertiary)'
+const PAPER      = 'var(--lm-bg-surface)'
 const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 interface Tab {
@@ -44,7 +44,7 @@ export default function BottomNav() {
         height: 'calc(64px + var(--lm-safe-bottom))',
         paddingBottom: 'var(--lm-safe-bottom)',
         backgroundColor: PAPER,
-        borderTop: '1px solid #1A1A1A0F',
+        borderTop: '1px solid var(--lm-border-subtle)',
         alignItems: 'stretch',
         zIndex: 50,
       }}

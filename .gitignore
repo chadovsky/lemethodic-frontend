@@ -38,6 +38,9 @@ next-env.d.ts
 # Playwright per-run state (F-225 captures live elsewhere)
 test-results/
 
+# t5 dark mode gallery — visual review artifact, not committed
+t5-dark-mode-gallery/
+
 .impeccable/
 
 # M0 audit auth state — contains JWT, never commit
