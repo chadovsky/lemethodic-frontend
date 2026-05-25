@@ -3669,8 +3669,8 @@ These four tickets are the direct output of the `/impeccable critique` second pa
 ### F-327 — [P0] another_exam funnel restoration + waitlist moat (BE + FE)
 
 **Priority:** P0 — conversion blocker + soft-beta moat
-**Status:** 🔄 In progress
-**Filed:** 2026-05-24 · Scope expanded: 2026-05-25
+**Status:** ✅ Shipped
+**Filed:** 2026-05-24 · Scope expanded: 2026-05-25 · Shipped: 2026-05-25 (BE 2d54de0, FE d329ff0)
 **Source:** Impeccable critique run 2 (2026-05-24T06-53-58Z) + scope-expansion diagnosis 2026-05-25
 **Surface:** `components/onboarding/questions/ExamPickerQuestion.tsx`, `components/onboarding/OnboardingFlow.tsx`, new post-submit + confirmation screens, BE `app/routers/onboarding.py` + schema + model + migration
 
