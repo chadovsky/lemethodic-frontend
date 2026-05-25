@@ -14,7 +14,7 @@ test.describe('Le Diagnostic landing â€” desktop (1280Ã—800)', () => {
   }) => {
     await page.goto('/diagnostic')
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
-    await expect(page.getByRole('heading', { level: 1, name: /le diagnostic/i })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: /l'examen/i })).toBeVisible()
     await expect(
       page.getByText(/mesurez votre niveau rÃ©el en expression orale tcf canada\./i),
     ).toBeVisible()

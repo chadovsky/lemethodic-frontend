@@ -32,7 +32,7 @@ const TOTAL_LESSONS = 27
 
 const COPY = {
   en: {
-    pageEyebrow: "L'École",
+    pageEyebrow: "La Méthode",
     pageTitle: 'Your path to B2.',
     progress: (done: number, total: number) => `${done} of ${total} lessons complete`,
     phaseFond: 'Fondations',
@@ -63,7 +63,7 @@ const COPY = {
     emptyNoEnrollmentCta: 'Start diagnostic',
   },
   fr: {
-    pageEyebrow: "L'École",
+    pageEyebrow: "La Méthode",
     pageTitle: 'Votre parcours vers le B2.',
     progress: (done: number, total: number) => `${done} sur ${total} leçons terminées`,
     phaseFond: 'Fondations',

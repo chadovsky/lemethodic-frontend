@@ -71,7 +71,7 @@ test.describe('Le Vocabulaire browse — desktop (1280×800)', () => {
   }) => {
     await page.goto('/vocabulaire')
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
-    await expect(page.getByRole('heading', { level: 1, name: /le vocabulaire/i })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: /la bibliothèque/i })).toBeVisible()
     await expect(page.getByText(/les chunks qui font la différence\./i)).toBeVisible()
     await expect(page.getByTestId('vocab-filter-bar')).toBeVisible()
     await expect(page.getByTestId('chunk-row')).toHaveCount(60)

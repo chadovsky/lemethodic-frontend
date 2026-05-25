@@ -31,11 +31,11 @@ const SERIF = 'var(--font-fraunces), Georgia, "Times New Roman", serif'
 
 const FRAME = {
   en: {
-    h1: "Welcome to L'École",
+    h1: "Welcome to La Méthode",
     subhead: '27 lessons. Built to break the B1 plateau. Made for English speakers.',
   },
   fr: {
-    h1: "Bienvenue à L'École",
+    h1: "Bienvenue à La Méthode",
     subhead: '27 leçons. Pour franchir le plateau B1. Pensé pour les anglophones.',
   },
 } as const
@@ -48,31 +48,31 @@ const METHODE = {
     couches: [
       {
         n: 'Couche 1',
-        name: 'Le Fond',
+        name: 'Le Propos',
         label: 'Range',
         body: 'Ideas, arguments, examples. Content, before form.',
       },
       {
         n: 'Couche 2',
-        name: 'Les Moules des Idées',
+        name: 'Le Plan',
         label: 'Coherence',
         body: "The architecture of discourse. French speakers nuance, contrast, synthesize. They don't think in straight lines. Without this structure, your French sounds translated, even when every word is correct.",
       },
       {
         n: 'Couche 3',
-        name: 'Les Moules',
+        name: 'La Construction',
         label: 'Accuracy',
         body: 'Sentence architecture. Seven laws that make a French sentence sound French. Pour your ideas into the right mold, and the sentences sound right without effort.',
       },
       {
         n: 'Couche 4',
-        name: 'Les Réflexes Anglais',
+        name: 'Les Pièges Anglais',
         label: 'Fluency',
         body: 'English habits that slip through unnoticed. False friends, calques, preposition traps, the disappearing *ne*. La Méthode catches them, one by one.',
       },
       {
         n: 'Couche 5',
-        name: 'La Voix',
+        name: 'La Musique',
         label: 'Voice',
         body: "How it sounds. The vowels English doesn't have, the liaisons that create flow, the rhythm that separates native from non-native.",
       },
@@ -87,31 +87,31 @@ const METHODE = {
     couches: [
       {
         n: 'Couche 1',
-        name: 'Le Fond',
+        name: 'Le Propos',
         label: 'Étendue',
         body: 'Les idées, les arguments, les exemples. Le contenu, avant la forme.',
       },
       {
         n: 'Couche 2',
-        name: 'Les Moules des Idées',
+        name: 'Le Plan',
         label: 'Cohérence',
         body: "L'architecture du discours. Les Français nuancent, opposent, synthétisent. Ils ne pensent pas en lignes droites. Sans cette structure, votre français a des allures de traduction, même quand chaque mot est correct.",
       },
       {
         n: 'Couche 3',
-        name: 'Les Moules',
+        name: 'La Construction',
         label: 'Correction',
         body: "L'architecture de la phrase. Sept lois qui font qu'une phrase sonne française. Coulez vos idées dans le bon moule, et vos phrases sonnent françaises sans effort.",
       },
       {
         n: 'Couche 4',
-        name: 'Les Réflexes Anglais',
+        name: 'Les Pièges Anglais',
         label: 'Aisance',
         body: 'Les habitudes anglaises qui passent sans permission. Faux-amis, calques, prépositions piégées, *ne* qui disparaît. La Méthode les détecte une par une.',
       },
       {
         n: 'Couche 5',
-        name: 'La Voix',
+        name: 'La Musique',
         label: 'Voix',
         body: "Comment ça sonne. Les voyelles que l'anglais n'a pas, les liaisons qui font la fluidité, le rythme qui sépare le natif du non-natif.",
       },
@@ -299,7 +299,7 @@ export default function EcoleIntro() {
       >
         <Link
           href="/ecole"
-          aria-label="L'École"
+          aria-label="La Méthode"
           style={{
             color: ED_FG,
             textDecoration: 'none',

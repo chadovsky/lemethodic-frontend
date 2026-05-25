@@ -7,7 +7,7 @@ import TacheNav from './TacheNav'
 
 export default function TacheShell({ tache }: { tache: Tache }) {
   const breadcrumbItems = [
-    { label: 'Le Diagnostic', href: '/diagnostic' },
+    { label: "L'Examen", href: '/diagnostic' },
     { label: `Tâche ${tache.id}` },
   ]
 

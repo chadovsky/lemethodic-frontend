@@ -18,7 +18,7 @@ describe('Results', () => {
     expect(screen.getByText(/évalué le/i)).toBeInTheDocument()
   })
 
-  it('renders the breadcrumb with "Le Diagnostic" and "Résultats"', () => {
+  it('renders the breadcrumb with "L\'Examen" and "Résultats"', () => {
     render(<Results />)
     const bc = screen.getByTestId('breadcrumb')
     expect(bc).toBeInTheDocument()

@@ -20,7 +20,7 @@ const COLUMNS: Column[] = [
   {
     Icon: EnglishSpeakersIcon,
     heading: 'Built for English speakers',
-    body: 'The 5-couche method surfaces Les Réflexes Anglais — the layer that catches the interference patterns native English speakers hit at B1.',
+    body: 'The 5-couche method surfaces Les Pièges Anglais — the layer that catches the interference patterns native English speakers hit at B1.',
   },
   {
     Icon: MethodBasedIcon,

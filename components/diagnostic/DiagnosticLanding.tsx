@@ -22,7 +22,7 @@ export default function DiagnosticLanding({ taches }: { taches: readonly Tache[]
             margin: 0,
           }}
         >
-          Le Diagnostic
+          {"L'Examen"}
         </h1>
         <p
           style={{

@@ -4,10 +4,10 @@ import TacheShell from '@/components/diagnostic/TacheShell'
 import { TACHES } from '@/lib/data/taches'
 
 describe('TacheShell', () => {
-  it('renders breadcrumb with "Le Diagnostic" link and current tâche label', () => {
+  it('renders breadcrumb with "L\'Examen" link and current tâche label', () => {
     render(<TacheShell tache={TACHES[0]} />)
     const bc = screen.getByTestId('breadcrumb')
-    expect(within(bc).getByText(/le diagnostic/i)).toBeInTheDocument()
+    expect(within(bc).getByText(/l'examen/i)).toBeInTheDocument()
     expect(within(bc).getByText('Tâche 1')).toBeInTheDocument()
   })
 

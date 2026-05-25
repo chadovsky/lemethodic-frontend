@@ -43,9 +43,9 @@ describe('VocabBrowse', () => {
     })
   })
 
-  it('renders the page header "Le Vocabulaire" with tagline', () => {
+  it('renders the page header "La Bibliothèque" with tagline', () => {
     render(<VocabBrowse />)
-    expect(screen.getByRole('heading', { level: 1, name: /le vocabulaire/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /la bibliothèque/i })).toBeInTheDocument()
     expect(screen.getByText(/les chunks qui font la différence\./i)).toBeInTheDocument()
   })
 

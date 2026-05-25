@@ -12,9 +12,9 @@ const COUCHE_NAMES = [
 ] as const
 
 describe('DiagnosticLanding', () => {
-  it('renders the page header "Le Diagnostic" with tagline', () => {
+  it('renders the page header "L\'Examen" with tagline', () => {
     render(<DiagnosticLanding taches={TACHES} />)
-    expect(screen.getByRole('heading', { level: 1, name: /le diagnostic/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /l'examen/i })).toBeInTheDocument()
     expect(
       screen.getByText(/mesurez votre niveau réel en expression orale tcf canada\./i),
     ).toBeInTheDocument()

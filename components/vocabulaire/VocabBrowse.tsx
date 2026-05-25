@@ -44,7 +44,7 @@ export default function VocabBrowse() {
               margin: 0,
             }}
           >
-            Le Vocabulaire
+            La Bibliothèque
           </h1>
           <p
             style={{
