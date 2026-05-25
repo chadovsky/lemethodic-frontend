@@ -3662,6 +3662,130 @@ Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split).
 
 ---
 
+## Onboarding harden+polish — 2026-05-24 critique (run 2, score 29/40)
+
+These four tickets are the direct output of the `/impeccable critique` second pass on the onboarding flow. Address in priority order; P0 first next session.
+
+### F-327 — [P0] another_exam funnel restoration + waitlist moat (BE + FE)
+
+**Priority:** P0 — conversion blocker + soft-beta moat
+**Status:** 🔄 In progress
+**Filed:** 2026-05-24 · Scope expanded: 2026-05-25
+**Source:** Impeccable critique run 2 (2026-05-24T06-53-58Z) + scope-expansion diagnosis 2026-05-25
+**Surface:** `components/onboarding/questions/ExamPickerQuestion.tsx`, `components/onboarding/OnboardingFlow.tsx`, new post-submit + confirmation screens, BE `app/routers/onboarding.py` + schema + model + migration
+
+**Problem (revised):** The "another exam" trap isn't a BE dead-end — it's a localStorage trap. Picker opens an inline form (which exam? + email), submits to `lib/landing/waitlist.ts` (localStorage), parks user at confirmation, gates Continue locally. Result: (1) waitlist signal lost on cache clear or browser change — permanent data loss during soft-beta, (2) user must manually backtrack to a supported exam to continue. BE already has a waitlist branch (`app/routers/onboarding.py:99`) for `q0_target_exam='another_exam'` but FE never sends that value, so the branch is dead code today.
+
+**Decision (locked 2026-05-25):** Replace the localStorage trap with BE-persisted waitlist + b1_to_b2 proxy-continuation offer. Rejected the original "accept another_exam + default plan + upsell later" framing as dishonest pricing/trust risk — users would pay for prep that doesn't match their target. Chosen path: capture granular intent at q0, offer b1_to_b2 proxy at end of questionnaire when q1/q2 levels fit, otherwise waitlist-only with clean exit.
+
+**BE changes (lands first, `master` branch):**
+- Add `q0_specific_intended_exam: Optional[str]` (max 120 chars) + `q0_accept_fallback: bool = False` to `OnboardingSubmitRequest` schema
+- Pydantic validator: require non-empty `q0_specific_intended_exam` when `q0_target_exam='another_exam'`
+- Add `users.specific_intended_exam VARCHAR(120) NULL` column + Alembic migration
+- Modify waitlist branch in `app/routers/onboarding.py`: always persist `user.specific_intended_exam`. When `q0_accept_fallback=True` AND `should_offer_b1_to_b2_fallback(q1, q2)` returns True → also create b1_to_b2 enrollment, return `path_slug='b1_to_b2'` alongside `waitlist=True`. Otherwise waitlist-only response (existing shape).
+- `users.target_exam='another_exam'` always preserved regardless of enrollment (intent kept for plan migration when actual exam ships)
+
+**FE changes (lands second, `main` branch):**
+- `ExamPickerQuestion.tsx`: remove `submitWaitlist` localStorage call entirely; drop inline email field (user is authed); keep "which exam?" free-text input; enable Continue when `another_exam` selected + examName non-empty. Propagate `specific_intended_exam` alongside `q0_target_exam` via `OnboardingFlow` state.
+- `OnboardingFlow.tsx`: if `q0_target_exam==='another_exam'`, insert a `WaitlistOrProxyConfirmation` screen between q11 and submit. Two CTAs: "Continue with La Méthode (recommended)" → submit with `accept_fallback=true`; "Just add me to the waitlist" → submit with `accept_fallback=false`. Non-another_exam users submit normally.
+- New post-submit screen handles three BE response shapes: (a) enrolled-on-proxy (`path_slug='b1_to_b2'` + `waitlist=True`) — proxy-continuation success, route to `/ecole`; (b) waitlist-only with fallback offered but not accepted — waitlist confirmation, clean exit; (c) waitlist-only with no fallback (levels don't fit) — waitlist-only confirmation, clean exit.
+- Audit `lib/landing/waitlist.ts` for other callers; delete only if unused elsewhere in the codebase.
+- Copy uses canonical product name "La Méthode" (not "L'École") even though routes stay legacy `/ecole` until M-RENAME ships.
+
+**Acceptance:**
+- BE: `target_exam='another_exam'` + `accept_fallback=true` + `q1='b1'` + `q2='b2'` → `users.specific_intended_exam` set + `path_slug='b1_to_b2'` + enrollment row created + `waitlist=True`
+- BE: `target_exam='another_exam'` + `accept_fallback=true` + `q1='a1'` + `q2='a2'` → `users.specific_intended_exam` set + `path_slug=null` + no enrollment + `waitlist=True` (graceful degradation when levels don't fit)
+- BE: `target_exam='another_exam'` + `accept_fallback=false` → `users.specific_intended_exam` set + `path_slug=null` + no enrollment + `waitlist=True`
+- BE: `target_exam='tcf_canada'` (or any other active slug) → unchanged behavior (regression-clean)
+- FE: TEF Canada / DELF B1-B2 paths unchanged (already active); proxy path works end-to-end; waitlist-only confirmation has working exit; no localStorage waitlist writes anywhere in onboarding flow
+- Cross-repo smoke test: four paths verified (active happy, another+proxy+valid levels, another+waitlist, another+proxy+invalid levels)
+
+**Branches:**
+- BE: `feat/v-exampicker-payload-and-fallback` off `master`
+- FE: `fix/v-exampicker-another-exam` off `main`
+
+**Owner:** Frontend + Backend Engineering
+
+---
+
+### F-328 — [P1] DateInputQuestion: date bounds enforced but never communicated
+
+**Priority:** P1 — silent error on mobile
+**Status:** 📋 Queued
+**Filed:** 2026-05-24
+**Source:** Impeccable critique run 2 (2026-05-24T06-53-58Z)
+**Surface:** `components/onboarding/questions/DateInputQuestion.tsx`
+
+**Problem:** The date input enforces `min` and `max` attributes (computed from `dateMeta.minOffsetDays`/`maxOffsetDays`) but provides no helper text explaining why certain dates are unavailable. On mobile, the native date picker grays out blocked dates silently. A user whose actual exam is sooner than the minimum offset assumes the field is broken rather than understanding the constraint.
+
+**Fix:**
+- Add a persistent helper below the date label: e.g., "Pick a date at least [N] days out — we need time to build your plan." Derive the human-readable minimum from `minDate` already computed in the component.
+- If a blocked date is tapped (detectable on some mobile pickers via `onChange` with an out-of-range value), show an inline message near the input explaining the constraint.
+
+**Scope:** `DateInputQuestion.tsx` only — label + optional inline message. No BE changes.
+**Owner:** Frontend Engineering
+
+---
+
+### F-329 — [P2] MultiSelectQuestion: no affordance that multiple selections are allowed
+
+**Priority:** P2 — answer quality
+**Status:** 📋 Queued
+**Filed:** 2026-05-24
+**Source:** Impeccable critique run 2 (2026-05-24T06-53-58Z)
+**Surface:** `components/onboarding/questions/MultiSelectQuestion.tsx`
+
+**Problem:** Multi-select questions render identically to single-select questions. No label, no count badge, no post-first-selection hint indicates that more than one option can be chosen. Users pick one option and press Continue, unaware that multi-selection was possible. This produces thinner plan data.
+
+**Fix:**
+- Add a persistent small label above the card list: "Select all that apply" (FR: "Sélectionnez tout ce qui s'applique"). Use `ED_MUTED` + 12px uppercase to match descriptor weight.
+- Optionally: show a count badge ("2 selected") below the headline after the first selection, using `aria-live="polite"` so screen readers announce the change.
+
+**Scope:** `MultiSelectQuestion.tsx` only — label + optional count. No BE changes.
+**Owner:** Frontend Engineering
+
+---
+
+### F-330 — [P3] EcoleReveal: persona label arrives without narrative bridge
+
+**Priority:** P3 — trust layer
+**Status:** 📋 Queued
+**Filed:** 2026-05-24
+**Source:** Impeccable critique run 2 (2026-05-24T06-53-58Z)
+**Surface:** `components/onboarding/EcoleReveal.tsx`
+
+**Problem:** The reveal shows the persona label ("Intensive") and a plan summary with no sentence connecting the user's inputs to the outcome. Users see what they're getting but not why — which can feel like being labeled rather than understood. Particularly significant for high-stakes users (immigrants, professionals) who need to trust the plan.
+
+**Fix:**
+- Add one line above the persona label or below the descriptor: e.g., "Based on your timeline, here's the plan we built." (FR: "En fonction de votre calendrier, voici le plan que nous avons construit.")
+- Alternative: on the plan card, replace the "Your plan" eyebrow with a light-touch rationale: "Because your exam is in [N] weeks" or "Built around your [B2→C2] goal."
+- Keep it to one line — the current reveal is well-paced and this should not add bulk.
+
+**Scope:** `EcoleReveal.tsx` copy + layout only. No BE changes.
+**Owner:** Frontend Engineering
+
+---
+
+### B-104 — [P1] Paywall: surface Exam Bundle tier for time-bounded users
+
+**Priority:** P1 — merchandising bug, not pricing change
+**Status:** 📋 Queued
+**Filed:** 2026-05-25
+**Source:** Impeccable critique 2026-05-24 product observation
+**Surface:** `components/paywall/*` (audit needed)
+
+**Problem:** Paywall presents $199 Sprint as the headline option. Users with ≤8 weeks to exam (the visa-urgent cohort, our primary persona per memory) see no time-bounded alternative on first glance. The $29 Exam Bundle tier exists in the pricing structure but isn't surfaced explicitly for users who are exactly the audience it was designed for — defaulting them toward Sprint when Exam Bundle may be the better trial.
+
+**Fix:** Audit current paywall component(s). Surface the $29 Exam Bundle as a primary option when the user's persona resolves to `cram` (≤6 weeks per existing `derive_persona` logic) or `acceleration` (6 weeks – 6 months). Sprint stays available but moves to secondary. Foundation users (no exam scheduled, persona='foundation') keep the current Sprint-led presentation.
+
+**Scope:** FE only. No pricing change. No BE change. Surface logic keys off persona already derived in onboarding state.
+
+**Branch:** `feat/b-104-paywall-exam-bundle-surfacing`
+
+**Owner:** Frontend Engineering
+
+---
+
 ## Working protocol reminder
 
 - Every new ticket drafted must reference this BACKLOG.md and use the next available F-0xx number.
