@@ -39,3 +39,6 @@ next-env.d.ts
 test-results/
 
 .impeccable/
+
+# M0 audit auth state — contains JWT, never commit
+audit-auth.json
