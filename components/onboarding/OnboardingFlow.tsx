@@ -30,6 +30,7 @@ import DateInputQuestion from './questions/DateInputQuestion'
 import OtherFreetextScreen from './questions/OtherFreetextScreen'
 import ExamPickerQuestion from './questions/ExamPickerQuestion'
 import EcoleReveal from './EcoleReveal'
+import WaitlistOrProxyConfirmation from './WaitlistOrProxyConfirmation'
 import {
   TARGET_LEVEL_HELPER_BY_EXAM,
   type ExamValue,
@@ -58,12 +59,19 @@ const STEP_PASTELS = [
 // screens between real questions. Today only the q9 freetext follow-up.
 const Q9_OTHER_STEP_ID = 'q9_native_language_other'
 
-// One position in the rendered flow. Either a real BE question or the
-// synthetic q9-other follow-up screen. Reveal is handled separately as the
-// terminal step.
+// One position in the rendered flow. Either a real BE question, the
+// synthetic q9-other follow-up, or the F-327 waitlist-confirmation screen
+// (inserted after q11 for another_exam users).
 type FlowStep =
   | { kind: 'question'; question: OnboardingQuestion }
   | { kind: 'q9_other' }
+  | { kind: 'waitlist_confirmation' }
+
+// F-327 — post-submit outcome for another_exam waitlist users.
+// proxy_enrolled routes to /ecole; the other two show inline confirmation.
+type WaitlistOutcome =
+  | { kind: 'waitlist_declined' }
+  | { kind: 'waitlist_no_fallback' }
 
 function detectBrowserLanguage(): UiLanguage {
   if (typeof navigator === 'undefined') return 'en'
@@ -135,9 +143,15 @@ export default function OnboardingFlow() {
   const data = useOnboardingStore((s) => s.data)
   const currentStepIndex = useOnboardingStore((s) => s.currentStepIndex)
   const interfaceLanguage = useOnboardingStore((s) => s.interfaceLanguage)
+  const specificIntendedExam = useOnboardingStore((s) => s.specificIntendedExam)
   const setAnswer = useOnboardingStore((s) => s.setAnswer)
   const setStep = useOnboardingStore((s) => s.setStep)
   const setLanguage = useOnboardingStore((s) => s.setLanguage)
+  const setAcceptFallback = useOnboardingStore((s) => s.setAcceptFallback)
+
+  // F-327 — local state for the another_exam post-submit outcome.
+  const [waitlistOutcome, setWaitlistOutcome] = useState<WaitlistOutcome | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // F-BUGS-001-FE-B B.2 — authed users with completed onboarding (i.e. BE
   // already holds their answers, signaled by user.targetLevel being set) skip
@@ -197,7 +211,7 @@ export default function OnboardingFlow() {
   }, [fetchKey])
 
   // Build the visible flow steps from the BE questions + answers + the
-  // synthetic q9 freetext follow-up.
+  // synthetic q9 freetext follow-up + F-327 waitlist confirmation.
   const flowSteps = useMemo<FlowStep[]>(() => {
     if (!questions) return []
     const steps: FlowStep[] = []
@@ -208,6 +222,11 @@ export default function OnboardingFlow() {
       if (readOtherFreetextField(q) && data[q.id] === 'other') {
         steps.push({ kind: 'q9_other' })
       }
+    }
+    // F-327 — for another_exam users, append a confirmation screen after q11.
+    // This replaces EcoleReveal as the terminal step; users submit from here.
+    if (data['q0_target_exam'] === 'another_exam') {
+      steps.push({ kind: 'waitlist_confirmation' })
     }
     return steps
   }, [questions, data])
@@ -252,7 +271,9 @@ export default function OnboardingFlow() {
     return <div style={{ minHeight: '100dvh', backgroundColor: LOADER_BG }} />
   }
 
-  const totalSteps = flowSteps.length + 1 // +1 for EcoleReveal as a dot
+  const isAnotherExam = data['q0_target_exam'] === 'another_exam'
+  // another_exam users submit from WaitlistOrProxyConfirmation (no EcoleReveal dot).
+  const totalSteps = isAnotherExam ? flowSteps.length : flowSteps.length + 1
   const safeIndex = Math.min(currentStepIndex, flowSteps.length)
   const onReveal = safeIndex >= flowSteps.length
 
@@ -281,7 +302,11 @@ export default function OnboardingFlow() {
       return
     }
     try {
-      await api.onboarding.submit(mapStoreToSubmitPayload(data, interfaceLanguage))
+      await api.onboarding.submit({
+        ...mapStoreToSubmitPayload(data, interfaceLanguage),
+        q0_specific_intended_exam: specificIntendedExam,
+        q0_accept_fallback: false,
+      })
       const enrichedUser = await api.users.getMe()
       auth.setAuth(auth.token, enrichedUser)
       useOnboardingStore.getState().reset()
@@ -295,6 +320,133 @@ export default function OnboardingFlow() {
       console.error('Onboarding flush from reveal failed — routing to /ecole anyway', flushErr)
       router.push('/ecole')
     }
+  }
+
+  // F-327 — fires from WaitlistOrProxyConfirmation CTAs.
+  // accept=true → "Start with La Méthode" primary CTA
+  // accept=false → "Just add me to the waitlist" secondary CTA
+  // Case A (path_slug=b1_to_b2 + waitlist) → /ecole (proxy-enrolled)
+  // Case B (waitlist + !accept)             → inline confirmation
+  // Case C (waitlist + accept + no path)    → inline confirmation
+  async function handleWaitlistSubmit(accept: boolean) {
+    const auth = useAuthStore.getState()
+    if (!auth.token) {
+      router.push('/paywall')
+      return
+    }
+    setIsSubmitting(true)
+    setAcceptFallback(accept)
+    try {
+      const response = await api.onboarding.submit({
+        ...mapStoreToSubmitPayload(data, interfaceLanguage),
+        q0_specific_intended_exam: specificIntendedExam,
+        q0_accept_fallback: accept,
+      })
+      const enrichedUser = await api.users.getMe()
+      auth.setAuth(auth.token, enrichedUser)
+      useOnboardingStore.getState().reset()
+      if (response.path_slug === 'b1_to_b2' && response.waitlist) {
+        router.push('/ecole')
+        return
+      }
+      setWaitlistOutcome(
+        accept ? { kind: 'waitlist_no_fallback' } : { kind: 'waitlist_declined' }
+      )
+    } catch (submitErr) {
+      if (isEmailNotVerifiedError(submitErr)) {
+        router.push('/verify-email')
+        return
+      }
+      // eslint-disable-next-line no-console
+      console.error('Waitlist submit failed', submitErr)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // F-327 — Cases B & C: another_exam user submitted but wasn't proxy-enrolled.
+  // Local state survives the store reset so this renders after reset() runs.
+  if (waitlistOutcome !== null) {
+    const SANS = 'var(--font-switzer), -apple-system, "Segoe UI", system-ui, sans-serif'
+    const SERIF = 'var(--font-fraunces), Georgia, "Times New Roman", serif'
+    const isDeclined = waitlistOutcome.kind === 'waitlist_declined'
+    const copy = interfaceLanguage === 'fr'
+      ? {
+          heading: "Vous êtes sur la liste d'attente.",
+          body: isDeclined
+            ? "Nous vous contacterons dès que votre examen sera disponible."
+            : "Nous vous contacterons dès que votre examen sera disponible. La Méthode nécessite un niveau B1+ pour commencer.",
+          done: "Terminer",
+        }
+      : {
+          heading: "You're on the waitlist.",
+          body: isDeclined
+            ? "We'll reach out when your exam is ready."
+            : "We'll reach out when your exam is ready. La Méthode requires B1+ level to begin.",
+          done: "Done",
+        }
+    return (
+      <div
+        className="min-h-screen w-full flex flex-col items-center ed-page-enter"
+        style={{ backgroundColor: 'var(--ed-warm-peach-deep)' }}
+      >
+        <div
+          className="w-full flex flex-col flex-1 min-h-screen"
+          style={{ maxWidth: 720, padding: '0 clamp(24px, 4vw, 48px)' }}
+        >
+          <div style={{ height: 'clamp(56px, 9vw, 96px)' }} />
+          <h1
+            style={{
+              fontFamily: SERIF,
+              fontWeight: 400,
+              fontStyle: 'italic',
+              fontSize: 'clamp(2rem, 4.5vw, 3rem)',
+              lineHeight: 1.15,
+              letterSpacing: '-0.015em',
+              color: 'var(--ed-fg)',
+              margin: 0,
+              marginBottom: 'clamp(16px, 2vw, 24px)',
+            }}
+          >
+            {copy.heading}
+          </h1>
+          <p
+            style={{
+              fontFamily: SANS,
+              fontWeight: 400,
+              fontSize: 'clamp(15px, 1.6vw, 17px)',
+              lineHeight: 1.6,
+              color: 'var(--ed-muted)',
+              margin: 0,
+            }}
+          >
+            {copy.body}
+          </p>
+          <div className="flex-1" />
+          <div style={{ paddingBottom: 'calc(32px + var(--fp-safe-bottom, 0px))' }}>
+            <button
+              type="button"
+              onClick={() => router.push('/')}
+              style={{
+                height: 56,
+                width: '100%',
+                backgroundColor: 'var(--ed-accent)',
+                color: '#FFFFFF',
+                borderRadius: 4,
+                fontFamily: SANS,
+                fontWeight: 600,
+                fontSize: 16,
+                border: 'none',
+                cursor: 'pointer',
+                outline: 'none',
+              }}
+            >
+              {copy.done}
+            </button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   // Closing reveal — pulled from store via the helpers EcoleReveal expects.
@@ -333,6 +485,20 @@ export default function OnboardingFlow() {
         onBack={onBack}
         headerRight={headerToggle}
         bg={STEP_PASTELS[safeIndex % STEP_PASTELS.length]}
+      />
+    )
+  }
+
+  // F-327 — terminal step for another_exam users; replaces EcoleReveal.
+  if (step.kind === 'waitlist_confirmation') {
+    return (
+      <WaitlistOrProxyConfirmation
+        specificIntendedExam={specificIntendedExam}
+        language={interfaceLanguage}
+        isSubmitting={isSubmitting}
+        bg={STEP_PASTELS[safeIndex % STEP_PASTELS.length]}
+        onAccept={() => handleWaitlistSubmit(true)}
+        onDecline={() => handleWaitlistSubmit(false)}
       />
     )
   }

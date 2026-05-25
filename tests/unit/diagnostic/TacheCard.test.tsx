@@ -9,6 +9,7 @@ const SAMPLE: Tache = {
   descriptor:
     "Vous échangez des opinions sur un sujet de la vie courante avec l'examinateur.",
   durationLabel: '~3 min 30',
+  durationSeconds: 210,
   prompt:
     'Donnez votre avis sur le télétravail. Préférez-vous travailler à distance ou au bureau ?',
 }
