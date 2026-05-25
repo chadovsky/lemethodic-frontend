@@ -2,12 +2,14 @@
 
 // F-221 — exam-target picker (q0_target_exam). Five large card buttons
 // each carrying a name + format-DNA chip. Picking "Another exam" reveals
-// an inline mini-form (which exam? + email) that submits to localStorage
-// waitlist (lib/landing/waitlist.ts via submitWaitlist with intent
-// 'exam_other'); on success, the picker shows a confirmation and the
-// questionnaire's Continue is disabled (the user is parked on the
-// confirmation, doesn't proceed). All other options dispatch normally
-// via onContinue + setAnswer (handled by the parent OnboardingFlow).
+// an inline mini-form (which exam?) that captures the free-text exam name.
+//
+// F-327 rework: removed localStorage waitlist submission (submitWaitlist)
+// and email field — user is authenticated at this point. The inline form
+// now ONLY captures examName; Continue writes it to the onboarding store
+// (specificIntendedExam) and propagates normally via onContinue. The
+// WaitlistOrProxyConfirmation screen (inserted by OnboardingFlow after q11)
+// handles the accept_fallback decision before submit.
 
 import { useState } from 'react'
 import { OnboardingScreen, OnboardingCard, CheckIcon } from '../OnboardingScreen'
@@ -17,10 +19,7 @@ import {
   type ExamValue,
   type Lang,
 } from '../../landing/copy'
-import {
-  submitWaitlist,
-  isValidEmail,
-} from '../../landing/waitlist'
+import { useOnboardingStore } from '@/lib/onboarding'
 import type { OnboardingQuestion } from '@/lib/onboarding-questions'
 import type { UiLanguage } from '@/lib/types'
 
@@ -45,8 +44,7 @@ interface ExamPickerQuestionProps {
 
 type AnotherExamState =
   | { kind: 'idle' }
-  | { kind: 'form'; examName: string; email: string; error: string | null }
-  | { kind: 'success' }
+  | { kind: 'form'; examName: string; error: string | null }
 
 export default function ExamPickerQuestion({
   question,
@@ -60,6 +58,8 @@ export default function ExamPickerQuestion({
   headerRight,
   bg,
 }: ExamPickerQuestionProps) {
+  const setSpecificIntendedExam = useOnboardingStore((s) => s.setSpecificIntendedExam)
+
   const [selected, setSelected] = useState<ExamValue | null>(
     (initialValue as ExamValue | null) ?? null,
   )
@@ -70,57 +70,36 @@ export default function ExamPickerQuestion({
   function handleSelect(value: ExamValue) {
     setSelected(value)
     if (value === 'another_exam') {
-      setAnother({ kind: 'form', examName: '', email: '', error: null })
+      setAnother({ kind: 'form', examName: '', error: null })
     } else {
       setAnother({ kind: 'idle' })
     }
   }
 
+  // Continue is enabled when something is selected AND, for another_exam,
+  // the free-text exam name is non-empty.
+  const continueEnabled =
+    selected !== null &&
+    (selected !== 'another_exam' ||
+      (another.kind === 'form' && another.examName.trim().length > 0))
+
   function handleContinue() {
     if (selected === null) return
-    if (selected === 'another_exam') return  // gated by inline form below
+    if (selected === 'another_exam') {
+      if (another.kind !== 'form') return
+      const examName = another.examName.trim()
+      if (!examName) {
+        setAnother({ ...another, error: formCopy.invalidExam })
+        return
+      }
+      // Persist exam name to store; OnboardingFlow will include it in the
+      // submit payload as q0_specific_intended_exam.
+      setSpecificIntendedExam(examName)
+      onContinue(selected)
+      return
+    }
     onContinue(selected)
   }
-
-  function handleAnotherExamSubmit() {
-    if (another.kind !== 'form') return
-    const examNameTrimmed = another.examName.trim()
-    if (!examNameTrimmed) {
-      setAnother({ ...another, error: formCopy.invalidExam })
-      return
-    }
-    if (!isValidEmail(another.email)) {
-      setAnother({ ...another, error: formCopy.invalidEmail })
-      return
-    }
-    const result = submitWaitlist({
-      email: another.email,
-      intent: 'exam_other',
-      examName: examNameTrimmed,
-    })
-    if (!result.ok) {
-      setAnother({
-        ...another,
-        error:
-          result.reason === 'invalid_email'
-            ? formCopy.invalidEmail
-            : formCopy.invalidExam, // storage error fallback
-      })
-      return
-    }
-    setAnother({ kind: 'success' })
-  }
-
-  function handleBackToPicker() {
-    setSelected(null)
-    setAnother({ kind: 'idle' })
-  }
-
-  // Continue is disabled when:
-  //   - nothing selected
-  //   - "another_exam" selected (gated by the inline mini-form / success)
-  const continueEnabled =
-    selected !== null && selected !== 'another_exam'
 
   return (
     <OnboardingScreen
@@ -174,9 +153,9 @@ export default function ExamPickerQuestion({
         )
       })}
 
-      {/* Inline another-exam form / success — appears when 'another_exam'
-          is the current selection. Replaces standard Continue with form
-          submission + parked confirmation. */}
+      {/* Inline exam-name capture — appears when 'another_exam' is selected.
+          Email field and localStorage submit removed (F-327): the Continue
+          button (OnboardingScreen CTA) handles propagation via the store. */}
       {another.kind === 'form' && (
         <div
           style={{
@@ -257,46 +236,6 @@ export default function ExamPickerQuestion({
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label
-              htmlFor="exam-other-email"
-              style={{
-                fontFamily: SANS,
-                fontWeight: 600,
-                fontSize: 12,
-                color: ED_MUTED,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-              }}
-            >
-              {formCopy.emailLabel}
-            </label>
-            <input
-              id="exam-other-email"
-              type="email"
-              inputMode="email"
-              autoComplete="email"
-              value={another.email}
-              onChange={(e) =>
-                setAnother({ ...another, email: e.target.value, error: null })
-              }
-              placeholder={formCopy.emailPlaceholder}
-              style={{
-                height: 48,
-                width: '100%',
-                borderRadius: 4,
-                border: `1px solid ${another.email ? ED_FG : ED_RULE}`,
-                backgroundColor: ED_PAPER,
-                padding: '0 16px',
-                fontFamily: SANS,
-                fontWeight: 400,
-                fontSize: 15,
-                color: ED_FG,
-                outline: 'none',
-              }}
-            />
-          </div>
-
           {another.error && (
             <p
               role="alert"
@@ -311,85 +250,6 @@ export default function ExamPickerQuestion({
               {another.error}
             </p>
           )}
-
-          <button
-            type="button"
-            onClick={handleAnotherExamSubmit}
-            style={{
-              height: 48,
-              width: '100%',
-              borderRadius: 4,
-              backgroundColor: 'var(--ed-accent)',
-              color: '#FFFFFF',
-              border: 'none',
-              fontFamily: SANS,
-              fontWeight: 600,
-              fontSize: 15,
-              cursor: 'pointer',
-              outline: 'none',
-            }}
-          >
-            {formCopy.submit}
-          </button>
-        </div>
-      )}
-
-      {another.kind === 'success' && (
-        <div
-          style={{
-            backgroundColor: ED_PAPER,
-            border: `1px solid ${ED_RULE}`,
-            borderRadius: 4,
-            padding: 'clamp(20px, 2.5vw, 28px)',
-            marginTop: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12,
-          }}
-        >
-          <h3
-            style={{
-              fontFamily: SANS,
-              fontWeight: 600,
-              fontSize: 17,
-              color: ED_FG,
-              margin: 0,
-            }}
-          >
-            {formCopy.successHeading}
-          </h3>
-          <p
-            style={{
-              fontFamily: SANS,
-              fontWeight: 400,
-              fontSize: 14,
-              lineHeight: 1.55,
-              color: ED_MUTED,
-              margin: 0,
-            }}
-          >
-            {formCopy.successBody}
-          </p>
-          <button
-            type="button"
-            onClick={handleBackToPicker}
-            style={{
-              alignSelf: 'flex-start',
-              padding: '6px 12px',
-              borderRadius: 4,
-              backgroundColor: 'transparent',
-              color: ED_FG,
-              border: `1px solid ${ED_RULE}`,
-              fontFamily: SANS,
-              fontWeight: 500,
-              fontSize: 13,
-              cursor: 'pointer',
-              outline: 'none',
-              marginTop: 4,
-            }}
-          >
-            {formCopy.backToPicker}
-          </button>
         </div>
       )}
     </OnboardingScreen>
