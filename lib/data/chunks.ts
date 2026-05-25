@@ -27,7 +27,7 @@ export const CHUNK_SOURCES: readonly ChunkSource[] = [
 export const CHUNKS: readonly Chunk[] = [
   // A1 — 6
   { id: 1, fr: 'Ça va', en: "I'm fine", level: 'A1', source: 'Conversation' },
-  { id: 2, fr: 'S’il vous plaît', en: 'Please', level: 'A1', source: 'Quotidien' },
+  { id: 2, fr: "S'il vous plaît", en: 'Please', level: 'A1', source: 'Quotidien' },
   { id: 3, fr: 'Bonne journée', en: 'Have a nice day', level: 'A1', source: 'Quotidien' },
   { id: 4, fr: 'Combien ça coûte ?', en: 'How much is it?', level: 'A1', source: 'Voyage' },
   { id: 5, fr: 'Je voudrais…', en: 'I would like...', level: 'A1', source: 'Travail' },
@@ -37,7 +37,7 @@ export const CHUNKS: readonly Chunk[] = [
   { id: 7, fr: 'Pas de souci', en: 'No worries', level: 'A2', source: 'Conversation' },
   { id: 8, fr: 'Tout droit', en: 'Straight ahead', level: 'A2', source: 'Voyage' },
   { id: 9, fr: 'Du coup', en: 'So / therefore', level: 'A2', source: 'Conversation' },
-  { id: 10, fr: 'À tout à l’heure', en: 'See you later', level: 'A2', source: 'Quotidien' },
+  { id: 10, fr: "À tout à l'heure", en: 'See you later', level: 'A2', source: 'Quotidien' },
   { id: 11, fr: 'Sans problème', en: 'No problem', level: 'A2', source: 'Travail' },
   { id: 12, fr: 'Où est…', en: 'Where is...', level: 'A2', source: 'Voyage' },
 
@@ -51,11 +51,11 @@ export const CHUNKS: readonly Chunk[] = [
 
   // B2 — 6
   { id: 19, fr: 'Faire le point', en: 'To take stock', level: 'B2', source: 'Travail' },
-  { id: 20, fr: 'Il n’empêche que', en: 'Nevertheless', level: 'B2', source: 'Média' },
+  { id: 20, fr: "Il n'empêche que", en: 'Nevertheless', level: 'B2', source: 'Média' },
   { id: 21, fr: 'Mine de rien', en: 'Without seeming to', level: 'B2', source: 'Quotidien' },
   { id: 22, fr: 'Pour autant', en: 'However', level: 'B2', source: 'Média' },
   { id: 23, fr: 'Tomber sur', en: 'To stumble upon', level: 'B2', source: 'Conversation' },
-  { id: 24, fr: 'À l’étranger', en: 'Abroad', level: 'B2', source: 'Voyage' },
+  { id: 24, fr: "À l'étranger", en: 'Abroad', level: 'B2', source: 'Voyage' },
 
   // C1 — 6
   { id: 25, fr: 'Tirer parti de', en: 'To take advantage of', level: 'C1', source: 'Travail' },
@@ -102,7 +102,7 @@ export const CHUNKS: readonly Chunk[] = [
   { id: 56, fr: 'Force est de constater', en: 'One cannot but notice', level: 'C1', source: 'Média' },
   { id: 57, fr: 'À juste titre', en: 'Rightfully so', level: 'C1', source: 'Travail' },
   { id: 58, fr: 'Nonobstant', en: 'Notwithstanding', level: 'C1', source: 'Média' },
-  { id: 59, fr: "Quoi qu’il en soit", en: 'Be that as it may', level: 'C1', source: 'Conversation' },
+  { id: 59, fr: "Quoi qu'il en soit", en: 'Be that as it may', level: 'C1', source: 'Conversation' },
   { id: 60, fr: 'Battre en brèche', en: 'To challenge / refute', level: 'C1', source: 'Voyage' },
 ]
 

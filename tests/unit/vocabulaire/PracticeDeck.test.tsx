@@ -20,7 +20,7 @@ describe('PracticeDeck', () => {
     expect(back).toHaveAttribute('href', '/la-bibliotheque')
   })
 
-  it('starts on card 1 of 30 with the first chunk’s French side visible', () => {
+  it("starts on card 1 of 30 with the first chunk's French side visible", () => {
     render(<PracticeDeck />)
     expect(screen.getByTestId('practice-progress')).toHaveTextContent(`Carte 1 sur ${TOTAL}`)
     expect(screen.getByTestId('flashcard')).toHaveAttribute('data-flipped', 'false')

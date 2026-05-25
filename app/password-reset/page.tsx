@@ -242,7 +242,7 @@ function ConfirmForm({ token }: { token: string }) {
 
   function validate(): string | null {
     if (newPassword.length < 8) return 'Password must be at least 8 characters'
-    if (newPassword !== confirmPassword) return 'Passwords don’t match'
+    if (newPassword !== confirmPassword) return "Passwords don't match"
     return null
   }
 

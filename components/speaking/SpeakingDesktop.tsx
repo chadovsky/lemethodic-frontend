@@ -112,10 +112,10 @@ const COPY = {
       tache_1: {
         title: 'Présentation personnelle',
         meta: { duration: '5–8 min', mode: 'Conversation' },
-        intro: 'Présentez-vous. L’examinateur pose des questions sur votre vie, votre travail et vos objectifs.',
+        intro: "Présentez-vous. L'examinateur pose des questions sur votre vie, votre travail et vos objectifs.",
         formatLabel: 'Format',
         format:
-          'Vous parlez d’abord, puis l’examinateur pose 2 à 4 questions. Temps total : 5 à 8 minutes.',
+          "Vous parlez d'abord, puis l'examinateur pose 2 à 4 questions. Temps total : 5 à 8 minutes.",
         tipsLabel: 'Conseils',
         tips: [
           'Parlez en phrases complètes. Les réponses courtes signalent un niveau CECR bas.',
@@ -127,7 +127,7 @@ const COPY = {
       tache_2: {
         title: 'Jeu de rôle',
         meta: { duration: '8–12 min', mode: 'Maintenir pour parler' },
-        intro: 'Vous jouez un client, un voyageur, un usager. L’examinateur-agent répond à vos questions.',
+        intro: "Vous jouez un client, un voyageur, un usager. L'examinateur-agent répond à vos questions.",
         formatLabel: 'Format',
         format:
           'Choisissez un scénario, posez 8 à 12 questions pour obtenir des informations. Enregistrement maintenu par tour.',
@@ -135,7 +135,7 @@ const COPY = {
         tips: [
           'Utilisez le vouvoiement. Le tutoiement dans un échange de service vous fait perdre des points.',
           'Commencez par une formule de politesse ("Bonjour, je voudrais…") au premier tour.',
-          'Posez des questions de suivi plutôt que d’accepter la première réponse.',
+          "Posez des questions de suivi plutôt que d'accepter la première réponse.",
         ],
         startCta: 'Commencer la Tâche 2',
       },
@@ -148,7 +148,7 @@ const COPY = {
           'Vous recevez un sujet. 2 minutes de préparation silencieuse. Puis 3 minutes de monologue solo, sans interruption.',
         tipsLabel: 'Conseils',
         tips: [
-          'Pendant la préparation : thèse + 2 arguments + reconnaissance d’un contre-argument.',
+          "Pendant la préparation : thèse + 2 arguments + reconnaissance d'un contre-argument.",
           'Ouvrez avec une position claire, pas un évitement ("Je pense que…" plutôt que "Peut-être que…").',
           'Concluez par une synthèse qui rappelle la position. Les examinateurs écoutent la conclusion.',
         ],

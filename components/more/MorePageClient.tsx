@@ -76,7 +76,7 @@ const COPY = {
     },
     profile: {
       examLabel: 'Examen visé',
-      daysLabel: 'Jours avant l’examen',
+      daysLabel: "Jours avant l'examen",
       noExam: 'Aucun examen prévu',
     },
     settings: {
@@ -94,7 +94,7 @@ const COPY = {
     about: {
       version: 'Version',
       support: 'Support',
-      terms: 'Conditions d’utilisation',
+      terms: "Conditions d'utilisation",
       privacy: 'Politique de confidentialité',
       refund: 'Politique de remboursement',
     },

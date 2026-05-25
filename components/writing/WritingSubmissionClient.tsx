@@ -74,7 +74,7 @@ const COPY = {
   fr: {
     backToLibrary: 'Retour aux sujets',
     showEnglish: 'Afficher en anglais',
-    hideEnglish: 'Masquer l’anglais',
+    hideEnglish: "Masquer l'anglais",
     minutes: 'min',
     wordsRange: 'mots demandés',
     yourResponse: 'Votre réponse',

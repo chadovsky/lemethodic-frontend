@@ -24,7 +24,7 @@ describe('buildQuiz', () => {
     }
   })
 
-  it('correctIndex is a valid 0..3 index and points to the prompt chunk’s English gloss', () => {
+  it("correctIndex is a valid 0..3 index and points to the prompt chunk's English gloss", () => {
     const quiz = buildQuiz(CHUNKS, 10)
     for (const q of quiz) {
       expect(q.correctIndex).toBeGreaterThanOrEqual(0)

@@ -234,7 +234,7 @@ const FR: VocabularyCopy = {
     corpusTitle: 'La Bibliothèque arrive.',
     corpusBody: 'Le corpus est en préparation. Les premiers ensembles thématiques apparaîtront ici dès que le contenu sera prêt.',
     topicFilteredTitle: 'Aucun chunk ne correspond à ces filtres.',
-    topicFilteredBody: 'Essayez d’élargir la plage CEFR ou de retirer un tag d’examen.',
+    topicFilteredBody: "Essayez d'élargir la plage CEFR ou de retirer un tag d'examen.",
   },
   locked: {
     title: 'Le corpus tagué examen est réservé aux offres payantes.',
@@ -289,8 +289,8 @@ const FR: VocabularyCopy = {
   test: {
     startCta: 'Commencer le test',
     configTitle: 'Tester ce thème',
-    configSubtitle: 'Choisissez un type d’exercice, une direction et une durée de session.',
-    exerciseTypeLabel: 'Type d’exercice',
+    configSubtitle: "Choisissez un type d'exercice, une direction et une durée de session.",
+    exerciseTypeLabel: "Type d'exercice",
     typeMcq: 'Choix multiple',
     typeDropdown: 'Liste déroulante',
     typeExact: 'Complétion exacte',

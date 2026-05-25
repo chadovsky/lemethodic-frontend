@@ -78,7 +78,7 @@ const METHODE = {
       },
     ],
     closer:
-      'Most platforms tell you to practice more. La Méthode identifies the layer that’s dragging. Treats that one, specifically.',
+      "Most platforms tell you to practice more. La Méthode identifies the layer that's dragging. Treats that one, specifically.",
   },
   fr: {
     title: 'La Méthode en Couches',
@@ -137,7 +137,7 @@ const HOW = {
       },
       {
         head: 'You progress one Goulet at a time.',
-        body: 'Not "practice more." Not "try harder." Specific, layered work on the layer that needs it. Until you’re solid across all five.',
+        body: 'Not "practice more." Not "try harder." Specific, layered work on the layer that needs it. Until you're solid across all five.',
       },
     ],
   },
@@ -148,7 +148,7 @@ const HOW = {
     blocks: [
       {
         head: 'Vous enregistrez. Le diagnostic écoute.',
-        body: 'Chaque tâche orale que vous soumettez est passée au crible des cinq couches. L’IA évalue chaque couche et identifie votre goulet (*Le Goulet*), la couche qui freine l’ensemble.',
+        body: "Chaque tâche orale que vous soumettez est passée au crible des cinq couches. L'IA évalue chaque couche et identifie votre goulet (*Le Goulet*), la couche qui freine l'ensemble.",
       },
       {
         head: 'Les leçons travaillent ce goulet.',
@@ -156,7 +156,7 @@ const HOW = {
       },
       {
         head: 'Vous progressez un goulet à la fois.',
-        body: 'Pas « pratiquez plus. » Pas « essayez plus fort. » Un travail précis et stratifié sur la couche qui en a besoin. Jusqu’à ce que les cinq soient solides.',
+        body: "Pas « pratiquez plus. » Pas « essayez plus fort. » Un travail précis et stratifié sur la couche qui en a besoin. Jusqu'à ce que les cinq soient solides.",
       },
     ],
   },
@@ -194,14 +194,14 @@ const PARCOURS = {
     approfondissement: {
       name: 'Approfondissement',
       range: 'Leçons 17 à 27',
-      body: 'Là où ça s’affine. Nuance, registre, contrôle de la voix. Le travail qui vous fait passer de la confiance B1 à la maîtrise B2.',
+      body: "Là où ça s'affine. Nuance, registre, contrôle de la voix. Le travail qui vous fait passer de la confiance B1 à la maîtrise B2.",
     },
     segmentsTitle: 'Chaque leçon suit cinq segments :',
     segments: [
       { name: 'Le Piège', body: "l'erreur typique de l'anglophone qu'on corrige aujourd'hui." },
       { name: 'La Règle', body: 'la structure française qui la corrige.' },
-      { name: 'Le Drill', body: 'la pratique. Répétition du modèle jusqu’à l’automatisme.' },
-      { name: 'La Situation', body: 'l’application. Vous parlez, l’examinateur IA répond et corrige.' },
+      { name: 'Le Drill', body: "la pratique. Répétition du modèle jusqu'à l'automatisme." },
+      { name: 'La Situation', body: "l'application. Vous parlez, l'examinateur IA répond et corrige." },
       { name: 'Le Débrief', body: 'le bilan. Ce que vous avez réussi, ce qui vous a échappé, la suite.' },
     ],
   },

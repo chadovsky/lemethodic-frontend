@@ -35,7 +35,7 @@ const COPY = {
     notifyLabel: 'Soyez prévenu(e) au lancement',
     placeholder: 'Votre adresse e-mail',
     button: 'Me prévenir',
-    success: 'Vous êtes inscrit(e). Nous vous écrirons à l’ouverture du catalogue.',
+    success: "Vous êtes inscrit(e). Nous vous écrirons à l'ouverture du catalogue.",
     fallbackInvalid: 'Entrez une adresse e-mail valide.',
     backCta: "Retour à l'accueil",
     backHref: '/fr',

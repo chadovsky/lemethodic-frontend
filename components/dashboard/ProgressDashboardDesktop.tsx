@@ -71,7 +71,7 @@ const COPY = {
   },
   fr: {
     title: 'Progrès',
-    subtitle: 'Où vous en êtes aujourd’hui.',
+    subtitle: "Où vous en êtes aujourd'hui.",
     radarLabel: 'La Méthode en Couches',
     radarEmpty: 'Enregistrez sur /speaking pour alimenter votre diagnostic.',
     todayLabel: 'Focus du jour',
@@ -432,7 +432,7 @@ function TodayBody({ today, language }: { today: TodayActionResponse; language: 
   // today, so we drive copy from action.kind.
   const action = today.action
   const headline = (() => {
-    if (!action) return language === 'fr' ? 'Pas de recommandation aujourd’hui.' : 'No recommendation today.'
+    if (!action) return language === 'fr' ? "Pas de recommandation aujourd'hui." : 'No recommendation today.'
     if (action.kind === 'cluster_practice')
       return language === 'fr' ? 'Pratique du cluster.' : 'Cluster practice.'
     if (action.kind === 'free_practice')

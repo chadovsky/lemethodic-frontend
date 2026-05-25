@@ -35,7 +35,7 @@ const CORAL          = '#FF8B6B'
 // URL slug isn't numeric — sufficient to exercise the recording pipeline.
 const TOPIC = {
   prompt:
-    'Certains pensent que les réseaux sociaux ont rapproché les gens. D’autres estiment qu’ils ont au contraire détérioré nos relations. Qu’en pensez-vous ?',
+    "Certains pensent que les réseaux sociaux ont rapproché les gens. D'autres estiment qu'ils ont au contraire détérioré nos relations. Qu'en pensez-vous ?",
   difficulty: 'B1-B2',
   theme: 'Society',
 }
