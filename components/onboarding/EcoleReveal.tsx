@@ -90,7 +90,7 @@ const SECTION_LABELS = {
     practice: 'Practice',
     pace: 'Pace',
     noExam: 'No exam scheduled',
-    cta: "Start your École",
+    cta: "Start your Méthode",
     eyebrow: 'Your assessment',
   },
   fr: {
@@ -101,7 +101,7 @@ const SECTION_LABELS = {
     practice: 'Pratique',
     pace: 'Cadence',
     noExam: 'Aucun examen prévu',
-    cta: 'Commencer votre École',
+    cta: 'Commencer votre Méthode',
     eyebrow: 'Votre évaluation',
   },
 } as const
@@ -374,7 +374,7 @@ export default function EcoleReveal({ data, language, onContinue }: EcoleRevealP
             style={{
               height: 56,
               backgroundColor: ED_ACCENT,
-              color: '#FFFFFF',
+              color: 'hsl(0 0% 100%)',
               borderRadius: 4,
               fontFamily: SANS,
               fontWeight: 600,

@@ -123,7 +123,7 @@ export default function LoginPage() {
         style={{
           width: '100%',
           maxWidth: 420,
-          backgroundColor: '#FFFFFF',
+          backgroundColor: 'var(--lm-bg-surface)',
           borderRadius: 24,
           padding: '32px 28px',
           boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
@@ -168,7 +168,7 @@ export default function LoginPage() {
             marginTop: 6,
           }}
         >
-          Sign in to continue your École.
+          Sign in to continue your Méthode.
         </p>
 
         {/* Email */}
@@ -200,7 +200,7 @@ export default function LoginPage() {
               height: 52,
               borderRadius: 14,
               border: `1.5px solid ${INK_MUTED}`,
-              backgroundColor: '#FFFFFF',
+              backgroundColor: 'var(--lm-bg-surface)',
               padding: '0 16px',
               fontFamily: DISPLAY_FONT,
               fontWeight: 500,
@@ -238,7 +238,7 @@ export default function LoginPage() {
               height: 52,
               borderRadius: 14,
               border: `1.5px solid ${INK_MUTED}`,
-              backgroundColor: '#FFFFFF',
+              backgroundColor: 'var(--lm-bg-surface)',
               padding: '0 16px',
               fontFamily: DISPLAY_FONT,
               fontWeight: 500,
@@ -260,7 +260,7 @@ export default function LoginPage() {
             width: '100%',
             height: 52,
             backgroundColor: isLoading ? CTA_DISABLED : INK,
-            color: '#FFFFFF',
+            color: 'hsl(0 0% 100%)',
             borderRadius: 14,
             border: 'none',
             fontFamily: DISPLAY_FONT,
@@ -293,7 +293,7 @@ export default function LoginPage() {
               fontWeight: 500,
               fontSize: 13,
               lineHeight: '18px',
-              color: '#B42318',
+              color: 'var(--lm-error)',
               textAlign: 'center',
             }}
           >

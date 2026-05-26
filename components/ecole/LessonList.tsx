@@ -31,7 +31,7 @@ export default function LessonList() {
             margin: 0,
           }}
         >
-          L&rsquo;École
+          La Méthode
         </h1>
         <p
           style={{

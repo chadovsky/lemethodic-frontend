@@ -33,17 +33,17 @@ test.beforeEach(async ({ page }) => {
   })
 })
 
-test.describe("L'École lesson list — desktop (1280×800)", () => {
+test.describe("La Méthode lesson list — desktop (1280×800)", () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
   test('renders page header inside the (app) shell', async ({ page }) => {
     await page.goto('/la-methode')
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
-    await expect(page.getByRole('heading', { level: 1, name: /l['']école/i })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: /la méthode/i })).toBeVisible()
     await expect(page.getByText(/la méthode en 27 leçons\./i)).toBeVisible()
   })
 
-  test("shows L'École as active in the sidebar", async ({ page }) => {
+  test("shows La Méthode as active in the sidebar", async ({ page }) => {
     await page.goto('/la-methode')
     await expect(page.getByTestId('sidebar-link-la-methode')).toHaveAttribute(
       'aria-current',
@@ -116,7 +116,7 @@ test.describe("L'École lesson list — desktop (1280×800)", () => {
   })
 })
 
-test.describe("L'École lesson list — mobile (375×667)", () => {
+test.describe("La Méthode lesson list — mobile (375×667)", () => {
   test.use({ viewport: { width: 375, height: 667 } })
 
   test('all 27 cards rendered and reachable on scroll', async ({ page }) => {

@@ -56,7 +56,7 @@ function shouldHideOn(pathname: string): boolean {
 
 const COPY = {
   en: {
-    nav: { ecole: 'École', speaking: 'Speaking', writing: 'Writing', progress: 'Progress' },
+    nav: { ecole: 'Méthode', speaking: 'Speaking', writing: 'Writing', progress: 'Progress' },
     menu: {
       profile: 'Profile',
       settings: 'Settings',
@@ -67,7 +67,7 @@ const COPY = {
     skipToContent: 'Skip to content',
   },
   fr: {
-    nav: { ecole: 'École', speaking: 'Oral', writing: 'Écrit', progress: 'Progrès' },
+    nav: { ecole: 'Méthode', speaking: 'Oral', writing: 'Écrit', progress: 'Progrès' },
     menu: {
       profile: 'Profil',
       settings: 'Paramètres',

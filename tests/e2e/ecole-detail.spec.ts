@@ -43,7 +43,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 
-test.describe("L'École lesson detail — desktop (1280×800)", () => {
+test.describe("La Méthode lesson detail — desktop (1280×800)", () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
   test('renders inside the (app) shell with breadcrumb, header, audio placeholder, sections, nav', async ({
@@ -132,7 +132,7 @@ test.describe("L'École lesson detail — desktop (1280×800)", () => {
   })
 })
 
-test.describe("L'École lesson detail — mobile (375×667)", () => {
+test.describe("La Méthode lesson detail — mobile (375×667)", () => {
   test.use({ viewport: { width: 375, height: 667 } })
 
   test('renders /la-methode/3 with audio placeholder full-width and content stacked', async ({

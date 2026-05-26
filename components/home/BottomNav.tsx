@@ -17,7 +17,7 @@ interface Tab {
 }
 
 const TABS: Tab[] = [
-  { href: '/',          label: 'École', Icon: Home         },
+  { href: '/',          label: 'Méthode', Icon: Home         },
   { href: '/speaking',  label: 'Speaking',  Icon: Mic          },
   { href: '/writing',   label: 'Writing',   Icon: PenLine      },
   { href: '/progress',  label: 'Progress',  Icon: BarChart2    },

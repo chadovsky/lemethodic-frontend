@@ -50,7 +50,7 @@ describe('LessonList', () => {
 
   it('renders the page header with title and tagline', async () => {
     render(<LessonList />)
-    // h1 text is "L’École" from &rsquo;  &mdash; match via text content
+    // h1 text is "La Méthode" — match via role only (name not filtered)
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
     expect(screen.getByText(/la méthode en 27 leçons\./i)).toBeInTheDocument()
   })

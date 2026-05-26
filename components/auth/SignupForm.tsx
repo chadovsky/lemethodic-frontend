@@ -208,7 +208,7 @@ export default function SignupForm({ tier }: SignupFormProps) {
             <p
               role="alert"
               style={{
-                color: '#B42318',
+                color: 'var(--lm-error)',
                 fontSize: '0.875rem',
                 margin: 0,
                 fontFamily: SANS_FONT,
@@ -227,7 +227,7 @@ export default function SignupForm({ tier }: SignupFormProps) {
               width: '100%',
               height: 52,
               backgroundColor: disabled ? 'var(--rule-default)' : 'var(--cta-primary)',
-              color: disabled ? 'var(--text-muted)' : '#ffffff',
+              color: disabled ? 'var(--text-muted)' : 'hsl(0 0% 100%)',
               borderRadius: 4,
               border: 'none',
               fontFamily: SANS_FONT,
