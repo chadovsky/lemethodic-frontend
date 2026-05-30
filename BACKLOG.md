@@ -4069,4 +4069,49 @@ The F-225 amendment remains documented in CLAUDE.md as the intended protocol; it
 
 ---
 
+## M-VISUAL fix A-007 — Replace v1 warm-cream :root tokens with v2 Palette A values
+
+**Milestone:** M2 visual fixes
+**Status:** ✅ Shipped — (main, 2026-05-30)
+
+**What shipped:**
+- `app/globals.css` `:root` block — F-VISUAL-001 intermediate tokens remapped to v2 chains:
+  - `--bg-canvas: hsl(38 25% 96%)` (#F8F4ED warm cream) → `var(--paper)` (#FFFFFF)
+  - `--bg-elevated: hsl(0 0% 100%)` (orphan) → `var(--paper)`
+  - `--bg-subtle: hsl(38 18% 92%)` (#ECE7DE warm muted) → `var(--paper-edge)` (#F4F4F5)
+  - `--text-primary: hsl(30 18% 14%)` (#2A2520 warm near-black) → `var(--ink)` (#0F1419)
+  - `--text-secondary: hsl(30 10% 28%)` → `var(--ink-soft)` (rgba 62%)
+  - `--text-muted: hsl(30 5% 42%)` → `var(--ink-faint)` (rgba 38%)
+  - `--text-disabled: hsl(30 5% 60%)` → `var(--ink-faint)`
+  - `--accent-primary: hsl(80 18% 58%)` (#8FA279 sage) → `var(--accent)` (#C8102E vermillion); no v2 sage analog per DESIGN.md §2
+  - `--accent-primary-hover: hsl(80 18% 48%)` → `var(--accent-soft)` (#E84A5F)
+  - `--accent-primary-soft: hsl(80 22% 88%)` → `var(--paper-edge)`
+  - `--cta-primary: hsl(220 40% 21%)` (#1F2D4A) → `var(--dominant)` (#14213D); was v1 purple-navy, now correct ink blue
+  - `--cta-primary-hover: hsl(220 40% 14%)` → `var(--dominant-deep)` (#0B1729)
+  - `--rule-default: hsl(38 18% 88%)` (#E5E0D8 warm divider) → `var(--rule)` (rgba cool 8%)
+  - `--rule-strong: hsl(38 15% 78%)` **removed** — duplicate that was silently overriding the v2 canonical `rgba(15, 20, 25, 0.16)` defined above it
+
+**Auto-resolved by this change (components reading via bridge now get correct values):**
+- Any component using `var(--bg-canvas)` directly: cream → paper white (affects RevealOnScroll, HeroSection via `ED.bg = 'var(--bg-canvas)'` in lib/motion.ts)
+- Any component using `var(--text-primary)` directly: warm near-black → v2 ink
+- Any component using `var(--cta-primary)` directly: v1 purple-navy → v2 dominant (fixes Known issue #1: CTA hue)
+- `.pricing-popular-card` border in globals.css: auto-resolves via `var(--cta-primary)` chain
+- `.ed-field:focus-visible { border-color: var(--cta-primary) }`: auto-resolves
+- `D-002` (PersonaMatch sage icons): `var(--accent-primary)` now resolves to vermillion — visual change from sage to vermillion icons on `/`
+- `--rule-strong` in light mode now correctly resolves to `rgba(15, 20, 25, 0.16)` (was overridden by warm gray)
+
+**Deferred to next dispatch (out of A-007 scope):**
+- A-013: `.ed-cta-warm-hover:hover { background-color: var(--lm-warm-peach-deep) }` — light-mode utility class, not `:root` block
+- A-016: `.prose-legal th { background-color: rgba(0, 0, 0, 0.02) }` — utility class, not `:root` block
+- `.ed-field:focus-visible { box-shadow: 0 0 0 3px rgba(31, 45, 74, 0.18) }` — hardcoded v1 navy shadow in utility class, not `:root` block
+- `--lm-warm-peach: #FFD8C2`, `--lm-warm-peach-deep: #E0A890` — `--lm-*` bridge preserved intact per brief
+- Neutral scale `--neutral-50` through `--neutral-950` (warm HSL) — no v2 DESIGN.md equivalent defined; left for M-RENAME
+- All Category A component-level hardcoded hex (A-001 through A-006, A-008 through A-011) — component dispatch
+
+**Stale-hex check post-fix:** `Select-String -Path app\globals.css -Pattern '#FAF7F0|#F5EFE0|...'` → 0 matches ✓
+
+**Manual smoke (per revised verification protocol):** `/ecrit`, `/progres` backgrounds are now paper white not cream when light mode; dark mode night-paper unaffected (`.dark` override already correct since t10).
+
+---
+
 End of BACKLOG.md.

@@ -29,28 +29,28 @@
      ────────────────────────────────────────────────────────────────────── */
 
   /* Surfaces */
-  --bg-canvas:       hsl(38 25% 96%);   /* #F8F4ED warm cream */
-  --bg-elevated:     hsl(0  0% 100%);   /* #FFFFFF cards */
-  --bg-subtle:       hsl(38 18% 92%);   /* #ECE7DE muted band */
+  --bg-canvas:       var(--paper);
+  --bg-elevated:     var(--paper);
+  --bg-subtle:       var(--paper-edge);
 
   /* Text */
-  --text-primary:    hsl(30 18% 14%);   /* #2A2520 warm near-black */
-  --text-secondary:  hsl(30 10% 28%);   /* #4A4540 */
-  --text-muted:      hsl(30  5% 42%);   /* #6F6B66 — AA on canvas (4.7:1) */
-  --text-disabled:   hsl(30  5% 60%);   /* #9F9C97 */
+  --text-primary:    var(--ink);
+  --text-secondary:  var(--ink-soft);
+  --text-muted:      var(--ink-faint);
+  --text-disabled:   var(--ink-faint);
 
-  /* Accent — sage (decoration only; see two-greens rule above) */
-  --accent-primary:        hsl(80 18% 58%);   /* #8FA279 */
-  --accent-primary-hover:  hsl(80 18% 48%);   /* #7A8C66 — icon/large-text hover only */
-  --accent-primary-soft:   hsl(80 22% 88%);   /* #E8EDDE — bg fills, paired with dark text */
+  /* Accent — v1 sage retired; no v2 analog, maps to vermillion (DESIGN.md §2) */
+  --accent-primary:        var(--accent);
+  --accent-primary-hover:  var(--accent-soft);
+  --accent-primary-soft:   var(--paper-edge);
 
-  /* CTA — editorial navy (primary action color) */
-  --cta-primary:        hsl(220 40% 21%);  /* #1F2D4A */
-  --cta-primary-hover:  hsl(220 40% 14%);  /* darker on hover */
+  /* CTA */
+  --cta-primary:        var(--dominant);
+  --cta-primary-hover:  var(--dominant-deep);
 
   /* Rules / borders */
-  --rule-default:    hsl(38 18% 88%);   /* #E5E0D8 warm divider */
-  --rule-strong:     hsl(38 15% 78%);
+  --rule-default:    var(--rule);
+  /* --rule-strong duplicate removed — v2 canonical defined above was being overridden */
 
   /* Status (semantic; distinct from --accent-primary per two-greens rule) */
   --success:  hsl(140 30% 38%);   /* #44794F state-signal sage */
