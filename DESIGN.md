@@ -54,6 +54,10 @@ Cool, not warm. One dominant, one accent, paper white, and a near-black ink for 
 - `--accent` (vermillion) is reserved for emphasis, attention/bottleneck states, the master's accent line, and the wordmark animation. It is the single bold note — used sparingly so it stays loud.
 - Backgrounds: `--paper` (pure white) is the base. `--paper-tint` for raised cards/cells. The beige `#FAF7F0` from v1 is banned.
 
+**Couche colors (LOCKED).** Four couches render in `--dominant` (ink blue): Le Propos, Le Plan, La Construction, La Musique. **Les Pièges Anglais** — the differentiator — renders in `--accent` (vermillion). It is the only couche with a distinct color, spending the palette's single bold note where it matters most.
+
+Bottleneck/attention is communicated by the "Bottleneck" tag pill (with its breathing animation), NOT by recoloring a bar to vermillion. That color is reserved for Les Pièges Anglais's identity, so any couche can be flagged as a bottleneck via the tag with no color conflict.
+
 Dark mode tokens are not yet defined for Atelier Français (v1 dark values are obsolete). Open item — see §9.
 
 ---
@@ -163,7 +167,7 @@ The wordmark is **"LE MÉTHODIC"** and its animation is the brand's signature ge
 - `--paper-tint` background, `--r-lg`/`--r-xl` radius. Hover: rise 3px + soft shadow. No hard borders.
 
 **Progress / couche bars**
-- Track in faint ink; fill in `--dominant`. Attention/bottleneck states in `--accent` (vermillion). Fills animate width on scroll-into-view.
+- Track in faint ink. Fill in the couche's identity color: `--dominant` for four couches, `--accent` (vermillion) for Les Pièges Anglais. Bottleneck/attention shown via the "Bottleneck" tag pill, not by recoloring the fill. Fills animate width on scroll-into-view.
 
 **Editorial (lesson) elements**
 - Drop cap (Instrument Serif, vermillion) on opening paragraph.
@@ -187,9 +191,8 @@ The wordmark is **"LE MÉTHODIC"** and its animation is the brand's signature ge
 
 ## 9. Open items (decisions pending)
 
-1. **5-couche color system.** v1 assigned each couche a warm mustard hex (Le Propos #BC4F2A, etc.) — obsolete. Atelier Français demotes couches to semantic indicators rendered in `--dominant`, with attention/bottleneck in `--accent`. Les Pièges Anglais is the pedagogical/visual differentiator and may warrant a distinct treatment. **Decision needed:** do couches get individual accent colors in this palette, or stay unified under dominant/accent?
-2. **Dark mode.** v1 dark tokens (`#1A1612` etc.) are obsolete. Atelier Français dark-mode values are undefined. Dark mode is a v1 launch requirement, so this needs a palette before M2 fully closes.
-3. **Hero treatment.** "Bonjour, [name]." in Instrument Serif with a vermillion hand-drawn accent line under the name is locked as Hero A. Full hero/dashboard layout still iterating.
+1. **Dark mode.** v1 dark tokens (`#1A1612` etc.) are obsolete. Atelier Français dark-mode values are undefined. Dark mode is a v1 launch requirement, so this needs a palette before M2 fully closes.
+2. **Hero treatment.** "Bonjour, [name]." in Instrument Serif with a vermillion hand-drawn accent line under the name is locked as Hero A. Full hero/dashboard layout still iterating.
 
 ---
 
