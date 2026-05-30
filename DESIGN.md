@@ -58,7 +58,37 @@ Cool, not warm. One dominant, one accent, paper white, and a near-black ink for 
 
 Bottleneck/attention is communicated by the "Bottleneck" tag pill (with its breathing animation), NOT by recoloring a bar to vermillion. That color is reserved for Les Pièges Anglais's identity, so any couche can be flagged as a bottleneck via the tag with no color conflict.
 
-Dark mode tokens are not yet defined for Atelier Français (v1 dark values are obsolete). Open item — see §9.
+**Dark mode (LOCKED) — "night paper."** The dark background is a deep version of the ink blue, not a neutral charcoal, so dark mode still reads as Le Méthodic. Cool, not warm. The dominant shifts to a mid-blue so it stays visible against the dark background while white button text still passes contrast; hover lightens rather than darkens. Vermillion brightens slightly so it pops instead of going muddy.
+
+```css
+.dark {
+  /* Night paper — deep ink blue, cool */
+  --paper: #0E1626;
+  --paper-tint: #16203A;
+  --paper-edge: #1E2A47;
+
+  /* Cool off-white ink */
+  --ink: #E5E9F0;
+  --ink-soft: rgba(229, 233, 240, 0.64);
+  --ink-faint: rgba(229, 233, 240, 0.40);
+  --ink-trace: rgba(229, 233, 240, 0.18);
+
+  /* Rules / borders */
+  --rule: rgba(229, 233, 240, 0.10);
+  --rule-strong: rgba(229, 233, 240, 0.20);
+
+  /* Dominant — mid blue: visible on night paper, white text still passes contrast */
+  --dominant: #38598F;
+  --dominant-soft: #2E4A7A;
+  --dominant-deep: #4A6BA3;   /* hover LIGHTENS in dark mode */
+
+  /* Accent — vermillion brightened for dark backgrounds */
+  --accent: #E23A54;
+  --accent-soft: #F06B7E;
+}
+```
+
+Toggle via the `.dark` class on a wrapper (next-themes ThemeProvider is already wired). The codebase's legacy `--lm-*` dark tokens must be mapped to these values during migration (see §10).
 
 ---
 
@@ -145,6 +175,8 @@ The wordmark is **"LE MÉTHODIC"** and its animation is the brand's signature ge
 - Frame padding is parameterized per context via data attributes: `data-frame-pad-x`, `data-frame-pad-y`, `data-frame-margin`. Showcase uses generous padding; nav uses tight (`pad-x≈11`, `pad-y≈5`, `margin≈2`).
 - Frame SVG `stroke-width` ~1.4px, `stroke-linejoin: miter` for crisp corners.
 - The frame is enabled per-element via a `data-frame="1"` attribute on the wordmark; the typewriter is enabled via `data-typewriter`.
+- The wordmark element MUST set `white-space: nowrap`. The typewriter wraps each letter in an inline-block span, which can wrap to a second line in a constrained container; if it does, the frame measures a broken tall/narrow box.
+- The frame stroke, caret, and M-breath colors MUST read from theme tokens (`var(--ink)` for the frame, `var(--accent)` for caret and the M's color shift), not hardcoded hex, so they flip correctly between light and dark mode. Read the computed token values in JS at setup time.
 
 **Do not** attempt to anchor animated lines to the M's stroke positions — that approach (earlier iterations) is abandoned because per-glyph stroke alignment can't be made reliable across fonts/sizes/render engines. The frame is independent of the M.
 
@@ -191,8 +223,7 @@ The wordmark is **"LE MÉTHODIC"** and its animation is the brand's signature ge
 
 ## 9. Open items (decisions pending)
 
-1. **Dark mode.** v1 dark tokens (`#1A1612` etc.) are obsolete. Atelier Français dark-mode values are undefined. Dark mode is a v1 launch requirement, so this needs a palette before M2 fully closes.
-2. **Hero treatment.** "Bonjour, [name]." in Instrument Serif with a vermillion hand-drawn accent line under the name is locked as Hero A. Full hero/dashboard layout still iterating.
+1. **Hero treatment.** "Bonjour, [name]." in Instrument Serif with a vermillion hand-drawn accent line under the name is locked as Hero A. Full hero/dashboard layout still iterating.
 
 ---
 
