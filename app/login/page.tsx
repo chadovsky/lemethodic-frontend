@@ -12,6 +12,7 @@ import {
   CTA_DISABLED,
   DISPLAY_FONT,
 } from '@/components/onboarding/OnboardingScreen'
+import Wordmark from '@/components/Wordmark'
 
 // F-206 — bg migrated to editorial system. Inner card chrome left in
 // place for v1 (matches signup pattern; full editorial pass is F-206.deep).
@@ -130,19 +131,9 @@ export default function LoginPage() {
         }}
       >
         {/* Brand mark */}
-        <p
-          style={{
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 700,
-            fontSize: 13,
-            color: INK_MUTED,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            marginBottom: 24,
-          }}
-        >
-          Le Méthodic
-        </p>
+        <div style={{ marginBottom: 24 }}>
+          <Wordmark size="nav" />
+        </div>
 
         {/* Heading */}
         <h1

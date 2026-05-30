@@ -19,6 +19,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { api, ApiError } from '@/lib/api'
 import { resolveHcaptchaSitekey } from '@/lib/hcaptcha'
+import Wordmark from '@/components/Wordmark'
 
 const HCaptcha = dynamic(() => import('@hcaptcha/react-hcaptcha'), {
   ssr: false,
@@ -47,19 +48,9 @@ function PasswordResetInner() {
           padding: 'clamp(32px, 4vw, 48px) clamp(28px, 3vw, 40px)',
         }}
       >
-        <p
-          style={{
-            fontFamily: SANS,
-            fontWeight: 600,
-            fontSize: 12,
-            color: 'var(--lm-text-tertiary)',
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            marginBottom: 24,
-          }}
-        >
-          Le Méthodic
-        </p>
+        <div style={{ marginBottom: 24 }}>
+          <Wordmark size="nav" />
+        </div>
 
         {token ? <ConfirmForm token={token} /> : <RequestForm />}
       </div>

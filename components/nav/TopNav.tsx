@@ -14,6 +14,7 @@ import { useOnboardingStore } from '@/lib/onboarding'
 import { useSubmitResponseStore } from '@/lib/submitResponse'
 import { useInterfaceLanguage, type InterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import Wordmark from '@/components/Wordmark'
 
 const ED_BG = 'var(--lm-bg-base)'
 const ED_FG = 'var(--lm-text-primary)'
@@ -184,20 +185,7 @@ export default function TopNav() {
         }}
       >
         {/* LEFT — wordmark */}
-        <Link
-          href="/la-methode"
-          style={{
-            fontFamily: SERIF,
-            fontStyle: 'italic',
-            fontWeight: 400,
-            fontSize: 24,
-            letterSpacing: '-0.01em',
-            color: ED_FG,
-            textDecoration: 'none',
-          }}
-        >
-          Le Méthodic
-        </Link>
+        <Wordmark size="nav" href="/la-methode" />
 
         {/* CENTER — nav links */}
         <ul

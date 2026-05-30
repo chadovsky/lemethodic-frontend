@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
+import { SANS_FONT } from '@/lib/typography'
 import SidebarLink from './SidebarLink'
+import Wordmark from '@/components/Wordmark'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Tableau de bord' },
@@ -78,17 +79,9 @@ export default function Sidebar({
           href="/dashboard"
           data-testid="sidebar-wordmark"
           onClick={onLinkClick}
-          style={{
-            fontFamily: SERIF_FONT,
-            fontStyle: 'italic',
-            fontWeight: 400,
-            fontSize: '1.125rem',
-            letterSpacing: '-0.01em',
-            color: 'var(--text-primary)',
-            textDecoration: 'none',
-          }}
+          style={{ textDecoration: 'none', display: 'inline-block' }}
         >
-          Le Méthodic
+          <Wordmark size="nav" />
         </Link>
       </div>
 

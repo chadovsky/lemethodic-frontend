@@ -21,6 +21,7 @@ import type {
 import ClusterHeader from './ClusterHeader'
 import LessonBody from './LessonBody'
 import PracticeCTA from './PracticeCTA'
+import Wordmark from '@/components/Wordmark'
 
 // F-204 — page chrome migrated to editorial system. Section components
 // (ClusterHeader / LessonBody / PracticeCTA) restyled in this same ticket
@@ -104,7 +105,7 @@ export default function ClusterDetailPage({ slug }: ClusterDetailPageProps) {
             }}
           >
             <ChevronLeft size={18} strokeWidth={2.25} />
-            <span>Le Méthodic</span>
+            <Wordmark size="nav" />
           </Link>
         </header>
 

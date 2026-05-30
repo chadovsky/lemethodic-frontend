@@ -17,6 +17,7 @@ import Link from 'next/link'
 import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 import { useInViewOnce } from '@/lib/motion'
 import type { ReactNode } from 'react'
+import Wordmark from '@/components/Wordmark'
 
 const ED_BG = 'var(--lm-bg-base)'
 const ED_PAPER = 'var(--lm-bg-surface)'
@@ -297,20 +298,7 @@ export default function EcoleIntro() {
           padding: 'var(--lm-safe-top) clamp(16px, 3vw, 32px) 0',
         }}
       >
-        <Link
-          href="/la-methode"
-          aria-label="La Méthode"
-          style={{
-            color: ED_FG,
-            textDecoration: 'none',
-            fontFamily: SANS,
-            fontWeight: 700,
-            fontSize: 15,
-            letterSpacing: '0',
-          }}
-        >
-          Le Méthodic
-        </Link>
+        <Wordmark size="nav" href="/la-methode" />
       </header>
 
       {/* ── Section 1 — Frame ─────────────────────────────────────── */}

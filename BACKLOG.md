@@ -4273,4 +4273,62 @@ Updated descriptions (1 restated, 5 shortened): "A clear position, developed arg
 
 **Verification:** `pnpm build` clean. Em-dash regression check on new copy strings: 0. Unit test `MethodologyPreview.test.tsx` compatible (data-testid="couche-name" still returns French names).
 
+---
+
+## M5 Wordmark: typewriter LE MÉTHODIC + caret + animated frame + breathing M ✅ Shipped
+
+**Status:** ✅ Shipped
+
+**Scope:** New `components/Wordmark.tsx` component + keyframes in `app/globals.css` + replacement of all 8 inline brand-mark rendering sites.
+
+### Component (`components/Wordmark.tsx`)
+
+Props:
+- `size?: 'nav' | 'showcase'` — nav: small static; showcase: large with full animation sequence
+- `animateReveal?: boolean` — showcase: IntersectionObserver triggers sequence; nav: false (default)
+- `href?: string` — wraps in Next.js Link when provided
+
+Animation layers (showcase + `animateReveal=true`):
+1. Typewriter — CSS `wordmark-letter-in` with 70ms stagger per character
+2. Caret appear + blink — CSS `wordmark-caret-appear` + `wordmark-caret-blink` after last letter
+3. Frame draw — WAAPI `stroke-dashoffset` on two SVG paths (800ms ease), starts after caret blink
+4. Breathing M — CSS `wordmark-m-breathe` (scale 1.0→1.06 + color var(--ink)→var(--accent), 3.6s loop) after frame
+
+Nav mode: frame immediately visible, caret blinking, M breathing — all static-state CSS.
+
+Text layer: "Le Méthodic" in mixed-case DOM with `textTransform: uppercase` CSS. Visual = "LE MÉTHODIC" in DM Mono (`var(--f-mono)`). DOM `textContent` preserves "Le Méthodic" for test and accessibility compat.
+
+Frame SVG: two paths from top-center — Path A (left side) + Path B (right side) — meeting at bottom-center. `stroke-width: 1.4`, `stroke-linejoin: miter`, `stroke="var(--ink)"`. Padding: nav (x:11, y:5), showcase (x:20, y:12). WAAPI handles runtime path length. Light/dark flips automatically via `var(--ink)`.
+
+Caret: `|` glyph, `color: var(--accent)` (vermillion #C8102E light / #E23A54 dark). Blinks 1s step-start cycle.
+
+Breathing M: wraps the `M` character specifically. Scale + color via CSS chain to `wordmark-m-breathe`.
+
+Reduced motion: `@media (prefers-reduced-motion: reduce)` strips all animations, shows final static state immediately.
+
+Accessibility: `aria-label="Le Méthodic"` on wrapper, `aria-hidden="true"` on SVG + caret, `data-testid="wordmark"`.
+
+### Replacements (8 sites)
+
+| File | Old | New |
+|---|---|---|
+| `components/landing/LandingHeader.tsx` | `{BRAND}` in `<span>` | `<Wordmark size="showcase" animateReveal />` |
+| `components/nav/TopNav.tsx` | italic SERIF Link | `<Wordmark size="nav" href="/la-methode" />` |
+| `components/layout/Sidebar.tsx` | italic SERIF inside Link | `<Wordmark size="nav" />` inside existing Link (preserves `data-testid="sidebar-wordmark"` + `onClick`) |
+| `app/login/page.tsx` | `<p>Le Méthodic</p>` | `<Wordmark size="nav" />` |
+| `app/verify-email/page.tsx` | `<p>Le Méthodic</p>` | `<Wordmark size="nav" />` |
+| `app/password-reset/page.tsx` | `<p>Le Méthodic</p>` | `<Wordmark size="nav" />` |
+| `components/ecole/intro/EcoleIntro.tsx` | italic text Link | `<Wordmark size="nav" href="/la-methode" />` |
+| `components/cluster/ClusterDetailPage.tsx` | `<span>Le Méthodic</span>` | `<Wordmark size="nav" />` (parent Link handles navigation) |
+
+Excluded (plaintext contexts): `Paywall.tsx` comparison table header, `LandingFooter.tsx` copyright, `Tache3Session.tsx` error message, all `<title>`/`metadata`/`manifest.json` strings.
+
+### Test compat
+
+`Sidebar.test.tsx` `toHaveTextContent('Le Méthodic')` passes: mixed-case DOM text "Le Méthodic" + caret "|" = "Le Méthodic|"; substring check finds "Le Méthodic". IntersectionObserver is no-op in jsdom (setup.ts stub), so `triggered` stays false, component renders static. `AppShell.test.tsx` click on `sidebar-wordmark` still works — parent Link wrapper preserved with `onClick={onLinkClick}`.
+
+Pre-existing test failure: `CouchesBreakdown.test.tsx > each couche badge has a data-cefr-token attribute` — confirmed failing before this commit (reproduces on 95df816 baseline). Not introduced by M5 Wordmark.
+
+**Verification:** `pnpm build` clean. Sidebar + AppShell tests pass. CouchesBreakdown failure pre-existing.
+
 End of BACKLOG.md.

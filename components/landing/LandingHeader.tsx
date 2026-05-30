@@ -3,8 +3,8 @@
 // bottom border on scroll (added later via sticky-shadow if needed).
 
 import LanguageToggle from './LanguageToggle'
-import { BRAND, type Lang } from './copy'
-import { ED, LETTER_SPACING, SANS_FONT } from '@/lib/typography'
+import type { Lang } from './copy'
+import Wordmark from '@/components/Wordmark'
 
 interface LandingHeaderProps {
   lang: Lang
@@ -20,17 +20,7 @@ export default function LandingHeader({ lang }: LandingHeaderProps) {
         margin: '0 auto',
       }}
     >
-      <span
-        style={{
-          fontFamily: SANS_FONT,
-          fontWeight: 600,
-          fontSize: '1.125rem',
-          color: ED.fg,
-          letterSpacing: LETTER_SPACING.heading,
-        }}
-      >
-        {BRAND}
-      </span>
+      <Wordmark size="showcase" animateReveal />
       <LanguageToggle currentLang={lang} />
     </header>
   )

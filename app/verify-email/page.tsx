@@ -13,6 +13,7 @@ import { Suspense, useCallback, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { api, ApiError } from '@/lib/api'
+import Wordmark from '@/components/Wordmark'
 
 const BG = 'var(--lm-bg-base)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
@@ -121,19 +122,9 @@ function VerifyEmailInner() {
           padding: 'clamp(32px, 4vw, 48px) clamp(28px, 3vw, 40px)',
         }}
       >
-        <p
-          style={{
-            fontFamily: SANS,
-            fontWeight: 600,
-            fontSize: 12,
-            color: 'var(--lm-text-tertiary)',
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            marginBottom: 24,
-          }}
-        >
-          Le Méthodic
-        </p>
+        <div style={{ marginBottom: 24 }}>
+          <Wordmark size="nav" />
+        </div>
 
         {isConfirmFlow ? (
           <ConfirmFlow state={confirmState} />
