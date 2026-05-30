@@ -3971,4 +3971,28 @@ TBD tickets below have ambiguous milestone assignments. One-line questions for C
 
 ---
 
+### M2 t10 — Wire Atelier Français color tokens (light + dark) + --lm-* bridge
+
+**Milestone:** M2 (token foundation)
+**Status:** ✅ Shipped — cf73e19 (main, 2026-05-30)
+**Non-visual change (no Playwright receipt required):** token-only edit; no new components or layout surfaces.
+
+**What shipped:**
+- DESIGN.md v2 canonical palette defined in `:root` (light) and `.dark` (night-paper): `--paper`, `--ink`, `--dominant`, `--accent` and their scale/alpha variants; couche tokens `--couche-default` / `--couche-pieges`; shape tokens `--r-xs` … `--r-pill`; motion `--ease` / `--ease-snap`.
+- `.dark` block fully replaced: v2 night-paper values per DESIGN.md §2 locked spec. `--foreground` and `--accent` flip automatically with the `.dark` class (wordmark-ready).
+- Shadcn rewire updated: `--background`, `--foreground`, `--primary`, `--accent`, `--border`, `--input`, `--ring` all chain through v2 canonical tokens.
+- `--lm-*` bridge: all tokens re-pointed to v2 canonical vars; no `--lm-*` token deleted (M-RENAME handles component-level migration).
+- Stale v1 hexes eliminated: `C49A3A / FAF7F0 / BC4F2A / A66A2E / 8E5A1F / E0701D / D4A431` — zero matches in globals.css.
+- v2 Tailwind utilities added to `@theme inline`: `--color-paper`, `--color-ink`, `--color-dominant`, `--color-couche-*`, etc.
+
+**⚠ M-RENAME flags (PR notes for Chadi):**
+- `--lm-brand-*` mapped to `--dominant-*` (v1 warm ochre had no v2 analog; nearest semantic = primary).
+- `--lm-bg-base` mapped to `var(--paper)` (v1 `#FAF7F0` warm cream banned in v2; components reading this now get pure white in light mode).
+- `--lm-warm-*` decorative tokens mapped to nearest paper/dominant/ink roles; `--lm-warm-sage-deep` was `var(--accent-primary)` (sage green), now `var(--dominant-soft)` (blue-grey). Component-level migration is M-RENAME.
+- Pastel chip tokens (`--lm-pastel-*`) retained at original hex — no v2 semantic role; they're decorative chip layer only per DESIGN.md §2 color hierarchy.
+
+**Blocks:** t1–t9 re-execution against v2 spec, M-RENAME routes.
+
+---
+
 End of BACKLOG.md.
