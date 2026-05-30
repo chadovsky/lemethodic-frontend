@@ -1,7 +1,7 @@
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 
 export const metadata = {
-  title: 'Compte — Le Méthodic',
+  title: 'Compte | Le Méthodic',
 }
 
 export default function AccountPage() {

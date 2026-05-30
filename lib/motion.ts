@@ -1,4 +1,4 @@
-// LeMethodic motion language.
+// Le Méthodic motion language.
 // All values sourced from LEMETHODIC-DESIGN.md §9 (Agent Prompt Guide → Motion).
 // Do not hand-edit values without updating the DESIGN.md decision log.
 //

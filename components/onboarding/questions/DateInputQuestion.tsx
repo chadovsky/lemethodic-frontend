@@ -183,11 +183,11 @@ export default function DateInputQuestion({
         >
           {weeksUntilExam === 0
             ? (language === 'fr'
-                ? "Votre examen est cette semaine — nous allons construire votre plan le plus ciblé."
-                : "Your exam is this week — we'll build your most focused plan.")
+                ? "Votre examen est cette semaine : nous allons construire votre plan le plus ciblé."
+                : "Your exam is this week: we'll build your most focused plan.")
             : (language === 'fr'
-                ? `${weeksUntilExam} semaine${weeksUntilExam !== 1 ? 's' : ''} jusqu'à votre examen — nous allons construire votre plan autour de ce calendrier.`
-                : `${weeksUntilExam} week${weeksUntilExam !== 1 ? 's' : ''} to your exam — we'll build your plan around this window.`)}
+                ? `${weeksUntilExam} semaine${weeksUntilExam !== 1 ? 's' : ''} jusqu'à votre examen : nous allons construire votre plan autour de ce calendrier.`
+                : `${weeksUntilExam} week${weeksUntilExam !== 1 ? 's' : ''} to your exam. We'll build your plan around this window.`)}
         </p>
       )}
 

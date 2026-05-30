@@ -1,4 +1,4 @@
-// LeMethodic API client. Typed fetch wrapper over the tcf-oral-tool FastAPI
+// Le Méthodic API client. Typed fetch wrapper over the tcf-oral-tool FastAPI
 // backend. All methods return Promise<T>; non-2xx responses throw ApiError.
 //
 // Token source: localStorage key "lemethodic_token" (written by lib/auth.ts).

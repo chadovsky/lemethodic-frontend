@@ -58,7 +58,7 @@ function PasswordResetInner() {
             marginBottom: 24,
           }}
         >
-          LeMethodic
+          Le Méthodic
         </p>
 
         {token ? <ConfirmForm token={token} /> : <RequestForm />}

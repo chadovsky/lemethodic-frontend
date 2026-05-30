@@ -6,9 +6,9 @@ import PlatformLanding from '@/components/landing/PlatformLanding'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'LeMethodic | Plateforme de français pour anglophones',
+  title: 'Le Méthodic | Plateforme de français pour anglophones',
   description:
-    'La méthode, les examens, les livres — pensés pour les anglophones. Parcours basé sur diagnostic pour le TCF · TEF · DELF · DALF, plus une bibliothèque croissante de livres de méthode et ressources gratuites.',
+    'La méthode, les examens, les livres, pensés pour les anglophones. Parcours basé sur diagnostic pour le TCF · TEF · DELF · DALF, plus une bibliothèque croissante de livres de méthode et ressources gratuites.',
   alternates: {
     canonical: '/fr',
     languages: {

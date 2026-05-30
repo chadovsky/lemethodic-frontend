@@ -2,7 +2,7 @@
 
 // F-200 — Problem. Text-led, no card chrome. Generous line-height, narrow
 // column for editorial reading rhythm. Last paragraph emphasized via
-// fg-not-muted color to land the conclusion ("That's what LeMethodic does.").
+// fg-not-muted color to land the conclusion ("That's what Le Méthodic does.").
 
 import type { Lang } from '../copy'
 import { PROBLEM } from '../copy'

@@ -64,13 +64,13 @@ export default function LessonList() {
       <Section
         id="fondations"
         title="Fondations"
-        eyebrow="Leçons 1 — 16"
+        eyebrow="Leçons 1–16"
         lessons={fondations}
       />
       <Section
         id="approfondissement"
         title="Approfondissement"
-        eyebrow="Leçons 17 — 27"
+        eyebrow="Leçons 17–27"
         lessons={approfondissement}
       />
     </div>

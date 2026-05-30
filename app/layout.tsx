@@ -56,8 +56,8 @@ const dmMono = DM_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'LeMethodic',
-  description: 'Learn French with LeMethodic',
+  title: 'Le Méthodic',
+  description: 'Method-based oral exam prep for anglophone French exam candidates pursuing Quebec PR.',
   generator: 'v0.app',
   manifest: '/manifest.json',
   openGraph: {

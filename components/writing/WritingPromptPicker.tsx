@@ -29,7 +29,7 @@ type TacheFilter = 'all' | '1' | '2' | '3'
 const COPY = {
   en: {
     pageTitle: 'Writing',
-    pageSubtitle: 'Practice prompts with Claude analysis on the 4 couches.',
+    pageSubtitle: 'Practice prompts with Claude analysis on the 5 couches.',
     tacheAll: 'All tasks',
     tache1: 'Tâche 1',
     tache2: 'Tâche 2',
@@ -45,7 +45,7 @@ const COPY = {
   },
   fr: {
     pageTitle: 'Production écrite',
-    pageSubtitle: 'Sujets de pratique avec analyse Claude sur les 4 couches.',
+    pageSubtitle: 'Sujets de pratique avec analyse Claude sur les 5 couches.',
     tacheAll: 'Toutes les tâches',
     tache1: 'Tâche 1',
     tache2: 'Tâche 2',

@@ -16,7 +16,7 @@ const TIERS: Tier[] = [
     name: 'À la carte',
     price: '$9–19',
     priceNote: 'per session',
-    description: 'Individual oral mock sessions or module packs. No subscription — buy what you need.',
+    description: 'Individual oral mock sessions or module packs. No subscription. Buy what you need.',
     slug: 'a-la-carte',
     popular: false,
   },

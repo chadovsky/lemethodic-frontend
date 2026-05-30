@@ -52,7 +52,7 @@ export default function Hero() {
               marginBottom: 'clamp(32px, 4vw, 48px)',
             }}
           >
-            The only TCF Canada prep built on the 5-Couche method — for anglophone candidates racing the clock.
+            The only TCF Canada prep built on the 5-Couche method, for anglophone candidates racing the clock.
           </p>
 
           <div data-testid="hero-cta-wrapper" className="ed-hero-rise ed-hero-rise-delay-3">

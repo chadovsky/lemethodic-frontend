@@ -3387,6 +3387,70 @@ Edge cases handled:
 - CONFIDENCE: HIGH. Single-function fix in `lib/api.ts`, helper already shipped in F-310.fe, validated by tsc --noEmit + `pnpm build` (no warnings, no type errors, 36 routes compiled clean).
 - WHY: Documented out-of-scope flag during F-310.fe; small, well-bounded, doesn't gate anything else.
 - UNCERTAINTY: `window.location.assign` is a hard navigation. A 403 hitting a writing async-job poll or conversation upload mid-action tears down in-flight UI state. Acceptable per ticket. `?next=` does NOT persist across the BE-built email-link cross-tab round-trip (no localStorage shim — kept the change scoped); cross-tab degrades cleanly to `/login`. Forward-compat if BE ever embeds `next` in the verification email URL.
+
+---
+
+## M-VISUAL Cat E: copy sweep — em-dashes, brand mark, nav i18n, couche count, legacy names ✅ Shipped
+
+**Status:** ✅ Shipped
+
+**Scope:** Pure copy pass. Zero token edits, zero component restructuring, zero route changes.
+
+### E-001 — Brand mark "LeMethodic" → "Le Méthodic"
+
+`replace_all` on all `.tsx/.ts/.json` files. Files changed:
+`components/landing/copy.ts` (BRAND constant + 12 inline occurrences), `app/layout.tsx`, `components/nav/TopNav.tsx`, `app/login/page.tsx` (×2), `app/verify-email/page.tsx`, `app/password-reset/page.tsx`, `components/ecole/intro/EcoleIntro.tsx`, `components/cluster/ClusterDetailPage.tsx`, `components/speaking/Tache3Session.tsx`, `components/Paywall.tsx`, `components/landing/LandingFooter.tsx` (×2 in copyright line), `app/fr/page.tsx`, `app/terms/page.tsx`, `app/privacy/page.tsx`, `app/refund/page.tsx`, `app/library/page.tsx`, `app/fr/library/page.tsx`, `public/manifest.json` (short_name), `lib/api.ts` (header comment), `lib/motion.ts` (header comment), `lib/storage-keys.ts` (header comment), `lib/types.ts` (header comment), `components/landing/PlatformLanding.tsx` (comment), `components/landing/sections/ProblemSection.tsx` (comment).
+
+`app/layout.tsx` root description updated per E-010: `'Learn French with LeMethodic'` → `'Method-based oral exam prep for anglophone French exam candidates pursuing Quebec PR.'`
+
+### E-002 — Em-dash purge (` — ` → `, ` / `: ` / `. ` / `|`)
+
+Page title separators (`—` → `|`):
+`app/(app)/dashboard/page.tsx`, `app/(app)/account/page.tsx`, `app/(app)/l-examen/page.tsx`, `app/(app)/l-examen/results/page.tsx`, `app/(app)/l-examen/tache/[n]/page.tsx`, `app/(app)/la-methode/page.tsx`, `app/(app)/la-methode/[id]/page.tsx`, `app/(app)/la-bibliotheque/page.tsx`, `app/(app)/la-bibliotheque/test/page.tsx`, `app/(app)/la-bibliotheque/practice/page.tsx`.
+
+Hero subheadline (`Hero.tsx`): `"5-Couche method — for anglophone candidates..."` → `"5-Couche method, for anglophone candidates..."`.
+
+`app/fr/page.tsx` description: `"les livres — pensés pour"` → `"les livres, pensés pour"`.
+
+In-product copy (comma or colon per context):
+`LessonList.tsx`: range notation `Leçons 1 — 16` → `Leçons 1–16` (en-dash for numeric range).
+`LessonDetail.tsx` (×4), `SpeakingDesktop.tsx` (×2), `EcoleReveal.tsx` (×2), `PersonaMatch.tsx` (×3), `MethodologyPreview.tsx` (×1), `PlatformLanding.tsx` (×2), `DateInputQuestion.tsx` (×3), `PricingTeaser.tsx` (×1), `verify-email/page.tsx` (×1).
+
+Kept as-is (not text separators): `'—'` placeholder dashes in `SnapshotSection.tsx`, `EcoleReveal.tsx`, `WritingSubmissionClient.tsx`, `Tache1Session.tsx`, `Tache2Session.tsx` — null-value indicators, not punctuation.
+
+### E-003 — BottomNav labels French canonical
+
+`components/home/BottomNav.tsx`: `Speaking` → `Oral`, `Writing` → `Écrit`, `Progress` → `Progrès`.
+
+### E-004 — TopNav EN nav French canonical
+
+`components/nav/TopNav.tsx` COPY.en.nav: `speaking: 'Speaking'` → `'Oral'`, `writing: 'Writing'` → `'Écrit'`, `progress: 'Progress'` → `'Progrès'`.
+
+**Locale decision:** TopNav uses `useInterfaceLanguage()` (already i18n-capable). EN nav now mirrors FR nav per DESIGN.md §8 "French is the primary product language." Nav names are product brand signals, not translatable UI chrome.
+
+### E-005 — "4 couches" / "4-couche" → "5"
+
+`components/writing/WritingPromptPicker.tsx` (EN + FR pageSubtitle), `components/speaking/Tache1Session.tsx`, `components/speaking/Tache2Session.tsx`.
+
+### E-009 — BottomNav Méthode href `/` → `/la-methode`
+
+`components/home/BottomNav.tsx` TABS[0]: `href: '/'` → `href: '/la-methode'`. Prevents authenticated users landing on the public marketing page when tapping the Méthode tab.
+
+### E-010 — Root metadata description updated (covered under E-001)
+
+### E-013 — Sidebar sign-out hardcoded English → French
+
+`components/layout/Sidebar.tsx`: `Sign out` → `Se déconnecter`.
+
+### Deferred to next dispatch
+
+- **E-006** — Italic on display headings: `fontStyle: 'italic'` on hero H1, section headings, wordmarks. Blocked by A-008 (font family migration from Source Serif 4 → Instrument Serif). Removing italic without fixing the font family is a half-measure. Deferred to A-008 dispatch.
+- **E-007** — Footer wordmark Cabinet Grotesk: blocked by A-009 (font migration). Deferred.
+- **E-008** — MethodologySection.tsx comment documents violation: blocked by A-008. Deferred.
+- **E-011** — Legacy product names in code comments/tests (`L'École`, `Le Vocabulaire`, `Le Diagnostic`): non-user-facing. Deferred to M-RENAME dispatch.
+- `manifest.json` `theme_color`/`background_color` `#F8F4ED` (v1 warm cream): color value, not copy. Deferred to A-007 follow-up.
+
+**Verification:** `pnpm build` clean. `grep LeMethodic **/*.{tsx,ts,json}` → 0 matches in user-facing files. Em-dash user-facing strings: 0.
 - VERIFICATION RUNBOOK (Chadi):
   1. Sign up a fresh test account on `lemethodic.com/signup`. Capture the access token in DevTools localStorage (`lemethodic_token`).
   2. **Do NOT verify the email.** Close the tab.

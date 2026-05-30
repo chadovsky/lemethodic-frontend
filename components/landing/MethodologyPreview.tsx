@@ -31,7 +31,7 @@ const COUCHES = [
   {
     name: "Les Pièges Anglais",
     description:
-      "A targeted inventory of anglophone interference patterns — the syntax, register, and reflex traps that cost English speakers points.",
+      "A targeted inventory of anglophone interference patterns: the syntax, register, and reflex traps that cost English speakers points.",
     backgroundColor: 'var(--paper-edge)',
     accentColor: 'var(--lm-pastel-lavender)',
     nameColor: 'var(--accent)',

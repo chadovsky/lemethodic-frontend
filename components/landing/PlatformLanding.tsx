@@ -1,6 +1,6 @@
 'use client'
 
-// F-300a — platform-level landing for / and /fr. Reframes LeMethodic
+// F-300a — platform-level landing for / and /fr. Reframes Le Méthodic
 // from "TCF speaking exam prep" to "French learning platform" with
 // three product surfaces:
 //   - Exam Prep (featured) → /exam-prep
@@ -34,7 +34,7 @@ const PLATFORM_COPY = {
   en: {
     hero: {
       h1: 'Stop translating. Start producing French.',
-      sub: 'The method, the exams, the books — built for English speakers.',
+      sub: 'The method, the exams, the books, built for English speakers.',
       kickerSub: 'Built for the exams that change visa outcomes.',
       ctaPrimary: 'Start free diagnostic',
       ctaSecondary: 'Browse the library',
@@ -80,7 +80,7 @@ const PLATFORM_COPY = {
   fr: {
     hero: {
       h1: 'Arrêtez de traduire. Commencez à produire en français.',
-      sub: 'La méthode, les examens, les livres — pensés pour les anglophones.',
+      sub: 'La méthode, les examens, les livres, pensés pour les anglophones.',
       kickerSub: 'Conçu pour les examens qui changent les résultats de visa.',
       ctaPrimary: 'Commencer le diagnostic gratuit',
       ctaSecondary: 'Parcourir la bibliothèque',

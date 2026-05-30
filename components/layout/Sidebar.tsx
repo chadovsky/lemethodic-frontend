@@ -127,7 +127,7 @@ export default function Sidebar({
               borderRadius: 4,
             }}
           >
-            Sign out
+            Se déconnecter
           </button>
         </div>
       )}

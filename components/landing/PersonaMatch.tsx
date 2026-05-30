@@ -15,17 +15,17 @@ const COLUMNS: Column[] = [
   {
     Icon: ExamSpecificIcon,
     heading: 'TCF Canada-specific',
-    body: 'Built around the TCF Canada speaking tasks — not generic French exam prep that misses what Quebec immigration actually tests.',
+    body: 'Built around the TCF Canada speaking tasks, not generic French exam prep that misses what Quebec immigration actually tests.',
   },
   {
     Icon: EnglishSpeakersIcon,
     heading: 'Built for English speakers',
-    body: 'The 5-couche method surfaces Les Pièges Anglais — the layer that catches the interference patterns native English speakers hit at B1.',
+    body: 'The 5-couche method surfaces Les Pièges Anglais, the layer that catches the interference patterns native English speakers hit at B1.',
   },
   {
     Icon: MethodBasedIcon,
     heading: 'Method, not memorization',
-    body: 'Structured oral production frameworks you can deploy under exam pressure — not vocabulary lists you forget overnight.',
+    body: 'Structured oral production frameworks you can deploy under exam pressure, not vocabulary lists you forget overnight.',
   },
 ]
 

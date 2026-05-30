@@ -17,10 +17,10 @@ interface Tab {
 }
 
 const TABS: Tab[] = [
-  { href: '/',          label: 'Méthode', Icon: Home         },
-  { href: '/speaking',  label: 'Speaking',  Icon: Mic          },
-  { href: '/writing',   label: 'Writing',   Icon: PenLine      },
-  { href: '/progress',  label: 'Progress',  Icon: BarChart2    },
+  { href: '/la-methode', label: 'Méthode', Icon: Home         },
+  { href: '/speaking',  label: 'Oral',     Icon: Mic          },
+  { href: '/writing',   label: 'Écrit',    Icon: PenLine      },
+  { href: '/progress',  label: 'Progrès',  Icon: BarChart2    },
   { href: '/more',      label: 'More',      Icon: MoreHorizontal },
 ]
 

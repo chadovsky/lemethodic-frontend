@@ -522,7 +522,7 @@ export default function Tache3Session({ topicSlug }: Tache3SessionProps) {
                 }}
               >
                 {errorIsPermission
-                  ? "LeMethodic needs your microphone to record practice sessions. Click the camera/lock icon in your browser's address bar and allow microphone access, then try again."
+                  ? "Le Méthodic needs your microphone to record practice sessions. Click the camera/lock icon in your browser's address bar and allow microphone access, then try again."
                   : uploadError || recorder.error || 'Please try again.'}
               </p>
 

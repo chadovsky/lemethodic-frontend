@@ -132,7 +132,7 @@ function VerifyEmailInner() {
             marginBottom: 24,
           }}
         >
-          LeMethodic
+          Le Méthodic
         </p>
 
         {isConfirmFlow ? (
@@ -272,7 +272,7 @@ function EmptyState({ resendState, resendError, onResend }: EmptyStateProps) {
         {resendState === 'sending'
           ? 'Sending…'
           : resendState === 'sent'
-            ? 'Sent — check your inbox'
+            ? 'Sent. Check your inbox'
             : 'Resend verification email'}
       </button>
       {resendState === 'error' && resendError && (

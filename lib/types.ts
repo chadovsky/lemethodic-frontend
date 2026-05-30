@@ -1,4 +1,4 @@
-// Shared types for the LeMethodic frontend. Where the backend (tcf-oral-tool
+// Shared types for the Le Méthodic frontend. Where the backend (tcf-oral-tool
 // FastAPI) exposes a richer shape than the UI needs, this file keeps the
 // frontend-facing view; the mapper lives in lib/api.ts.
 

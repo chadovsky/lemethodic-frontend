@@ -4,7 +4,7 @@ import LibraryStub from '@/components/library/LibraryStub'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Bibliothèque | LeMethodic',
+  title: 'Bibliothèque | Le Méthodic',
   description:
     "Livres de méthode, PDF de préparation aux examens, ressources gratuites pour anglophones apprenant le français. Catalogue à venir bientôt.",
   alternates: {

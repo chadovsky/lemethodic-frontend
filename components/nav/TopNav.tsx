@@ -56,7 +56,7 @@ function shouldHideOn(pathname: string): boolean {
 
 const COPY = {
   en: {
-    nav: { ecole: 'Méthode', speaking: 'Speaking', writing: 'Writing', progress: 'Progress' },
+    nav: { ecole: 'Méthode', speaking: 'Oral', writing: 'Écrit', progress: 'Progrès' },
     menu: {
       profile: 'Profile',
       settings: 'Settings',
@@ -196,7 +196,7 @@ export default function TopNav() {
             textDecoration: 'none',
           }}
         >
-          LeMethodic
+          Le Méthodic
         </Link>
 
         {/* CENTER — nav links */}

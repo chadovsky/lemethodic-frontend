@@ -141,7 +141,7 @@ export default function LoginPage() {
             marginBottom: 24,
           }}
         >
-          LeMethodic
+          Le Méthodic
         </p>
 
         {/* Heading */}
@@ -336,7 +336,7 @@ export default function LoginPage() {
           textAlign: 'center',
         }}
       >
-        New to LeMethodic?{' '}
+        New to Le Méthodic?{' '}
         <Link
           href="/onboarding"
           style={{

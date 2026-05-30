@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import LessonDetailContainer from '@/components/ecole/LessonDetailContainer'
 
 export const metadata = {
-  title: 'Leçon — Le Méthodic',
+  title: 'Leçon | Le Méthodic',
 }
 
 type Params = Promise<{ id: string }>

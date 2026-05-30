@@ -1,4 +1,4 @@
-// LeMethodic localStorage key constants
+// Le Méthodic localStorage key constants
 // Centralized to prevent drift between lib/api.ts and lib/auth.ts
 
 export const TOKEN_KEY = 'lemethodic_token'

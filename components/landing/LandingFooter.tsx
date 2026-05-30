@@ -21,7 +21,7 @@ const COPY = {
     privacy: 'Privacy',
     terms: 'Terms',
     refund: 'Refund',
-    rights: '© 2026 LeMethodic',
+    rights: '© 2026 Le Méthodic',
   },
   fr: {
     examPrep: 'Préparation aux examens',
@@ -29,7 +29,7 @@ const COPY = {
     privacy: 'Confidentialité',
     terms: 'Conditions',
     refund: 'Remboursement',
-    rights: '© 2026 LeMethodic',
+    rights: '© 2026 Le Méthodic',
   },
 } as const satisfies Record<Lang, unknown>
 

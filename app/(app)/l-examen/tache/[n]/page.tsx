@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Params }) {
   const { n } = await params
   const tache = await fetchTache(Number(n))
   if (!tache) return { title: 'Not Found' }
-  return { title: `${tache.title} — Le Méthodic` }
+  return { title: `${tache.title} | Le Méthodic` }
 }
 
 export default async function TachePage({ params }: { params: Params }) {

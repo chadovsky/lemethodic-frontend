@@ -112,7 +112,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
         title="Introduction"
         paragraphs={[
           "Dans cette leçon, vous découvrirez les mécanismes qui permettent de prendre la parole avec fluidité. L'objectif est de poser un cadre clair et de comprendre l'intention avant de pratiquer.",
-          "Prenez le temps de lire attentivement — la compréhension précède l'imitation, et une idée bien ancrée produit des réflexes durables.",
+          "Prenez le temps de lire attentivement : la compréhension précède l'imitation, et une idée bien ancrée produit des réflexes durables.",
         ]}
       />
 
@@ -120,7 +120,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
         id="methode"
         title="Méthode"
         paragraphs={[
-          "La méthode met en lumière les points d'attention concrets : quoi observer à l'écoute, quoi reproduire à la pratique, et quels pièges éviter. Aucun jargon technique — on décrit ce que fait la langue.",
+          "La méthode met en lumière les points d'attention concrets : quoi observer à l'écoute, quoi reproduire à la pratique, et quels pièges éviter. Aucun jargon technique : on décrit ce que fait la langue.",
           "Lisez d'abord, écoutez ensuite. L'ordre compte : la compréhension intellectuelle prépare l'oreille, et l'oreille guide la production.",
         ]}
       />
@@ -129,12 +129,12 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
         id="pratique"
         title="Pratique"
         paragraphs={[
-          "Essayez à voix haute, sans relire la leçon. Notez les hésitations — elles indiquent précisément où le réflexe n'est pas encore automatique.",
+          "Essayez à voix haute, sans relire la leçon. Notez les hésitations : elles indiquent précisément où le réflexe n'est pas encore automatique.",
           "Répétez l'exercice à intervalles espacés : le lendemain, puis trois jours plus tard. La répétition espacée consolide ce que la pratique initiale a installé.",
         ]}
         prompts={[
           "Reformulez l'idée de la leçon en une phrase, sans utiliser les mots du texte.",
-          'Donnez un exemple personnel qui illustre le point central — vingt secondes maximum.',
+          'Donnez un exemple personnel qui illustre le point central, vingt secondes maximum.',
           "Anticipez une question d'examinateur sur ce point et préparez une réponse en trois temps : position, raison, exemple.",
         ]}
       />

@@ -1070,7 +1070,7 @@ function FinalizingOverlay() {
         Analyzing your interview…
       </p>
       <p style={{ fontWeight: 500, fontSize: 13, color: INK_MUTED, margin: 0, textAlign: 'center', maxWidth: 300 }}>
-        Running the 4-couche analysis across all {TARGET_USER_TURNS} of your turns.
+        Running the 5-couche analysis across all {TARGET_USER_TURNS} of your turns.
       </p>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>

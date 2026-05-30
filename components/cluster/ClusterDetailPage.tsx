@@ -104,7 +104,7 @@ export default function ClusterDetailPage({ slug }: ClusterDetailPageProps) {
             }}
           >
             <ChevronLeft size={18} strokeWidth={2.25} />
-            <span>LeMethodic</span>
+            <span>Le Méthodic</span>
           </Link>
         </header>
 

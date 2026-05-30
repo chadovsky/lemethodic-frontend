@@ -59,7 +59,7 @@ const COPY = {
           'You speak first, then the examiner asks 2–4 questions. Total speaking time: 5–8 minutes.',
         tipsLabel: 'Tips',
         tips: [
-          'Speak in full sentences — short answers signal a low CEFR band.',
+          'Speak in full sentences: short answers signal a low CEFR band.',
           "Don't switch to English when stuck. Reformulate in French.",
           'Use connectors (parce que, donc, alors) to extend turns.',
         ],
@@ -74,7 +74,7 @@ const COPY = {
           'Pick a scenario, ask 8–12 questions to gather information. Hold-to-talk recording per turn.',
         tipsLabel: 'Tips',
         tips: [
-          "Use formal vous register — informal tu in a service exchange marks down.",
+          "Use formal vous register: informal tu in a service exchange marks down.",
           'Lead with a polite framer ("Bonjour, je voudrais…") on your first turn.',
           'Ask follow-up questions instead of accepting the first answer.',
         ],

@@ -309,7 +309,7 @@ export default function EcoleIntro() {
             letterSpacing: '0',
           }}
         >
-          LeMethodic
+          Le Méthodic
         </Link>
       </header>
 

@@ -72,8 +72,8 @@ const PERSONA_DESCRIPTORS: Record<Persona, { en: string; fr: string }> = {
     fr: 'Suffisamment de temps pour construire solidement.',
   },
   acceleration: {
-    en: 'A focused run — enough weeks to prepare well.',
-    fr: 'Un sprint ciblé — suffisamment de semaines pour bien préparer.',
+    en: 'A focused run, enough weeks to prepare well.',
+    fr: 'Un sprint ciblé, suffisamment de semaines pour bien préparer.',
   },
   cram: {
     en: 'A tight timeline. Every session is targeted.',
