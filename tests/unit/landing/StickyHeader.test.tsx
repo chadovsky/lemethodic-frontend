@@ -19,7 +19,7 @@ import StickyHeader from '@/components/layout/StickyHeader'
 describe('StickyHeader', () => {
   it('renders the logo', () => {
     render(<StickyHeader />)
-    expect(screen.getByTestId('header-logo')).toBeInTheDocument()
+    expect(screen.getByTestId('wordmark')).toBeInTheDocument()
   })
 
   it('Sign in link points to /login', () => {

@@ -4,7 +4,8 @@ import { useState, useRef, useEffect, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
+import { SANS_FONT } from '@/lib/typography'
+import Wordmark from '@/components/Wordmark'
 import FormField from './FormField'
 import PasswordStrength from './PasswordStrength'
 import { api, ApiError } from '@/lib/api'
@@ -105,20 +106,9 @@ export default function SignupForm({ tier }: SignupFormProps) {
         }}
       >
         {/* Wordmark */}
-        <p
-          style={{
-            fontFamily: SERIF_FONT,
-            fontStyle: 'italic',
-            fontWeight: 400,
-            fontSize: '1.125rem',
-            letterSpacing: '-0.01em',
-            color: 'var(--text-primary)',
-            margin: 0,
-            marginBottom: 24,
-          }}
-        >
-          Le Méthodic
-        </p>
+        <div style={{ marginBottom: 24 }}>
+          <Wordmark size="nav" />
+        </div>
 
         {/* Tier label */}
         {tier && (

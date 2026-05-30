@@ -38,7 +38,7 @@ describe('StickyHeader', () => {
   it('renders logo link and Sign in link', () => {
     mockUsePathname.mockReturnValue('/')
     render(<StickyHeader />)
-    expect(screen.getByTestId('header-logo')).toBeInTheDocument()
+    expect(screen.getByTestId('wordmark')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /sign in/i })).toBeInTheDocument()
   })
 

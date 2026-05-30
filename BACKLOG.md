@@ -4331,4 +4331,27 @@ Pre-existing test failure: `CouchesBreakdown.test.tsx > each couche badge has a 
 
 **Verification:** `pnpm build` clean. Sidebar + AppShell tests pass. CouchesBreakdown failure pre-existing.
 
+## M5-fix Wordmark: replacement gap fix — StickyHeader + SignupForm + verification sweep ✅ Shipped
+
+**Status:** ✅ Shipped
+
+**Scope:** Remediation of two replacement sites omitted from 77be0ed. `StickyHeader.tsx` had `data-testid="header-logo"` `<Link>` with inline SERIF markup still rendering on the marketing route; `SignupForm.tsx` had inline `<p>Le Méthodic</p>` on the signup surface. Both replaced with `<Wordmark>`. Tests updated: `header-logo` → `wordmark` in both `tests/unit/landing/StickyHeader.test.tsx` and `tests/unit/layout/StickyHeader.test.tsx`.
+
+### Replacements (2 sites)
+
+| File | Old | New |
+|---|---|---|
+| `components/layout/StickyHeader.tsx` | `<Link data-testid="header-logo">Le Méthodic</Link>` (SERIF inline) | `<Wordmark size="showcase" animateReveal href="/" />` |
+| `components/auth/SignupForm.tsx` | `<p>Le Méthodic</p>` (SERIF inline) | `<div style={{ marginBottom: 24 }}><Wordmark size="nav" /></div>` |
+
+### Verification sweep (all 10 Wordmark sites confirmed)
+
+All 8 original 77be0ed sites (`LandingHeader`, `TopNav`, `Sidebar`, `login`, `verify-email`, `password-reset`, `EcoleIntro`, `ClusterDetailPage`) confirmed via grep. Plus the 2 new sites above. `data-testid="header-logo"` returns zero matches codebase-wide.
+
+Excluded (plaintext contexts, unchanged): `AppShell.tsx` mobile top-bar brand label (in-product, not a marketing/nav wordmark site), `Paywall.tsx` comparison table header, `LandingFooter.tsx` copyright, all `<title>`/metadata strings.
+
+**Note:** `SERIF_FONT` (Source Serif 4) import removed from `StickyHeader.tsx` and `SignupForm.tsx` as part of cleanup. Remaining `SERIF_FONT` usages in other files are a t11 typography question tied to deferred A-008/A-009 — not addressed here.
+
+**Verification:** `pnpm build` clean. 402 unit tests pass. CouchesBreakdown failure pre-existing (t10 token rename).
+
 End of BACKLOG.md.

@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
+import { SANS_FONT } from '@/lib/typography'
+import Wordmark from '@/components/Wordmark'
 
 // Mirror the TopNav exclusion list — StickyHeader shows exactly where
 // the in-product TopNav hides. These sets should stay in sync as new
@@ -78,21 +79,7 @@ export default function StickyHeader() {
           justifyContent: 'space-between',
         }}
       >
-        <Link
-          href="/"
-          data-testid="header-logo"
-          style={{
-            fontFamily: SERIF_FONT,
-            fontStyle: 'italic',
-            fontWeight: 400,
-            fontSize: '1.25rem',
-            letterSpacing: '-0.01em',
-            color: 'var(--text-primary)',
-            textDecoration: 'none',
-          }}
-        >
-          Le Méthodic
-        </Link>
+        <Wordmark size="showcase" animateReveal href="/" />
 
         <Link
           href="/login"
