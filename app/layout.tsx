@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import localFont from 'next/font/local'
-import { Geist, Source_Serif_4 } from 'next/font/google'
+import { Instrument_Serif, Crimson_Pro, Instrument_Sans, Inter, DM_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import TopNav from '@/components/nav/TopNav'
@@ -8,50 +7,51 @@ import StickyHeader from '@/components/layout/StickyHeader'
 import QueryProvider from '@/components/QueryProvider'
 import { ThemeProvider } from '@/components/ThemeProvider'
 
-// M2 t6 — Font stack migration per DESIGN.md v1:
-//   Cabinet Grotesk — display/hero/marketing headings (self-hosted woff2)
-//   Geist            — UI/body/interface chrome (next/font/google)
-//   Source Serif 4   — lesson content/editorial reading (next/font/google)
+// M2 t11 — Type A font stack per DESIGN.md v2 (Atelier Français):
+//   Instrument Serif — display/hero/wordmark (--f-display)
+//   Crimson Pro      — lesson body, long-form reading (--f-body)
+//   Instrument Sans  — French UI chrome: nav, labels, buttons (--f-ui)
+//   Inter            — English UI text (--f-en)
+//   DM Mono          — metadata, eyebrows, folios, accents (--f-mono)
 //
-// Subset coverage for French (CRITICAL):
+// Subset coverage for French (CRITICAL — non-negotiable):
 //   'latin'     — U+0000-00FF: é è à â ç î ô û ï ù ë and « »
 //   'latin-ext' — U+0100-024F: œ Œ (cœur, œuvre, sœur, bœuf)
-// All three fonts subset to 'latin' + 'latin-ext'.
+// All five fonts subset to 'latin' + 'latin-ext'.
 
-const cabinetGrotesk = localFont({
-  src: [
-    {
-      path: '../public/fonts/cabinet-grotesk/cabinet-grotesk-medium.woff2',
-      weight: '500',
-      style: 'normal',
-    },
-    {
-      path: '../public/fonts/cabinet-grotesk/cabinet-grotesk-bold.woff2',
-      weight: '700',
-      style: 'normal',
-    },
-    {
-      path: '../public/fonts/cabinet-grotesk/cabinet-grotesk-black.woff2',
-      weight: '900',
-      style: 'normal',
-    },
-  ],
-  variable: '--font-cabinet',
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-instrument-serif',
+  weight: ['400'],
   display: 'swap',
 })
 
-const geist = Geist({
+const crimsonPro = Crimson_Pro({
   subsets: ['latin', 'latin-ext'],
-  variable: '--font-geist',
-  weight: ['400', '500', '600', '700'],
-  display: 'swap',
-})
-
-const sourceSerif4 = Source_Serif_4({
-  subsets: ['latin', 'latin-ext'],
-  variable: '--font-source-serif',
-  weight: ['400', '600', '700'],
+  variable: '--font-crimson-pro',
+  weight: ['400', '600'],
   style: ['normal', 'italic'],
+  display: 'swap',
+})
+
+const instrumentSans = Instrument_Sans({
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-instrument-sans',
+  weight: ['400', '500', '600'],
+  display: 'swap',
+})
+
+const inter = Inter({
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-inter',
+  weight: ['400', '500', '600'],
+  display: 'swap',
+})
+
+const dmMono = DM_Mono({
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-dm-mono',
+  weight: ['400', '500'],
   display: 'swap',
 })
 
@@ -78,7 +78,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#F8F4ED', // F-VISUAL-001 — warm cream --bg-canvas
+  themeColor: '#FFFFFF', // v2 --paper
   width: 'device-width',
   initialScale: 1,
   // userScalable defaults to true — explicitly omitted per WCAG 2.1
@@ -92,7 +92,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${cabinetGrotesk.variable} ${geist.variable} ${sourceSerif4.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${instrumentSerif.variable} ${crimsonPro.variable} ${instrumentSans.variable} ${inter.variable} ${dmMono.variable}`}>
       <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <QueryProvider>
