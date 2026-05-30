@@ -26,7 +26,7 @@ function stateBadgeStyle(vs: VisualState): React.CSSProperties {
       }
     case 'available':
       return {
-        backgroundColor: 'var(--cta-primary)',
+        backgroundColor: 'var(--cta-utility)',
         color: '#fff',
         border: '1px solid transparent',
       }

@@ -6,9 +6,10 @@ interface CouchesLayerProps {
   description: string
   backgroundColor: string
   accentColor: string
+  nameColor?: string
 }
 
-export default function CouchesLayer({ number, name, description, backgroundColor, accentColor }: CouchesLayerProps) {
+export default function CouchesLayer({ number, name, description, backgroundColor, accentColor, nameColor = 'var(--dominant)' }: CouchesLayerProps) {
   return (
     <div
       data-testid="couche-layer"
@@ -56,7 +57,7 @@ export default function CouchesLayer({ number, name, description, backgroundColo
               fontSize: 'clamp(1.125rem, 1.6vw, 1.375rem)',
               lineHeight: 1.2,
               letterSpacing: '-0.01em',
-              color: 'var(--text-primary)',
+              color: nameColor,
               margin: 0,
               marginBottom: 10,
             }}

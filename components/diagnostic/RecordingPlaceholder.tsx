@@ -51,7 +51,7 @@ export default function RecordingPlaceholder() {
                 width: 96,
                 height: 96,
                 borderRadius: '50%',
-                border: '2px solid var(--cta-primary)',
+                border: '2px solid var(--cta-utility)',
                 pointerEvents: 'none',
               }}
             />
@@ -63,7 +63,7 @@ export default function RecordingPlaceholder() {
                 width: 96,
                 height: 96,
                 borderRadius: '50%',
-                border: '2px solid var(--cta-primary)',
+                border: '2px solid var(--cta-utility)',
                 pointerEvents: 'none',
               }}
             />
@@ -79,8 +79,8 @@ export default function RecordingPlaceholder() {
             width: 96,
             height: 96,
             borderRadius: '50%',
-            border: `2px solid ${state === 'recording' ? 'var(--cta-primary)' : 'var(--rule-default)'}`,
-            backgroundColor: state === 'recording' ? 'var(--cta-primary)' : 'var(--bg-elevated)',
+            border: `2px solid ${state === 'recording' ? 'var(--cta-utility)' : 'var(--rule-default)'}`,
+            backgroundColor: state === 'recording' ? 'var(--cta-utility)' : 'var(--bg-elevated)',
             cursor: state === 'stopped' ? 'default' : 'pointer',
             display: 'flex',
             alignItems: 'center',

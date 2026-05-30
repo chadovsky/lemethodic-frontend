@@ -97,8 +97,8 @@ export default function QuizResults({ score, total, onRestart }: QuizResultsProp
             fontWeight: 600,
             fontSize: '0.9375rem',
             color: 'var(--bg-elevated)',
-            backgroundColor: 'var(--cta-primary)',
-            border: '1px solid var(--cta-primary)',
+            backgroundColor: 'var(--cta-utility)',
+            border: '1px solid var(--cta-utility)',
             borderRadius: 4,
             cursor: 'pointer',
           }}

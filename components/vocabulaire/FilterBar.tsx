@@ -61,9 +61,9 @@ export default function FilterBar({ state, onChange }: FilterBarProps) {
                 fontSize: '0.75rem',
                 letterSpacing: '0.04em',
                 color: selected ? 'var(--bg-elevated)' : 'var(--text-primary)',
-                backgroundColor: selected ? 'var(--cta-primary)' : 'transparent',
+                backgroundColor: selected ? 'var(--cta-utility)' : 'transparent',
                 border: selected
-                  ? '1px solid var(--cta-primary)'
+                  ? '1px solid var(--cta-utility)'
                   : '1px solid var(--rule-default)',
                 padding: '6px 12px',
                 borderRadius: 999,

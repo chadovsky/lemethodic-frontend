@@ -357,7 +357,7 @@ function SessionConfigCard({
           height: 52,
           borderRadius: 4,
           border: 'none',
-          backgroundColor: chunkCount < TEST_MIN_CHUNKS ? 'var(--lm-border-subtle)' : 'var(--cta-primary)',
+          backgroundColor: chunkCount < TEST_MIN_CHUNKS ? 'var(--lm-border-subtle)' : 'var(--cta-utility)',
           color: chunkCount < TEST_MIN_CHUNKS ? 'var(--lm-text-tertiary)' : '#FFFFFF',
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
@@ -411,7 +411,7 @@ function ToggleRow<T extends string | number>({
               padding: '0 14px',
               borderRadius: 4,
               border: '1px solid var(--lm-border-subtle)',
-              backgroundColor: isActive ? 'var(--cta-primary)' : 'var(--lm-bg-surface)',
+              backgroundColor: isActive ? 'var(--cta-utility)' : 'var(--lm-bg-surface)',
               color: isActive ? '#FFFFFF' : 'var(--lm-text-primary)',
               fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
               fontWeight: 500,
@@ -564,9 +564,9 @@ function optionStyle(
   if (opt === correct) {
     return {
       ...base,
-      backgroundColor: 'var(--cta-primary)',
+      backgroundColor: 'var(--cta-utility)',
       color: '#FFFFFF',
-      borderColor: 'var(--cta-primary)',
+      borderColor: 'var(--cta-utility)',
     }
   }
   if (opt === picked) {
@@ -631,7 +631,7 @@ function FeedbackBlock({
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
           fontSize: 14,
-          color: ok ? 'var(--cta-primary)' : 'var(--lm-text-primary)',
+          color: ok ? 'var(--cta-utility)' : 'var(--lm-text-primary)',
           textAlign: 'center',
           margin: 0,
         }}
@@ -647,7 +647,7 @@ function FeedbackBlock({
           height: 48,
           borderRadius: 4,
           border: 'none',
-          backgroundColor: 'var(--cta-primary)',
+          backgroundColor: 'var(--cta-utility)',
           color: '#FFFFFF',
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
@@ -723,7 +723,7 @@ function DropdownView({
             height: 48,
             borderRadius: 4,
             border: 'none',
-            backgroundColor: !picked ? 'var(--lm-border-subtle)' : 'var(--cta-primary)',
+            backgroundColor: !picked ? 'var(--lm-border-subtle)' : 'var(--cta-utility)',
             color: !picked ? 'var(--lm-text-tertiary)' : '#FFFFFF',
             fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
@@ -802,7 +802,7 @@ function ExactView({
             height: 48,
             borderRadius: 4,
             border: 'none',
-            backgroundColor: !value.trim() ? 'var(--lm-border-subtle)' : 'var(--cta-primary)',
+            backgroundColor: !value.trim() ? 'var(--lm-border-subtle)' : 'var(--cta-utility)',
             color: !value.trim() ? 'var(--lm-text-tertiary)' : '#FFFFFF',
             fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
@@ -956,7 +956,7 @@ function MatchingView({
             height: 48,
             borderRadius: 4,
             border: 'none',
-            backgroundColor: !allPaired ? 'var(--lm-border-subtle)' : 'var(--cta-primary)',
+            backgroundColor: !allPaired ? 'var(--lm-border-subtle)' : 'var(--cta-utility)',
             color: !allPaired ? 'var(--lm-text-tertiary)' : '#FFFFFF',
             fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
@@ -989,7 +989,7 @@ function MatchingView({
               height: 48,
               borderRadius: 4,
               border: 'none',
-              backgroundColor: 'var(--cta-primary)',
+              backgroundColor: 'var(--cta-utility)',
               color: '#FFFFFF',
               fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
               fontWeight: 600,
@@ -1027,17 +1027,17 @@ function MatchItem({
   let borderColor: React.CSSProperties['borderColor'] = 'var(--lm-border-subtle)'
   let textDecoration: React.CSSProperties['textDecoration'] = 'none'
   if (correct === true) {
-    bg = 'var(--cta-primary)'
+    bg = 'var(--cta-utility)'
     fg = '#FFFFFF'
-    borderColor = 'var(--cta-primary)'
+    borderColor = 'var(--cta-utility)'
   } else if (correct === false) {
     bg = 'var(--lm-bg-base)'
     fg = 'var(--lm-text-tertiary)'
     textDecoration = 'line-through'
   } else if (selected) {
-    bg = 'var(--cta-primary)'
+    bg = 'var(--cta-utility)'
     fg = '#FFFFFF'
-    borderColor = 'var(--cta-primary)'
+    borderColor = 'var(--cta-utility)'
   } else if (paired) {
     bg = 'var(--lm-bg-base)'
     fg = 'var(--lm-text-primary)'
@@ -1130,7 +1130,7 @@ function TestEndCard({
             height: 48,
             borderRadius: 4,
             border: 'none',
-            backgroundColor: 'var(--cta-primary)',
+            backgroundColor: 'var(--cta-utility)',
             color: '#FFFFFF',
             fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
             fontWeight: 600,
@@ -1263,7 +1263,7 @@ function TierLockedCard({
           padding: '0 24px',
           borderRadius: 4,
           border: 'none',
-          backgroundColor: 'var(--cta-primary)',
+          backgroundColor: 'var(--cta-utility)',
           color: '#FFFFFF',
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
@@ -1328,7 +1328,7 @@ function ErrorCard({
           padding: '0 20px',
           borderRadius: 4,
           border: 'none',
-          backgroundColor: 'var(--cta-primary)',
+          backgroundColor: 'var(--cta-utility)',
           color: '#FFFFFF',
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,
@@ -1446,7 +1446,7 @@ function SoftEmptyCard({
           justifyContent: 'center',
           borderRadius: 4,
           border: 'none',
-          backgroundColor: 'var(--cta-primary)',
+          backgroundColor: 'var(--cta-utility)',
           color: '#FFFFFF',
           fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
           fontWeight: 600,

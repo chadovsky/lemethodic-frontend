@@ -26,7 +26,7 @@ export default function TacheShell({ tache }: { tache: Tache }) {
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
               color: 'var(--bg-elevated)',
-              backgroundColor: 'var(--cta-primary)',
+              backgroundColor: 'var(--cta-utility)',
               borderRadius: 4,
               padding: '2px 8px',
               lineHeight: 1.6,

@@ -8,36 +8,41 @@ const COUCHES = [
     name: "Le Propos",
     description:
       "The structural backbone of every oral response: a clear position, developed argument, and grounded conclusion.",
-    backgroundColor: '#D4CBBA',
+    backgroundColor: 'var(--paper)',
     accentColor: 'var(--lm-pastel-peach)',
+    nameColor: 'var(--dominant)',
   },
   {
     name: "Le Plan",
     description:
       "Ready-made idea frameworks that let you generate relevant content instantly, without relying on memorized topics.",
-    backgroundColor: '#DDD6C4',
+    backgroundColor: 'var(--paper-edge)',
     accentColor: 'var(--lm-pastel-sage)',
+    nameColor: 'var(--dominant)',
   },
   {
     name: "La Construction",
     description:
       "Sentence-level grammar templates that package your ideas into natural, examiner-recognized French structures.",
-    backgroundColor: '#E6E0D3',
+    backgroundColor: 'var(--paper)',
     accentColor: 'var(--lm-pastel-butter)',
+    nameColor: 'var(--dominant)',
   },
   {
     name: "Les Pièges Anglais",
     description:
       "A targeted inventory of anglophone interference patterns — the syntax, register, and reflex traps that cost English speakers points.",
-    backgroundColor: '#EEE9DF',
+    backgroundColor: 'var(--paper-edge)',
     accentColor: 'var(--lm-pastel-lavender)',
+    nameColor: 'var(--accent)',
   },
   {
     name: "La Musique",
     description:
       "Prosody, pacing, and hesitation management: the delivery layer that carries your method into the examiner scoring grid.",
-    backgroundColor: '#F5F1EA',
+    backgroundColor: 'var(--paper)',
     accentColor: 'var(--lm-pastel-sky)',
+    nameColor: 'var(--dominant)',
   },
 ]
 
@@ -86,6 +91,7 @@ export default function MethodologyPreview() {
               description={couche.description}
               backgroundColor={couche.backgroundColor}
               accentColor={couche.accentColor}
+              nameColor={couche.nameColor}
             />
           </RevealOnScroll>
         ))}

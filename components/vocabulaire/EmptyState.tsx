@@ -41,7 +41,7 @@ export default function EmptyState({ onReset }: { onReset: () => void }) {
           fontWeight: 500,
           fontSize: '0.9375rem',
           color: 'var(--bg-elevated)',
-          backgroundColor: 'var(--cta-primary)',
+          backgroundColor: 'var(--cta-utility)',
           border: 'none',
           padding: '10px 18px',
           borderRadius: 4,

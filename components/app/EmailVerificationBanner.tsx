@@ -33,7 +33,7 @@ export default function EmailVerificationBanner() {
         Please verify your email address to unlock all features.{' '}
         <a
           href="/verify-email"
-          style={{ color: 'var(--cta-primary)', textDecoration: 'underline' }}
+          style={{ color: 'var(--cta-utility)', textDecoration: 'underline' }}
         >
           Resend verification email
         </a>

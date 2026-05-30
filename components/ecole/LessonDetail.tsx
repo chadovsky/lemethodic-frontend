@@ -50,7 +50,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
             fontSize: '0.6875rem',
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: 'var(--cta-primary)',
+            color: 'var(--cta-utility)',
             backgroundColor: 'var(--lm-bg-base)',
             border: '1px solid var(--lm-border-subtle)',
             padding: '4px 10px',

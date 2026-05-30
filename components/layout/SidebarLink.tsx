@@ -31,7 +31,7 @@ export default function SidebarLink({ href, label, onClick }: SidebarLinkProps) 
           style={{
             width: 4,
             flexShrink: 0,
-            backgroundColor: 'var(--cta-primary)',
+            backgroundColor: 'var(--cta-utility)',
             borderRadius: '0 2px 2px 0',
           }}
         />

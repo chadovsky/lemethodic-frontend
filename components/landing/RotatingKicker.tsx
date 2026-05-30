@@ -17,7 +17,7 @@ import type { Lang } from './copy'
 
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const ED_FG_SOFT = 'var(--lm-text-secondary)'
-const ED_WARM_PEACH_DEEP = 'var(--lm-warm-peach-deep)'
+const ED_EXAM_COLOR = 'var(--accent)'
 
 const EXAMS = ['TCF', 'TEF', 'DELF', 'DALF'] as const
 
@@ -61,7 +61,7 @@ export default function RotatingKicker({ lang }: RotatingKickerProps) {
         }}
       >
         <span style={{ color: ED_FG_SOFT }}>{PREFIX[lang]}</span>{' '}
-        <span style={{ color: ED_WARM_PEACH_DEEP }}>TCF · TEF · DELF · DALF</span>
+        <span style={{ color: ED_EXAM_COLOR }}>TCF · TEF · DELF · DALF</span>
       </p>
     )
   }
@@ -106,7 +106,7 @@ export default function RotatingKicker({ lang }: RotatingKickerProps) {
           height: '1.1em',
           overflow: 'hidden',
           textAlign: 'center',
-          color: ED_WARM_PEACH_DEEP,
+          color: ED_EXAM_COLOR,
         }}
       >
         <span style={{ visibility: 'hidden' }}>{widestExam}</span>

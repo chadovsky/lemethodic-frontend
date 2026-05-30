@@ -3299,6 +3299,64 @@ Milestone: DONE
   7. **Bad reset token:** Visit /password-reset?token=BAD. Enter passwords + submit. Should surface "This reset link is invalid or has expired. Request a new one."
   8. **Field-name sanity (only if step 4 refresh appears to silently fail):** Open the /refresh response in DevTools Network → Preview. Confirm the new access token comes back under `access_token` (FE default) or `token` (FE fallback). If it's a third field name, surface to FE-Claude as a follow-up — the interceptor needs that field name added.
 
+---
+
+## M-VISUAL fix bundle 1 — CTA → vermillion + 5-couche section contrast + exam highlight ✅ Shipped
+
+**Status:** ✅ Shipped
+
+**Scope:** Fix three M-VISUAL-AUDIT findings in one atomic commit.
+
+### Changes
+
+**1. CTA token architecture (Option A) — `app/globals.css`, 35 in-product components**
+
+`--cta-primary` → `var(--accent)` (vermillion `#C8102E` / `#E23A54` dark). New `--cta-utility` → `var(--dominant)` (ink-blue `#14213D`) for in-product actions.
+
+New tokens added to `:root` + `.dark`:
+- `--accent-deep: hsl(350 85% 30%)` (light) / `hsl(351 74% 44%)` (dark) — hover depth for vermillion CTAs
+- `--cta-utility: var(--dominant)` — in-product action buttons
+- `--cta-utility-hover: var(--dominant-deep)` — utility hover state
+- Tailwind surface: `--color-cta-utility`, `--color-cta-utility-hover`, `--color-accent-deep`
+- `.ed-field:focus-visible` border changed to `--cta-utility` (form fields should be ink-blue)
+
+**Marketing/conversion — keep `--cta-primary` (→ vermillion):**
+`Hero.tsx`, `MethodologyPreview.tsx` (CTA button), `PricingTeaser.tsx`, `Paywall.tsx`, `SignupForm.tsx` (submit button + login link in auth flow), `OnboardingFlow.tsx`, `OnboardingScreen.tsx` (ED_ACCENT), `WaitlistOrProxyConfirmation.tsx` (ED_ACCENT).
+
+`lib/typography.ts` `ED.accent = 'var(--cta-primary)'` left unchanged — all callers (`TestimonialCard`, `PricingSection`, `MethodologySection`, `HowItWorksSection`, `ProductDemo`, `FinalCTASection`, `PlatformLanding`) are landing/marketing components.
+
+**In-product utility — reclassified to `--cta-utility` (→ ink-blue, 35 files):**
+`writing/WritingSubmissionClient.tsx` (ED_ACCENT), `writing/WritingPromptPicker.tsx`, `writing/WritingHistoryClient.tsx`,
+`speaking/SpeakingDesktop.tsx` (ED_ACCENT), `home/EcoleDesktop.tsx` (ED_ACCENT),
+`ecole/intro/EcoleIntro.tsx` (ED_ACCENT), `ecole/LessonDetail.tsx`, `ecole/LessonCard.tsx`, `ecole/AudioPlayerPlaceholder.tsx`,
+`dashboard/NextLessonWidget.tsx` (Reprendre), `dashboard/ProgressDashboardDesktop.tsx`,
+`vocabulaire/QuizQuestion.tsx`, `vocabulaire/QuizResults.tsx`, `vocabulaire/VocabBrowse.tsx`, `vocabulaire/PracticeActions.tsx`, `vocabulaire/FilterBar.tsx`, `vocabulaire/EndOfDeck.tsx`, `vocabulaire/EmptyState.tsx`,
+`diagnostic/TacheShell.tsx`, `diagnostic/TacheNav.tsx` (Voir les résultats), `diagnostic/Timer.tsx`, `diagnostic/RecordingPlaceholder.tsx`, `diagnostic/DiagnosticLanding.tsx` (Commencer le diagnostic), `diagnostic/Results.tsx`, `diagnostic/RecommendationsStub.tsx`, `diagnostic/CouchesBreakdown.tsx`, `diagnostic/WaveformPlaceholder.tsx`,
+`layout/SidebarLink.tsx`, `layout/Sidebar.tsx` (avatar chip),
+`app/EmailVerificationBanner.tsx`, `app/password-reset/page.tsx`, `app/verify-email/page.tsx`,
+`la-bibliotheque/[slug]/TopicDetail.tsx`, `la-bibliotheque/[slug]/practice/PracticeClient.tsx`, `la-bibliotheque/[slug]/test/TestClient.tsx`.
+
+**2. 5-couche section — `MethodologyPreview.tsx`, `CouchesLayer.tsx`**
+
+- Hardcoded cream hex backgrounds (`#D4CBBA`, `#DDD6C4`, `#E6E0D3`, `#EEE9DF`, `#F5F1EA`) → alternating `var(--paper)` / `var(--paper-edge)`. Zero cream.
+- Added `nameColor` prop to `CouchesLayer`. Le Propos / Le Plan / La Construction / La Musique → `var(--dominant)`. Les Pièges Anglais → `var(--accent)` (vermillion, DESIGN.md §2 couche color lock). Couche 05 La Musique was invisible (white text on cream); now dark ink-blue on white.
+
+**3. Rotating exam highlight — `RotatingKicker.tsx`**
+
+`ED_WARM_PEACH_DEEP = 'var(--lm-warm-peach-deep)'` → `ED_EXAM_COLOR = 'var(--accent)'`. Full vermillion `#C8102E` on the rotating exam name (TCF / TEF / DELF / DALF).
+
+**Deferred from this bundle (separate dispatches):**
+- A-008/A-009/A-010/A-011 — font stack migration (Cabinet Grotesk, SANS_FONT, SERIF_FONT in 20+ components)
+- A-013 — `.ed-cta-warm-hover:hover` warm-peach-deep hover on marketing CTAs
+- A-016 — `.prose-legal th` globals.css utility block
+- `.ed-field:focus-visible` box-shadow `rgba(31, 45, 74, 0.18)` v1 navy (tracked under A-013)
+- `--lm-warm-peach-deep: #E0A890` bridge value (kept intact per A-007 brief)
+- Category E copy fixes (E-001 through E-005) — separate dispatch
+
+**Verification:** `pnpm build` clean. No type errors. Token chain verified: `--cta-primary → var(--accent) → #C8102E` in light, `#E23A54` in dark. `--cta-utility → var(--dominant) → #14213D` in light, `#38598F` in dark.
+
+**non-visual change note:** Build-only verification applied (Playwright captures deferred to soft-beta battery per F-225 2026-05-23 debt acceptance).
+
 ### F-310.fe.coldreload — Route email_not_verified 403 from any protected page
 Milestone: TBD
 

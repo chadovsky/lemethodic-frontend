@@ -44,9 +44,12 @@
   --accent-primary-hover:  var(--accent-soft);
   --accent-primary-soft:   var(--paper-edge);
 
-  /* CTA */
-  --cta-primary:        var(--dominant);
-  --cta-primary-hover:  var(--dominant-deep);
+  /* CTA — primary = vermillion for marketing/conversion (hero, paywall, signup, onboarding) */
+  --cta-primary:        var(--accent);
+  --cta-primary-hover:  var(--accent-deep);
+  /* CTA — utility = ink blue for in-product action buttons */
+  --cta-utility:        var(--dominant);
+  --cta-utility-hover:  var(--dominant-deep);
 
   /* Rules / borders */
   --rule-default:    var(--rule);
@@ -105,6 +108,7 @@
   /* Accent — vermillion (wordmark caret + M-breath, Les Pièges Anglais, emphasis) */
   --accent: #C8102E;
   --accent-soft: #E84A5F;
+  --accent-deep: hsl(350 85% 30%);   /* hover depth — #8D0B21, ~12% darker than #C8102E */
 
   /* Couche identity tokens — 4 couches inherit dominant, Pièges Anglais gets accent */
   --couche-default: var(--dominant);
@@ -248,6 +252,7 @@
   --dominant-deep: #4A6BA3;
   --accent: #E23A54;
   --accent-soft: #F06B7E;
+  --accent-deep: hsl(351 74% 44%);   /* hover depth for dark-mode vermillion */
 
   /* shadcn token overrides — v2 night-paper */
   --background: var(--paper);
@@ -293,7 +298,8 @@
   --text-muted:     var(--ink-faint);
   --text-disabled:  var(--ink-faint);
   --rule-default:   var(--rule);
-  --cta-primary:    var(--dominant);
+  --cta-primary:    var(--accent);
+  --cta-utility:    var(--dominant);
 
   /* nav backdrop-blur bg for dark mode (v2 night-paper) */
   --lm-bg-blur: rgba(14, 22, 38, 0.82);
@@ -368,6 +374,9 @@
   --color-accent-primary-soft: var(--accent-primary-soft);
   --color-cta-primary: var(--cta-primary);
   --color-cta-primary-hover: var(--cta-primary-hover);
+  --color-cta-utility: var(--cta-utility);
+  --color-cta-utility-hover: var(--cta-utility-hover);
+  --color-accent-deep: var(--accent-deep);
   --color-rule-default: var(--rule-default);
   --color-rule-strong: var(--rule-strong);
   --color-success: var(--success);
@@ -839,8 +848,8 @@
 }
 .ed-field:focus-visible {
   outline: none;
-  border-color: var(--cta-primary);
-  box-shadow: 0 0 0 3px rgba(31, 45, 74, 0.18); /* ed-accent at ~18% */
+  border-color: var(--cta-utility);
+  box-shadow: 0 0 0 3px rgba(31, 45, 74, 0.18); /* ed-accent at ~18% — deferred A-013 */
 }
 
 /* F-211 — skeleton shimmer. ed-rule on ed-paper, slow 1.5s sweep, no

@@ -61,8 +61,8 @@ export default function TacheNav({ tacheId }: { tacheId: TacheId }) {
           className="ed-btn-press"
           style={{
             ...NAV_LINK_STYLE,
-            backgroundColor: 'var(--cta-primary)',
-            borderColor: 'var(--cta-primary)',
+            backgroundColor: 'var(--cta-utility)',
+            borderColor: 'var(--cta-utility)',
             color: 'var(--bg-elevated)',
           }}
         >

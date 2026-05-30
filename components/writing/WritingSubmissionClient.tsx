@@ -21,7 +21,7 @@ const ED_FG_SOFT = 'var(--lm-text-secondary)'
 const ED_MUTED = 'var(--lm-text-tertiary)'
 const ED_RULE = 'var(--lm-border-subtle)'
 const ED_PAPER = 'var(--lm-bg-surface)'
-const ED_ACCENT = 'var(--cta-primary)'
+const ED_ACCENT = 'var(--cta-utility)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const SERIF = 'var(--font-source-serif), Georgia, serif'
 

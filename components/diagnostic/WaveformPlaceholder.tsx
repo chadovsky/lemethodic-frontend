@@ -23,7 +23,7 @@ export default function WaveformPlaceholder({ isActive }: { isActive: boolean })
             width: 4,
             height: h,
             borderRadius: 2,
-            backgroundColor: isActive ? 'var(--cta-primary)' : 'var(--rule-default)',
+            backgroundColor: isActive ? 'var(--cta-utility)' : 'var(--rule-default)',
             animationDelay: `${i * 50}ms`,
           }}
         />

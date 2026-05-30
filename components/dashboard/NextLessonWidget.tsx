@@ -52,7 +52,7 @@ export default function NextLessonWidget() {
           alignSelf: 'flex-start',
           marginTop: 'auto',
           padding: '10px 18px',
-          backgroundColor: 'var(--cta-primary)',
+          backgroundColor: 'var(--cta-utility)',
           color: '#ffffff',
           fontFamily: SANS_FONT,
           fontWeight: 600,

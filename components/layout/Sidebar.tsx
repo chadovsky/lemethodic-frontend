@@ -60,7 +60,7 @@ export default function Sidebar({
             width: 36,
             height: 36,
             borderRadius: '50%',
-            backgroundColor: 'var(--cta-primary)',
+            backgroundColor: 'var(--cta-utility)',
             color: '#fff',
             fontFamily: SANS_FONT,
             fontWeight: 600,

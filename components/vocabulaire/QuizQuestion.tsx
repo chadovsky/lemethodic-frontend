@@ -28,9 +28,9 @@ function choiceVisualState(
 }
 
 function choiceBorderColor(state: ChoiceState, selected: boolean): string {
-  if (state === 'correct') return 'var(--cta-primary)'
+  if (state === 'correct') return 'var(--cta-utility)'
   if (state === 'incorrect') return 'var(--text-primary)'
-  if (selected) return 'var(--cta-primary)'
+  if (selected) return 'var(--cta-utility)'
   return 'var(--rule-default)'
 }
 
@@ -246,8 +246,8 @@ export default function QuizQuestion({
               fontWeight: 600,
               fontSize: '0.9375rem',
               color: 'var(--bg-elevated)',
-              backgroundColor: 'var(--cta-primary)',
-              border: '1px solid var(--cta-primary)',
+              backgroundColor: 'var(--cta-utility)',
+              border: '1px solid var(--cta-utility)',
               borderRadius: 4,
               cursor: 'pointer',
             }}
@@ -269,10 +269,10 @@ export default function QuizQuestion({
               fontSize: '0.9375rem',
               color: selectedIndex === null ? 'var(--text-muted)' : 'var(--bg-elevated)',
               backgroundColor:
-                selectedIndex === null ? 'var(--bg-subtle)' : 'var(--cta-primary)',
+                selectedIndex === null ? 'var(--bg-subtle)' : 'var(--cta-utility)',
               border: '1px solid',
               borderColor:
-                selectedIndex === null ? 'var(--rule-default)' : 'var(--cta-primary)',
+                selectedIndex === null ? 'var(--rule-default)' : 'var(--cta-utility)',
               borderRadius: 4,
               cursor: selectedIndex === null ? 'not-allowed' : 'pointer',
               opacity: selectedIndex === null ? 0.7 : 1,

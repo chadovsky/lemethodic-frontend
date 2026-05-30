@@ -58,7 +58,7 @@ export default function AudioPlayerPlaceholder({ cefr }: { cefr?: string }) {
           width: 44,
           height: 44,
           borderRadius: '50%',
-          backgroundColor: 'var(--cta-primary)',
+          backgroundColor: 'var(--cta-utility)',
           border: 'none',
           color: '#fff',
           display: 'flex',
@@ -104,7 +104,7 @@ export default function AudioPlayerPlaceholder({ cefr }: { cefr?: string }) {
               position: 'absolute',
               inset: 0,
               width: '0%',
-              backgroundColor: 'var(--cta-primary)',
+              backgroundColor: 'var(--cta-utility)',
               borderRadius: 999,
             }}
           />
@@ -132,7 +132,7 @@ export default function AudioPlayerPlaceholder({ cefr }: { cefr?: string }) {
             fontSize: '0.6875rem',
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            color: 'var(--cta-primary)',
+            color: 'var(--cta-utility)',
             backgroundColor: 'var(--lm-bg-base)',
             border: '1px solid var(--lm-border-subtle)',
             padding: '3px 8px',

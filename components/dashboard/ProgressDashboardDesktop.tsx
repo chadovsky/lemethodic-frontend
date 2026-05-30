@@ -660,7 +660,7 @@ function ErrorRetry({ message, retryLabel, onRetry }: { message: string; retryLa
           fontWeight: 600,
           fontSize: 14,
           color: '#FFFFFF',
-          backgroundColor: 'var(--cta-primary)',
+          backgroundColor: 'var(--cta-utility)',
           padding: '8px 18px',
           borderRadius: 4,
           border: 'none',

@@ -254,7 +254,7 @@ function EmptyState({ resendState, resendError, onResend }: EmptyStateProps) {
           backgroundColor:
             resendState === 'sending' || resendState === 'sent'
               ? 'var(--lm-border-subtle)'
-              : 'var(--cta-primary)',
+              : 'var(--cta-utility)',
           color:
             resendState === 'sending' || resendState === 'sent'
               ? 'var(--lm-text-tertiary)'
