@@ -75,20 +75,62 @@
      Source Serif 4: lesson/editorial. */
   --font-geist: 'Geist', -apple-system, "Segoe UI", system-ui, sans-serif;
 
+  /* ── DESIGN.md v2 — Atelier Français canonical palette (M2 t10, 2026-05-30) ── */
+
+  /* Paper / backgrounds */
+  --paper: #FFFFFF;
+  --paper-tint: #FAFAFA;
+  --paper-edge: #F4F4F5;
+
+  /* Ink / text */
+  --ink: #0F1419;
+  --ink-soft: rgba(15, 20, 25, 0.62);
+  --ink-faint: rgba(15, 20, 25, 0.38);
+  --ink-trace: rgba(15, 20, 25, 0.16);
+
+  /* Rules / borders */
+  --rule: rgba(15, 20, 25, 0.08);
+  --rule-strong: rgba(15, 20, 25, 0.16);
+
+  /* Dominant — French ink blue */
+  --dominant: #14213D;
+  --dominant-soft: #2C3E5E;
+  --dominant-deep: #0B1729;
+
+  /* Accent — vermillion (wordmark caret + M-breath, Les Pièges Anglais, emphasis) */
+  --accent: #C8102E;
+  --accent-soft: #E84A5F;
+
+  /* Couche identity tokens — 4 couches inherit dominant, Pièges Anglais gets accent */
+  --couche-default: var(--dominant);
+  --couche-pieges: var(--accent);
+
+  /* Shape */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-snap: cubic-bezier(0.4, 0, 0.2, 1.4);
+
   /* ── DESIGN.md v1 — Le Méthodic canonical tokens (M2 t7, 2026-05-25) ──── */
 
-  /* Brand (warm ochre) */
-  --lm-brand: #C49A3A;
-  --lm-brand-deep: #8B6914;
-  --lm-brand-tint: #F5E8C0;
-  --lm-brand-glow: #E8C77A;
+  /* Brand — v2 bridge (warm ochre retired; ⚠ M-RENAME: no v2 analog, mapped to nearest primary) */
+  --lm-brand: var(--dominant);
+  --lm-brand-deep: var(--dominant-deep);
+  --lm-brand-tint: var(--paper-tint);
+  --lm-brand-glow: var(--dominant-soft);
 
-  /* Per-couche colors (light mode) */
-  --lm-couche-propos: #BC4F2A;
-  --lm-couche-plan: #A66A2E;
-  --lm-couche-construction: #8E5A1F;
-  --lm-couche-pieges: #E0701D;
-  --lm-couche-musique: #D4A431;
+  /* Per-couche colors — v2: 4 couches = dominant blue, Pièges Anglais = vermillion */
+  --lm-couche-propos: var(--dominant);
+  --lm-couche-plan: var(--dominant);
+  --lm-couche-construction: var(--dominant);
+  --lm-couche-pieges: var(--accent);
+  --lm-couche-musique: var(--dominant);
 
   /* Functional */
   --lm-success: #6B8E3B;
@@ -97,23 +139,24 @@
   --lm-error: #A8341B;
   --lm-info: #7B6A8B;
 
-  /* Background / text / border (light mode defaults) */
-  --lm-bg-base: #FAF7F0;
-  --lm-bg-surface: #FFFFFF;
-  --lm-bg-subtle: #F0EBE0;
-  --lm-text-primary: #1E1A14;
-  --lm-text-secondary: #5C544A;
-  --lm-text-tertiary: #8B8275;
-  --lm-border-subtle: #E5DFD2;
+  /* Background / text / border — v2 bridges */
+  --lm-bg-base: var(--paper);          /* ⚠ M-RENAME: was warm cream (banned in v2), now paper white */
+  --lm-bg-surface: var(--paper);
+  --lm-bg-subtle: var(--paper-edge);
+  --lm-text-primary: var(--ink);
+  --lm-text-secondary: var(--ink-soft);
+  --lm-text-tertiary: var(--ink-faint);
+  --lm-border-subtle: var(--rule);
 
-  /* Warm editorial palette */
+  /* Warm editorial palette — ⚠ M-RENAME: v1-era decorative tokens; no v2 analogs.
+     Mapped to nearest v2 semantic role. Component-level migration is M-RENAME. */
   --lm-warm-peach: #FFD8C2;
   --lm-warm-peach-deep: #E0A890;
   --lm-warm-sage: #B8C4A8;
-  --lm-warm-sage-deep: var(--accent-primary);
-  --lm-warm-espresso: #4A3528;
-  --lm-warm-cream: #FDFBF7;
-  --lm-warm-sand: #F5E6D8;
+  --lm-warm-sage-deep: var(--dominant-soft);
+  --lm-warm-espresso: var(--ink);
+  --lm-warm-cream: var(--paper);
+  --lm-warm-sand: var(--paper-tint);
 
   /* Onboarding pastel chip palette */
   --lm-pastel-peach: #FFD8C2;
@@ -142,34 +185,32 @@
   --lm-safe-left: env(safe-area-inset-left);
   --lm-safe-right: env(safe-area-inset-right);
 
-  /* t5 — nav backdrop-blur bg: warm cream at 78% opacity. Defined here
+  /* t5 — nav backdrop-blur bg: paper white at 78% opacity (v2). Defined here
      so dark mode can override without touching JS. */
-  --lm-bg-blur: rgba(250, 247, 240, 0.78);
+  --lm-bg-blur: rgba(255, 255, 255, 0.78);
 
-  /* F-VISUAL-001 X.2 — shadcn token rewire. components/ui/* sources
-     unchanged (per Q4); the rewire happens at the token level here so
-     <Button variant="default"> / <Card> / <Input> / etc. inherit the
-     editorial palette automatically. Reversible: revert this block to
-     re-detach shadcn from the design system. */
-  --background: var(--bg-canvas);
-  --foreground: var(--text-primary);
-  --card: var(--bg-elevated);
-  --card-foreground: var(--text-primary);
-  --popover: var(--bg-elevated);
-  --popover-foreground: var(--text-primary);
-  --primary: var(--cta-primary);
+  /* F-VISUAL-001 X.2 / v2 — shadcn token rewire to DESIGN.md v2 canonical tokens.
+     components/ui/* sources unchanged; palette flips automatically.
+     Reversible: revert this block to re-detach shadcn from the design system. */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper);
+  --card-foreground: var(--ink);
+  --popover: var(--paper);
+  --popover-foreground: var(--ink);
+  --primary: var(--dominant);
   --primary-foreground: hsl(0 0% 100%);
-  --secondary: var(--accent-primary-soft);
-  --secondary-foreground: var(--text-primary);
-  --muted: var(--bg-subtle);
-  --muted-foreground: var(--text-muted);
-  --accent: var(--accent-primary);
+  --secondary: var(--paper-tint);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-edge);
+  --muted-foreground: var(--ink-faint);
+  /* --accent resolves to v2 vermillion (#C8102E) from token defined above */
   --accent-foreground: hsl(0 0% 100%);
   --destructive: var(--error);
   --destructive-foreground: hsl(0 0% 100%);
-  --border: var(--rule-default);
-  --input: var(--rule-default);
-  --ring: var(--accent-primary);
+  --border: var(--rule);
+  --input: var(--rule);
+  --ring: var(--accent);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -187,25 +228,42 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  /* ── DESIGN.md v2 night-paper tokens (M2 t10) ── */
+  --paper: #0E1626;
+  --paper-tint: #16203A;
+  --paper-edge: #1E2A47;
+  --ink: #E5E9F0;
+  --ink-soft: rgba(229, 233, 240, 0.64);
+  --ink-faint: rgba(229, 233, 240, 0.40);
+  --ink-trace: rgba(229, 233, 240, 0.18);
+  --rule: rgba(229, 233, 240, 0.10);
+  --rule-strong: rgba(229, 233, 240, 0.20);
+  --dominant: #38598F;
+  --dominant-soft: #2E4A7A;
+  --dominant-deep: #4A6BA3;
+  --accent: #E23A54;
+  --accent-soft: #F06B7E;
+
+  /* shadcn token overrides — v2 night-paper */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper-tint);
+  --card-foreground: var(--ink);
+  --popover: var(--paper);
+  --popover-foreground: var(--ink);
+  --primary: var(--dominant);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: var(--paper-edge);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-edge);
+  --muted-foreground: var(--ink-faint);
+  /* --accent resolves to v2 dark vermillion (#E23A54) from token above */
+  --accent-foreground: hsl(0 0% 100%);
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+  --border: var(--rule);
+  --input: var(--rule);
+  --ring: var(--accent);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -216,56 +274,54 @@
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
 
-  /* t5 — legacy token dark aliases. Components still using --bg-elevated,
-     --text-primary, --rule-default etc. flip correctly via these.
-     Long-term: migrate callsites to --lm-* tokens directly. */
-  --bg-canvas:      var(--lm-bg-base);
-  --bg-elevated:    var(--lm-bg-surface);
-  --bg-subtle:      var(--lm-bg-subtle);
-  --text-primary:   var(--lm-text-primary);
-  --text-secondary: var(--lm-text-secondary);
-  --text-muted:     var(--lm-text-tertiary);
-  --text-disabled:  var(--lm-text-tertiary);
-  --rule-default:   var(--lm-border-subtle);
-  --rule-strong:    var(--lm-border-subtle);
-  --cta-primary:    hsl(220 40% 58%);
+  /* t5 / v2 — intermediate token dark overrides. Chains: component → --bg-* /
+     --text-* / --rule-* → --lm-* → v2 canonical → flips correctly. */
+  --bg-canvas:      var(--paper);
+  --bg-elevated:    var(--paper-tint);
+  --bg-subtle:      var(--paper-edge);
+  --text-primary:   var(--ink);
+  --text-secondary: var(--ink-soft);
+  --text-muted:     var(--ink-faint);
+  --text-disabled:  var(--ink-faint);
+  --rule-default:   var(--rule);
+  --cta-primary:    var(--dominant);
 
-  /* nav backdrop-blur bg for dark mode */
-  --lm-bg-blur: rgba(26, 22, 18, 0.82);
+  /* nav backdrop-blur bg for dark mode (v2 night-paper) */
+  --lm-bg-blur: rgba(14, 22, 38, 0.82);
 
-  /* warm editorial palette dark overrides */
-  --lm-warm-peach:      #5C3A28;
-  --lm-warm-peach-deep: #8B5A42;
-  --lm-warm-espresso:   #C8B89A;
-  --lm-warm-cream:      #1E1A14;
-  --lm-warm-sand:       #2A2018;
+  /* warm editorial palette — v2 night-paper remaps */
+  --lm-warm-peach:      var(--paper-edge);
+  --lm-warm-peach-deep: var(--dominant-soft);
+  --lm-warm-espresso:   var(--ink);
+  --lm-warm-cream:      var(--paper);
+  --lm-warm-sand:       var(--paper-tint);
 
-  /* DESIGN.md v1 dark mode overrides */
-  --lm-brand: #D4A847;
-  --lm-brand-deep: #A88830;
-  --lm-brand-tint: #3A2F18;
-  --lm-brand-glow: #C9A04A;
-  --lm-couche-propos: #D66A47;
-  --lm-couche-plan: #BC8447;
-  --lm-couche-construction: #B07A38;
-  --lm-couche-pieges: #F08940;
-  --lm-couche-musique: #E0BC50;
+  /* --lm-* dark aliases — v2 canonical values */
+  --lm-brand: var(--dominant);
+  --lm-brand-deep: var(--dominant-deep);
+  --lm-brand-tint: var(--paper-tint);
+  --lm-brand-glow: var(--dominant-soft);
+  --lm-couche-propos: var(--dominant);
+  --lm-couche-plan: var(--dominant);
+  --lm-couche-construction: var(--dominant);
+  --lm-couche-pieges: var(--accent);
+  --lm-couche-musique: var(--dominant);
   --lm-success: #8FB058;
   --lm-success-25: rgba(143, 176, 88, 0.25);
   --lm-warning: #E2A040;
   --lm-error: #D45A3A;
   --lm-info: #9B8AAB;
-  --lm-bg-base: #1A1612;
-  --lm-bg-surface: #241F1A;
-  --lm-bg-subtle: #2C2620;
-  --lm-text-primary: #F5F0E5;
-  --lm-text-secondary: #B5AC9C;
-  --lm-text-tertiary: #857D70;
-  --lm-border-subtle: #3A332B;
+  --lm-bg-base: var(--paper);
+  --lm-bg-surface: var(--paper-tint);
+  --lm-bg-subtle: var(--paper-edge);
+  --lm-text-primary: var(--ink);
+  --lm-text-secondary: var(--ink-soft);
+  --lm-text-tertiary: var(--ink-faint);
+  --lm-border-subtle: var(--rule);
 }
 
 @theme inline {
@@ -277,6 +333,17 @@
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   --font-display: var(--font-cabinet);
   --font-serif: var(--font-source-serif);
+
+  /* DESIGN.md v2 — Atelier Français canonical Tailwind utilities */
+  --color-paper: var(--paper);
+  --color-paper-tint: var(--paper-tint);
+  --color-paper-edge: var(--paper-edge);
+  --color-ink: var(--ink);
+  --color-dominant: var(--dominant);
+  --color-dominant-soft: var(--dominant-soft);
+  --color-dominant-deep: var(--dominant-deep);
+  --color-couche-default: var(--couche-default);
+  --color-couche-pieges: var(--couche-pieges);
 
   /* F-VISUAL-001 — canonical token surface exposed as Tailwind
      utilities (bg-bg-canvas, text-text-primary, border-rule-default,
