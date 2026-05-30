@@ -4026,4 +4026,25 @@ TBD tickets below have ambiguous milestone assignments. One-line questions for C
 
 ---
 
+### M2 ops — Disable Playwright auto-captures + clean output (drive constraint)
+
+**Milestone:** M2 ops
+**Status:** ✅ Shipped — (main, 2026-05-30)
+
+**What shipped:**
+- `playwright.config.ts`: `screenshot: 'off'`, `video: 'off'`, `trace: 'off'` added to `use` block. Previously only `trace: 'on-first-retry'` was set; screenshot/video were implicitly off. All three now explicit.
+- `.gitignore`: Added `playwright-report/`, `tests/screenshots/`, `tests/traces/`, `tests/videos/` alongside existing `test-results/` entry.
+- Deleted `test-results/` directory (existed on disk, empty, 0 MB). No other capture directories were present.
+
+**F-225 verification approach change (Chadi 2026-05-30 — drive constraint):** F-225 amendment (automated Playwright capture as the verification receipt) is **reverted** for the current dev machine. Verification approach for all future tickets reverts to:
+1. Manual smoke test against local dev server.
+2. Confirm `next build` passes.
+3. Deploy to lemethodic.com (Vercel) and verify the live URL.
+
+The F-225 amendment remains documented in CLAUDE.md as the intended protocol; it will be re-enabled when drive space allows. Until then, `non-visual change — verification skipped` or `manual smoke pass` are acceptable receipt notes on PRD entries.
+
+**Disk freed:** 0 MB (captures were already empty). Config and gitignore changes prevent future accumulation.
+
+---
+
 End of BACKLOG.md.

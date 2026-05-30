@@ -35,8 +35,12 @@ next-env.d.ts
 !.claude/agents/
 !.claude/commands/
 
-# Playwright per-run state (F-225 captures live elsewhere)
+# Playwright capture output — all off per M2 ops (drive constraint, 2026-05-30)
 test-results/
+playwright-report/
+tests/screenshots/
+tests/traces/
+tests/videos/
 
 # t5 dark mode gallery — visual review artifact, not committed
 t5-dark-mode-gallery/
