@@ -2,14 +2,25 @@ import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 
 interface CouchesLayerProps {
   number: number
+  heading: string
   name: string
   description: string
   backgroundColor: string
   accentColor: string
   nameColor?: string
+  headingColor?: string
 }
 
-export default function CouchesLayer({ number, name, description, backgroundColor, accentColor, nameColor = 'var(--dominant)' }: CouchesLayerProps) {
+export default function CouchesLayer({
+  number,
+  heading,
+  name,
+  description,
+  backgroundColor,
+  accentColor,
+  nameColor = 'var(--dominant)',
+  headingColor = 'var(--ink)',
+}: CouchesLayerProps) {
   return (
     <div
       data-testid="couche-layer"
@@ -49,21 +60,36 @@ export default function CouchesLayer({ number, name, description, backgroundColo
         </span>
         <div>
           <h3
+            data-testid="couche-heading"
+            style={{
+              fontFamily: SANS_FONT,
+              fontWeight: 600,
+              fontSize: 'clamp(1.125rem, 1.6vw, 1.375rem)',
+              lineHeight: 1.2,
+              letterSpacing: '-0.015em',
+              color: headingColor,
+              margin: 0,
+              marginBottom: 4,
+            }}
+          >
+            {heading}
+          </h3>
+          <p
             data-testid="couche-name"
             style={{
               fontFamily: SERIF_FONT,
               fontStyle: 'italic',
               fontWeight: 400,
-              fontSize: 'clamp(1.125rem, 1.6vw, 1.375rem)',
+              fontSize: '0.9375rem',
               lineHeight: 1.2,
-              letterSpacing: '-0.01em',
+              letterSpacing: '0',
               color: nameColor,
               margin: 0,
-              marginBottom: 10,
+              marginBottom: 12,
             }}
           >
             {name}
-          </h3>
+          </p>
           <p
             data-testid="couche-description"
             style={{

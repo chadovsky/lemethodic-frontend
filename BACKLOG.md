@@ -4236,4 +4236,41 @@ The F-225 amendment remains documented in CLAUDE.md as the intended protocol; it
 
 ---
 
+---
+
+## M2 5-couche restate: English benefit-led headers + French names as supporting brand label ✅ Shipped
+
+**Status:** ✅ Shipped
+
+**Scope:** Copy + layout change only. No token changes, no globals.css edits, no route logic.
+
+### Changes
+
+**`components/landing/CouchesLayer.tsx`**
+
+Added `heading: string` and `headingColor?: string` props (default `'var(--ink)'`). New render order:
+1. `<h3 data-testid="couche-heading">` — English benefit-led header, SANS_FONT, weight 600, `headingColor`, marginBottom 4px
+2. `<p data-testid="couche-name">` — French brand label, SERIF_FONT italic, 0.9375rem (~80% of heading), lineHeight 1.2, `nameColor`, marginBottom 12px
+3. `<p data-testid="couche-description">` — Body copy, unchanged
+
+`data-testid="couche-name"` moved from h3 to the French label `<p>` to preserve unit test compatibility (test checks French names via this testid).
+
+**`components/landing/MethodologyPreview.tsx`**
+
+COUCHES array updated: added `heading` field (English header) and `headingColor` per entry. Updated descriptions 1 and 5.
+
+| # | English heading | French label | headingColor | nameColor |
+|---|---|---|---|---|
+| 01 | Structure that holds under pressure | Le Propos | var(--ink) | var(--dominant) |
+| 02 | Ideas on tap, not memorized | Le Plan | var(--ink) | var(--dominant) |
+| 03 | Sentences examiners recognize | La Construction | var(--ink) | var(--dominant) |
+| 04 | Anglo traps that cost the most points | Les Pièges Anglais | var(--accent) | var(--accent) |
+| 05 | The rhythm examiners reward | La Musique | var(--ink) | var(--dominant) |
+
+Updated descriptions (1 restated, 5 shortened): "A clear position, developed argument, and grounded conclusion: the structural backbone every oral response needs." / "the delivery layer that carries your method into the scoring grid" (removed "examiner").
+
+**Deferred:** `ProductDemo.tsx` demo text em-dashes (A-003/A-005/A-006 scope). CouchesLayer accentColor still uses lm-pastel-* tokens (C-003 scope). Section CTA `href="/method"` not yet verified as live route.
+
+**Verification:** `pnpm build` clean. Em-dash regression check on new copy strings: 0. Unit test `MethodologyPreview.test.tsx` compatible (data-testid="couche-name" still returns French names).
+
 End of BACKLOG.md.

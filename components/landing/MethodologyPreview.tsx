@@ -5,43 +5,53 @@ import CouchesLayer from './CouchesLayer'
 
 const COUCHES = [
   {
+    heading: "Structure that holds under pressure",
     name: "Le Propos",
     description:
-      "The structural backbone of every oral response: a clear position, developed argument, and grounded conclusion.",
+      "A clear position, developed argument, and grounded conclusion: the structural backbone every oral response needs.",
     backgroundColor: 'var(--paper)',
     accentColor: 'var(--lm-pastel-peach)',
+    headingColor: 'var(--ink)',
     nameColor: 'var(--dominant)',
   },
   {
+    heading: "Ideas on tap, not memorized",
     name: "Le Plan",
     description:
       "Ready-made idea frameworks that let you generate relevant content instantly, without relying on memorized topics.",
     backgroundColor: 'var(--paper-edge)',
     accentColor: 'var(--lm-pastel-sage)',
+    headingColor: 'var(--ink)',
     nameColor: 'var(--dominant)',
   },
   {
+    heading: "Sentences examiners recognize",
     name: "La Construction",
     description:
       "Sentence-level grammar templates that package your ideas into natural, examiner-recognized French structures.",
     backgroundColor: 'var(--paper)',
     accentColor: 'var(--lm-pastel-butter)',
+    headingColor: 'var(--ink)',
     nameColor: 'var(--dominant)',
   },
   {
+    heading: "Anglo traps that cost the most points",
     name: "Les Pièges Anglais",
     description:
       "A targeted inventory of anglophone interference patterns: the syntax, register, and reflex traps that cost English speakers points.",
     backgroundColor: 'var(--paper-edge)',
     accentColor: 'var(--lm-pastel-lavender)',
+    headingColor: 'var(--accent)',
     nameColor: 'var(--accent)',
   },
   {
+    heading: "The rhythm examiners reward",
     name: "La Musique",
     description:
-      "Prosody, pacing, and hesitation management: the delivery layer that carries your method into the examiner scoring grid.",
+      "Prosody, pacing, and hesitation management: the delivery layer that carries your method into the scoring grid.",
     backgroundColor: 'var(--paper)',
     accentColor: 'var(--lm-pastel-sky)',
+    headingColor: 'var(--ink)',
     nameColor: 'var(--dominant)',
   },
 ]
@@ -87,10 +97,12 @@ export default function MethodologyPreview() {
           <RevealOnScroll key={couche.name} delay={i * 0.05}>
             <CouchesLayer
               number={i + 1}
+              heading={couche.heading}
               name={couche.name}
               description={couche.description}
               backgroundColor={couche.backgroundColor}
               accentColor={couche.accentColor}
+              headingColor={couche.headingColor}
               nameColor={couche.nameColor}
             />
           </RevealOnScroll>
