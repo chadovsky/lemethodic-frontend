@@ -3995,4 +3995,35 @@ TBD tickets below have ambiguous milestone assignments. One-line questions for C
 
 ---
 
+### M2 t11 — Wire Type A typography tokens + next/font loading
+
+**Milestone:** M2 (token foundation)
+**Status:** ✅ Shipped — ee03af4 (main, 2026-05-30)
+
+**What shipped:**
+- Five fonts loaded via `next/font/google` in `app/layout.tsx`, all with `subsets: ['latin', 'latin-ext']` for French diacritics (é è ê à ô ç œ Œ):
+  - `Instrument_Serif` w400 → `--font-instrument-serif`
+  - `Crimson_Pro` w400/600 normal+italic → `--font-crimson-pro`
+  - `Instrument_Sans` w400/500/600 → `--font-instrument-sans`
+  - `Inter` w400/500/600 → `--font-inter`
+  - `DM_Mono` w400/500 → `--font-dm-mono`
+- All five `.variable` bindings on `<html>` className.
+- `globals.css` `:root` — DESIGN.md v2 semantic aliases: `--f-display`, `--f-body`, `--f-ui`, `--f-en`, `--f-mono` → next/font injected vars.
+- `@theme inline` utilities: `--font-display`, `--font-body`, `--font-ui-fr`, `--font-ui-en`, `--font-mono`.
+- Legacy shadcn bridges: `--font-sans → --f-ui` (Instrument Sans), `--font-serif → --f-body` (Crimson Pro). No broken references.
+- Stale v1 fonts (Cabinet Grotesk localFont, v1 Geist, v1 Source Serif 4) removed from imports + all CSS references.
+- `Select-String -Pattern 'Cabinet Grotesk|Geist|Source Serif'` → 0 matches in `app/layout.tsx` + `app/globals.css`.
+- `themeColor` updated from warm cream to v2 `--paper` (#FFFFFF).
+
+**⚠ Playwright diacritic gate deferred:** Target routes (`/la-methode`, `/la-bibliotheque`, `/l-examen`) are M-RENAME routes that currently 404 per DESIGN.md §10. French diacritic visual verification batched into the soft-beta launch full-surface Playwright battery (F-225 amendment). Coverage exists for all live routes.
+
+**PR notes for Chadi — weight choices (DESIGN.md silent on these):**
+- Instrument Serif: w400 only (no other weights on Google Fonts for this face).
+- Crimson Pro italic included (editorial body pull quotes, marginalia per DESIGN.md §7).
+- Instrument Sans / Inter / DM Mono weights flagged in the commit; use the table defaults from the brief.
+
+**Blocks:** t1–t9 re-execution against v2 spec.
+
+---
+
 End of BACKLOG.md.
