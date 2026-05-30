@@ -4047,4 +4047,26 @@ The F-225 amendment remains documented in CLAUDE.md as the intended protocol; it
 
 ---
 
+## M-VISUAL-AUDIT — Surface visual audit (read-only punch-list)
+
+**Milestone:** M2 foundation
+**Status:** ✅ Shipped — (main, 2026-05-30)
+
+**What shipped:**
+- `M-VISUAL-AUDIT.md` created at repo root: read-only static analysis across all working routes.
+- 49 findings across 5 categories (A: off-palette colors, B: off-system Tailwind utilities, C: tokenization opportunities, D: contrast risks, E: copy violations).
+- Zero source-file modifications — pure audit output.
+- All 8 known screenshot issues mapped to findings.
+
+**Key findings:**
+- **A-007** (root cause): F-VISUAL-001 `:root` intermediate tokens (`--bg-canvas`, `--text-primary`, `--cta-primary`) still hold v1 warm-cream hex values; light mode components consuming these get v1 look.
+- **A-008/A-010**: `lib/typography.ts` SANS_FONT/SERIF_FONT still reference Geist/Source Serif 4; 20+ components inherit banned fonts.
+- **E-001**: `BRAND = 'LeMethodic'` in `lib/copy.ts` — missing space and accent; drives all landing body copy.
+- **E-003/E-004**: BottomNav/TopNav nav labels in English ("Speaking", "Writing", "Progress").
+- **E-005**: "4 couches" in WritingPromptPicker (should be 5).
+
+**Non-visual change — verification skipped** (audit doc only, no UI surface changes).
+
+---
+
 End of BACKLOG.md.
