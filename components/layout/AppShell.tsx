@@ -113,6 +113,7 @@ export default function AppShell({ children }: AppShellProps) {
       <Sidebar
         drawerOpen={drawerOpen}
         onLinkClick={closeDrawer}
+        onClose={closeDrawer}
         onSignOut={() => signOut(router)}
         initials={initials}
       />

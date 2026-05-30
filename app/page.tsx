@@ -7,6 +7,7 @@ import MethodologyPreview from '@/components/landing/MethodologyPreview'
 import ProductDemo from '@/components/landing/ProductDemo'
 import PricingTeaser from '@/components/landing/PricingTeaser'
 import Footer from '@/components/landing/Footer'
+import AuthRedirect from '@/components/auth/AuthRedirect'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -21,6 +22,9 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
+      {/* Redirect authenticated users to their dashboard server-side equivalent.
+          Client-side only — no httpOnly cookie is exposed to middleware. */}
+      <AuthRedirect to="/dashboard" />
       <main className="ed-page-enter">
         <Hero />
         <PersonaMatch />

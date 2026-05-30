@@ -16,6 +16,7 @@ const NAV_ITEMS = [
 interface SidebarProps {
   drawerOpen: boolean
   onLinkClick?: () => void
+  onClose?: () => void
   onSignOut?: () => void
   initials?: string
 }
@@ -23,6 +24,7 @@ interface SidebarProps {
 export default function Sidebar({
   drawerOpen,
   onLinkClick,
+  onClose,
   onSignOut,
   initials = 'CH',
 }: SidebarProps) {
@@ -32,7 +34,10 @@ export default function Sidebar({
       data-testid="app-shell-sidebar"
       data-drawer-open={drawerOpen}
       aria-label="Primary"
-      className="app-shell-sidebar"
+      // lg:!top-16 offsets below the 64px TopNav on desktop so both nav
+      // systems coexist without overlapping. Mobile keeps top:0 (full-height
+      // drawer). !important needed to override the inline top:0.
+      className="app-shell-sidebar lg:!top-16"
       style={{
         position: 'fixed',
         top: 0,
@@ -83,6 +88,37 @@ export default function Sidebar({
         >
           <Wordmark size="nav" />
         </Link>
+        {onClose && (
+          <button
+            type="button"
+            aria-label="Close navigation"
+            // Visible on mobile only — desktop sidebar is always-open column.
+            className="lg:hidden inline-flex items-center justify-center"
+            onClick={onClose}
+            style={{
+              marginLeft: 'auto',
+              width: 32,
+              height: 32,
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--text-primary)',
+              borderRadius: 4,
+              padding: 0,
+              flexShrink: 0,
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              <path
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                d="M2 2l12 12M14 2L2 14"
+                fill="none"
+              />
+            </svg>
+          </button>
+        )}
       </div>
 
       <nav aria-label="App sections" style={{ flex: 1 }}>

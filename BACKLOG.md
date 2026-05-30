@@ -4354,4 +4354,43 @@ Excluded (plaintext contexts, unchanged): `AppShell.tsx` mobile top-bar brand la
 
 **Verification:** `pnpm build` clean. 402 unit tests pass. CouchesBreakdown failure pre-existing (t10 token rename).
 
+## M2-shell-sweep: sidebar overlap + mobile drawer close + marketing mobile nav + auth home redirect ✅ Shipped
+
+**Status:** ✅ Shipped
+
+**Scope:** Three independent shell defects fixed atomically.
+
+### Fix 1 — Desktop sidebar / TopNav overlap + mobile drawer close affordance
+
+**Root cause:** `Sidebar` (`position: fixed; top: 0; z-index: 50`) and `TopNav` (`position: sticky; top: 0; z-index: 50; height: 64px`) both anchored to the viewport top. Same z-index; Sidebar later in DOM order → Sidebar painted over TopNav's left 240px. Both brand marks simultaneously rendered.
+
+**Fix:** `className="app-shell-sidebar lg:!top-16"` on `<aside>` in `Sidebar.tsx`. Tailwind `lg:!top-16` = `@media (min-width: 1024px) { top: 64px !important }` — overrides the `top: 0` inline style at desktop. Sidebar now occupies a left column starting below the TopNav. Mobile drawer unaffected (< 1024px keeps `top: 0` from inline style).
+
+**Mobile close:** Added `onClose?: () => void` prop to `SidebarProps`. `AppShell` passes `onClose={closeDrawer}`. An × button (`className="lg:hidden"`) renders in the Sidebar header top-right on mobile. Existing backdrop click already closed the drawer; × button is the explicit affordance.
+
+**Files:** `Sidebar.tsx`, `AppShell.tsx`
+
+### Fix 2 — Marketing mobile nav
+
+**Root cause:** `StickyHeader` (marketing routes only) showed only a "Sign in" link at mobile. No hamburger; no access to La Méthode or Sign up from the sticky header.
+
+**Fix:** Added `menuOpen` state to `StickyHeader`. Desktop: "Sign in" link (`hidden md:inline-flex`) unchanged. Mobile: hamburger button (`md:hidden`) toggles a `position: fixed; top: 64px` slide-down nav with three entries: La Méthode → `/method`, Sign in → `/login`, Get started → `/signup`. Nav auto-closes on route change via `useEffect([pathname])`.
+
+**Files:** `StickyHeader.tsx`
+
+### Fix 3 — Authenticated home redirect
+
+**Root cause:** `/` served the public marketing hero to authenticated users with no redirect.
+
+**Fix:** `components/auth/AuthRedirect.tsx` — client component that mirrors `ProtectedRoute`'s Zustand hydration pattern in reverse: calls `useAuthStore.getState().hydrate()` on mount, then `router.replace(to)` when `hydrated && token`. Rendered at the top of `app/page.tsx` with `to="/dashboard"`. Marketing page SSR is preserved (no SEO impact). Authenticated users land on marketing for ≈1 frame before redirect fires (localStorage is synchronous; flash is imperceptible).
+
+**No-flash constraint note:** A true zero-flash server-side redirect requires a Next.js `middleware.ts` reading an httpOnly cookie. The auth stack (localStorage + Zustand) doesn't expose a cookie name to the FE. Adding a `lemethodic_session` cookie mirror to `lib/auth.ts` would achieve it but the constraint "no auth library code changes" blocks it. Deferred — if the refresh cookie name becomes known, a one-line `middleware.ts` is the next step.
+
+**Files:** `components/auth/AuthRedirect.tsx` (new), `app/page.tsx`
+
+### Common
+
+- `pnpm build` clean. 402 unit tests pass. Pre-existing CouchesBreakdown failure unchanged.
+- Adjacent deferred: `AppShell.tsx` mobile top-bar has inline `Le Méthodic` span (SERIF_FONT, not a Wordmark). Out of scope for this sweep — defer to a dedicated wordmark/typography pass.
+
 End of BACKLOG.md.
