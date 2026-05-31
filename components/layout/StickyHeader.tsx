@@ -12,7 +12,6 @@ import Wordmark from '@/components/Wordmark'
 const MARKETING_EXACT: ReadonlySet<string> = new Set([
   '/',
   '/fr',
-  '/exam-prep',
   '/fr/exam-prep',
   '/library',
   '/fr/library',

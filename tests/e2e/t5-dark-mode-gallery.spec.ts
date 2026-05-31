@@ -44,7 +44,6 @@ const AUTH_ROUTES = [
 // Public marketing / funnel routes.
 const PUBLIC_ROUTES = [
   '/',
-  '/exam-prep',
   '/fr',
   '/fr/exam-prep',
   '/fr/library',

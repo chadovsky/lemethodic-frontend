@@ -35,13 +35,11 @@ const EXCLUDED_PREFIXES = [
   '/refund',
 ] as const
 
-// F-300b — /exam-prep + /fr/exam-prep are the migrated funnel landings;
-// they keep marketing chrome (no in-product TopNav).
 // V-016g — /library + /fr/library stubs are also marketing surfaces.
+// /fr/exam-prep still has its own page; /exam-prep now redirects to /tcf-canada (F-332).
 const EXCLUDED_EXACT: ReadonlySet<string> = new Set([
   '/',
   '/fr',
-  '/exam-prep',
   '/fr/exam-prep',
   '/library',
   '/fr/library',

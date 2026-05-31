@@ -31,7 +31,6 @@ interface RouteResult extends RouteSpec {
 
 const STATIC_ROUTES: RouteSpec[] = [
   { path: '/', slug: 'home', isDynamic: false },
-  { path: '/exam-prep', slug: 'exam-prep', isDynamic: false },
   { path: '/library', slug: 'library', isDynamic: false },
   { path: '/login', slug: 'login', isDynamic: false },
   { path: '/method', slug: 'method', isDynamic: false },
