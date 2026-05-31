@@ -1,4 +1,4 @@
-# Le Méthodic — ROADMAP
+# Le Méthodic: ROADMAP
 
 **Anti-drift OS** • Source of truth for milestone sequencing.
 Last updated: 2026-05-25.
@@ -18,7 +18,7 @@ Last updated: 2026-05-25.
 
 ## Active
 
-**Milestone:** M0 — Audit + ROADMAP
+**Milestone:** M0: Audit + ROADMAP
 **Active micro-feature:** ROADMAP authoring (this file)
 
 ---
@@ -27,7 +27,7 @@ Last updated: 2026-05-25.
 
 **Parallel marketing track.** Marketing site work (homepage, exam landings, public method explainer, pricing page, founder + coaching pages, help and legal, blog, /library store) is tracked separately in ROADMAP-marketing.md. The product milestones M0 through M8 cover the authenticated app and backend. Both tracks ship independently. M8 soft-beta requires both tracks ready.
 
-### M0 — Audit + ROADMAP
+### M0: Audit + ROADMAP
 
 Establish the source of truth before any further work.
 
@@ -40,7 +40,7 @@ Establish the source of truth before any further work.
 
 ---
 
-### M1 — Surface parity
+### M1: Surface parity
 
 Every shipped surface renders without empty states, broken routes, or 500s.
 
@@ -52,12 +52,12 @@ Every shipped surface renders without empty states, broken routes, or 500s.
 - V-016c resolved (/ecole Fondations + Approfondissement render)
 - `NEXT_PUBLIC_API_URL` resolves in production
 
-**In-scope (initial map — Step 4 confirms):**
+**In-scope (initial map, Step 4 confirms):**
 F-328, F-329, F-330, V-016c, V-vercel-dup, W-* surface wiring tickets.
 
 ---
 
-### M2 — Visual coherence (DESIGN.md + M-RENAME + 5-couche)
+### M2: Visual coherence (DESIGN.md + M-RENAME + 5-couche)
 
 DESIGN.md v1 applied across all surfaces. Canonical names live everywhere.
 
@@ -75,7 +75,7 @@ DESIGN.md v1 applied across all surfaces. Canonical names live everywhere.
 
 ---
 
-### M3 — L'Examen e2e (F-322 + F-336-340)
+### M3: L'Examen e2e (F-322 + F-336-340)
 
 Complete diagnostic flow: Tâche 1 → 2 → 3 → scored report with examiner voice.
 
@@ -92,7 +92,7 @@ Complete diagnostic flow: Tâche 1 → 2 → 3 → scored report with examiner v
 
 ---
 
-### M4 — La Bibliothèque (F-321 + modes)
+### M4: La Bibliothèque (F-321 + modes)
 
 Vocab product live with all 4 modes and Phase 1 corpus loaded.
 
@@ -107,7 +107,7 @@ Vocab product live with all 4 modes and Phase 1 corpus loaded.
 
 ---
 
-### M5 — Le Maître (F-351)
+### M5: Le Maître (F-351)
 
 ElevenLabs Chadi-clone wired as unified tutor persona.
 
@@ -115,14 +115,14 @@ ElevenLabs Chadi-clone wired as unified tutor persona.
 - Le Maître voice plays in La Méthode lesson narration
 - Le Maître voice plays in La Bibliothèque tutor mode
 - Le Maître voice plays in L'Examen onboarding (not Tâches themselves)
-- OpenAI TTS-1-HD remains **examiner-only** during Tâches — non-negotiable brand separation
+- OpenAI TTS-1-HD remains **examiner-only** during Tâches. Non-negotiable brand separation.
 - F-351 voice selection locked
 
 **In-scope:** F-351.
 
 ---
 
-### M6 — Paywall + Stripe/LLC (B-104 + B-100 + D-028/029/033)
+### M6: Paywall + Stripe/LLC (B-104 + B-100 + D-028/029/033)
 
 Revenue infrastructure operational end-to-end.
 
@@ -141,7 +141,7 @@ Revenue infrastructure operational end-to-end.
 
 ---
 
-### M7 — Satisfaction gate
+### M7: Satisfaction gate
 
 Quality sign-off before exposing to users. One session.
 
@@ -153,7 +153,7 @@ Quality sign-off before exposing to users. One session.
 
 ---
 
-### M8 — Soft-beta 30-50
+### M8: Soft-beta 30-50
 
 Beta cohort onboarded, feedback loop running.
 
@@ -168,9 +168,9 @@ Beta cohort onboarded, feedback loop running.
 
 These exist in BACKLOG.md but do not gate soft-beta:
 
-- **S-001 / S-002** — Whisper async STT swap (Tâche 3 + vocab + batch only via Groq or CPU self-host; **streaming Tâche 1/2 stays AssemblyAI until V2+** — local Whisper needs GPU for sub-1s latency, doesn't pencil pre-volume)
-- **M-013** — programmatic SEO at scale
-- **M-018-028** — content marketing workflows
+- **S-001 / S-002**: Whisper async STT swap (Tâche 3 + vocab + batch only via Groq or CPU self-host; **streaming Tâche 1/2 stays AssemblyAI until V2+**, local Whisper needs GPU for sub-1s latency, doesn't pencil pre-volume)
+- **M-013**: programmatic SEO at scale
+- **M-018-028**: content marketing workflows
 - Native app wrappers (Capacitor)
 - Non-Anglophone UI localization (ES/PT/AR)
 - B2B tutor mode with student dashboards
