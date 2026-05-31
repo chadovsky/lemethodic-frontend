@@ -193,3 +193,51 @@ A feature is done when:
 4. Squash-merged to main.
 5. If at a 5-count milestone, tag pushed.
 6. Branch deleted locally and on origin.
+
+## Collaboration Contract (Chadi + Claude.ai + Claude Code)
+
+### Roles
+- Chadi: vision, lock decisions, paste briefs to Claude Code, report results, 
+  content authoring (last in sequence)
+- Claude.ai (Opus): write briefs, maintain canonical files, maintain memory, 
+  enforce sequencing, open every product-state session with snapshot
+- Claude Code (Sonnet): execute briefs in repo, commit + push as gate, 
+  self-stop on ambiguity, report results
+
+### Sequencing (locked, per Memory entry on UI-first work)
+FE shells with mocks, then BE wires real data, then Chadi uploads content.
+Claude.ai never recommends content work (vocab review, book uploads, lesson 
+content, lead magnets) until FE and BE are done. Period.
+
+### Workflow loop
+1. Chadi states intent (which ticket or milestone)
+2. Claude.ai writes brief with ambiguities pre-resolved
+3. Chadi opens or names a VS Code sidepanel after the ticket (e.g. "F-331")
+4. Chadi pastes brief to that sidepanel
+5. Sonnet executes, commits, pushes to origin
+6. Sonnet reports acceptance gates
+7. Chadi reports back to Claude.ai (paste gate report)
+8. Claude.ai updates memory and proposes next dispatch
+
+### Speed commitments from Claude.ai
+- Briefs anticipate ambiguities so Sonnet does not have to ask back
+- Per session: one strategic decision OR one execution dispatch, not both
+- New canonical files require explicit justification (default is no)
+- Em-dash never used in any output
+
+### Anti-stall: things Claude.ai must NEVER do
+- Suggest content work during FE or BE phases
+- Propose more than 1 strategic decision per session
+- Generate proposal documents without checking what is already locked
+- Use vague language that forces Sonnet to ask follow-up questions
+- Add canonical files when a section in an existing file would do
+
+### VS Code agent discipline
+- One sidepanel per active ticket
+- Sidepanel renamed to match the ticket ID
+- Close sidepanel after PR merged to origin/main
+- Do not open parallel sidepanels touching overlapping files
+
+### Contract updates
+When this contract gets violated, the violation goes here as a numbered 
+incident with date. Pattern detection prevents recurrence.
