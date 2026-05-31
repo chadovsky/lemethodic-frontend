@@ -50,7 +50,7 @@ function extractPromptPreview(prompt: Record<string, unknown>): string | null {
 export default function PracticeCTA({ detail }: PracticeCTAProps) {
   const tacheNum = TACHE_NUMBER[detail.tache_application]
   const tacheName = TACHE_NAME[detail.tache_application]
-  const href = `/speaking/tache-${tacheNum}?promptCluster=${encodeURIComponent(detail.slug)}`
+  const href = `/l-examen/expression-orale/tache-${tacheNum}?promptCluster=${encodeURIComponent(detail.slug)}`
   const promptPreview = extractPromptPreview(detail.practice_prompt)
 
   return (

@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 const INK          = 'var(--text-primary)'
@@ -8,7 +7,6 @@ const BG           = 'var(--lm-bg-base)'
 
 export default function FeedbackPlaceholderPage() {
   return (
-    <ProtectedRoute>
     <div
       style={{
         minHeight: '100dvh',
@@ -30,7 +28,7 @@ export default function FeedbackPlaceholderPage() {
         Feedback analysis is coming in F-058.
       </p>
       <Link
-        href="/speaking"
+        href="/l-examen/expression-orale"
         style={{
           display: 'inline-block',
           marginTop: 8,
@@ -44,9 +42,8 @@ export default function FeedbackPlaceholderPage() {
           textDecoration: 'none',
         }}
       >
-        Back to Speaking
+        Retour à Expression orale
       </Link>
     </div>
-    </ProtectedRoute>
   )
 }

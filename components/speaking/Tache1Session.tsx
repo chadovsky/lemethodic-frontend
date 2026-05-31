@@ -208,7 +208,7 @@ export default function Tache1Session() {
       if (result.recordingId == null) {
         throw new Error('Analysis returned no recording id.')
       }
-      router.push(`/l-examen?session=${result.recordingId}`)
+      router.push(`/l-examen/diagnostic?session=${result.recordingId}`)
     } catch (err) {
       finalizingRef.current = false
       handleApiError(err, 'Could not finalize the session. Retry?')
@@ -500,7 +500,7 @@ export default function Tache1Session() {
           onExit={() => {
             if (confirm('End this session?')) {
               recorder.reset()
-              router.push('/speaking')
+              router.push('/l-examen/expression-orale')
             }
           }}
           turnDisplay={showTurnIndicator ? turnDisplay : null}

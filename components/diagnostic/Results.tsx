@@ -126,7 +126,7 @@ export default function Results() {
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', paddingTop: 8 }}>
         <Link
           data-testid="results-action-recommencer"
-          href="/l-examen/tache/1"
+          href="/l-examen/diagnostic/tache/1"
           className="ed-btn-press"
           style={{
             fontFamily: SANS_FONT,

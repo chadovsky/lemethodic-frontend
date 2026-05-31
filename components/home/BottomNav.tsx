@@ -18,8 +18,8 @@ interface Tab {
 
 const TABS: Tab[] = [
   { href: '/cours/methode-tcf-canada', label: 'Méthode', Icon: Home         },
-  { href: '/speaking',  label: 'Oral',     Icon: Mic          },
-  { href: '/writing',   label: 'Écrit',    Icon: PenLine      },
+  { href: '/l-examen/expression-orale',   label: 'Oral',  Icon: Mic     },
+  { href: '/l-examen/expression-ecrite', label: 'Écrit', Icon: PenLine },
   { href: '/progress',  label: 'Progrès',  Icon: BarChart2    },
   { href: '/more',      label: 'More',      Icon: MoreHorizontal },
 ]

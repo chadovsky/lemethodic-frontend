@@ -79,8 +79,8 @@ const COPY = {
 
 const NAV_LINKS = [
   { key: 'ecole' as const, href: '/cours/methode-tcf-canada', match: ['/cours/methode-tcf-canada', '/cluster', '/learn'] },
-  { key: 'speaking' as const, href: '/speaking', match: ['/speaking'] },
-  { key: 'writing' as const, href: '/writing', match: ['/writing'] },
+  { key: 'speaking' as const, href: '/l-examen/expression-orale', match: ['/l-examen/expression-orale'] },
+  { key: 'writing' as const, href: '/l-examen/expression-ecrite', match: ['/l-examen/expression-ecrite'] },
   { key: 'progress' as const, href: '/progress', match: ['/progress', '/l-examen'] },
 ] as const
 

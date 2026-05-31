@@ -33,7 +33,7 @@ const CARDS: TacheCard[] = [
     metaClock: '5–8 min',
     metaMode: 'Conversation',
     MetaIcon: MessageCircle,
-    href: '/speaking/tache-1/interview',
+    href: '/l-examen/expression-orale/tache-1/interview',
   },
   {
     number: 2,
@@ -43,7 +43,7 @@ const CARDS: TacheCard[] = [
     metaClock: '8–12 min',
     metaMode: 'Hold to talk',
     MetaIcon: Mic,
-    href: '/speaking/tache-2',
+    href: '/l-examen/expression-orale/tache-2',
   },
   {
     number: 3,
@@ -53,7 +53,7 @@ const CARDS: TacheCard[] = [
     metaClock: '5 min · 2 min prep + 3 min',
     metaMode: 'Solo recording',
     MetaIcon: Mic,
-    href: '/speaking/tache-3/environnement',
+    href: '/l-examen/expression-orale/tache-3/environnement',
   },
 ]
 
@@ -221,7 +221,7 @@ export default function SpeakingLanding() {
             >
               Recommended right now
             </p>
-            <Link href="/speaking/tache-2/agence-voyages" style={{ textDecoration: 'none' }}>
+            <Link href="/l-examen/expression-orale/tache-2/agence-voyages" style={{ textDecoration: 'none' }}>
               <div
                 style={{
                   backgroundColor: SAGE,

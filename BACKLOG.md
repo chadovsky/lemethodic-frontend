@@ -4477,10 +4477,21 @@ Milestone: M2
 Milestone: M3
 
 **Priority:** HIGH
+**Status:** ✅ Shipped
+**Filed:** 2026-05-31
+**Shipped:** 2026-05-31
+**Source:** Session 3 lock: L'Examen unified under one umbrella per SITEMAP.md
+**Scope:** Refactor `/l-examen` to serve as umbrella for 4 sections. Diagnostic moved to `/l-examen/diagnostic`. Speaking (`/speaking`) moved to `/l-examen/expression-orale`. Writing (`/writing`) moved to `/l-examen/expression-ecrite`. Both adopted (app) group AppShell. Comprehension-orale, comprehension-ecrite, mock skeleton pages created. 7 redirect rules added (speaking, writing, old tache/results paths).
+**Owner:** Frontend Engineering
+
+### F-341: [FE+Design] Sidebar audit, consolidation, and collapse toggle
+Milestone: M3
+
+**Priority:** MEDIUM
 **Status:** 📋 Queued
 **Filed:** 2026-05-31
-**Source:** Session 3 lock: L'Examen unified under one umbrella per SITEMAP.md
-**Scope:** Refactor `/l-examen` to serve as umbrella for 4 sections. Add `/comprehension-orale`, `/comprehension-ecrite` as net-new surfaces. Move existing `/l-examen` Taches 1/2/3 under `/l-examen/expression-orale/tache-N`. Fold `/ecrit` (L'Ecrit) under `/l-examen/expression-ecrite`. Set 308 redirects from old routes.
+**Source:** F-335 dispatch identified sidebar complexity deferred from scope
+**Scope:** Audit current sidebar implementation(s). Count distinct sidebar components. Document collapse toggle behavior or its absence. Apply DESIGN.md v2 Atelier Francais palette. Consolidate to a single canonical sidebar component if multiple exist. Add collapse toggle if missing. Quality reference: Pro Sidebar pattern (collapsible icon + label nav, hamburger toggle, polished hover and active states).
 **Owner:** Frontend Engineering
 
 ### F-336: [FE+BE] Comprehension surface implementation

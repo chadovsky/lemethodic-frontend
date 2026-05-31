@@ -10,8 +10,8 @@ test.beforeEach(async ({ page }) => {
 const ROUTES = [
   '/',
   '/dashboard',
-  '/l-examen/results',
-  '/l-examen/tache/1',
+  '/l-examen/diagnostic/results',
+  '/l-examen/diagnostic/tache/1',
   '/cours/methode-tcf-canada',
   '/cours/methode-tcf-canada/lecon-1',
   '/la-bibliotheque',

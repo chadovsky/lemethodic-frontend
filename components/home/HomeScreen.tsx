@@ -460,7 +460,7 @@ export default function HomeScreen({
                 ]}
                 illustrationSrc="/illustration-language.jpg"
                 illustrationAlt="Speech bubble illustration"
-                href="/speaking/tache-2/agence-voyages"
+                href="/l-examen/expression-orale/tache-2/agence-voyages"
               />
             </div>
 

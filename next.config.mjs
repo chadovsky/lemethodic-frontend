@@ -24,6 +24,16 @@ const nextConfig = {
       { source: '/vocabulaire/:path*', destination: '/la-bibliotheque/:path*', permanent: true },
       { source: '/diagnostic', destination: '/l-examen', permanent: true },
       { source: '/diagnostic/:path*', destination: '/l-examen/:path*', permanent: true },
+      // F-335: /speaking -> /l-examen/expression-orale
+      { source: '/speaking', destination: '/l-examen/expression-orale', permanent: true },
+      { source: '/speaking/:path*', destination: '/l-examen/expression-orale/:path*', permanent: true },
+      // F-335: /writing -> /l-examen/expression-ecrite
+      { source: '/writing', destination: '/l-examen/expression-ecrite', permanent: true },
+      { source: '/writing/:path*', destination: '/l-examen/expression-ecrite/:path*', permanent: true },
+      // F-335: /l-examen/results and /l-examen/tache/:n -> under /diagnostic/
+      { source: '/l-examen/results', destination: '/l-examen/diagnostic/results', permanent: true },
+      { source: '/l-examen/results/:path*', destination: '/l-examen/diagnostic/results/:path*', permanent: true },
+      { source: '/l-examen/tache/:n', destination: '/l-examen/diagnostic/tache/:n', permanent: true },
     ]
   },
 }

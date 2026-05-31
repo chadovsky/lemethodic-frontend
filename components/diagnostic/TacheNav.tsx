@@ -35,7 +35,7 @@ export default function TacheNav({ tacheId }: { tacheId: TacheId }) {
       {hasPrev ? (
         <Link
           data-testid="tache-nav-prev"
-          href={`/l-examen/tache/${tacheId - 1}`}
+          href={`/l-examen/diagnostic/tache/${tacheId - 1}`}
           className="ed-btn-press"
           style={NAV_LINK_STYLE}
         >
@@ -48,7 +48,7 @@ export default function TacheNav({ tacheId }: { tacheId: TacheId }) {
       {hasNext ? (
         <Link
           data-testid="tache-nav-next"
-          href={`/l-examen/tache/${(tacheId + 1) as TacheId}`}
+          href={`/l-examen/diagnostic/tache/${(tacheId + 1) as TacheId}`}
           className="ed-btn-press"
           style={NAV_LINK_STYLE}
         >
@@ -57,7 +57,7 @@ export default function TacheNav({ tacheId }: { tacheId: TacheId }) {
       ) : (
         <Link
           data-testid="tache-nav-results"
-          href="/l-examen/results"
+          href="/l-examen/diagnostic/results"
           className="ed-btn-press"
           style={{
             ...NAV_LINK_STYLE,

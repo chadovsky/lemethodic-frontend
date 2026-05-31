@@ -24,7 +24,7 @@ const ROWS = [
     chipColor: 'var(--lm-pastel-butter)',
     suggestion:
       "Travailler l'intonation et le débit sur les tâches orales courtes.",
-    cta: { label: 'Travailler La Musique', href: '/l-examen/tache/1' },
+    cta: { label: 'Travailler La Musique', href: '/l-examen/diagnostic/tache/1' },
   },
 ]
 

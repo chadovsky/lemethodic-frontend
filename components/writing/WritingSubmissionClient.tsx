@@ -356,7 +356,7 @@ export default function WritingSubmissionClient({ promptId }: Props) {
       <div style={{ maxWidth: 720, margin: '0 auto', padding: 'clamp(20px, 3vw, 32px) clamp(16px, 4vw, 32px) 96px' }}>
         {/* Back link */}
         <Link
-          href="/writing"
+          href="/l-examen/expression-ecrite"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -1317,7 +1317,7 @@ function NotFoundState({ message, backLabel }: { message: string; backLabel: str
     <div role="alert" style={{ padding: '48px 16px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
       <h1 style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 28, color: ED_FG, margin: 0 }}>{message}</h1>
       <Link
-        href="/writing"
+        href="/l-examen/expression-ecrite"
         style={{
           fontFamily: SANS,
           fontWeight: 600,
