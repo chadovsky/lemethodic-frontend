@@ -4488,11 +4488,39 @@ Milestone: M3
 Milestone: M3
 
 **Priority:** MEDIUM
-**Status:** 📋 Queued
+**Status:** 🔄 In progress (audit shipped 2026-05-31 at docs/sidebar-audit-2026-05-31.md; consolidation + toggle work is follow-up)
 **Filed:** 2026-05-31
 **Source:** F-335 dispatch identified sidebar complexity deferred from scope
 **Scope:** Audit current sidebar implementation(s). Count distinct sidebar components. Document collapse toggle behavior or its absence. Apply DESIGN.md v2 Atelier Francais palette. Consolidate to a single canonical sidebar component if multiple exist. Add collapse toggle if missing. Quality reference: Pro Sidebar pattern (collapsible icon + label nav, hamburger toggle, polished hover and active states).
+**Audit findings summary:** 2 sidebar implementations found. S1 (Sidebar.tsx, active, production) has no desktop collapse toggle. S2 (ui/sidebar.tsx, Radix UI) is unused dead code. Recommended path: keep S1 as base, add icons + desktop toggle + cookie persistence + Cmd+B + focus trap. Full findings at docs/sidebar-audit-2026-05-31.md.
 **Owner:** Frontend Engineering
+
+### F-342: [BE+Docs] BE audit findings reference and follow-up tracking
+
+**Priority:** MEDIUM
+**Status:** 📋 Queued (becomes in-progress once BE audit completes)
+**Filed:** 2026-05-31
+**Source:** BE audit work in progress; referenced in session dispatch
+**Scope:** References docs/be-audit-2026-05-31.md in the BE repo (local path: C:\Users\pc\Downloads\tcf-oral-tool\tcf-oral-tool\docs\). Catalogs follow-up tickets that arise from the BE audit findings (N+1 queries, pagination gaps, missing indexes, connection pool config, security checklist items). Each follow-up gets its own ticket ID once identified; this ticket tracks the overall remediation status.
+**Owner:** Backend Engineering
+
+### F-343: [FE] CouchesBreakdown.test.tsx token mismatch
+
+**Priority:** LOW
+**Status:** 📋 Queued
+**Filed:** 2026-05-31
+**Source:** F-331 gate report (2026-05-31) surfaced 1 failing test in unit suite (401/402 passing)
+**Scope:** Test failure where fp-sage token reference does not match current lm-pastel-sage canonical token. Either update test to use new token name, or update CouchesBreakdown component to maintain backward-compatible token name. Pre-existing failure, non-blocking.
+**Owner:** Frontend Engineering
+
+### F-344: [FE] Historical FIXME tickets review (F-039 through F-043, F-045)
+
+**Priority:** LOW
+**Status:** 📋 Queued -- Chadi action needed
+**Filed:** 2026-05-31
+**Source:** Backlog enforcement gap: layer tag cannot be determined from title alone
+**Scope:** Tickets F-039 through F-043 and F-045 are tagged [FE] by default because their titles read "[historical, see code comments]" and the layer cannot be determined from title alone. Chadi to review the code comments referenced in each ticket and confirm or update the layer tag. Could be [FE], [BE], or [FE+BE].
+**Owner:** Chadi (review) then Frontend Engineering (update)
 
 ### F-336: [FE+BE] Comprehension surface implementation
 Milestone: M3
