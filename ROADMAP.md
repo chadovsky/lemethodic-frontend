@@ -122,6 +122,18 @@ ElevenLabs Chadi-clone wired as unified tutor persona.
 
 ---
 
+### M5.5: BE pre-monetization hardening
+
+Backend hardening required before revenue infrastructure is safe to expose.
+
+**Acceptance:**
+1. Tier enforced server-side; free token rejected from paid endpoints (P-105)
+2. AI endpoints rate-limited per user, 429 on breach (F-401)
+3. FK indexes present and used (F-402)
+4. Flagged endpoints free of N+1 (F-403)
+
+---
+
 ### M6: Paywall + Stripe/LLC (B-104 + B-100 + D-028/029/033)
 
 Revenue infrastructure operational end-to-end.
@@ -138,6 +150,8 @@ Revenue infrastructure operational end-to-end.
 - F-405 token control + F-406 auth hardening landed (revenue prerequisites)
 
 **In-scope:** B-100, B-101, B-104, D-028, D-029, D-033, F-405, F-406.
+
+**Note:** "Tier enforcement (returning the correct tier from DB) is M5.5 scope (P-105), not M6 scope. M6 only populates real subscription_tier values into the DB via Stripe webhook handling."
 
 ---
 
