@@ -397,3 +397,87 @@ The rename migration is **substantial** — touches routes, copy, internal API f
 ---
 
 *End of PRODUCT.md v1. Next: DESIGN.md authoring (visual constitution, exact palette, per-couche specifications, motion conventions, component-level direction). After DESIGN.md is locked, design skills (impeccable first) install with full anchoring context.*
+
+---
+
+## Homepage positioning (locked 2026-05-31, Session 2)
+
+**Hero direction.** Direction C, brand-forward.
+
+- H1: There's a method to French. Now there's Le Méthodic.
+- Sub: Built by an author of 28 French linguistics books. Used by anglophones who want their French to sound native, not assembled.
+- Primary CTA: See how it works
+- Secondary CTA: Start with a free placement
+
+**Strategic framing.** Homepage builds desire for French itself and establishes Le Méthodic as the right place to learn it. Exam-specific landing pages handle conversion for visa-urgent users.
+
+**Supersedes.** F-300a tagline lock ("Stop translating. Start producing French.") from 2026-05-07.
+
+---
+
+## Service architecture and pricing (locked 2026-05-31, Sessions 4-5)
+
+**Four tiers plus à la carte.**
+
+| Tier | Price | Surfaces included |
+|---|---|---|
+| Découverte | $0 | Public, /placement, Fondation 1 of /cours, Bibliothèque browse, L'Examen diagnostic, /coaching/trial-class |
+| Engagement | $29 monthly or $290 annual | Full /cours, full L'Examen, full Bibliothèque, Progrès, 15% off /library |
+| Maîtrise | $79 monthly or $790 annual | Engagement + Le Maître unlimited + monthly mock review + 25% off /library |
+| Sprint TCF Canada | $499 one-time, 90 days | Maîtrise + 4 coaching sessions + study plan + priority feedback + 30% off /library |
+
+**À la carte.**
+- Coaching sessions: $99 each, first trial session free
+- /library items: $9 to $49 (books, audio packs, downloads), 3 bundles ($49, $79, $99)
+
+**Trial mechanic.** 14-day Engagement trial with card-on-file (auto-cancels if user does not actively convert).
+
+**Free hooks.** /placement (no auth), Fondation 1 of /cours (email signup), /coaching/trial-class (first 30-minute session free).
+
+---
+
+## Product surfaces (locked 2026-05-31, Session 3)
+
+**Four top-level product surfaces:**
+
+1. /cours, the curriculum (27 lessons across Fondations 1-16 and Approfondissement 17-27). Route: /cours/methode-tcf-canada/lecon-N
+2. La Bibliothèque, vocab chunks (browse, practice, test modes). Le Maître absorbs the former tutor mode.
+3. Le Maître, AI tutor with ElevenLabs Chadi voice clone (top-level surface per Session 1 lock)
+4. L'Examen, unified exam-format practice for all 4 TCF Canada sections:
+   - /l-examen/comprehension-orale (listening)
+   - /l-examen/comprehension-ecrite (reading)
+   - /l-examen/expression-orale (Tâches 1, 2, 3)
+   - /l-examen/expression-ecrite (formerly top-level L'Écrit, now folded in)
+   - /l-examen/mock (full 4-section mock exam)
+   - /l-examen/diagnostic (initial assessment)
+
+See SITEMAP.md for the full surface inventory across all zones.
+
+---
+
+## Strategic decisions (Sessions 1-5 locks)
+
+**Coaching V1 active (locked 2026-05-31, Session 1).** /chadi (founder content + video library) and /coaching (1-on-1 booking with Chadi) are V1 active surfaces. This reverses the prior "human support dropped" lock. /coaching/trial-class offers a free first 30-minute session as conversion mechanic.
+
+**Capacity note.** At 30 to 45 hours per week sustainable work ceiling, realistic coaching availability is 6 to 10 sessions per week. Sprint users get 4 sessions over 90 days. Watch capacity as Sprint adoption scales; consider waitlist or price increase at ~30 active Sprint users.
+
+---
+
+## /library positioning (locked 2026-05-31, Sessions 1 and 5)
+
+/library is the Stripe-backed digital store, repositioned from its original LemonSqueezy-era stub purpose. Catalog has 4 categories:
+
+- Livres: Book-Lab catalog (digital books), $19 to $29 per title
+- Audio: audiobook versions, pronunciation packs, listening comprehension packs, $19 to $39 per item
+- Téléchargements: PDFs, cheat sheets, worksheets, sample mock-exam packs, $9 to $19 per item
+- Ressources gratuites: lead magnets, email-gated, free
+
+V1 launches with curated subset: 8-10 books, 3-5 audio, 5-8 downloads, 5-8 free resources. Plus 3 bundles for upsell mechanics. Subscriber discounts (15/25/30% by tier) applied at checkout.
+
+See SITEMAP.md /library section and ROADMAP-marketing.md MS-7 for full launch scope.
+
+---
+
+## Editorial rules
+
+**Em-dash hard rule.** Never use em-dash (—) in any output, including prose, file contents, code comments, diagram labels, conversational responses. Use commas, colons, parentheses, or sentence breaks instead. This is a recurring violation that requires explicit vigilance every response.
