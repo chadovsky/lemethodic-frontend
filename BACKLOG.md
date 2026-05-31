@@ -23,35 +23,35 @@
 
 ## Shipped — Week 1 (April 21)
 
-F-038 ✅ Fluency analysis layer (backend)
-F-039 ✅ [historical, see code comments]
-F-040 ✅ [historical, see code comments]
-F-041 ✅ [historical, see code comments]
-F-042 ✅ [historical, see code comments]
-F-043 ✅ [historical, see code comments]
-F-044 ✅ Language verification (backend)
-F-045 ✅ [historical, see code comments]
-F-046 ✅ FR i18n leaks, radar orphaning, hidden accordions
-F-047 ✅ Tâche 1/2/3 mode architecture (tache_mode column)
-F-048 ✅ Tâche 1 engine (examiner persona)
-F-049 ✅ Tâche 2 engine (Yarden methodology)
-F-050 ✅ Tâche 2 PTT + transcription review (backend)
-F-051 ✅ Tâche 3 engine (monologue scoring)
-F-052 ✅ OpenAI TTS-1-HD integration + cache
-F-053 ✅ Le Raccourci backend (lessons, completion, gating)
+F-038 ✅ [BE] Fluency analysis layer (backend)
+F-039 ✅ [FE] [historical, see code comments]
+F-040 ✅ [FE] [historical, see code comments]
+F-041 ✅ [FE] [historical, see code comments]
+F-042 ✅ [FE] [historical, see code comments]
+F-043 ✅ [FE] [historical, see code comments]
+F-044 ✅ [BE] Language verification (backend)
+F-045 ✅ [FE] [historical, see code comments]
+F-046 ✅ [FE] FR i18n leaks, radar orphaning, hidden accordions
+F-047 ✅ [FE+BE] Tâche 1/2/3 mode architecture (tache_mode column)
+F-048 ✅ [BE] Tâche 1 engine (examiner persona)
+F-049 ✅ [BE] Tâche 2 engine (Yarden methodology)
+F-050 ✅ [BE] Tâche 2 PTT + transcription review (backend)
+F-051 ✅ [BE] Tâche 3 engine (monologue scoring)
+F-052 ✅ [BE] OpenAI TTS-1-HD integration + cache
+F-053 ✅ [BE] Le Raccourci backend (lessons, completion, gating)
 
 ## Shipped — Week 2 (April 22)
 
-F-054 ✅ v0 onboarding screen 1 + design tokens
-F-055 ✅ v0 onboarding screens 2-6 + paywall
-F-056 ✅ v0 home screen + Le Raccourci tab + lesson detail + quiz scaffold
-F-057 ✅ v0 speaking module (Speaking landing, T1, T2 picker, T2 session, T3 session, TranscriptReviewPanel with Pyramide/Rebond/Ciblage)
-F-058 ✅ v0 diagnostic view (CouchesDiagnostic stacked bars, Le Goulet, L'Ordonnance, CorrectedLine)
+F-054 ✅ [FE] v0 onboarding screen 1 + design tokens
+F-055 ✅ [FE] v0 onboarding screens 2-6 + paywall
+F-056 ✅ [FE] v0 home screen + Le Raccourci tab + lesson detail + quiz scaffold
+F-057 ✅ [FE] v0 speaking module (Speaking landing, T1, T2 picker, T2 session, T3 session, TranscriptReviewPanel with Pyramide/Rebond/Ciblage)
+F-058 ✅ [FE] v0 diagnostic view (CouchesDiagnostic stacked bars, Le Goulet, L'Ordonnance, CorrectedLine)
 _Diagnostic view shipped; Progress page surface tracked separately as P-100; session-details data layer remains a future ticket (referenced inline within F-084 / F-084.x / F-075b.x)._
 
 ## Shipped — Week 2 (April 23)
 
-F-059 ✅ Phase 3 integration
+F-059 ✅ [FE+BE] Phase 3 integration
   - Backend: onboarding persistence (6 new columns on users table)
   - Backend: POST /api/users/onboarding endpoint
   - Frontend: API plumbing (lib/api, lib/auth, lib/types, lib/onboarding)
@@ -67,7 +67,7 @@ F-059 ✅ Phase 3 integration
   - /test-drive route deleted (deferred post-launch)
   - Paywall heading renamed "Where you stand today"
 
-F-061 ✅ Tâche 3 full loop shipped — audio capture, upload, backend analysis, diagnostic page render with real data. Verified end-to-end on recording #22.
+F-061 ✅ [FE+BE] Tâche 3 full loop shipped — audio capture, upload, backend analysis, diagnostic page render with real data. Verified end-to-end on recording #22.
   - `hooks/useAudioRecorder.ts` — MediaRecorder wrapper exposing status, error, durationMs, stream, startRecording, stopRecording, reset; Date.now()-based timing (sidesteps the hidden-tab throttle called out in F-076); releases getUserMedia tracks on stop/reset/unmount so the browser recording indicator doesn't linger
   - Maps getUserMedia errors (NotAllowedError, NotFoundError, NotReadableError, SecurityError) to human-readable copy; "permission" keyword in the string is what Tache3Session uses to switch into the permission-help card
   - `components/speaking/VuMeter.tsx` — stream prop drives a Web Audio AnalyserNode (fftSize 64, smoothing 0.55) read via requestAnimationFrame; AudioContext torn down on stream change / unmount; falls back to idle bars when no stream
@@ -81,22 +81,22 @@ F-061 ✅ Tâche 3 full loop shipped — audio capture, upload, backend analysis
 
 ## Shipped — Week 2 (April 24)
 
-F-061.2a ✅ Tâche 3 upload hotfix — tache_mode + error surfacing hardening
+F-061.2a ✅ [FE+BE] Tâche 3 upload hotfix — tache_mode + error surfacing hardening
   - `lib/api.ts` `createRecording`: added `tacheMode` option accepting `1|2|3|'tache_1'|'tache_2'|'tache_3'`; normalizes bare digits to `tache_${n}` before posting. Defaults to `'tache_3'`. Unblocks F-062/F-063 reuse. Backend's `_validate_tache_mode_for_oral` rejects anything other than the full string form with a 400.
   - `components/speaking/Tache3Session.tsx` uploadBlob catch: differentiates `ApiError` (prefix with status code, surface backend `detail` verbatim), `TypeError` from fetch (actual network failure → "Couldn't reach the server"), and other errors (generic fallback). Stops mislabeling server-side errors as connectivity problems.
   - Tache3Session call site passes `tacheMode: 3` explicitly — normalized to `'tache_3'` at the API boundary.
 
-F-061.2 ✅ Fetch method inference fix
+F-061.2 ✅ [FE] Fetch method inference fix
   - Fixed fetch method inference in `lib/api.ts` `request()` — bodies now force POST. Affected `createRecording` and `uploadAudio` (would have bit F-062 too). Caller audit confirmed all 16 endpoints use correct methods.
   - Root cause: the request wrapper defaulted `method = 'GET'`. The two FormData callers passed only `{ formData: fd }` with no explicit method, so fetch was invoked with `GET + body` and the browser rejected it synchronously with "Request with GET/HEAD method cannot have body." This silent failure never reached the Network tab and was only pinpointed by transient `REC:` / `SESSION:` console instrumentation (removed on ship).
   - Fix: `method = opts.method ?? (body !== undefined || formData ? 'POST' : 'GET')`. Explicit overrides still work; all other callers already passed `method: 'POST'` explicitly so only the two FormData sites changed behavior.
 
-F-061.3 ✅ Ordonnance shape normalization
+F-061.3 ✅ [FE] Ordonnance shape normalization
   - Backend `ordonnance` is a wrapper object `{ couche_ciblee, nom_couche, exercices: [...] }` with per-exercise keys `{numero, type, consigne, modele, phrase, options, reponse, explication}`. Empty recordings serialize as `{}` (per `recordings.py:645`). Frontend was typing it as `OrdonnanceStep[]` and calling `.slice(0, 3)` on the object — instant runtime TypeError on first real diagnostic render.
   - `lib/api.ts`: new `RawOrdonnanceExercise` / `RawOrdonnanceBlock` types + a dedicated `mapOrdonnance(raw: unknown)` guard that returns `[]` for any unrecognized shape and key-maps present exercises (`numero→priority`, `consigne→action` with `type` fallback, `type→pattern`, `modele ?? phrase→example`). `RawDiagnosticBlock.ordonnance` retyped to `unknown` so the guard owns the shape check.
   - `app/diagnostic/page.tsx:316`: belt-and-braces `(diagnostic.ordonnance ?? []).slice(0, 3)` — if a future backend shape change breaks the mapper invariant, the page renders fewer cards instead of crashing. Mock-card padding (tops up to 3) still kicks in when backend returns fewer exercises.
 
-F-062 ✅ Tâche 2 multi-turn role-play shipped end-to-end — 6-turn flow with examiner persona, per-turn review sheet with per-session suppression, final /end routes to diagnostic with real 4-couche analysis on combined audio.
+F-062 ✅ [FE+BE] Tâche 2 multi-turn role-play shipped end-to-end — 6-turn flow with examiner persona, per-turn review sheet with per-session suppression, final /end routes to diagnostic with real 4-couche analysis on combined audio.
   - `components/speaking/Tache2Session.tsx` — full rewrite against a phase state machine: `briefing → user-idle → user-recording → user-transcribing → reviewing → examiner-speaking → finalizing` (plus `error` recovery). Fixed 6-turn client-side cap (`TARGET_USER_TURNS`); backend hard cap is 12 so the client's cap always wins and we explicitly call finalize.
   - Reuses F-061 primitives unchanged: `useAudioRecorder` (60s per-turn cap via effect on `durationMs`, same pattern as T3's 180s but with a different threshold) and `VuMeter` (stream-driven AnalyserNode). No fork.
   - PTT flow — hold to record, release to stop. Idempotency guards (`stoppingRef`, `finalizingRef`) prevent the 60s cap effect racing a user tap, and prevent double-finalize on error-retry.
@@ -115,7 +115,7 @@ F-062 ✅ Tâche 2 multi-turn role-play shipped end-to-end — 6-turn flow with 
       · T2 `/start` returns `examiner_turn_text: null` (candidate opens). Spec's `examiner-speaking` phase after briefing is skipped for T2 — we go straight to `user-idle`. The phase still exists for T1 reuse in F-063.
   - Verification: `tsc --noEmit` clean except the pre-existing TargetScoreSelect.tsx:98 known issue.
 
-F-062.1 ✅ Scenario slug↔backend code mapping + dev sanity check
+F-062.1 ✅ [FE] Scenario slug↔backend code mapping + dev sanity check
   - Bug: browser test hit "Start conversation" on /speaking/tache-2/agence-voyages and got `404: Unknown or inactive scenario_code 'agence-voyages'`. Frontend was sending URL slugs; backend's `tache2_scenarios.code` column uses underscored + three entirely different spellings (picker and seeder drifted during F-049 seeding):
       · `agence-voyages` → `agence_voyages` (hyphen→underscore)
       · `ami-demenage` → `ami_demenagement` (different word form)
@@ -127,7 +127,7 @@ F-062.1 ✅ Scenario slug↔backend code mapping + dev sanity check
   - New API method: `api.sessions.listTache2Scenarios()` — GET /api/conversations/scenarios, returns trimmed `{scenarios: [{id, code, difficulty}], aboveA2}`. Reused by the sanity check; eventually consumed by F-061.1 picker wiring as the source-of-truth replacement for the client literal.
   - TODO(F-061.1) comment on both sides points at the long-term fix: have the picker consume `/scenarios` directly, eliminating the drift problem by construction.
 
-F-062.2 ✅ PTT pointer capture + minimum-hold guard
+F-062.2 ✅ [FE] PTT pointer capture + minimum-hold guard
   - Bug: turn 2 of a T2 session produced a 110-byte empty webm; backend rejected with `500: Transcription failed: ... File does not appear to contain audio. File type is video/webm`. Turn 1 always worked.
   - Diagnosis (via transient REC:/T2: instrumentation, removed on ship): `RecordButton.tsx` wired `onPointerLeave={handlePointerUp}`. On turn 1, the getUserMedia permission prompt absorbs the pointer-down gesture — by the time the MediaRecorder starts, no layout shift matters. On turn 2, permission is cached, getUserMedia returns in ~10ms, the phase transition `user-idle → user-recording` mounts the turn-timer text + VuMeter above the button, the button shifts down in the layout → `pointerleave` fires against the user's still-held finger → `onPTTEnd` → `finishRecording` → recorder stops ~10ms after start → 0 audio chunks → 110-byte header-only webm. Full trace in conversation thread.
   - Fix 1 — pointer capture in `components/speaking/RecordButton.tsx`: `setPointerCapture(pointerId)` on pointerdown routes all subsequent pointer events to the button regardless of cursor position. `pointerleave` no longer fires while captured. `pointerup` still delivered correctly even if the user's finger drifts off the button. Dropped `onPointerLeave={handlePointerUp}`; added `onPointerCancel` handler (releases capture + fires onPTTEnd) to handle OS-level pointer takeaway (phone call, tab switch, app backgrounded, stylus lifted without a normal up event). Tap mode (`mode === 'tap'`, used by T3) is untouched — every new handler bails with `if (mode !== 'ptt') return`.
@@ -138,7 +138,7 @@ F-062.2 ✅ PTT pointer capture + minimum-hold guard
 
 ## Shipped — Week 2 (April 27)
 
-F-086 ✅ Le Raccourci → L'École rename. Atomic phase-1 of the F-086→F-089 pack.
+F-086 ✅ [FE+BE] Le Raccourci → L'École rename. Atomic phase-1 of the F-086→F-089 pack.
 
 **Backend (tcf-oral-tool):**
 - `scripts/rename_raccourci_to_ecole.py` — idempotent SQLite migration. Renamed three tables (`raccourci_lessons` → `ecole_lessons`, `raccourci_quiz_questions` → `ecole_quiz_questions`, `user_raccourci_progress` → `user_ecole_progress`) and one column (`remediation_modules.raccourci_lesson_id` → `ecole_lesson_id`). Row counts preserved exactly: 16 lessons, 80 quiz questions, 80 progress rows. SQLite 3.50.4 auto-rewrites FK references on `ALTER TABLE RENAME`; foreign-key enforcement disabled during the migration window as belt-and-braces. Indexes keep their original `raccourci_*` names — internal sqlite_master metadata, not surfaced anywhere user-or-grep-facing.
@@ -174,7 +174,7 @@ F-086 ✅ Le Raccourci → L'École rename. Atomic phase-1 of the F-086→F-089 
 
 ---
 
-F-087 ✅ 27-lesson L'École curriculum. Phase 2 of the F-086→F-089 pack.
+F-087 ✅ [FE+BE] 27-lesson L'École curriculum. Phase 2 of the F-086→F-089 pack.
 
 **Backend (tcf-oral-tool):**
 - New `scripts/seed_ecole_curriculum.py` — single-run migration + seeder. Adds `phase` (default 1) and `subline_en` (nullable) columns to `ecole_lessons` via idempotent `ALTER TABLE ADD COLUMN IF NOT EXISTS`-equivalent (PRAGMA-guarded). Wipes `user_ecole_progress` (80 stale rows from the pre-rename test users — 0 completions, 1 quiz attempt, no real investment per F-086 Q1.2 audit). Truncates `ecole_lessons` and inserts the locked 27 rows. Updates `remediation_modules.ecole_lesson_id` for `gerondif_confusion` from 16 → 22 (gérondif moved from old curriculum lesson 16 to new curriculum lesson 22, in Phase 2). Linear prerequisite chain (1→2→3→…→27).
@@ -211,7 +211,7 @@ F-087 ✅ 27-lesson L'École curriculum. Phase 2 of the F-086→F-089 pack.
 
 ---
 
-F-089 ✅ Lesson card subline rendering. Final phase of the F-086→F-089 pack.
+F-089 ✅ [FE] Lesson card subline rendering. Final phase of the F-086→F-089 pack.
 
 **Backend (tcf-oral-tool):**
 - No changes. F-087 had already exposed `subline_en` on both `_lesson_row_to_summary` and `_lesson_full_detail` in `app/routers/ecole.py`; the model column was added in the same seed. B1 verification confirmed the API was already shipping the field on all 27 lessons.
@@ -239,7 +239,7 @@ F-089 ✅ Lesson card subline rendering. Final phase of the F-086→F-089 pack.
 
 ---
 
-F-088 ✅ Couches → TCF criteria relabel. Closes the F-086→F-089 pack.
+F-088 ✅ [FE+BE] Couches → TCF criteria relabel. Closes the F-086→F-089 pack.
 
 **Spec correction (commit + ticket history accuracy):** the F-088 spec referred to a `/api/diagnostic/{session_id}` endpoint; this codebase doesn't have one. The diagnostic block is served under `GET /api/recordings/{id}` with `result["diagnostic"] = {...}`. Frontend: `lib/api.ts:890` + `mapDiagnosticBlock()`. The implementation targets `/api/recordings/{id}` (and the `/history` companion that uses the same shape).
 
@@ -275,7 +275,7 @@ F-088 ✅ Couches → TCF criteria relabel. Closes the F-086→F-089 pack.
 
 ---
 
-F-083 ✅ Per-Tâche pedagogical rubric (backend). Sprint feedback-rendering pack, phase 1.
+F-083 ✅ [BE] Per-Tâche pedagogical rubric (backend). Sprint feedback-rendering pack, phase 1.
 
 **Architecture:** additive layer alongside the existing prompts (chosen over strict replacement after a Step 0 audit found the existing `SYSTEM_PROMPT_DIAGNOSTIC` is consumed by F-088 / F-080c / scoring_profiles — replacing it would have collapsed yesterday's F-088 ship). Three prompt categories per recording: (1) generic 4-couche diagnostic (`analysis.py::SYSTEM_PROMPT_DIAGNOSTIC`, unchanged); (2) Tâche specialty prompts (T2 Yarden Pyramide/Rebond/Ciblage from F-049, T3 argumentation from F-051, both unchanged); (3) **new** per-Tâche pedagogical rubric (F-083). Two Claude calls per recording instead of one, run in parallel via `asyncio.gather` so total latency is `max()` not `sum()`.
 
@@ -308,7 +308,7 @@ F-083 ✅ Per-Tâche pedagogical rubric (backend). Sprint feedback-rendering pac
 
 ---
 
-F-084 ✅ Diagnostic page progressive disclosure (v2 — replaces the original basic/detailed toggle design). Two-commit ship: backend extends the F-083 rubric prompt with `narrative_summary`; frontend rebuilds the diagnostic page around 5 layers.
+F-084 ✅ [FE+BE] Diagnostic page progressive disclosure (v2 — replaces the original basic/detailed toggle design). Two-commit ship: backend extends the F-083 rubric prompt with `narrative_summary`; frontend rebuilds the diagnostic page around 5 layers.
 
 **Audit C decision: A1 (extend F-083 prompt) over A2 (separate Claude call).** The F-083 prompts are large but structurally compartmentalized — scoring (sec. 3) and threshold (sec. 4) are isolated from the JSON OUTPUT block (sec. 5). Adding a `narrative_summary` field to the JSON schema doesn't touch the scoring instructions, and the LLM has all the right context already in scope. A2 would have meant 50% more tokens per analysis to re-derive context. F-083 verification harness re-ran 6/6 + 4/4 + 3/3 green post-change → byte-identical scoring confirmed (gate 2).
 
@@ -353,7 +353,7 @@ F-084 ✅ Diagnostic page progressive disclosure (v2 — replaces the original b
 
 ---
 
-F-076 ✅ Background tab timer drift fix. Last of the three pre-launch security tickets.
+F-076 ✅ [FE] Background tab timer drift fix. Last of the three pre-launch security tickets.
 
 **Audit reshaped scope, again.** Spec assumed counter-pattern timers (`setInterval(() => seconds + 1)`) across T1/T2/T3 record screens. Reality: T1/T2/T3 already use wall-clock math via `useAudioRecorder.durationMs` (Date.now()-based, fixed in F-061 — the file header explicitly notes the F-050 throttle bug). Auto-stop in all three sessions reads `recorder.durationMs >= CAP_MS` directly; the cap fires correctly under throttling, just visually lagged.
 
@@ -384,7 +384,7 @@ The ONE real counter-pattern bug was in `components/speaking/CountdownTimer.tsx`
 
 ---
 
-F-075b ✅ Auth on audio serving. Second half of F-075 (security hardening, carried from F-050).
+F-075b ✅ [BE] Auth on audio serving. Second half of F-075 (security hardening, carried from F-050).
 
 **Audit reshaped the scope.** The original F-075b spec assumed a user-audio serving route existed and lacked an ownership check. **It doesn't exist.** Audit found no `app.mount("/uploads", ...)`, no `FileResponse` returning recording audio anywhere; `_serialize_turn` (conversations.py:138) explicitly refuses to expose candidate audio_url with the comment "We deliberately do NOT expose candidate audio_url — those are raw filesystem paths to ./uploads and aren't web-servable." `_format_recording` doesn't include `audio_path` either. The frontend `<audio>` calls in `Tache1Session` / `Tache2Session` play back **examiner TTS** (`/tts_audio/<hash>.mp3`), not user recordings.
 
@@ -426,7 +426,7 @@ Harness `scripts/verify_f075b_tts_auth.py` drops a synthetic mp3 stub into the T
 
 ---
 
-F-075a ✅ Server-side audio upload size cap. First half of F-075 (security hardening, carried from F-050); F-075b (user_id auth on /api/audio/{id} serving) remains queued.
+F-075a ✅ [BE] Server-side audio upload size cap. First half of F-075 (security hardening, carried from F-050); F-075b (user_id auth on /api/audio/{id} serving) remains queued.
 
 **Audit findings reshaped the design.** The spec assumed one upload endpoint (`/api/recordings/upload`); the codebase has **four** audio-receiving multipart routes:
 - `POST /api/recordings/upload` (T3 / legacy single-shot)
@@ -467,7 +467,7 @@ A path-prefix middleware (`/api/recordings/*`) would have left two of four wide 
 
 ---
 
-F-091.0 ✅ V1 onboarding lock to TCF-only. Pre-launch ticket; May 4 launch ships TCF-honest.
+F-091.0 ✅ [FE] V1 onboarding lock to TCF-only. Pre-launch ticket; May 4 launch ships TCF-honest.
 
 **Approach (a-prime) — adopted after Step 0 audit found the spec's two choices (hide selector / grey out cards) didn't fit the architecture.** No discrete exam-selector step exists in this codebase: step 2 is `TCFGoalSelect` which captures motivation (`immigration` / `studies` / `general`), and the exam profile is **derived** from goal via `mapOnboardingToBackend`. The goal step also gates step 4 (`TargetScoreSelect` branches on `state.goal` to choose between CLB / B1-C2 / "confident conversational"-style options) — removing it breaks the score-selection screen.
 
@@ -501,7 +501,7 @@ F-091.0 ✅ V1 onboarding lock to TCF-only. Pre-launch ticket; May 4 launch ship
 
 ## Shipped — Week 2 (April 30)
 
-P-100 ✅ Real Progress Dashboard. Replaces the "Coming soon (F-058)" placeholder on the Progress tab with the 4-section dashboard — live in production on lemethodic-frontend.vercel.app. **Superseded by P-230 (LEMETHODIC-CURRICULUM v0.2 §10.4) on 2026-05-01.** The shipped 4-section dashboard is the current production state and stays live until P-230 implementation lands; the original P-100 spec is no longer the target.
+P-100 ✅ [FE] Real Progress Dashboard. Replaces the "Coming soon (F-058)" placeholder on the Progress tab with the 4-section dashboard — live in production on lemethodic-frontend.vercel.app. **Superseded by P-230 (LEMETHODIC-CURRICULUM v0.2 §10.4) on 2026-05-01.** The shipped 4-section dashboard is the current production state and stays live until P-230 implementation lands; the original P-100 spec is no longer the target.
 
 **Sections live:**
 1. Snapshot card (current CEFR estimate, target level, exam date countdown)
@@ -586,7 +586,7 @@ Milestone: DONE
 
 ## Shipped — Week 2 (May 1)
 
-P-115 ✅ **Partial ship — foundation + 4 of 8+ motion surfaces.** Filed 2026-04-30, foundation shipped 2026-05-01 (`df11866`), motion implementation 2026-05-01 (`64aad94`). Remainder filed as **P-115.x** (see Queued — follow-ups below).
+P-115 ✅ [FE] **Partial ship — foundation + 4 of 8+ motion surfaces.** Filed 2026-04-30, foundation shipped 2026-05-01 (`df11866`), motion implementation 2026-05-01 (`64aad94`). Remainder filed as **P-115.x** (see Queued — follow-ups below).
 
 **Foundation (`df11866`):**
 - `framer-motion@^12.38.0` added.
@@ -613,7 +613,7 @@ All 4 surfaces respect `prefers-reduced-motion` via `useReducedMotion()`.
 
 ---
 
-P-104 ✅ **Background-tab timer drift fix — Step 1 (visibilitychange listener).** Pre-launch UX hardening for the per-Tâche cap auto-stop when the user backgrounds the tab mid-recording.
+P-104 ✅ [FE] **Background-tab timer drift fix — Step 1 (visibilitychange listener).** Pre-launch UX hardening for the per-Tâche cap auto-stop when the user backgrounds the tab mid-recording.
 
 **Investigation finding:** `useAudioRecorder.durationMs` and `CountdownTimer` (owned mode, F-076) already use `Date.now()` deltas, so the values are wall-clock-correct. The residual gap is **state-update cadence** — `setInterval(100ms)` is throttled to ≥1Hz in background tabs (and paused entirely under Chrome's intensive throttling after ~5 min hidden). The downstream `useEffect([recorder.durationMs])` cap-watchers in T1/T2/T3 only fire when `durationMs` lands in React state, so a stale state means a late auto-stop.
 
@@ -631,7 +631,7 @@ P-104 ✅ **Background-tab timer drift fix — Step 1 (visibilitychange listener
 
 ---
 
-P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that together complete P-100 (Real Progress Dashboard). Filed and shipped 2026-05-01 after a single-recording user surfaced three rendering issues on production: SnapshotCard CEFR mismatched the diagnostic page (A2 vs B2), SustainedCouches didn't render at all, RecurringModulesList silently disappeared.
+P-100.5 ✅ [FE] **Dashboard rendering bundle.** Three independent fixes that together complete P-100 (Real Progress Dashboard). Filed and shipped 2026-05-01 after a single-recording user surfaced three rendering issues on production: SnapshotCard CEFR mismatched the diagnostic page (A2 vs B2), SustainedCouches didn't render at all, RecurringModulesList silently disappeared.
 
 **Superseded by P-230 (LEMETHODIC-CURRICULUM v0.2 §10.4) on 2026-05-01** — the same day the bundle shipped. Rendering fixes are preserved as production state until P-230 implementation lands; the underlying CEFR null handling, F-110.1 migration, and empty-state placeholder all carry forward into the rebuilt dashboard.
 
@@ -670,7 +670,7 @@ P-100.5 ✅ **Dashboard rendering bundle.** Three independent fixes that togethe
 
 ### Foundation (§10.1) — must ship first, in order
 
-### P-200 — Diagnostic engine: detector implementation
+### P-200 — [BE] Diagnostic engine: detector implementation
 Milestone: DONE
 
 **Priority:** HIGH (pre-launch blocker)
@@ -681,7 +681,7 @@ Milestone: DONE
 **Scope:** implement L1 transfer detector, preposition error detector, subordination counter, connector variety scorer, A2 sentence structure detector, A2 infinitive substitution detector. Plug into existing analysis pipeline alongside couches scoring. Output ceiling markers per level.
 **Owner:** Engineering
 
-### P-201 — Diagnostic engine: level assignment + confidence
+### P-201 — [BE] Diagnostic engine: level assignment + confidence
 Milestone: DONE
 
 **Priority:** HIGH
@@ -692,7 +692,7 @@ Milestone: DONE
 **Scope:** implement level assignment rule (§3.5). Add confidence scoring. Surface level + confidence on diagnostic page and Snapshot via Block 8.
 **Owner:** Engineering
 
-### P-202 — Cluster data model
+### P-202 — [BE] Cluster data model
 Milestone: DONE
 
 **Priority:** HIGH
@@ -703,7 +703,7 @@ Milestone: DONE
 **Scope:** backend schema for clusters (grammar topic, vocabulary theme, Tâche application, lesson reference, exercise set reference, prompt reference, detection rubric, lesson delivery format flag). Migration. CRUD for clusters via admin or seed script.
 **Owner:** Engineering
 
-### P-203 — Path data model
+### P-203 — [BE] Path data model
 Milestone: DONE
 
 **Priority:** HIGH
@@ -714,7 +714,7 @@ Milestone: DONE
 **Scope:** backend schema for paths (level start, level target, phases, cluster sequence per phase). Path entity, Phase entity, PathCluster join table.
 **Owner:** Engineering
 
-### P-204 — User progress model
+### P-204 — [BE] User progress model
 Milestone: DONE
 
 **Priority:** HIGH
@@ -727,7 +727,7 @@ Milestone: DONE
 
 ### Content scaffolding (§10.2)
 
-### P-210 — B1→B2 path seed data
+### P-210 — [BE] B1→B2 path seed data
 Milestone: DONE
 
 **Priority:** HIGH (pre-launch blocker)
@@ -738,7 +738,7 @@ Milestone: DONE
 **Scope:** seed the B1→B2 path's 15-20 clusters in the database (titles + structure only; content authored separately). Phase boundaries defined.
 **Owner:** Engineering
 
-### P-211 — Cluster content authoring
+### P-211 — [Content] Cluster content authoring
 Milestone: DONE
 
 **Priority:** HIGH (pre-launch blocker)
@@ -749,7 +749,7 @@ Milestone: DONE
 **Scope:** author lesson + exercise set + practice prompt + detection rubric for each B1→B2 cluster. Decide delivery format per cluster (markdown / PDF / video). Delivered as files into the system.
 **Owner:** Chadi (content authoring, not engineering)
 
-### P-212 — Starter cluster seed for A2 and B2 paths
+### P-212 — [BE] Starter cluster seed for A2 and B2 paths
 Milestone: DONE
 
 **Priority:** MEDIUM (pre-launch)
@@ -760,7 +760,7 @@ Milestone: DONE
 **Scope:** seed first 3-4 clusters of A2→B1 path and first 3-4 of B2→C1 path. Used as waitlist preview content.
 **Owner:** Engineering (schema seed); Chadi for the small starter content set
 
-### P-213 — Dialogue Box template authoring
+### P-213 — [Content] Dialogue Box template authoring
 Milestone: TBD
 
 **Priority:** MEDIUM (pre-launch)
@@ -773,7 +773,7 @@ Milestone: TBD
 
 ### Onboarding (§10.3)
 
-### P-220 — Onboarding questionnaire rebuild
+### P-220 — [FE] Onboarding questionnaire rebuild
 Milestone: DONE
 
 **Priority:** HIGH
@@ -784,7 +784,7 @@ Milestone: DONE
 **Scope:** rebuild current onboarding to match §8.3 (10-12 screens). Each answer maps to user profile fields that drive path assignment.
 **Owner:** Engineering
 
-### P-220.z — Onboarding per-question illustrations and pastels (Phase 1 polish)
+### P-220.z — [FE] Onboarding per-question illustrations and pastels (Phase 1 polish)
 Milestone: polish-defer
 
 **Priority:** —
@@ -796,7 +796,7 @@ Milestone: polish-defer
 **Owner:** Chadi (illustrations) + Engineering (wire-up)
 **Note:** Closed by F-201 — the editorial direction (F-200) replaced the pastel-cycle approach with uniform `--ed-bg` across all 11 questions, type-led screens with no per-question illustrations. P-228 inherits the EcoleReveal-only asset scope.
 
-### P-228 — EcoleReveal hero asset (art-directed illustration)
+### P-228 — [Content] EcoleReveal hero asset (art-directed illustration)
 Milestone: M2
 
 **Priority:** LOW (post-soft-beta; placeholder works)
@@ -807,7 +807,7 @@ Milestone: M2
 **Scope:** single high-quality art-directed illustration for the EcoleReveal closing screen (the funnel's emotional terminal, where the user sees their persona + plan before /paywall). Current placeholder: `/illustration-ecole.png` recycled from P-220 era. F-201 sized the asset slot at 280×280 above the persona label. Per F-200 imagery rules: real photography muted-tone OR art-directed line drawing / geometric primitives. No 3D emoji, no library cartoon, no mascot energy.
 **Owner:** Chadi (art direction / commission) + Engineering (drop-in swap)
 
-### F-213 — Page transitions + celebration moments
+### F-213 — [FE] Page transitions + celebration moments
 Milestone: M2
 
 **Priority:** MEDIUM (soft-beta polish)
@@ -824,7 +824,7 @@ Milestone: M2
 - /onboarding/waitlist + EcoleReveal + paywall route transitions: not added in this commit (those are terminal/closing surfaces — adding fade-in wouldn't add value, and EcoleReveal already has hero-rise sequence from F-212).
 - Inter-question transition within OnboardingFlow (between q1 and q2 etc.): out of scope — that's a state change, not a route change. Could be F-213.intra if user testing flags abrupt step swaps.
 
-### F-213.celebration — Milestone + completion celebration moments
+### F-213.celebration — [FE] Milestone + completion celebration moments
 Milestone: M2
 
 **Priority:** MEDIUM (post-soft-beta polish)
@@ -835,7 +835,7 @@ Milestone: M2
 **Scope:** layered celebration treatments for lesson complete (per-quiz-pass), finish onboarding (after EcoleReveal continue), and milestone hits (Fondations done at lesson 4, Approfondissement at 16, L'École Complète at 27). Editorial restraint: no confetti. Candidates: typography-led congratulations screen (Source Serif italic for the achievement label), subtle Y-translate + opacity reveal of next-step CTA, ed-accent pulse on milestone badge in EcoleProgress.tsx. Needs Chadi pick + content per moment.
 **Owner:** Engineering + Chadi (celebration copy + design picks)
 
-### F-210 — Icon system audit (lucide-react retention + custom marks plan)
+### F-210 — [FE] Icon system audit (lucide-react retention + custom marks plan)
 Milestone: M2
 
 **Priority:** MEDIUM (audit + filing)
@@ -849,7 +849,7 @@ Milestone: M2
 - **Custom marks needed for ADDITIONS only** — surfaces that don't yet have icons but should get brand-specific marks. Filed as P-229 (Chadi authoring).
 **Cuts:** none — audit complete.
 
-### P-229 — Custom brand marks (methodology + exam + milestone iconography)
+### P-229 — [Content] Custom brand marks (methodology + exam + milestone iconography)
 Milestone: M2
 
 **Priority:** LOW (post-soft-beta polish)
@@ -864,7 +864,7 @@ Milestone: M2
 Editorial constraint per F-200: line drawings or geometric primitives, no mascot energy, no 3D emoji. Either commissioned by Chadi or authored solo.
 **Owner:** Chadi (art direction / commission) + Engineering (drop-in swap)
 
-### F-211 — Loading states overhaul (skeleton shimmer migration)
+### F-211 — [FE] Loading states overhaul (skeleton shimmer migration)
 Milestone: M2
 
 **Priority:** MEDIUM (soft-beta polish)
@@ -886,7 +886,7 @@ Milestone: M2
 - LessonDetailClient (1 remaining animate-pulse instance): low-traffic auth-gated surface, F-211.x — sweep alongside F-206.lessons.
 - shadcn `components/ui/skeleton.tsx` legacy primitive: leave as-is (used by other surfaces; per-consumer migration as F-2xx tickets touch them).
 
-### F-214 — Visual depth + design system extension
+### F-214 — [FE] Visual depth + design system extension
 Milestone: M2
 
 **Priority:** MEDIUM (soft-beta polish)
@@ -905,7 +905,7 @@ Milestone: M2
 **Cuts:**
 - Wire TestimonialCard into a TestimonialSection on landing: filed as F-214.x — needs Chadi-authored quotes from beta cohort.
 
-### F-212 — Micro-animations + interaction feedback system
+### F-212 — [FE] Micro-animations + interaction feedback system
 Milestone: M2
 
 **Priority:** HIGH (soft-beta polish — interaction language across the platform)
@@ -934,7 +934,7 @@ Milestone: M2
 - Tab/toggle underline slide (deliverable #7): LanguageToggle is already EN/FR with active-state color shift — adding underline-slide on a 2-state toggle is overkill. Will revisit when a multi-tab surface lands (e.g., F-204.deep dashboard with method/calm mode toggle).
 - Form-field per-input `ed-field` class application: deferred — existing :focus-visible global rule from F-200 (commit 14d0691) already gives inputs visible focus rings. F-212.field will swap to ed-accent ring + 18% opacity once a sweep across all 8+ form locations is justified.
 
-### F-221 — Exam-target picker + brand-layer rewrite (multi-exam launch)
+### F-221 — [FE+BE] Exam-target picker + brand-layer rewrite (multi-exam launch)
 Milestone: M1
 
 **Priority:** HIGH (launch — multi-exam onboarding gates which path the user enters)
@@ -959,7 +959,7 @@ Milestone: M1
 **Owner:** Engineering
 **Note:** picker dormant until BE adds q0_target_exam to questions endpoint. Once BE lands: picker fires as Q1 of questionnaire, "Another exam" routes to email capture, "Not sure" submits as `not_sure` (BE backfills to TCF Canada per Chadi). Existing user backfill (test users id IN 5,6,7) is BE's responsibility.
 
-### F-203 — Auth flow surfaces editorial migration (signup full + paywall responsive)
+### F-203 — [FE] Auth flow surfaces editorial migration (signup full + paywall responsive)
 Milestone: M1
 
 **Priority:** HIGH (launch-blocking — auth surfaces are the conversion funnel)
@@ -970,7 +970,7 @@ Milestone: M1
 **Scope:** signup got full editorial migration (bg ed-bg, paper card with 1px ed-rule + 0 shadow + 4px radius, all form fields ed-tokens with 56px height + 4px radii + ed-paper bg + ed-rule borders, navy ed-accent submit CTA, Geist throughout). Paywall got minimal responsive fix only (bg → ed-bg, column widened 440→640px to fix desktop white-rails launch-blocker) — full editorial migration of Paywall's pricing chrome / radar chart / comparison table tracked separately as F-203.paywall.
 **Owner:** Engineering
 
-### F-203.paywall — Paywall full editorial migration
+### F-203.paywall — [FE] Paywall full editorial migration
 Milestone: M1
 
 **Priority:** MEDIUM (post-soft-beta polish — F-203 minimal responsive fix unblocks launch)
@@ -981,7 +981,7 @@ Milestone: M1
 **Scope:** migrate Paywall's 660-line pricing chrome to editorial system: typography (DISPLAY_FONT → Geist), Recharts radar styling (axis labels, fill colors, grid stroke → ed-* tokens), value-row checkmarks (current pastel/svg → ed-rule outlined), comparison table (current pill toggles → editorial tabs), trial timeline cards. Significant design work; F-203 minimal fix solves the launch-blocker.
 **Owner:** Engineering
 
-### F-204 — Authenticated dashboard surfaces editorial migration (page chrome only)
+### F-204 — [FE] Authenticated dashboard surfaces editorial migration (page chrome only)
 Milestone: M1
 
 **Priority:** HIGH (launch-blocking — desktop white-rails)
@@ -993,7 +993,7 @@ Milestone: M1
 **Owner:** Engineering
 **Note:** F-204 deliberately scope-cut to page chrome only because section internals carry data-display chips (status indicators on cluster header, confidence visualizer pips on Snapshot, Tâche+CEFR badges on RecentActivity) where ed-* migration without redesign would lose information. Full migration needs design pass on chip vocabulary.
 
-### F-204.deep — Section-internal editorial migration on /progress + /cluster
+### F-204.deep — [FE] Section-internal editorial migration on /progress + /cluster
 Milestone: M1
 
 **Priority:** MEDIUM (post-soft-beta polish — F-204 chrome fix unblocks launch)
@@ -1004,7 +1004,7 @@ Milestone: M1
 **Scope:** migrate Snapshot section (level chips + confidence visualizer + agreement copy + diagnostic-in-progress fallback), TodayFocus (Dialogue Box + reason_code copy), GouletStack (RecurringModuleCard reuse), RecentActivity (linear list with Tâche/CEFR badges) on /progress. Plus ClusterHeader (status + last_detection_result chips with traffic-light dots) on /cluster. Each chip vocabulary needs editorial-system equivalent without losing data display.
 **Owner:** Engineering + design pass on chip palette
 
-### F-205 — User-state surfaces editorial migration (page chrome only)
+### F-205 — [FE] User-state surfaces editorial migration (page chrome only)
 Milestone: M1
 
 **Priority:** HIGH (launch-blocking — desktop white-rails)
@@ -1016,7 +1016,7 @@ Milestone: M1
 **Owner:** Engineering
 **Note:** /profile's hardcoded mockup data ("Chadi", "chadi@example.com", 47 days) is F-222.x scope — F-205 just restyles chrome. /diagnostic's CouchesDiagnostic + DetectedModuleCard + ordonnance components carry P-088 layout invariants — chrome-only migration avoids breaking those.
 
-### F-205.deep — Section-internal editorial migration on /profile + /diagnostic
+### F-205.deep — [FE] Section-internal editorial migration on /profile + /diagnostic
 Milestone: M1
 
 **Priority:** MEDIUM (post-soft-beta polish)
@@ -1027,7 +1027,7 @@ Milestone: M1
 **Scope:** /profile inner cards restyle (Preply CTA / Stats / Account / Settings card system to editorial). /diagnostic CouchesDiagnostic + DetectedModuleCard + InlineContentRef + CorrectedLine + GouletCard + ordonnance row migration to editorial chip system. Significant — needs P-088 layout audit to ensure data-display doesn't lose semantic meaning.
 **Owner:** Engineering + design pass
 
-### F-206 — Recording + module surfaces editorial migration (page chrome only)
+### F-206 — [FE] Recording + module surfaces editorial migration (page chrome only)
 Milestone: M1
 
 **Priority:** HIGH (launch-blocking — desktop white-rails)
@@ -1039,7 +1039,7 @@ Milestone: M1
 **Owner:** Engineering
 **Note:** /speaking surfaces (SpeakingLanding + 3 Tâche sessions + feedback page) deferred to F-206.speaking — they have heavy interactive UI (PTT button, vu-meter, transcript review sheet, F-061/F-062/F-104 invariants). Editorial migration without invariant audit risks breaking core recording flow. /ecole/lesson/[id] surfaces (LessonDetailClient + quiz) deferred to F-206.lessons.
 
-### F-206.speaking — /speaking surfaces editorial migration
+### F-206.speaking — [FE] /speaking surfaces editorial migration
 Milestone: M1
 
 **Priority:** MEDIUM (post-soft-beta polish)
@@ -1050,7 +1050,7 @@ Milestone: M1
 **Scope:** migrate /speaking, /speaking/tache-1[/topic], /speaking/tache-2[/scenario], /speaking/tache-3/[topic], /speaking/feedback/[session]. Recording surfaces have load-bearing UI (PTT, vu-meter, ChatBubble, TranscriptReviewPanel, CountdownTimer, RecordButton). Editorial migration needs invariant audit.
 **Owner:** Engineering + careful audit
 
-### F-206.lessons — /ecole/lesson/[id] + quiz editorial migration
+### F-206.lessons — [FE] /ecole/lesson/[id] + quiz editorial migration
 Milestone: M1
 
 **Priority:** MEDIUM (post-soft-beta polish)
@@ -1061,7 +1061,7 @@ Milestone: M1
 **Scope:** migrate LessonDetailClient (markdown rendering + quiz CTA + back nav) and QuizClient (multi-question flow + answer-checking + result + lesson-unlock animation). Carries F-087 + F-115 motion invariants (lesson-unlock animation in HomeScreen).
 **Owner:** Engineering
 
-### F-202 — L'École intro rebuild + methodology surface (post-signup destination)
+### F-202 — [FE] L'École intro rebuild + methodology surface (post-signup destination)
 Milestone: M1
 
 **Priority:** HIGH (launch-blocking — was the empty pink-key placeholder per Block 3 critique)
@@ -1098,7 +1098,7 @@ Milestone: M1
 - Reduced-motion: ed-page-enter respects prefers-reduced-motion (gated in globals.css); useInViewOnce returns inView immediately when IntersectionObserver unavailable.
 - Reveal opacity starts at 0 — if reduced-motion users want sections visible immediately, the IntersectionObserver fires on mount-near-viewport, so they see the same end state without animation.
 
-### F-202.x — "À propos de L'École" header link from /ecole
+### F-202.x — [FE] "À propos de L'École" header link from /ecole
 Milestone: M1
 
 **Priority:** LOW (post-launch UX polish)
@@ -1109,7 +1109,7 @@ Milestone: M1
 **Scope:** add a small "À propos" / "About" link in /ecole header (or profile menu) that navigates to /ecole/intro. Copy: "À propos de L'École" (FR) / "About L'École" (EN). Position: header right-side, between page title and notifications bell. The intro page is always reachable; this just exposes it for return-users who want to revisit the methodology.
 **Owner:** Engineering
 
-### F-202.split — EcoleIntro sub-component decomposition
+### F-202.split — [FE] EcoleIntro sub-component decomposition
 Milestone: M1
 
 **Priority:** LOW (refactor)
@@ -1120,7 +1120,7 @@ Milestone: M1
 **Scope:** split `components/ecole/intro/EcoleIntro.tsx` into `IntroFrame.tsx`, `MethodeEnCouches.tsx`, `HowItWorks.tsx`, `LeParcours.tsx`, `IntroCTA.tsx`. Lift the FRAME/METHODE/HOW/PARCOURS/CTA copy constants to a shared `intro-copy.ts`. No visual changes — refactor only.
 **Owner:** Engineering
 
-### F-201 — Onboarding flow editorial migration (desktop responsive)
+### F-201 — [FE] Onboarding flow editorial migration (desktop responsive)
 Milestone: M1
 
 **Priority:** HIGH (launch-blocking — onboarding is the conversion funnel)
@@ -1140,7 +1140,7 @@ Milestone: M1
 
 
 
-### P-221 — Diagnostic flow integration
+### P-221 — [FE+BE] Diagnostic flow integration
 Milestone: DONE
 
 **Priority:** HIGH
@@ -1151,7 +1151,7 @@ Milestone: DONE
 **Scope:** after questionnaire, run 3 diagnostic recordings (one per Tâche). Engine output updates user level. Path assignment confirmed/adjusted.
 **Owner:** Engineering
 
-### P-222 — Waitlist UX for A2 and B2+ paths
+### P-222 — [FE+BE] Waitlist UX for A2 and B2+ paths
 Milestone: DONE
 
 **Priority:** HIGH (pre-launch)
@@ -1162,7 +1162,7 @@ Milestone: DONE
 **Scope:** when user diagnostic places them in a not-yet-built path, show waitlist screen with explanation, free interim resources, optional early-access opt-in.
 **Owner:** Engineering
 
-### P-222.x — capacity_warning UX surface
+### P-222.x — [FE] capacity_warning UX surface
 Milestone: TBD
 
 **Priority:** LOW (post-launch)
@@ -1173,7 +1173,7 @@ Milestone: TBD
 **Scope:** OnboardingSubmitResponse can carry `capacity_warning` independent of `waitlist` (e.g., a B1→B2 user with too few hours per week vs. their exam date). P-222 v1 ignores this field. This ticket adds a non-blocking advisory surface — banner or toast on /ecole first-load — that surfaces `weeks_to_exam` + recommended-vs-selected hours from the BE warning. Out of scope for waitlist (different code path).
 **Owner:** Engineering
 
-### P-222.y — EcoleReveal pre-signup waitlist-aware copy
+### P-222.y — [FE] EcoleReveal pre-signup waitlist-aware copy
 Milestone: TBD
 
 **Priority:** LOW (post-launch UX polish)
@@ -1184,7 +1184,7 @@ Milestone: TBD
 **Scope:** EcoleReveal renders pre-signup before /onboarding/submit fires, so a user who'll be waitlisted (q1 = a2/b2/c1) sees "Meet L'École" + persona preview that doesn't apply to them. Either (a) duplicate the BE waitlist-routing logic in FE so EcoleReveal can short-circuit to a "your path isn't ready, you'll see details after signup" preview, or (b) move EcoleReveal post-signup behind /onboarding/submit so it can read the waitlist flag. (b) is structurally cleaner but reshapes the conversion funnel — needs Chadi sign-off.
 **Owner:** Engineering
 
-### P-106.x — /paywall waitlist-aware behavior
+### P-106.x — [FE] /paywall waitlist-aware behavior
 Milestone: M6
 
 **Priority:** MEDIUM (Stripe-dependent)
@@ -1197,7 +1197,7 @@ Milestone: M6
 
 ### Dashboards (§10.4) — full §7 implementation
 
-### P-230 — Overall Progress dashboard rebuild
+### P-230 — [FE] Overall Progress dashboard rebuild
 Milestone: DONE
 
 **Priority:** HIGH
@@ -1210,7 +1210,7 @@ Milestone: DONE
 **Supersedes:** P-100, P-100.5
 **Note:** v1 ships calm mode only. Method mode toggle deferred until Blocks 1 (Ceiling Marker Map, P-235) and 7 (Mistake Repository, P-236) land. dialogue_box always null in production today (P-240b + P-213 not shipped); FE renders reason_code-driven fallback copy with defensive `dialogue_box.text` rendering for when BE populates the field.
 
-### P-230.x — Recent activity calendar view
+### P-230.x — [FE] Recent activity calendar view
 Milestone: TBD
 
 **Priority:** LOW (post-launch UX polish)
@@ -1221,7 +1221,7 @@ Milestone: TBD
 **Scope:** §7.4 calls for a "calendar view (kept from current implementation)" for Recent activity. v1 ships a linear list of last 5 recordings (matches functional baseline + ships fast). This ticket replaces it with a GitHub-contribution-graph-style grid showing the last 30+ days of recording activity. Requires extending `api.recordings.list` or adding a date-bucketed endpoint.
 **Owner:** Engineering
 
-### P-230.consolidate — Goulet Stack + /ecole "Recommended for you" overlap
+### P-230.consolidate — [FE] Goulet Stack + /ecole "Recommended for you" overlap
 Milestone: TBD
 
 **Priority:** LOW (post-launch UX polish)
@@ -1232,7 +1232,7 @@ Milestone: TBD
 **Scope:** Goulet Stack (top 3) on /progress and "Recommended for you" (F-080d) on /ecole both consume `getRecurringModules`. Different framings — /ecole = "patterns we've seen" (curriculum-side recommendation), /progress = "bottlenecks blocking you" (severity-ranked dashboard signal) — but the data is the same and the visual treatment is similar. User testing may show this duplication as confusing. Resolution options: (a) keep both with sharper framings, (b) deprecate one, (c) split the data source so /progress reads from a dedicated bottleneck endpoint distinct from /ecole's recurring-detection feed.
 **Owner:** Engineering + Product
 
-### P-230.unify — DailyActionCard vs Today's focus duplication
+### P-230.unify — [FE] DailyActionCard vs Today's focus duplication
 Milestone: TBD
 
 **Priority:** LOW (post-launch UX polish)
@@ -1243,7 +1243,7 @@ Milestone: TBD
 **Scope:** /ecole's HomeScreen has a DailyActionCard ("today's lesson" — linear curriculum-driven). /progress's TodayFocusSection has a "Today's focus" card ("today's prescribed practice" — engine-recommended). Two daily-action surfaces in one app may confuse users. v1 ships both intentionally per §7.3 (distinct surfaces). This ticket revisits if user testing shows confusion: (a) keep both with sharper framings, (b) deprecate /ecole's daily action card in favor of /progress's, (c) reverse — keep /ecole's, hide /progress's.
 **Owner:** Engineering + Product
 
-### P-231 — Speaking dashboard
+### P-231 — [FE] Speaking dashboard
 Milestone: TBD
 
 **Priority:** HIGH
@@ -1254,7 +1254,7 @@ Milestone: TBD
 **Scope:** implement §7.5. New surface, drill-down from Speaking tab. Includes Block 3 (Recording Replay with Inline Diagnostics).
 **Owner:** Engineering
 
-### P-232 — Per-Tâche dashboards
+### P-232 — [FE] Per-Tâche dashboards
 Milestone: TBD
 
 **Priority:** MEDIUM
@@ -1265,7 +1265,7 @@ Milestone: TBD
 **Scope:** implement §7.6. Three dashboards (T1, T2, T3). Block 3 reused.
 **Owner:** Engineering
 
-### P-233 — Curriculum view (path surface)
+### P-233 — [FE] Curriculum view (path surface)
 Milestone: TBD
 
 **Priority:** HIGH
@@ -1276,7 +1276,7 @@ Milestone: TBD
 **Scope:** implement §7.7. New surface accessible from main nav. Includes Block 4 (Path Topography).
 **Owner:** Engineering
 
-### P-234 — Cluster detail view
+### P-234 — [FE] Cluster detail view
 Milestone: DONE
 
 **Priority:** HIGH
@@ -1288,7 +1288,7 @@ Milestone: DONE
 **Owner:** Engineering
 **Note:** v1 ships at /cluster/[slug]. Visual language paper-on-canvas (mirrors B-102 LegalPage), distinct from /learn/[id]'s category-tinted modules. No `locked` UserClusterStatus state — BE confirmed 4-value enum (not_started/in_progress/absorbed/needs_revisit). TodayFocusSection re-routed: cluster_practice actions now go to /cluster/{slug} instead of directly to /speaking/tache-{N} (cluster page's CTA forwards with ?promptCluster URL param).
 
-### P-234.history — Cluster recording history surface
+### P-234.history — [FE] Cluster recording history surface
 Milestone: TBD
 
 **Priority:** LOW (post-launch)
@@ -1298,7 +1298,7 @@ Milestone: TBD
 **Dependencies:** P-234
 **Scope:** GET /api/users/me/clusters/{slug} already returns `recording_history` (last 10 newest-first, RecordingHistoryEntry items with detection_result + rubric_score). v1 doesn't render this. Add a "My history on this cluster" section: linear list with date / detection_result chip (clean/wobble/fail/not_observed) / rubric_score badge. Tap → /diagnostic?session={recording_id} per existing diagnostic deep-link convention.
 
-### P-234.exercises — Cluster exercise set rendering + answer checking
+### P-234.exercises — [FE+BE] Cluster exercise set rendering + answer checking
 Milestone: TBD
 
 **Priority:** MEDIUM (post-launch)
@@ -1318,7 +1318,7 @@ Milestone: TBD
 **Dependencies:** P-234, BE practice prompt resolution
 **Scope:** P-234's PracticeCTA emits `/speaking/tache-{N}?promptCluster={slug}`. /speaking/tache-{N} pages currently ignore this param and serve a default/random prompt. This ticket reads the param and either (a) uses the cluster's `practice_prompt` JSONB to override the default Tâche prompt (FE-side lookup), or (b) sends the slug to BE and lets the engine serve the cluster-specific prompt. (b) is cleaner — needs BE to accept the param on the recording-start endpoints.
 
-### P-235 — Ceiling Marker Map
+### P-235 — [FE] Ceiling Marker Map
 Milestone: TBD
 
 **Priority:** HIGH (method mode visibility moat)
@@ -1329,7 +1329,7 @@ Milestone: TBD
 **Scope:** implement Block 1. Surfaceable from Overall Progress (method mode) and Curriculum view (method mode).
 **Owner:** Engineering
 
-### P-236 — Mistake Repository
+### P-236 — [FE] Mistake Repository
 Milestone: TBD
 
 **Priority:** MEDIUM
@@ -1340,7 +1340,7 @@ Milestone: TBD
 **Scope:** implement Block 7. Standalone tab inside Progress.
 **Owner:** Engineering
 
-### P-237 — Time-Adaptive UI (lean version)
+### P-237 — [FE] Time-Adaptive UI (lean version)
 Milestone: TBD
 
 **Priority:** HIGH (meta-ticket affecting all dashboards)
@@ -1353,7 +1353,7 @@ Milestone: TBD
 
 ### Prescription engine (§10.5)
 
-### P-240 — Today's recommended action
+### P-240 — [FE+BE] Today's recommended action
 Milestone: DONE
 
 **Priority:** HIGH
@@ -1364,7 +1364,7 @@ Milestone: DONE
 **Scope:** prescription logic — given user's current path/phase/cluster + recent submissions + Dialogue Box template selection, output the single recommended next action. Surface on Overall Progress §7.4 section 2.
 **Owner:** Engineering
 
-### P-241 — Cluster-level prescription
+### P-241 — [FE+BE] Cluster-level prescription
 Milestone: TBD
 
 **Priority:** MEDIUM
@@ -1377,7 +1377,7 @@ Milestone: TBD
 
 ### Calibration & content ops (§10.6)
 
-### P-250 — Threshold calibration
+### P-250 — [BE] Threshold calibration
 Milestone: TBD
 
 **Priority:** HIGH
@@ -1388,7 +1388,7 @@ Milestone: TBD
 **Scope:** run real recordings of known-level students (Chadi's existing Preply students with documented levels) through the diagnostic. Tune thresholds in §2.4 and §3.x against ground truth. Iterate until level assignment agrees with Chadi's expert judgment ≥80% of the time.
 **Owner:** Engineering (tuning); Chadi (ground-truth labels)
 
-### P-251 — Lesson content delivery infrastructure
+### P-251 — [FE+BE] Lesson content delivery infrastructure
 Milestone: TBD
 
 **Priority:** MEDIUM
@@ -1403,7 +1403,7 @@ Milestone: TBD
 
 Stubs filed at the same time as Phase 1 to lock the IDs and prevent collision. Scope is the title only — full specs land when each ticket is taken up post-launch.
 
-### P-260 — Writing analysis pipeline
+### P-260 — [BE] Writing analysis pipeline
 Milestone: TBD
 
 **Priority:** —
@@ -1414,7 +1414,7 @@ Milestone: TBD
 **Scope:** writing analysis pipeline — full spec at pickup time.
 **Owner:** Engineering
 
-### P-261 — Writing dashboard
+### P-261 — [FE] Writing dashboard
 Milestone: TBD
 
 **Priority:** —
@@ -1425,7 +1425,7 @@ Milestone: TBD
 **Scope:** writing dashboard — full spec at pickup time.
 **Owner:** Engineering
 
-### P-262 — Cross-modal prescription
+### P-262 — [FE+BE] Cross-modal prescription
 Milestone: TBD
 
 **Priority:** —
@@ -1436,7 +1436,7 @@ Milestone: TBD
 **Scope:** cross-modal prescription (speaking + writing) — full spec at pickup time.
 **Owner:** Engineering
 
-### P-263 — A2 path full content
+### P-263 — [Content] A2 path full content
 Milestone: TBD
 
 **Priority:** —
@@ -1447,7 +1447,7 @@ Milestone: TBD
 **Scope:** A2→B1 path full content authoring (extends P-212 starter set).
 **Owner:** Chadi
 
-### P-264 — B2→C1 path full content
+### P-264 — [Content] B2→C1 path full content
 Milestone: TBD
 
 **Priority:** —
@@ -1458,7 +1458,7 @@ Milestone: TBD
 **Scope:** B2→C1 path full content authoring (extends P-212 starter set).
 **Owner:** Chadi
 
-### P-265 — C1→C2 path
+### P-265 — [Content] C1→C2 path
 Milestone: TBD
 
 **Priority:** —
@@ -1469,7 +1469,7 @@ Milestone: TBD
 **Scope:** C1→C2 path (structure + content) — full spec at pickup time.
 **Owner:** Chadi (content); Engineering (structure)
 
-### P-266 — Tense + conjugation + idiomaticity detectors
+### P-266 — [BE] Tense + conjugation + idiomaticity detectors
 Milestone: TBD
 
 **Priority:** —
@@ -1480,7 +1480,7 @@ Milestone: TBD
 **Scope:** additional detectors beyond P-200's initial set — tense correctness, conjugation accuracy, idiomaticity scoring.
 **Owner:** Engineering
 
-### P-267 — Time-Adaptive UI full mode redesigns
+### P-267 — [FE] Time-Adaptive UI full mode redesigns
 Milestone: polish-defer
 
 **Priority:** —
@@ -1491,7 +1491,7 @@ Milestone: polish-defer
 **Scope:** Foundation / Acceleration / Cram modes with different navigation structures (full redesign beyond P-237's lean conditional rendering).
 **Owner:** Engineering
 
-### P-268 — Audio-synced playback for Recording Replay
+### P-268 — [FE+BE] Audio-synced playback for Recording Replay
 Milestone: polish-defer
 
 **Priority:** —
@@ -1502,7 +1502,7 @@ Milestone: polish-defer
 **Scope:** Block 3 enhancement — audio-synced inline diagnostic playback.
 **Owner:** Engineering
 
-### P-269 — Streak system
+### P-269 — [FE] Streak system
 Milestone: polish-defer
 
 **Priority:** —
@@ -1514,7 +1514,7 @@ Milestone: polish-defer
 **Owner:** Engineering
 **Note:** F-067 (Queued — polish for real-feel) is now superseded by P-269.
 
-### M-101.z — Landing page custom hero asset + per-section icons (Phase 1 polish)
+### M-101.z — [Content] Landing page custom hero asset + per-section icons (Phase 1 polish)
 Milestone: polish-defer
 
 **Priority:** LOW (post-launch P1)
@@ -1526,7 +1526,7 @@ Milestone: polish-defer
 **Owner:** Chadi (illustrations) + Engineering (wire-up)
 **Note:** filed per the P-220.z precedent (Phase 1 polish, illustrations not blocking ship).
 
-### B-102 — Privacy + Terms + Refund pages with footer integration
+### B-102 — [FE] Privacy + Terms + Refund pages with footer integration
 Milestone: DONE
 
 **Priority:** HIGH (pre-launch legal compliance)
@@ -1551,7 +1551,7 @@ Milestone: DONE
 
 ---
 
-F-062.3 ✅ Tâche 2 re-record current turn — "Refaire cette prise"
+F-062.3 ✅ [FE+BE] Tâche 2 re-record current turn — "Refaire cette prise"
   - User-facing: new secondary button in the TurnReviewSheet alongside "Confirmer". Tap → current transcript discarded, user's optimistic bubble popped from chat, turn counter unchanged, phase resets to user-idle, user can hold PTT to re-record the same turn position. No max-attempts cap.
   - Backend (tcf-oral-tool):
       · Migration `scripts/add_turn_supersede_columns.py` (repo convention: direct sqlite3 ALTER TABLE + idempotent PRAGMA guard; no Alembic — project doesn't use it and the F-062.3 ticket's "Use Alembic" line was superseded by its own "File naming per repo convention" line). Adds `superseded_at TIMESTAMP NULL` + `superseded_by_turn_id INTEGER NULL` columns to `conversation_turns`, plus partial index `ix_conversation_turns_active` on (conversation_id, speaker) WHERE superseded_at IS NULL for hot-path queries.
@@ -1574,7 +1574,7 @@ F-062.3 ✅ Tâche 2 re-record current turn — "Refaire cette prise"
   - Final verification (Recording #25): DB soft-flag cascade confirmed on a 7-candidate-row conversation where 1 row was re-recorded — `conversation_turns` had (candidate 0, examiner 1, candidate 2 superseded, examiner 3 superseded via cascade, candidate 4, examiner 5, ...) with 6 active candidate turns total. `/end` analysis built the combined transcript from active rows only. Diagnostic page rendered real 4-couche scores matching conversation content (Le Goulet explanation cited "says 'I'm going to Marrakech' but explains neither preferences, needs, budget" — content from the kept turns, not the discarded retake).
   - `tsc --noEmit` clean on ship (only the pre-existing TargetScoreSelect.tsx:98 known error). Migration ran cleanly on dev SQLite.
 
-F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end — 4-turn personal-interview flow with randomized opening prompts from DB, per-turn upload + review sheet (Confirmer / Refaire cette prise), hybrid briefing-then-examiner-opens, final /end routing to /diagnostic with 4-couche analysis on combined active-turn audio.
+F-063 ✅ [FE+BE] Tâche 1 real recording (AI examiner conversation) shipped end-to-end — 4-turn personal-interview flow with randomized opening prompts from DB, per-turn upload + review sheet (Confirmer / Refaire cette prise), hybrid briefing-then-examiner-opens, final /end routing to /diagnostic with 4-couche analysis on combined active-turn audio.
   - Backend (tcf-oral-tool):
       · New model `Tache1Opening` in `app/models/models.py` — columns: `id`, `opening_prompt_fr` (NOT NULL), `opening_prompt_en`, `opening_prompt_es`, `is_active`, `created_at`. EN/ES columns mirror the Tâche 2 scenario table's multi-language pattern; examiner TTS only reads the FR column (kept for future bilingual-subtitle display).
       · Migration `scripts/add_tache1_openings.py` — idempotent CREATE TABLE IF NOT EXISTS + partial index `ix_tache1_openings_active` on (is_active). Repo-convention direct-sqlite3 pattern, same as `scripts/add_turn_supersede_columns.py` from F-062.3. Note: because `init_db.py` uses `Base.metadata.create_all()` the table auto-materializes when the backend imports the model — the explicit migration script is still shipped for fresh-DB bootstrapping and clarity.
@@ -1614,13 +1614,13 @@ F-063 ✅ Tâche 1 real recording (AI examiner conversation) shipped end-to-end 
 - Fix candidate: gate the review sheet mount on `audioEnded === true` for the most recent examiner turn (or queue the sheet open behind the audio's `ended` event). Same pattern T2 already handles correctly via deferred-commit (F-062.3) — T1 inherited the structure but the audio-finish gate didn't carry over.
 - Filed 2026-04-27 from F-063 verification.
 
-### F-110.1 — Migrate frontend reads from internal_key to key
+### F-110.1 — [FE] Migrate frontend reads from internal_key to key
 Milestone: DONE
 
 **Status:** Superseded by P-100.5 (2026-05-01) — same code change shipped as part of the dashboard rendering fix bundle. The migration originally specced here (RawCouche type rename + filter + mapDiagnosticBlock + mapRecordingSummary) shipped verbatim under P-100.5 because Section 2's missing render was caused by exactly this mismatch (frontend reading `internal_key` while F-110 list endpoint emitted `key` only).
 **Cleanup trigger:** F-110.2 backend cleanup is now safe to execute — notify backend to drop `internal_key` from `couches_array` dual-emission.
 
-### P-104.x — Wall-clock setTimeout cap fallback for deep-throttle edge case
+### P-104.x — [FE] Wall-clock setTimeout cap fallback for deep-throttle edge case
 Milestone: TBD
 
 **Priority:** Low (post-launch)
@@ -1636,7 +1636,7 @@ Milestone: TBD
 
 **When:** defer until real user data shows the long-hidden case happens. The Visa-Urgent persona is unlikely to background a TCF practice tab for 5+ min mid-recording. Pre-launch coverage of the brief and moderate cases via P-104 Step 1 is sufficient.
 
-### P-115.x — Motion pass: remaining surfaces
+### P-115.x — [FE] Motion pass: remaining surfaces
 Milestone: M2
 
 **Priority:** Medium
@@ -2101,7 +2101,7 @@ Milestone: TBD
 
 ---
 
-### F-108 — Fix pre-existing TS error in TargetScoreSelect.tsx
+### F-108 — [FE] Fix pre-existing TS error in TargetScoreSelect.tsx
 Milestone: M1
 
 **Status:** OPEN
@@ -2148,13 +2148,13 @@ Belt-and-braces diagnostic pattern: add `print(..., flush=True)` calls in the li
 
 ## Shipped — Week 3 (May 2-4)
 
-P-220 ✅ Onboarding questionnaire rebuild (Shipped 2026-05-02). See §10.3 entry above for full status detail.
-P-222 ✅ Waitlist UX (Shipped 2026-05-03). See §10.3 entry.
-B-102 ✅ Privacy + Terms + Refund pages with footer integration (Shipped 2026-05-03). See entry above.
-P-230 ✅ Overall Progress dashboard rebuild (Shipped 2026-05-03). See §10.4 entry.
-P-234 ✅ Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
+P-220 ✅ [FE] Onboarding questionnaire rebuild (Shipped 2026-05-02). See §10.3 entry above for full status detail.
+P-222 ✅ [FE+BE] Waitlist UX (Shipped 2026-05-03). See §10.3 entry.
+B-102 ✅ [FE] Privacy + Terms + Refund pages with footer integration (Shipped 2026-05-03). See entry above.
+P-230 ✅ [FE] Overall Progress dashboard rebuild (Shipped 2026-05-03). See §10.4 entry.
+P-234 ✅ [FE] Cluster detail view (Shipped 2026-05-03). See §10.4 entry.
 
-### F-223 — "Le raccourci" / "The shortcut" copy cleanup (interim patch)
+### F-223 — [FE] "Le raccourci" / "The shortcut" copy cleanup (interim patch)
 Milestone: DONE
 
 **Priority:** MEDIUM (user-visible stale copy)
@@ -2166,7 +2166,7 @@ Milestone: DONE
 **Owner:** Engineering
 **Note:** Interim only. F-202 (full L'École intro rebuild with methodology demo) supersedes this copy entirely.
 
-### F-226 — FR voice audit (tu vs vous) full-app sweep
+### F-226 — [Content] FR voice audit (tu vs vous) full-app sweep
 Milestone: M2
 
 **Priority:** LOW (post-soft-beta polish)
@@ -2177,7 +2177,7 @@ Milestone: M2
 **Scope:** audit every FR string across the FE for tu/vous consistency. Onboarding questionnaire uses vous (`Quel est votre niveau`); waitlist + landing footer use vous; some Block 3 / interim copy specs called out tu-form. Pick one (likely vous given current preponderance), align all surfaces, document the convention in CLAUDE.md so future copy authoring is consistent.
 **Owner:** Engineering + Chadi (copy review)
 
-### F-222 — Sign Out does nothing on click
+### F-222 — [FE] Sign Out does nothing on click
 Milestone: M1
 
 **Priority:** HIGH (auth-state correctness)
@@ -2189,7 +2189,7 @@ Milestone: M1
 **Owner:** Engineering
 **Note:** Verification requires interactive trace per F-225.5 — screenshots alone won't catch a Sign Out regression. Test plan: (1) sign in, (2) navigate to /profile, (3) click Sign Out, (4) verify localStorage has zero `lemethodic_*` keys, (5) verify URL is `/`, (6) verify subsequent visit to /profile redirects to `/` (ProtectedRoute kicks in). Same trace from /onboarding/waitlist sign-out link.
 
-### F-222.x — /profile real-data wire-up
+### F-222.x — [FE+BE] /profile real-data wire-up
 Milestone: M1
 
 **Priority:** MEDIUM (Active LC, prioritize after responsive sweep starts)
@@ -2201,7 +2201,7 @@ Milestone: M1
 **Owner:** Engineering
 **Note:** Beta-credibility hit if a user opens /profile and sees someone else's name + exam date. Not a functional blocker (Sign Out works post-F-222) but a real perception issue.
 
-### F-200 — Landing page desktop responsive + editorial design system foundation
+### F-200 — [FE] Landing page desktop responsive + editorial design system foundation
 Milestone: M1
 
 **Priority:** HIGH (launch-blocking — establishes the design system F-201..F-214 inherit)
@@ -2221,7 +2221,7 @@ Milestone: M1
 - Methodology bg flips to `--ed-paper` with top+bottom `--ed-rule` — visual emphasis on the moat-evidence section without breaking the bg-flat rhythm elsewhere.
 - Sprint/Premium "Join the waitlist" CTAs use ghost button (transparent + ed-fg border, fills on hover) — visual hierarchy below Subscription's solid navy CTA. Confirmed conversion ladder.
 
-### F-227 — Methodology breakout on landing (compressed 5-couche surface)
+### F-227 — [FE] Methodology breakout on landing (compressed 5-couche surface)
 Milestone: M2
 
 **Priority:** MEDIUM (post-F-202, public-side moat surface)
@@ -2239,7 +2239,7 @@ Milestone: M2
 - (c) **Reorder side-effect flagged but not fixed in F-227 scope:** removing Methodology from between Pricing and FAQ creates new Pricing(bg)→FAQ(bg) adjacency. Per spec "Do not change the surrounding sections' copy or structure" — accepted. Filed as F-227.rhythm.
 - (d) **Motion**: spec's "ed-page-enter primitive" misuses the name (ed-page-enter is route-level mount); intent is RevealOnScroll viewport-entry. Used existing RevealOnScroll like the prior MethodologySection.
 
-### V-016a.fix — Writing result rendering crash (couches shape mismatch)
+### V-016a.fix — [FE] Writing result rendering crash (couches shape mismatch)
 Milestone: DONE
 
 **Priority:** CRITICAL (production blocker — completed analyses crashed the result view)
@@ -2264,7 +2264,7 @@ Milestone: DONE
 - `lib/types.ts` — `WritingCoucheFeedback` interface; `WritingSubmissionResult` shape relaxed (couches → optional array; overall_score + cefr_band → optional)
 - `components/writing/WritingSubmissionClient.tsx` — ResultView refactored: array→Map lookup, defensive guards, "Coming soon" placeholder per missing couche
 
-### V-016a.dashboard — Render BE rich feedback envelope on /writing dashboard
+### V-016a.dashboard — [FE+BE] Render BE rich feedback envelope on /writing dashboard
 Milestone: DONE
 
 **Priority:** HIGH (production: dashboard hid every per-layer feedback field BE returned; em-dashes for overall_score + CEFR; "No feedback" everywhere despite BE populating examiner remarks, coaching, transformations, and a full TCF rubric breakdown)
@@ -2307,7 +2307,7 @@ Milestone: DONE
 - UNCERTAINTY: Visual density on a long /writing/{id} result with all four sub-blocks (examiner remark + coaching + transformation + criteria accordion) — may need a polish pass on spacing/typography after TARS captures the screenshots. Correctness is not at risk; polish is.
 - VERIFICATION: Hit `/writing/10` on prod with an authenticated session, submit a fresh response, wait for analysis. Per-couche cards should show numeric score (incl. `0` as `0`), examiner remark in serif italic French, Coaching block with EN primary + FR secondary, and a "Try this" sub-card. TCF rubric accordion appears below the couche stack — expand to see per-criterion label, `score / max_score`, examiner remark, and coaching. Top-card scores read from `exam_profile`; secondary-framework row renders only if BE supplies a non-null CLB-equivalent value. Regression: `/ecole` still renders both phase grids populated (V-016c.fix unaffected).
 
-### V-016g — /library prefetch 404 cleanup (stub page)
+### V-016g — [FE] /library prefetch 404 cleanup (stub page)
 Milestone: DONE
 
 **Priority:** MEDIUM (production console noise; UX gap when users click directly)
@@ -2328,7 +2328,7 @@ Milestone: DONE
 - `components/library/LibraryStub.tsx` (NEW) — hero + sub + notify form (email validation + success state) + back-to-home link
 - `components/nav/TopNav.tsx` — EXCLUDED_EXACT extended to `/library`, `/fr/library` so the marketing chrome stays consistent (no in-product TopNav)
 
-### V-016g.notify — BE library-notify email capture
+### V-016g.notify — [BE] BE library-notify email capture
 Milestone: TBD
 
 **Priority:** LOW (post-launch; FE has localStorage stash today)
@@ -2339,7 +2339,7 @@ Milestone: TBD
 **Scope:** BE `POST /api/library/notify` accepting `{ email }`, persisting to a notify list. FE swaps localStorage write to API call once the endpoint ships. When F-300c launches the real catalog, BE batch-sends launch notification to the captured list.
 **Owner:** Backend Engineering
 
-### F-300a — Platform-level / landing redesign
+### F-300a — [FE] Platform-level / landing redesign
 Milestone: M1
 
 **Priority:** HIGH (strategic surface restructure; depends on F-300b having stabilized /exam-prep)
@@ -2374,7 +2374,7 @@ Milestone: M1
 - `components/landing/LandingFooter.tsx` — footer nav extended with Exam Prep + Library links (lang-aware /exam-prep vs /fr/exam-prep)
 - `app/globals.css` — .fp-platform-cards grid + breakpoint rules
 
-### F-300a.proof — Platform landing social proof section
+### F-300a.proof — [Content] Platform landing social proof section
 Milestone: polish-defer
 
 **Priority:** LOW (post-launch UX polish)
@@ -2385,7 +2385,7 @@ Milestone: polish-defer
 **Scope:** add a "voices from English speakers" testimonial section between the product cards and the methodology section on platform landing. Pattern from current /exam-prep TestimonialCard component. 3 testimonials minimum, attribution + exam context + outcome quote. Needs Chadi-authored or Chadi-curated testimonials (real users where possible).
 **Owner:** Chadi (copy) + Engineering (wire-up)
 
-### F-300b — Move current landing to /exam-prep
+### F-300b — [FE] Move current landing to /exam-prep
 Milestone: M1
 
 **Priority:** HIGH (F-300 chain head; preserves existing funnel before / pivots)
@@ -2401,7 +2401,7 @@ Milestone: M1
 - `app/fr/exam-prep/page.tsx` (NEW) — renders LandingPage with lang="fr"
 - `components/nav/TopNav.tsx` — EXCLUDED_EXACT extended
 
-### F-300c — Library route + content
+### F-300c — [FE] Library route + content
 Milestone: M1
 
 **Priority:** MEDIUM (post-F-300a; /library currently 404)
@@ -2414,7 +2414,7 @@ Milestone: M1
 
 **Scope rewrite note (Session 1 lock, 2026-05-31):** LemonSqueezy era. Scope rewrite owing per Session 1 lock: /library is now Stripe-backed store with 4 categories (Livres, Audio, Telechargements, Ressources gratuites). See SITEMAP.md /library section and PRODUCT.md /library positioning. Detailed scope rewrite in MS-7 (ROADMAP-marketing.md).
 
-### F-300d: Library catalog content authoring
+### F-300d: [Content] Library catalog content authoring
 Milestone: M1
 
 **Priority:** MEDIUM
@@ -2422,7 +2422,7 @@ Milestone: M1
 **Filed:** 2026-05-31 (recreated)
 **Scope rewrite note (Session 1 lock, 2026-05-31):** LemonSqueezy era. Scope rewrite owing per Session 1 lock: /library is now Stripe-backed store with 4 categories (Livres, Audio, Telechargements, Ressources gratuites). See SITEMAP.md /library section and PRODUCT.md /library positioning. Detailed scope rewrite in MS-7 (ROADMAP-marketing.md).
 
-### F-300e: Library checkout + payment flow
+### F-300e: [FE+BE] Library checkout + payment flow
 Milestone: M6
 
 **Priority:** MEDIUM
@@ -2430,7 +2430,7 @@ Milestone: M6
 **Filed:** 2026-05-31 (recreated)
 **Scope rewrite note (Session 1 lock, 2026-05-31):** LemonSqueezy era. Scope rewrite owing per Session 1 lock: /library is now Stripe-backed store with 4 categories (Livres, Audio, Telechargements, Ressources gratuites). Payment processing now Stripe (not LemonSqueezy). See SITEMAP.md /library/checkout and PRODUCT.md /library positioning. Detailed scope rewrite in MS-7 (ROADMAP-marketing.md).
 
-### F-300f: Library subscriber discount logic
+### F-300f: [FE+BE] Library subscriber discount logic
 Milestone: M6
 
 **Priority:** MEDIUM
@@ -2438,7 +2438,7 @@ Milestone: M6
 **Filed:** 2026-05-31 (recreated)
 **Scope rewrite note (Session 1 lock, 2026-05-31):** LemonSqueezy era. Scope rewrite owing per Session 1 lock: Subscriber discounts now 15% Engagement / 25% Maitrise / 30% Sprint applied at Stripe checkout. See SITEMAP.md /library/checkout and PRODUCT.md service architecture section. Detailed scope rewrite in MS-7 (ROADMAP-marketing.md).
 
-### F-300g: Library bundle definition and display
+### F-300g: [Content] Library bundle definition and display
 Milestone: M6
 
 **Priority:** MEDIUM
@@ -2446,7 +2446,7 @@ Milestone: M6
 **Filed:** 2026-05-31 (recreated)
 **Scope rewrite note (Session 1 lock, 2026-05-31):** LemonSqueezy era. Scope rewrite owing per Session 1 lock: 3 bundles defined (TCF Canada Complete Pack $79, Anglophone Starter Pack $49, Sprint Companion $99). See SITEMAP.md /library section. Detailed scope rewrite in MS-7 (ROADMAP-marketing.md).
 
-### V-016a.fe — Writing submit polling consumer
+### V-016a.fe — [FE] Writing submit polling consumer
 Milestone: DONE
 
 **Priority:** HIGH (parallel to BE V-016a; FE ready before BE ships contract)
@@ -2490,7 +2490,7 @@ interface WritingJob {
 **Hold notes:**
 - Pushing the FE code now per Chadi resume direction. Auto-deploy to Vercel will happen but will fail live (writing surface non-functional) until BE V-016a contract is on prod. The user explicitly accepted this risk: "Commit + push (don't deploy until BE V-016a contract live)" — interpreted as FE deploy is OK, BE is still being shipped.
 
-### V-016c — /ecole desktop layout (lesson-grid Option C)
+### V-016c — [FE] /ecole desktop layout (lesson-grid Option C)
 Milestone: M1
 
 **Priority:** HIGH (V-016 chain mid; pre-launch desktop polish completes /ecole/speaking/progress trio)
@@ -2511,7 +2511,7 @@ Milestone: M1
 
 **Skipped from this rev:** the existing HomeScreen DailyActionCard pastels are NOT carried into desktop (warm token-based today card replaces). Recommended modules section reduced to a count chip.
 
-### V-016c.fix — /ecole desktop empty Fondations + Approfondissement (phase-filter regression)
+### V-016c.fix — [FE] /ecole desktop empty Fondations + Approfondissement (phase-filter regression)
 Milestone: DONE
 
 **Priority:** HIGH (production regression on V-016c desktop layout — visual verification on V-016c was blocked because the grids rendered with zero cards)
@@ -2543,7 +2543,7 @@ Milestone: DONE
 - UNCERTAINTY: Have not yet seen the populated phase grids render on prod with a real authenticated session. If the original bug was actually `lessons.length === 0` from BE (rather than the phase-field regression I diagnosed), the new empty-state will at least make that visible — but the underlying BE data issue would still need a separate fix.
 - VERIFICATION: Chadi/TARS hit `https://lemethodic.com/ecole` at 1440px desktop on an authenticated session; both Fondations (1-16) and Approfondissement (17-27) should render populated lesson card grids. Click a card in each phase to confirm `/ecole/lesson/{n}` navigation. On 375px mobile, HomeScreen still works — Phase 2 divider should now render between lessons 16 and 17 (it used to silently fail when BE phase was wrong; that's a side-benefit of the mapper hardening).
 
-### V-016f — Differentiation Card 1 rebuild (text-anchored bottleneck)
+### V-016f — [FE] Differentiation Card 1 rebuild (text-anchored bottleneck)
 Milestone: M2
 
 **Priority:** HIGH (V-016 chain; landing card 1 read as decorative not data)
@@ -2561,7 +2561,7 @@ Milestone: M2
 - Spring-eased fade-up on each cycle via `ed-pair-fade-in` keyframe (reused from V-004 InterferenceVisual). Reduced-motion users see end state instantly.
 - Card 1 file gains a `language` prop; Cards 2/3 remain prop-less; mount switched to per-index render in DifferentiationSection.
 
-### V-016e — Switzer font preload (landing FOUT fix)
+### V-016e — [FE] Switzer font preload (landing FOUT fix)
 Milestone: M2
 
 **Priority:** HIGH (V-016 chain; landing H1 fell back to system sans on first paint)
@@ -2575,7 +2575,7 @@ Milestone: M2
 
 If FOUT persists post-deploy, escalate to **V-016e.local** — self-host Switzer via `next/font/local` with downloaded woff2 files. Filed as queued follow-up.
 
-### V-016d — Hero kicker amendment (size, color split, spring)
+### V-016d — [FE] Hero kicker amendment (size, color split, spring)
 Milestone: M1
 
 **Priority:** MEDIUM (V-016 chain; landing hero polish)
@@ -2591,7 +2591,7 @@ Milestone: M1
 - Animation: keyframe `ed-kicker-slide` now runs at 200ms with `ED_EASE_SPRING_CSS` (was 600ms with ED_EASE_CSS). Tighter rotation rhythm.
 - Continuous infinite loop: `useRotatingText` already cycles forever via `setInterval`; no behavioral change needed. Hover-pause preserved (kicker pauses while focused / hovered for keyboard accessibility).
 
-### V-016b — La Méthode en Couches copy revision
+### V-016b — [Content] La Méthode en Couches copy revision
 Milestone: M2
 
 **Priority:** HIGH (V-016 chain; landing methodology copy didn't communicate value)
@@ -2605,7 +2605,7 @@ Milestone: M2
 
 **Out of scope:** EcoleIntro (`/ecole/intro` Section 2) keeps its longer methodology copy. The landing methodology is the compressed glance-form version; EcoleIntro is the deep version. V-016b applies only to the compressed copy on landing.
 
-### V-015d — /progress desktop bento dashboard
+### V-015d — [FE] /progress desktop bento dashboard
 Milestone: M1
 
 **Priority:** HIGH (V-015 chain tail; pre-launch desktop polish)
@@ -2631,7 +2631,7 @@ Milestone: M1
 - **V-015d.trend** — BE `GET /api/diagnostic/trend?days=30` endpoint for the score-trend tile (skipped from v1 per Chadi pick)
 - **V-015d.streak** — proper streak counter (BE field needed)
 
-### V-015c — /speaking desktop tab-driven layout
+### V-015c — [FE] /speaking desktop tab-driven layout
 Milestone: M1
 
 **Priority:** HIGH (V-015 chain mid; pre-launch desktop polish)
@@ -2659,7 +2659,7 @@ Milestone: M1
 
 **Mobile <md:** existing SpeakingLanding stays unchanged via `.fp-mobile-only`.
 
-### V-015c.copy — Real format/tips/examples copy
+### V-015c.copy — [Content] Real format/tips/examples copy
 Milestone: polish-defer
 
 **Priority:** MEDIUM (post-V-015c v1)
@@ -2670,7 +2670,7 @@ Milestone: polish-defer
 **Scope:** replace the 3-tâche placeholder format / 3-tips arrays in `components/speaking/SpeakingDesktop.tsx` COPY constant with Chadi-authored real content. Add an "Examples" block per tâche if Chadi provides sample exchanges. EN + FR.
 **Owner:** Chadi (copy) + Engineering (wire-up)
 
-### V-015d.trend — BE diagnostic trend endpoint
+### V-015d.trend — [BE] BE diagnostic trend endpoint
 Milestone: TBD
 
 **Priority:** LOW (post-V-015d; FE has placeholder)
@@ -2681,7 +2681,7 @@ Milestone: TBD
 **Scope:** BE `GET /api/diagnostic/trend?days=30` returning either per-couche or overall score time series. Shape suggestion: `{ couche_key | 'overall', points: [{ date: ISO, score: number }] }[]`. FE adds a Recharts line chart in the V-015d "Score trend" tile and the V-015c right-rail history slot once this lands.
 **Owner:** Backend Engineering
 
-### V-015d.streak — Streak counter (BE field + UI)
+### V-015d.streak — [FE+BE] Streak counter (BE field + UI)
 Milestone: TBD
 
 **Priority:** LOW (post-launch UX)
@@ -2692,7 +2692,7 @@ Milestone: TBD
 **Scope:** BE adds streak tracking on User (consecutive-day-with-recording counter). FE swaps the Streak bento tile from days-until-exam to actual streak count once BE field ships. Days-until-exam moves to a new dedicated tile or returns to /ecole header chip.
 **Owner:** Backend Engineering
 
-### V-013c — Nav system overhaul (mobile BottomNav + desktop TopNav)
+### V-013c — [FE] Nav system overhaul (mobile BottomNav + desktop TopNav)
 Milestone: M1
 
 **Priority:** HIGH (V-013 chain tail; pre-launch surface completeness)
@@ -2717,7 +2717,7 @@ Milestone: M1
 - Dropdown: click-to-open + click-outside dismiss (touch-friendly)
 - Mobile breakpoint: 768px (Tailwind md default)
 
-### V-013b — /more page (Profile, Settings, Account, About)
+### V-013b — [FE] /more page (Profile, Settings, Account, About)
 Milestone: M1
 
 **Priority:** HIGH (V-013 mid-chain; was F-058 placeholder)
@@ -2744,7 +2744,7 @@ Milestone: TBD
 **Scope:** BE PATCH /api/users/me accepting partial body with `interface_language: "en" | "fr"`. Updates User row, returns updated user. FE then calls api.users.update() (new method) on toggle and refreshes auth store from response. Without this, /me re-fetches will reset to BE-stored value.
 **Owner:** Backend Engineering
 
-### V-013b.notifications — Notification preferences UI + BE plumbing
+### V-013b.notifications — [FE+BE] Notification preferences UI + BE plumbing
 Milestone: TBD
 
 **Priority:** LOW (post-launch UX)
@@ -2755,7 +2755,7 @@ Milestone: TBD
 **Scope:** wire toggles for daily-streak-reminder, exam-countdown-warning, weekly-progress-summary. Needs BE notification store + dispatch system first. Out of soft-beta scope.
 **Owner:** Engineering (Chadi PM call on which categories)
 
-### V-013b.password — Change password flow
+### V-013b.password — [FE+BE] Change password flow
 Milestone: TBD
 
 **Priority:** MEDIUM (account hygiene)
@@ -2766,7 +2766,7 @@ Milestone: TBD
 **Scope:** route /more/change-password (or modal sheet); form with current_password + new_password fields, validation (min 8 chars), 422 error mapping. Uses ed-field utility + .ed-cta-warm-hover button. BE endpoint needed first.
 **Owner:** Engineering
 
-### V-013a — Wire /writing to F-224 (prompt picker, submission, history)
+### V-013a — [FE+BE] Wire /writing to F-224 (prompt picker, submission, history)
 Milestone: M1
 
 **Priority:** HIGH (V-013 chain head; production launch dependency)
@@ -2797,7 +2797,7 @@ Milestone: M1
 - Per-couche breakdown using BRAND_LABEL (Range / Coherence / Accuracy / Fluency, lang-aware)
 - "Submit another" → /writing; "Try again" → reset state on same prompt
 
-### V-013a.history — BE /api/writing/history endpoint
+### V-013a.history — [BE] BE /api/writing/history endpoint
 Milestone: TBD
 
 **Priority:** MEDIUM (post-V-013a; FE renders empty state in the meantime)
@@ -2808,7 +2808,7 @@ Milestone: TBD
 **Scope:** GET /api/writing/history returning user's past submissions (ordered DESC by submitted_at). Each row carries id, prompt_id, prompt_title_fr, word_count, overall_score, cefr_band, submitted_at. FE detects 404 and renders empty state until this ships.
 **Owner:** Backend Engineering
 
-### V-012c — Whitespace + bento variation (warmth refit phase 3)
+### V-012c — [FE] Whitespace + bento variation (warmth refit phase 3)
 Milestone: M2
 
 **Priority:** MEDIUM (V-012 chain tail; whitespace polish + bento exploration)
@@ -2829,7 +2829,7 @@ Milestone: M2
 - `components/landing/sections/MethodologySection.tsx` (vertical padding clamp)
 - `components/landing/sections/FinalCTASection.tsx` (vertical padding cap)
 
-### V-012c.bento — Differentiation cards bento variation (queued)
+### V-012c.bento — [FE] Differentiation cards bento variation (queued)
 Milestone: polish-defer
 
 **Priority:** LOW (post-V-012 polish; design taste pass)
@@ -2840,7 +2840,7 @@ Milestone: polish-defer
 **Scope:** swap the 3-equal-card grid in DifferentiationSection for a bento layout. Two candidate variations to surface in plan-first when picked up: (a) 1 large card 2/3-width spanning Card 1 (Diagnostic-driven, the strategic lead) + 2 stacked smaller cards 1/3-width for Cards 2/3; (b) 2-1-2 pattern with different aspect ratios across breakpoints. Mobile collapses to single-column stack regardless. Card chrome stays — only grid composition changes. Needs Chadi taste pass on which composition reads best with the V-012b warm visuals (peach-deep illuminated bar, peach strikethrough, sage waveform).
 **Owner:** Engineering (Chadi taste pass on composition)
 
-### V-012b — Per-surface warmth injection (warmth refit phase 2)
+### V-012b — [FE] Per-surface warmth injection (warmth refit phase 2)
 Milestone: M2
 
 **Priority:** HIGH (V-012 mid-chain — hero/Paywall/FinalCTA/EcoleReveal/onboarding/Differentiation cards get warmth)
@@ -2887,7 +2887,7 @@ Milestone: M2
 
 **V-011.color absorbed:** the FinalCTA bg shift + B2 highlight + button hover + trust line color all land here. V-011.color marked superseded; BE retiring from BACKLOG separately.
 
-### V-012a — Token foundation + motion language (warmth refit phase 1)
+### V-012a — [FE] Token foundation + motion language (warmth refit phase 1)
 Milestone: M2
 
 **Priority:** HIGH (V-012 chain root — V-012b/c inherit tokens + spring motion)
@@ -2929,7 +2929,7 @@ Milestone: M2
 - State transitions on color/bg properties feel softer (spring overshoot, not snap)
 - Card hover lifts get a subtle spring settle
 
-### V-011 — FinalCTA centering fix
+### V-011 — [FE] FinalCTA centering fix
 Milestone: M2
 
 **Priority:** HIGH (verification-found; visual reads off-center on production)
@@ -2949,7 +2949,7 @@ Milestone: M2
 - `components/landing/sections/FinalCTASection.tsx` — H2 + body P explicit centering attributes
 - `components/landing/copy.ts` — FR FINAL_CTA.heading gains NBSP between "ce" and "qui"
 
-### V-011.color — FinalCTA color treatment refresh (PLAN-FIRST, awaiting Chadi pick)
+### V-011.color — [FE] FinalCTA color treatment refresh (PLAN-FIRST, awaiting Chadi pick)
 Milestone: M2
 
 **Priority:** MEDIUM (verification-found; current treatment reads as flat per Chadi)
@@ -2972,7 +2972,7 @@ Milestone: M2
 
 **Awaiting Chadi pick (or hybrid).** After direction lands, ship as the same V-011.color ticket (single PR), mark Awaiting Verification.
 
-### V-010 — /ecole phase structure correction (3-button → 2-button)
+### V-010 — [FE] /ecole phase structure correction (3-button → 2-button)
 Milestone: M1
 
 **Priority:** HIGH (methodology-content alignment)
@@ -2995,7 +2995,7 @@ Milestone: M1
 **Files touched:**
 - `components/home/EcoleProgress.tsx` — MILESTONES 3-entry array → 2-entry array; ranges adjusted; comment block updated to V-010 reasoning.
 
-### V-009 — CouchesDiagnostic 5-axis + brand labels
+### V-009 — [FE] CouchesDiagnostic 5-axis + brand labels
 Milestone: M2
 
 **Priority:** HIGH (methodology-content credibility — wrong axis count + legacy labels surfaced on /diagnostic + /paywall)
@@ -3028,7 +3028,7 @@ Milestone: M2
 - `app/diagnostic/page.tsx` — couchesToRows uses BRAND_LABEL override, appends unscored Voix row
 - `components/Paywall.tsx` — RADAR_DATA 4 axes (legacy labels) → 5 axes (brand labels EN)
 
-### V-009.be — BE adds La Voix scoring
+### V-009.be — [BE] BE adds La Voix scoring
 Milestone: M3
 
 **Priority:** HIGH (BE-side dependency for V-009 to render real Voice data instead of placeholder)
@@ -3039,7 +3039,7 @@ Milestone: M3
 **Scope:** BE-side. Add `la_voix` to `CoucheKey` enum + scoring pipeline in `analysis.py` (or wherever the 4 existing couches are scored). Update `app/services/couche_labels.py` to emit brand labels (`displayLabelEn: "Voice"`, `displayLabelFr: "Voix"` for la_voix; same brand-label override for the other 4 couches so FE can drop its `BRAND_LABEL` override eventually). Diagnostic API response should return 5 couche scores once la_voix scoring is wired. La Voix scoring source: pronunciation/vowel-quality/liaison/rhythm metrics from the audio analysis pipeline (the existing speech-to-text + audio features could feed it). Scoring algorithm dimensions are a BE pedagogical pick — **no blocking owner input pending** (the 4 pedagogical decisions previously associated with V-009.be belonged to V-016a writing path; those shipped 2026-05-12 under V-016a + V-016a.fix).
 **Owner:** Backend Engineering
 
-### V-008 — Card 2 interference example direction reversed
+### V-008 — [FE] Card 2 interference example direction reversed
 Milestone: M2
 
 **Priority:** HIGH (verification-found; wrong audience direction shipped)
@@ -3061,7 +3061,7 @@ EN/FR small-caps prefix labels removed in this rewrite — they were the relics 
 **Files touched:**
 - `components/landing/sections/DifferentiationSection.tsx` — INTERFERENCE_PAIRS shape changed from `{en, fr}[]` to `{wrong, correct}[]`; InterferenceVisual rewritten as 2-line; SANS_FONT span prefixes removed (no longer needed without EN/FR labels)
 
-### V-007 — Final CTA trust line duplicate "Free."
+### V-007 — [FE] Final CTA trust line duplicate "Free."
 Milestone: M1
 
 **Priority:** HIGH (verification-found; user-visible duplication)
@@ -3072,7 +3072,7 @@ Milestone: M1
 **Dependencies:** V-002 (em-dash strip touched the FINAL_CTA copy and exposed the bug, though the duplicate was older — F-200 era concatenation that overlapped with FINAL_CTA.ctaSecondary's first sentence)
 **Scope:** in `FinalCTASection.tsx` line 100, the trust span rendered `{FINAL_CTA.ctaSecondary[lang]} {HERO.ctaSecondary[lang].split('.')[0]}.` — concatenating FINAL_CTA's `"Free. No card. About 12 minutes."` with HERO.ctaSecondary's first sentence (which is `"Free"`), producing the duplicate. Removed the `HERO.ctaSecondary` suffix; trust line now reads exactly `FINAL_CTA.ctaSecondary[lang]` ("Free. No card. About 12 minutes." / "Gratuit. Sans carte. Environ 12 minutes."). HERO import removed (no longer used in this file).
 
-### V-006 — Kicker container clipping (rotating word cut off)
+### V-006 — [FE] Kicker container clipping (rotating word cut off)
 Milestone: M1
 
 **Priority:** HIGH (verification-found; layout bug clipped DELF/DALF)
@@ -3085,7 +3085,7 @@ Milestone: M1
 
 **Side fix:** earlier V-001 edit only updated the reduced-motion branch's font size + marginBottom because the active-rotation branch had different indentation (10-space vs 8-space inside its parent), and the `replace_all` matched only one. V-006 brings the active branch into line — `clamp(20px, 1.8vw, 24px)` font, `clamp(16px, 2vw, 28px)` marginBottom — so both render paths agree.
 
-### V-004 — Differentiation cards rebuild (per-card art-directed visuals)
+### V-004 — [FE] Differentiation cards rebuild (per-card art-directed visuals)
 Milestone: M2
 
 **Priority:** MEDIUM (visual depth; differentiation cards were boring text-only templates)
@@ -3117,7 +3117,7 @@ Milestone: M2
 - `components/landing/sections/DifferentiationSection.tsx` — full rewrite. Adds 3 inline visual sub-components (CoucheStackVisual / InterferenceVisual / WaveformVisual) + useReducedMotion hook + visuals[] map indexed by card position
 - `app/globals.css` — added `@keyframes ed-pair-fade-in` + `.ed-pair-fade` class + `.ed-pair-fade-delay` class + `@keyframes ed-wave-pulse` + reduced-motion gate
 
-### V-003 — Hero atmospheric typographic animation
+### V-003 — [FE] Hero atmospheric typographic animation
 Milestone: M2
 
 **Priority:** MEDIUM (visual depth; F-200 editorial direction)
@@ -3136,7 +3136,7 @@ Milestone: M2
 
 **No-overlap discipline:** characters positioned in distinct viewport zones (top-left -12%/-8%, top-right -8%/-4%, mid-left 38%/-16%, mid-right 30%/-10%, bottom-center 38%-left/-14% bottom). Negative offsets push characters partially off-canvas so the eye reads them as atmospheric fragments rather than discrete shapes. At narrow viewports (mobile), character font-sizes drop to 240-300px floor, preserving the same off-canvas fragment effect.
 
-### V-003.opacity — atmosphere opacity tuning
+### V-003.opacity — [FE] atmosphere opacity tuning
 Milestone: polish-defer
 
 **Priority:** LOW (post-V-003 polish)
@@ -3147,7 +3147,7 @@ Milestone: polish-defer
 **Scope:** V-003 ships at 5% opacity (midpoint of 4-6%). Once on production, Chadi can taste-pass the level — bump to 6% if too subtle, drop to 4% if competing with copy. 1-line change in globals.css.
 **Owner:** Engineering
 
-### V-002 — Em-dash strip across FE copy
+### V-002 — [FE] Em-dash strip across FE copy
 Milestone: M2
 
 **Priority:** MEDIUM (editorial polish; em-dash overuse muddied prose voice)
@@ -3172,7 +3172,7 @@ Milestone: M2
 
 **Note:** PROBLEM body (`landing/copy.ts:65,71`) used comma instead of proposed period; the original sentence structure (`But when X, when Y, — Z`) made `Z` the main clause. Replacing — with period would have created a fragment ("But when X, or when Y."). Comma preserves grammar and the editorial restraint of dropping the em-dash. EN + FR both adjusted.
 
-### V-001 — Hero H1 + rotating kicker sizing
+### V-001 — [FE] Hero H1 + rotating kicker sizing
 Milestone: M1
 
 **Priority:** HIGH (verification-found; H1 overflow on production)
@@ -3185,7 +3185,7 @@ Milestone: M1
 - Hero H1 (`HeroSection.tsx`): `clamp(2.5rem, 7vw, 6rem)` → `clamp(2.5rem, 6vw, 5rem)`. 40px floor preserved (small mobile); 80px desktop cap (was 96px). The locked H1 string is 26 words — at 96px it overflowed the 920px column at 1440px. 80px fits with breathing room.
 - Rotating kicker (`RotatingKicker.tsx`): `clamp(13px, 1.2vw, 15px)` → `clamp(20px, 1.8vw, 24px)`. Tracking (0.06em) + color (ed-muted) + uppercase preserved. Bottom margin nudged from `clamp(12px, 1.5vw, 20px)` to `clamp(16px, 2vw, 28px)` proportional to the size bump. Slide animation timing untouched — runs at same ED_DUR.rotateWord (600ms) which still reads smoothly at the larger size.
 
-### V-005 — Font system upgrade (Switzer + Fraunces)
+### V-005 — [FE] Font system upgrade (Switzer + Fraunces)
 Milestone: M2
 
 **Priority:** HIGH (V-series chain root — V-003 + V-004 inherit the new font system)
@@ -3219,7 +3219,7 @@ Milestone: polish-defer
 **Scope:** apply `font-variation-settings: "SOFT" 28` (or similar) to Fraunces consumers at display sizes (Hero H1, EcoleIntro section headers, MethodologySection header, LegalPage h1). Currently V-005 ships Fraunces with SOFT defaulting to 0 (sharp). The warmth axis is the editorial signature; needs Chadi taste pass on +20 vs +30 vs +40 across surfaces. 1-line addition per H1 site.
 **Owner:** Engineering
 
-### F-227.rhythm — Pricing→FAQ same-bg adjacency (paired bg flip)
+### F-227.rhythm — [FE] Pricing→FAQ same-bg adjacency (paired bg flip)
 Milestone: M2
 
 **Priority:** LOW (visual rhythm polish)
@@ -3231,7 +3231,7 @@ Milestone: M2
 **Scope:** post-F-227 rhythm restoration. Two paired flips (the spec billed it as "one-line change" but the codebase had FinalCTA at ed-paper, not ed-bg, so two flips needed to land the stated outcome): FAQSection.tsx bg `ed-bg → ed-paper` + FinalCTASection.tsx bg `ed-paper → ed-bg`. Final landing rhythm: Hero(bg)/Problem(bg)/Differentiation(bg)/Methodology(bg)/HowItWorks(paper)/Pricing(bg)/FAQ(paper)/FinalCTA(bg). One residual same-bg adjacency at the top of the page (Hero→Problem→Differentiation→Methodology = 4 bgs) but that's the editorial canvas the visitor begins on; alternation kicks in from HowItWorks onward and is now perfectly clean.
 **Owner:** Engineering
 
-### F-225 — Desktop verification protocol (process change)
+### F-225 — [FE] Desktop verification protocol (process change)
 Milestone: DONE
 
 **Priority:** HIGH (process gate, launch-blocking)
@@ -3243,7 +3243,7 @@ Milestone: DONE
 **Owner:** Engineering (process)
 **Note:** Tickets shipped before 2026-05-04 (P-220, P-222, B-102, P-230, P-234, etc.) are grandfathered. The rule applies prospectively. Until F-225's doc commit landed, no other ticket could be marked `Shipped` — F-223, F-222, and any other in-flight FE work waited.
 
-### F-225.constraint — F-225 amendment: split visual vs non-visual verification
+### F-225.constraint — [FE] F-225 amendment: split visual vs non-visual verification
 Milestone: TBD
 
 **Priority:** LOW (doc-only; refines existing protocol)
@@ -3256,7 +3256,7 @@ Milestone: TBD
 
 ## Strategic queue — 2026-05-12 session
 
-### F-310 — Auth hardening (umbrella; supersedes F-072)
+### F-310 — [FE+BE] Auth hardening (umbrella; supersedes F-072)
 Milestone: DONE
 
 **Priority:** HIGH (pre-launch blocker per Decision 4)
@@ -3276,7 +3276,7 @@ Milestone: DONE
 **Owner:** Engineering (BE + FE)
 **Related:** F-310.fe (FE half — entry below)
 
-### F-310.fe — Auth hardening FE activation (5-commit chain)
+### F-310.fe — [FE] Auth hardening FE activation (5-commit chain)
 Milestone: DONE
 
 **Priority:** HIGH (FE half of F-310; gates the soft-beta hard cutoff + hCaptcha + email-verification + refresh-on-401)
@@ -3391,7 +3391,7 @@ New tokens added to `:root` + `.dark`:
 
 **non-visual change note:** Build-only verification applied (Playwright captures deferred to soft-beta battery per F-225 2026-05-23 debt acceptance).
 
-### F-310.fe.coldreload — Route email_not_verified 403 from any protected page
+### F-310.fe.coldreload — [FE] Route email_not_verified 403 from any protected page
 Milestone: TBD
 
 **Priority:** MEDIUM (cold-tab reload edge case; affects users who don't verify email immediately after register. Not blocking soft beta if verification is quick.)
@@ -3495,7 +3495,7 @@ Kept as-is (not text separators): `'—'` placeholder dashes in `SnapshotSection
   7. **In-session 403** — log in as the unverified user, manually call a protected endpoint from the console (e.g., `fetch('/api/users/me/today', { headers: { Authorization: 'Bearer ' + localStorage.lemethodic_token }, credentials: 'include' })`). Expected: page hard-navigates to `/verify-email?next=<current path>`.
   8. **Open-redirect safety** — manually visit `/verify-email?token=<any>&next=//evil.com` and `?next=https://evil.com`. Expected: post-confirm routes to `/login`, not the evil host.
 
-### F-311 — Token control (Redis rate limiter + model routing + prompt caching)
+### F-311 — [BE] Token control (Redis rate limiter + model routing + prompt caching)
 Milestone: DONE
 
 **Priority:** HIGH (pre-launch blocker per Decision 4 — at 5,000+ users Y1, uncapped diagnostic abuse blows API costs before revenue catches up)
@@ -3512,7 +3512,7 @@ Milestone: DONE
 - Prompt injection detection layer — reject system-override patterns before the Claude call
 **Owner:** Backend Engineering
 
-### F-312.0 — RAG corpus licensing pre-flight (HARD GATE)
+### F-312.0 — [BE] RAG corpus licensing pre-flight (HARD GATE)
 Milestone: DONE
 
 **Priority:** CRITICAL (hard gate per Chadi 2026-05-12 push-back — no RAG schema work commits until this returns legal-clear)
@@ -3524,7 +3524,7 @@ Milestone: DONE
 **Gate:** F-312, F-320, F-321 all blocked until F-312.0 completes with a legal-clear answer or a documented fallback strategy. "Better to know now than after building."
 **Owner:** Engineering (legal-adjacent; Chadi reviews conclusion)
 
-### F-312 — OQLF + Académie française RAG retrieval layer
+### F-312 — [BE] OQLF + Académie française RAG retrieval layer
 Milestone: TBD
 
 **Priority:** HIGH (Decision 2 — diagnostic credibility through authoritative grounding; replaces "the AI thinks this is wrong" with "according to the OQLF, this is an anglicism")
@@ -3537,7 +3537,7 @@ Milestone: TBD
 - Académie française "Dire et ne pas dire" (`academie-francaise.fr`) — ~500 entries, "don't say X, say Y" format
 **Owner:** Backend Engineering
 
-### F-319 — Le Vocabulaire (system; parent ticket)
+### F-319 — [FE+BE] Le Vocabulaire (system; parent ticket)
 Milestone: M4
 
 **Priority:** HIGH (Decision 3 — Le Méthodic shifts from exam-prep-only to general-French + exam platform; one engine, two audiences)
@@ -3562,7 +3562,7 @@ Milestone: M4
 **Why this matters:** without Le Vocabulaire, Le Méthodic is exam-prep only. With it, the product serves both general French learners and exam candidates — one engine, two audiences.
 **Owner:** Engineering (BE + FE; child tickets are layer-specific)
 
-### F-320 — Le Vocabulaire DB schema
+### F-320 — [BE] Le Vocabulaire DB schema
 Milestone: M4
 
 **Priority:** HIGH (F-319 MVP foundation)
@@ -3573,7 +3573,7 @@ Milestone: M4
 **Scope:** Postgres schema for Vocabulaire: `chunk` (FR) + `translation` (EN) + `topic` + `source` (OQLF / Académie / custom) + `register` (familier / standard / soutenu) + `exam_tag` (TCF / DELF / TEF / null) + `cefr_level`. Migration script. Consider shared table with F-312 RAG corpus if licensing permits — chunks have overlapping shape.
 **Owner:** Backend Engineering
 
-### F-321 — Le Vocabulaire seed Phase 1 (3 topic sets, 500–800 entries from OQLF BDL)
+### F-321 — [Content] Le Vocabulaire seed Phase 1 (3 topic sets, 500–800 entries from OQLF BDL)
 Milestone: M4
 
 **Priority:** HIGH (F-319 MVP content)
@@ -3584,7 +3584,7 @@ Milestone: M4
 **Scope:** ETL pipeline from OQLF BDL → Vocabulaire rows. Three Phase-1 topic sets curated for general French (e.g., arts, loisirs, voyages, société — Vocabulaire-progressif style; final pick per Chadi pedagogical signal). 500–800 entries total. Idempotent re-runnable seed script.
 **Owner:** Backend Engineering (Chadi pedagogical topic pick)
 
-### F-322 — Le Vocabulaire practice UI
+### F-322 — [FE] Le Vocabulaire practice UI
 Milestone: M4
 
 **Priority:** MEDIUM (Sprint 2 — F-319 MVP FE-side)
@@ -3654,7 +3654,7 @@ Milestone: M4
 
 **Owner:** Frontend Engineering
 
-### F-323 — Le Vocabulaire test UI
+### F-323 — [FE] Le Vocabulaire test UI
 Milestone: M4
 
 **Priority:** MEDIUM (Sprint 2 — F-319 MVP FE-side)
@@ -3737,7 +3737,7 @@ Milestone: M4
 
 **Owner:** Frontend Engineering
 
-### F-324 — Diagnostic ↔ Vocabulaire linking (auto-suggest vocab topics from flagged errors)
+### F-324 — [FE+BE] Diagnostic ↔ Vocabulaire linking (auto-suggest vocab topics from flagged errors)
 Milestone: M4
 
 **Priority:** MEDIUM (Sprint 2 — connects Le Diagnostic to Le Vocabulaire)
@@ -3748,7 +3748,7 @@ Milestone: M4
 **Scope:** when a diagnostic surfaces an error tagged with a vocabulary register/topic mismatch, FE renders a "Practice this in Le Vocabulaire" callout linking to the relevant topic set. BE: extend diagnostic response with `suggested_vocab_topics: string[]`. FE: render callout block in ResultView + diagnostic page.
 **Owner:** Engineering (BE + FE)
 
-### F-325 — Le Vocabulaire browse UI (FE) — topic catalog + chunk detail
+### F-325 — [FE] Le Vocabulaire browse UI (FE) — topic catalog + chunk detail
 Milestone: M4
 
 **Priority:** MEDIUM (Sprint 2 — corpus exploration surface; complements F-322 practice UI and F-323 test UI)
@@ -3820,7 +3820,7 @@ Mobile-first per F-225 (mirrors the `app/ecole/` mobile/desktop CSS-gate split).
   8. **403 email_not_verified flow** — log in as an unverified user (or simulate by clearing email_verified_at BE-side). Visit `/vocabulaire`. Verify hard-nav to `/verify-email?next=/vocabulaire` (F-310.fe.coldreload interceptor still works on this new surface).
   9. **Runtime log sweep** — Vercel runtime logs for the F-325 deploy: 0 errors / 0 5xx in a 1h window after smoke.
 
-### F-VISUAL-001 — design system audit + Wispr Flow benchmark rollout
+### F-VISUAL-001 — [FE] design system audit + Wispr Flow benchmark rollout
 Milestone: M2
 
 **Priority:** HIGH (cross-cutting design refresh — touches every surface; the editorial system bones are in place but the palette/typography pair/motion conventions need consolidation against the Wispr Flow benchmark)
@@ -3882,7 +3882,7 @@ Milestone: TBD
 **Scope:** edit BACKLOG.md:3274 (F-320 scope description) to replace the `oqlf|academie|curated` triple with the canonical four-value enum. Single-line docs change; no code touched. Kept out of the F-325 BACKLOG filing commit to preserve commit-scope discipline.
 **Owner:** Frontend Engineering (docs)
 
-### F-BUGS-001-FE-A — Lessons load graceful degradation
+### F-BUGS-001-FE-A — [FE] Lessons load graceful degradation
 Milestone: M1
 
 **Priority:** HIGH (production dead-end on lessons API failure)
@@ -3898,7 +3898,7 @@ Milestone: M1
 **F-225 verification status:** ⚠️ Pending. Per CLAUDE.md F-225 protocol, Shipped normally gates on (a) 1440px + 375px screenshots of each affected route AND (b) interaction trace (this is a behavior change — failure-path rendering — so interaction trace applies). Chadi to capture per 3-batch plan and attach to this entry. **Until that's attached, this entry is "Shipped on code, awaiting F-225 evidence."**
 **Owner:** Frontend Engineering
 
-### F-BUGS-001-FE-B — Auth-flow 5-surface fix (completed-onboarding users on logged-out chrome)
+### F-BUGS-001-FE-B — [FE] Auth-flow 5-surface fix (completed-onboarding users on logged-out chrome)
 Milestone: M1
 
 **Priority:** HIGH (broken user-state routing — affected every returning authed user)
@@ -3917,7 +3917,7 @@ Milestone: M1
 **Follow-up:** F-326 (this file:3618) — BE adds `subscriptionStatus` to `User`/`/api/auth/me`, then B.4's pessimistic redirect is replaced with a branched authed-paywall UX.
 **Owner:** Frontend Engineering
 
-### F-BUGS-001-FE-C — `/ecole` empty-state vs network-error differentiation
+### F-BUGS-001-FE-C — [FE] `/ecole` empty-state vs network-error differentiation
 Milestone: M1
 
 **Priority:** HIGH (regression introduced by FE-A soft-fail wrapper — no-lessons users saw network-error copy)
@@ -3933,7 +3933,7 @@ Milestone: M1
 **F-225 verification status:** ⚠️ Pending. Per CLAUDE.md F-225 protocol, Shipped normally gates on (a) 1440px + 375px screenshots of `/ecole` in both empty-array and network-error states AND (b) interaction trace (failure-path rendering + retry CTA behavior). Chadi to capture per 3-batch plan and attach to this entry. **Until that's attached, this entry is "Shipped on code, awaiting F-225 evidence."**
 **Owner:** Frontend Engineering
 
-### F-BUGS-001-FE-D — Tâche 2 candidate-brief language defaulting + FR/EN toggle
+### F-BUGS-001-FE-D — [FE] Tâche 2 candidate-brief language defaulting + FR/EN toggle
 Milestone: M1
 
 **Priority:** MEDIUM (UX polish — brief comprehension blocker for A1/A2 users)
@@ -3950,7 +3950,7 @@ Milestone: M1
 **F-225 verification status:** ⚠️ Pending. Per CLAUDE.md F-225 protocol, Shipped normally gates on (a) 1440px + 375px screenshots of `/speaking/tache-2/<scenario>` in FR and EN states AND (b) interaction trace (toggle click → language swap → localStorage persist → reload retains choice). Chadi to capture per 3-batch plan and attach to this entry. **Until that's attached, this entry is "Shipped on code, awaiting F-225 evidence."**
 **Owner:** Frontend Engineering
 
-### F-326 — subscriptionStatus on User (BE follow-up to F-BUGS-001-FE-B B.4)
+### F-326 — [BE] subscriptionStatus on User (BE follow-up to F-BUGS-001-FE-B B.4)
 Milestone: M1
 
 **Priority:** MEDIUM (unblocks proper authed paywall UX)
@@ -3971,7 +3971,7 @@ Milestone: M1
 
 These four tickets are the direct output of the `/impeccable critique` second pass on the onboarding flow. Address in priority order; P0 first next session.
 
-### F-327 — [P0] another_exam funnel restoration + waitlist moat (BE + FE)
+### F-327 — [FE+BE] [P0] another_exam funnel restoration + waitlist moat (BE + FE)
 Milestone: DONE
 
 **Priority:** P0 — conversion blocker + soft-beta moat
@@ -4014,7 +4014,7 @@ Milestone: DONE
 
 ---
 
-### F-328 — [P1] DateInputQuestion: date bounds enforced but never communicated
+### F-328 — [FE] [P1] DateInputQuestion: date bounds enforced but never communicated
 Milestone: M1
 
 **Priority:** P1 — silent error on mobile
@@ -4034,7 +4034,7 @@ Milestone: M1
 
 ---
 
-### F-329 — [P2] MultiSelectQuestion: no affordance that multiple selections are allowed
+### F-329 — [FE] [P2] MultiSelectQuestion: no affordance that multiple selections are allowed
 Milestone: M1
 
 **Priority:** P2 — answer quality
@@ -4054,7 +4054,7 @@ Milestone: M1
 
 ---
 
-### F-330 — [P3] EcoleReveal: persona label arrives without narrative bridge
+### F-330 — [FE] [P3] EcoleReveal: persona label arrives without narrative bridge
 Milestone: M1
 
 **Priority:** P3 — trust layer
@@ -4075,7 +4075,7 @@ Milestone: M1
 
 ---
 
-### B-104 — [P1] Paywall: surface Exam Bundle tier for time-bounded users
+### B-104 — [FE] [P1] Paywall: surface Exam Bundle tier for time-bounded users
 Milestone: M6
 
 **Priority:** P1 — merchandising bug, not pricing change
@@ -4433,7 +4433,7 @@ Excluded (plaintext contexts, unchanged): `AppShell.tsx` mobile top-bar brand la
 
 These tickets are driven by the Sessions 1-5 lock review. They represent gaps between the current codebase state and the canonical locked direction in PRODUCT.md and SITEMAP.md.
 
-### F-331: Homepage tagline reconciliation
+### F-331: [FE] Homepage tagline reconciliation
 Milestone: MS-1
 
 **Priority:** HIGH
@@ -4443,7 +4443,7 @@ Milestone: MS-1
 **Scope:** Apply Direction C copy from PRODUCT.md to `/` homepage. Replace current "Pass TCF Canada / Get to Quebec" + rotating exam list with locked H1 "There's a method to French. Now there's Le Methodic.", Sub copy, Primary CTA "See how it works", Secondary CTA "Start with a free placement". MS-1 milestone.
 **Owner:** Frontend Engineering
 
-### F-332: /exam-prep consolidation
+### F-332: [FE] /exam-prep consolidation
 Milestone: MS-1
 
 **Priority:** HIGH
@@ -4453,7 +4453,7 @@ Milestone: MS-1
 **Scope:** Redirect `/exam-prep` (308) to `/tcf-canada`. Closes May 24 MOCK-002 deferred ticket. MS-1 milestone.
 **Owner:** Frontend Engineering
 
-### F-333: /library repositioning
+### F-333: [FE] /library repositioning
 Milestone: MS-7
 
 **Priority:** MEDIUM
@@ -4463,7 +4463,7 @@ Milestone: MS-7
 **Scope:** Update existing `/library` stub to reflect Stripe store positioning. Implement 4-category navigation skeleton (Livres, Audio, Telechargements, Ressources gratuites). MS-7 milestone for full launch.
 **Owner:** Frontend Engineering
 
-### F-334: /cours route migration from /la-methode
+### F-334: [FE] /cours route migration from /la-methode
 Milestone: M2
 
 **Priority:** HIGH
@@ -4473,7 +4473,7 @@ Milestone: M2
 **Scope:** Rename `/la-methode` to `/cours/methode-tcf-canada`. Set 308 redirect from `/la-methode` to new route. Update internal navigation, sidebar, links. Update lesson sub-routes from `/la-methode/[lesson]` to `/cours/methode-tcf-canada/lecon-N`.
 **Owner:** Frontend Engineering
 
-### F-335: L'Examen unification refactor
+### F-335: [FE] L'Examen unification refactor
 Milestone: M3
 
 **Priority:** HIGH
@@ -4483,7 +4483,7 @@ Milestone: M3
 **Scope:** Refactor `/l-examen` to serve as umbrella for 4 sections. Add `/comprehension-orale`, `/comprehension-ecrite` as net-new surfaces. Move existing `/l-examen` Taches 1/2/3 under `/l-examen/expression-orale/tache-N`. Fold `/ecrit` (L'Ecrit) under `/l-examen/expression-ecrite`. Set 308 redirects from old routes.
 **Owner:** Frontend Engineering
 
-### F-336: Comprehension surface implementation
+### F-336: [FE+BE] Comprehension surface implementation
 Milestone: M3
 
 **Priority:** HIGH
@@ -4494,7 +4494,7 @@ Milestone: M3
 **Dependencies:** F-335
 **Owner:** Frontend Engineering + Chadi (content authoring)
 
-### F-337: CLB mapping in Progres
+### F-337: [FE+BE] CLB mapping in Progres
 Milestone: M3
 
 **Priority:** HIGH
@@ -4504,7 +4504,7 @@ Milestone: M3
 **Scope:** Add `/progres/clb` page showing user's current CLB level per skill plus projected Express Entry points plus gap-to-target. Primary persona anchor.
 **Owner:** Frontend Engineering
 
-### F-338: Dashboard widget expansion to Coursera density
+### F-338: [FE] Dashboard widget expansion to Coursera density
 Milestone: M2
 
 **Priority:** HIGH
@@ -4512,6 +4512,15 @@ Milestone: M2
 **Filed:** 2026-05-31
 **Source:** M2 visual coherence scope expansion per recent feedback (also reflected in ROADMAP.md M2 status note)
 **Scope:** Add countdown widget (days to exam date from `/onboarding`), streak widget, daily target widget, calendar widget, next lesson resume widget to `/dashboard`. M2 visual coherence scope expansion per recent feedback.
+**Owner:** Frontend Engineering
+
+### F-339: [FE] Em-dash cleanup pass, PRODUCT.md and ROADMAP.md
+
+**Priority:** LOW
+**Status:** ✅ Shipped — aff38e0
+**Filed:** 2026-05-31
+**Source:** Session 6 gate report — 87 em-dash instances flagged across PRODUCT.md and ROADMAP.md
+**Scope:** Mechanical replacement of 87 pre-existing em-dashes in PRODUCT.md and ROADMAP.md. One intentional reference preserved (inside the Em-dash hard rule section of PRODUCT.md). Final counts: PRODUCT.md 1, ROADMAP.md 0.
 **Owner:** Frontend Engineering
 
 ---
