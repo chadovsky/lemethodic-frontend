@@ -4488,7 +4488,7 @@ Milestone: M3
 Milestone: M3
 
 **Priority:** MEDIUM
-**Status:** 🔄 In progress (audit shipped 2026-05-31 at docs/sidebar-audit-2026-05-31.md; consolidation + toggle work is follow-up)
+**Status:** Shipped (audit at docs/sidebar-audit-2026-05-31.md; toggle + icons shipped as F-345)
 **Filed:** 2026-05-31
 **Source:** F-335 dispatch identified sidebar complexity deferred from scope
 **Scope:** Audit current sidebar implementation(s). Count distinct sidebar components. Document collapse toggle behavior or its absence. Apply DESIGN.md v2 Atelier Francais palette. Consolidate to a single canonical sidebar component if multiple exist. Add collapse toggle if missing. Quality reference: Pro Sidebar pattern (collapsible icon + label nav, hamburger toggle, polished hover and active states).
@@ -4521,6 +4521,25 @@ Milestone: M3
 **Source:** Backlog enforcement gap: layer tag cannot be determined from title alone
 **Scope:** Tickets F-039 through F-043 and F-045 are tagged [FE] by default because their titles read "[historical, see code comments]" and the layer cannot be determined from title alone. Chadi to review the code comments referenced in each ticket and confirm or update the layer tag. Could be [FE], [BE], or [FE+BE].
 **Owner:** Chadi (review) then Frontend Engineering (update)
+
+### F-345: [FE] Sidebar collapse toggle + lucide icons
+
+**Priority:** MEDIUM
+**Status:** Shipped
+**Filed:** 2026-05-31
+**Source:** F-341 sidebar audit; grafts S2's toggle mechanism onto S1
+**Scope:** Add lucide-react icons to 5 nav items (Home, GraduationCap, BookOpen, FileText, User). Add desktop-only collapse toggle (ChevronLeft/Right button at sidebar bottom). State management: isCollapsed boolean, persisted to sidebar_state cookie (S2-compatible), restored on mount. Keyboard shortcut: Cmd+B (Mac) / Ctrl+B (Windows). Collapsed width 64px with 200ms ease transition, icon-only state. Mobile drawer behavior unchanged. S2 not modified.
+**Cookie name used:** sidebar_state (matches S2 for future S2 deprecation parity)
+**Owner:** Frontend Engineering
+
+### F-346: [FE] Sidebar polish: Instrument Sans + a11y
+
+**Priority:** MEDIUM
+**Status:** Queued
+**Filed:** 2026-05-31
+**Source:** F-341 audit recommendations; deferred from F-345 scope
+**Scope:** Replace Geist with Instrument Sans for nav labels per DESIGN.md v2. Add focus trap on mobile drawer. Add focus move on mobile drawer open. Verify aria-current="page" on active item. Verify nav landmark with aria-label.
+**Owner:** Frontend Engineering
 
 ### F-336: [FE+BE] Comprehension surface implementation
 Milestone: M3
