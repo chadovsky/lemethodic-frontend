@@ -49,10 +49,10 @@ describe('Dashboard', () => {
     ).toBeInTheDocument()
   })
 
-  it('"Prochaine leçon" CTA links to /la-methode/5', () => {
+  it('"Prochaine leçon" CTA links to /cours/methode-tcf-canada/lecon-5', () => {
     render(<Dashboard />)
     const cta = screen.getByRole('link', { name: /reprendre/i })
-    expect(cta).toHaveAttribute('href', '/la-methode/5')
+    expect(cta).toHaveAttribute('href', '/cours/methode-tcf-canada/lecon-5')
   })
 
   it('"Score Diagnostic" CTA links to /l-examen', () => {

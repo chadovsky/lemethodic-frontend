@@ -7,7 +7,7 @@ import Wordmark from '@/components/Wordmark'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Tableau de bord' },
-  { href: '/la-methode', label: 'La Méthode' },
+  { href: '/cours/methode-tcf-canada', label: 'La Méthode' },
   { href: '/la-bibliotheque', label: 'La Bibliothèque' },
   { href: '/l-examen', label: "L'Examen" },
   { href: '/account', label: 'Compte' },

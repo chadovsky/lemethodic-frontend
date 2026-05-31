@@ -34,10 +34,10 @@ test.describe('Dashboard — desktop (1280×800)', () => {
     await expect(layers.nth(4)).toContainText('La Musique')
   })
 
-  test('"Prochaine leçon" CTA navigates to /la-methode/5', async ({ page }) => {
+  test('"Prochaine leçon" CTA navigates to /cours/methode-tcf-canada/lecon-5', async ({ page }) => {
     await page.goto('/dashboard')
     await page.getByRole('link', { name: /reprendre/i }).click()
-    await expect(page).toHaveURL(/\/la-methode\/5$/)
+    await expect(page).toHaveURL(/\/cours\/methode-tcf-canada\/lecon-5$/)
   })
 
   test('"Score Diagnostic" CTA links to /l-examen', async ({ page }) => {

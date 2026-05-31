@@ -190,7 +190,7 @@ export default function LessonListItem({ number, title, subline, descriptor, sta
 
   return (
     <Link
-      href={`/la-methode/lesson/${number}`}
+      href={`/cours/methode-tcf-canada/lecon-${number}`}
       style={{ display: 'block', textDecoration: 'none' }}
     >
       {inner}

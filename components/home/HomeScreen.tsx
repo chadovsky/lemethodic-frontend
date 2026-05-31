@@ -435,7 +435,7 @@ export default function HomeScreen({
                   ]}
                   illustrationSrc="/illustration-level.jpg"
                   illustrationAlt="Lesson illustration"
-                  href={`/la-methode/lesson/${nextLesson.lessonNumber}`}
+                  href={`/cours/methode-tcf-canada/lecon-${nextLesson.lessonNumber}`}
                 />
               ) : lessons === null && !fetchError ? (
                 <div

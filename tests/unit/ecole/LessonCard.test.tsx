@@ -34,10 +34,10 @@ describe('LessonCard', () => {
     expect(screen.getByText(SAMPLE.shortDescription)).toBeInTheDocument()
   })
 
-  it('wraps the card in a link to /la-methode/<lessonNumber>', () => {
+  it('wraps the card in a link to /cours/methode-tcf-canada/<lessonNumber>', () => {
     render(<LessonCard lesson={SAMPLE} />)
     const link = screen.getByRole('link')
-    expect(link).toHaveAttribute('href', '/la-methode/5')
+    expect(link).toHaveAttribute('href', '/cours/methode-tcf-canada/lecon-5')
   })
 
   it('renders the "Disponible" state badge for an unlocked lesson', () => {

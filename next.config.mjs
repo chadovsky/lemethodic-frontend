@@ -8,8 +8,12 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      { source: '/ecole', destination: '/la-methode', permanent: true },
-      { source: '/ecole/:path*', destination: '/la-methode/:path*', permanent: true },
+      // /ecole -> /cours/methode-tcf-canada (collapse old 2-hop chain)
+      { source: '/ecole', destination: '/cours/methode-tcf-canada', permanent: true },
+      { source: '/ecole/:path*', destination: '/cours/methode-tcf-canada/:path*', permanent: true },
+      // /la-methode -> /cours/methode-tcf-canada
+      { source: '/la-methode', destination: '/cours/methode-tcf-canada', permanent: true },
+      { source: '/la-methode/:path*', destination: '/cours/methode-tcf-canada/:path*', permanent: true },
       { source: '/vocabulaire', destination: '/la-bibliotheque', permanent: true },
       { source: '/vocabulaire/:path*', destination: '/la-bibliotheque/:path*', permanent: true },
       { source: '/diagnostic', destination: '/l-examen', permanent: true },

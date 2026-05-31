@@ -81,7 +81,7 @@ const COPY = {
 } as const
 
 const NAV_LINKS = [
-  { key: 'ecole' as const, href: '/la-methode', match: ['/la-methode', '/cluster', '/learn'] },
+  { key: 'ecole' as const, href: '/cours/methode-tcf-canada', match: ['/cours/methode-tcf-canada', '/cluster', '/learn'] },
   { key: 'speaking' as const, href: '/speaking', match: ['/speaking'] },
   { key: 'writing' as const, href: '/writing', match: ['/writing'] },
   { key: 'progress' as const, href: '/progress', match: ['/progress', '/l-examen'] },
@@ -185,7 +185,7 @@ export default function TopNav() {
         }}
       >
         {/* LEFT — wordmark */}
-        <Wordmark size="nav" href="/la-methode" />
+        <Wordmark size="nav" href="/cours/methode-tcf-canada" />
 
         {/* CENTER — nav links */}
         <ul

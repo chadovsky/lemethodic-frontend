@@ -64,7 +64,7 @@ describe('LessonDetail', () => {
   it("renders the breadcrumb with L'Ecole and lesson number/title", () => {
     render(<LessonDetail lesson={LESSON_3} />)
     const crumb = screen.getByTestId('lesson-breadcrumb')
-    expect(within(crumb).getByRole('link')).toHaveAttribute('href', '/la-methode')
+    expect(within(crumb).getByRole('link')).toHaveAttribute('href', '/cours/methode-tcf-canada')
     expect(within(crumb).getByText(/leçon\s*3/i)).toBeInTheDocument()
     expect(
       within(crumb).getByText(
@@ -115,24 +115,24 @@ describe('LessonDetail', () => {
     ).toBeTruthy()
   })
 
-  it('lesson 1 - renders no previous-lesson button, only a next button linking to /la-methode/2', () => {
+  it('lesson 1 - renders no previous-lesson button, only a next button linking to /cours/methode-tcf-canada/lecon-2', () => {
     render(<LessonDetail lesson={LESSON_1} />)
     expect(screen.queryByTestId('lesson-nav-prev')).not.toBeInTheDocument()
     const next = screen.getByTestId('lesson-nav-next')
-    expect(next).toHaveAttribute('href', '/la-methode/2')
+    expect(next).toHaveAttribute('href', '/cours/methode-tcf-canada/lecon-2')
   })
 
   it('lesson 27 - renders no next-lesson button, only a prev button linking to /ecole/26', () => {
     render(<LessonDetail lesson={LESSON_27} />)
     expect(screen.queryByTestId('lesson-nav-next')).not.toBeInTheDocument()
     const prev = screen.getByTestId('lesson-nav-prev')
-    expect(prev).toHaveAttribute('href', '/la-methode/26')
+    expect(prev).toHaveAttribute('href', '/cours/methode-tcf-canada/lecon-26')
   })
 
   it('mid lesson (5) - renders both prev and next buttons', () => {
     render(<LessonDetail lesson={LESSON_5} />)
-    expect(screen.getByTestId('lesson-nav-prev')).toHaveAttribute('href', '/la-methode/4')
-    expect(screen.getByTestId('lesson-nav-next')).toHaveAttribute('href', '/la-methode/6')
+    expect(screen.getByTestId('lesson-nav-prev')).toHaveAttribute('href', '/cours/methode-tcf-canada/lecon-4')
+    expect(screen.getByTestId('lesson-nav-next')).toHaveAttribute('href', '/cours/methode-tcf-canada/lecon-6')
   })
 
   // MOCK-008 - waveform bars, CEFR badge, keyboard navigation
@@ -156,13 +156,13 @@ describe('LessonDetail', () => {
   it('ArrowRight on lesson 5 pushes to /ecole/6', () => {
     render(<LessonDetail lesson={LESSON_5} />)
     fireEvent.keyDown(window, { key: 'ArrowRight' })
-    expect(mockPush).toHaveBeenCalledWith('/la-methode/6')
+    expect(mockPush).toHaveBeenCalledWith('/cours/methode-tcf-canada/lecon-6')
   })
 
   it('ArrowLeft on lesson 5 pushes to /ecole/4', () => {
     render(<LessonDetail lesson={LESSON_5} />)
     fireEvent.keyDown(window, { key: 'ArrowLeft' })
-    expect(mockPush).toHaveBeenCalledWith('/la-methode/4')
+    expect(mockPush).toHaveBeenCalledWith('/cours/methode-tcf-canada/lecon-4')
   })
 
   it('ArrowLeft on lesson 1 does not push (boundary guard)', () => {

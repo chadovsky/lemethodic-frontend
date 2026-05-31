@@ -17,7 +17,7 @@ interface Tab {
 }
 
 const TABS: Tab[] = [
-  { href: '/la-methode', label: 'Méthode', Icon: Home         },
+  { href: '/cours/methode-tcf-canada', label: 'Méthode', Icon: Home         },
   { href: '/speaking',  label: 'Oral',     Icon: Mic          },
   { href: '/writing',   label: 'Écrit',    Icon: PenLine      },
   { href: '/progress',  label: 'Progrès',  Icon: BarChart2    },
@@ -62,7 +62,7 @@ export default function BottomNav() {
           // treat /ecole/lesson/* as also "home" active
           const isActive =
             href === '/'
-              ? pathname === '/' || pathname.startsWith('/la-methode')
+              ? pathname === '/' || pathname.startsWith('/cours/methode-tcf-canada')
               : pathname === href || pathname.startsWith(href + '/')
 
           return (

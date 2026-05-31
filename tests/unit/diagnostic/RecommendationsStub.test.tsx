@@ -8,11 +8,11 @@ describe('RecommendationsStub', () => {
     expect(screen.getAllByTestId('recommendation-row')).toHaveLength(3)
   })
 
-  it('first recommendation CTA links to /la-methode', () => {
+  it('first recommendation CTA links to /cours/methode-tcf-canada', () => {
     render(<RecommendationsStub />)
     const rows = screen.getAllByTestId('recommendation-row')
     const cta = within(rows[0]).getByTestId('recommendation-cta')
-    expect(cta).toHaveAttribute('href', '/la-methode')
+    expect(cta).toHaveAttribute('href', '/cours/methode-tcf-canada')
   })
 
   it('second recommendation CTA links to /la-bibliotheque', () => {

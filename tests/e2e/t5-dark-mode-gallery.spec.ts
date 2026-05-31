@@ -21,8 +21,8 @@ const GALLERY_DIR = path.join(process.cwd(), 't5-dark-mode-gallery')
 // Routes that need auth injection (inside the (app) route group).
 const AUTH_ROUTES = [
   '/dashboard',
-  '/la-methode',
-  '/la-methode/intro',
+  '/cours/methode-tcf-canada',
+  '/cours/methode-tcf-canada/intro',
   '/l-examen',
   '/l-examen/results',
   '/l-examen/tache/1',

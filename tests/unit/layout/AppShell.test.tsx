@@ -132,12 +132,12 @@ describe('AppShell', () => {
       </AppShell>,
     )
     expect(screen.getByRole('main')).toHaveAttribute('data-pathname', '/dashboard')
-    mockPathname.mockReturnValue('/la-methode')
+    mockPathname.mockReturnValue('/cours/methode-tcf-canada')
     rerender(
       <AppShell>
         <div />
       </AppShell>,
     )
-    expect(screen.getByRole('main')).toHaveAttribute('data-pathname', '/la-methode')
+    expect(screen.getByRole('main')).toHaveAttribute('data-pathname', '/cours/methode-tcf-canada')
   })
 })

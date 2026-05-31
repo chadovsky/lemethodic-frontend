@@ -92,7 +92,7 @@ export default function LearnModuleSheet({ module: m, lessonTitle, lessonSubline
 
   const goLesson = () => {
     if (m.ecole_lesson_id == null) return
-    router.push(`/la-methode/lesson/${m.ecole_lesson_id}`)
+    router.push(`/cours/methode-tcf-canada/lecon-${m.ecole_lesson_id}`)
   }
 
   const goLearn = () => {

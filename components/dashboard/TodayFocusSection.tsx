@@ -145,7 +145,7 @@ function resolveCta(action: ActionBlock): { href: string; label: string } {
     case 'free_practice':
       return { href: '/speaking', label: 'Open Speaking' }
     case 'path_complete':
-      return { href: '/la-methode', label: 'Browse modules' }
+      return { href: '/cours/methode-tcf-canada', label: 'Browse modules' }
     case 'no_path':
       return { href: '/onboarding', label: 'Complete onboarding' }
   }

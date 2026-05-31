@@ -12,10 +12,10 @@ test.beforeAll(() => {
 const SURFACES = [
   { route: '/', slug: 'home' },
   { route: '/dashboard', slug: 'dashboard', auth: true },
-  { route: '/la-methode', slug: 'la-methode', auth: true },
+  { route: '/cours/methode-tcf-canada', slug: 'la-methode', auth: true },
   { route: '/la-bibliotheque', slug: 'la-bibliotheque', auth: true },
   { route: '/l-examen', slug: 'l-examen', auth: true },
-  { route: '/la-methode/lesson/1', slug: 'lesson-detail', auth: true },
+  { route: '/cours/methode-tcf-canada/lecon-1', slug: 'lesson-detail', auth: true },
 ]
 
 for (const surface of SURFACES) {

@@ -56,7 +56,7 @@ export default function LandingPage({ lang }: LandingPageProps) {
 
   useEffect(() => {
     if (hydrated && token && verified) {
-      router.replace('/la-methode')
+      router.replace('/cours/methode-tcf-canada')
     }
   }, [hydrated, token, verified, router])
 
