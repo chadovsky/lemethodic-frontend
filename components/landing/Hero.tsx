@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
-import RotatingKicker from '@/components/landing/RotatingKicker'
 
 export default function Hero() {
   return (
@@ -17,10 +16,6 @@ export default function Hero() {
       <div style={{ maxWidth: 1280, margin: '0 auto', width: '100%' }}>
         <div style={{ maxWidth: 760 }}>
 
-          <div data-testid="hero-kicker" className="ed-hero-rise">
-            <RotatingKicker lang="en" />
-          </div>
-
           <h1
             className="text-balance ed-hero-rise ed-hero-rise-delay-1"
             style={{
@@ -35,7 +30,7 @@ export default function Hero() {
               marginBottom: 'clamp(20px, 2.5vw, 32px)',
             }}
           >
-            Pass TCF Canada. Get to Quebec.
+            {"There's a method to French. Now there's Le Méthodic."}
           </h1>
 
           <p
@@ -52,12 +47,16 @@ export default function Hero() {
               marginBottom: 'clamp(32px, 4vw, 48px)',
             }}
           >
-            The only TCF Canada prep built on the 5-Couche method, for anglophone candidates racing the clock.
+            Built by an author of 28 French linguistics books. Used by anglophones who want their French to sound native, not assembled.
           </p>
 
-          <div data-testid="hero-cta-wrapper" className="ed-hero-rise ed-hero-rise-delay-3">
+          <div
+            data-testid="hero-cta-wrapper"
+            className="ed-hero-rise ed-hero-rise-delay-3"
+            style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}
+          >
             <Link
-              href="/signup"
+              href="/methode"
               className="ed-btn-press"
               style={{
                 display: 'inline-flex',
@@ -75,7 +74,25 @@ export default function Hero() {
                 textDecoration: 'none',
               }}
             >
-              Start your prep
+              See how it works
+            </Link>
+
+            <Link
+              href="/placement"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                height: 56,
+                fontFamily: SANS_FONT,
+                fontWeight: 500,
+                fontSize: '1rem',
+                color: 'var(--text-muted)',
+                textDecoration: 'underline',
+                textUnderlineOffset: 3,
+                letterSpacing: '0',
+              }}
+            >
+              Start with a free placement
             </Link>
           </div>
 
