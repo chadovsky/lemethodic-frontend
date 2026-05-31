@@ -4593,7 +4593,7 @@ Milestone: M2
 ### F-347: [DOC] ARCHITECTURE.md system-level doc
 
 **Priority:** LOW
-**Status:** Pass 1 SHIPPED, Pass 2 QUEUED
+**Status:** Pass 1 SHIPPED, Pass 2 SHIPPED
 **Filed:** 2026-05-31
 **Source:** BE audit 2026-05-31 completed; M5.5 filed in ROADMAP; time to write the system-level architecture doc the audit was feeding
 **Scope:** Canonical FE-root architecture document. Pass 1 = structural draft from Claude memory. Pass 2 = BE agent fills [BE-AUDIT: ...] markers from docs/be-audit-2026-05-31.md. Acceptance Pass 1: file exists at FE root with all 10 sections, M5.5 reflected in section 6, no em-dashes. Acceptance Pass 2: all [BE-AUDIT: ...] markers replaced with content from the audit doc; committed in BE-then-FE pattern (BE writes to a working copy, FE port lands the final).
