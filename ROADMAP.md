@@ -25,6 +25,8 @@ Last updated: 2026-05-25.
 
 ## Milestones
 
+**Parallel marketing track.** Marketing site work (homepage, exam landings, public method explainer, pricing page, founder + coaching pages, help and legal, blog, /library store) is tracked separately in ROADMAP-marketing.md. The product milestones M0 through M8 cover the authenticated app and backend. Both tracks ship independently. M8 soft-beta requires both tracks ready.
+
 ### M0 — Audit + ROADMAP
 
 Establish the source of truth before any further work.
@@ -66,6 +68,8 @@ DESIGN.md v1 applied across all surfaces. Canonical names live everywhere.
 - Canonical names live: La Méthode, La Bibliothèque, L'Examen, Le Propos, Le Plan, La Construction, Les Pièges Anglais, La Musique
 - M-RENAME ticket family executed
 - M-VISUAL audit ticket closes
+
+**Status:** Active. Visual coherence work in progress. Per recent feedback, Coursera-density dashboard widgets are added scope for M2.
 
 **In-scope:** M-RENAME family, M-VISUAL family.
 
@@ -181,3 +185,21 @@ Milestone MX. Active: <micro-feature>.
 ```
 
 If a session opens without this, the first task is to set it.
+
+---
+
+## Appendix, Visual debt (folded from M-VISUAL-AUDIT.md, 2026-05-31)
+
+This appendix folds the M-VISUAL-AUDIT.md findings into ROADMAP.md per the file consolidation plan (Sessions 1-5).
+
+The 49 findings from the 2026-05-25 audit are categorized as:
+
+- Category A, off-palette hex values
+- Category B, off-system Tailwind classes
+- Category C, tokenization opportunities
+- Category D, contrast risks
+- Category E, copy violations
+
+Status as of 2026-05-30: Several findings resolved through M2 visual coherence work (A-007 cascade, Cat E copy sweep, 5-couche restate, wordmark sweep, shell sweep). Remaining items become tickets in BACKLOG.md tagged with their original M-VISUAL-AUDIT category.
+
+The original M-VISUAL-AUDIT.md file is deleted as part of this consolidation. This appendix is the canonical reference for the audit findings going forward.
