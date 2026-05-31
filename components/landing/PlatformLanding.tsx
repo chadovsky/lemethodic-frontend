@@ -92,7 +92,8 @@ const PLATFORM_COPY = {
         subtitle: 'TCF · TEF · DELF · DALF',
         body: "Parcours basé sur diagnostic. Feedback d'examinateur IA sous pression d'examen. Pensé pour les anglophones qui butent sur le mur B1.",
         cta: 'Découvrir la préparation',
-        href: '/fr/exam-prep',
+        // /fr/tcf-canada not yet built (MS-1); pointing to /fr until it ships
+        href: '/fr',
       },
       library: {
         title: 'Bibliothèque',
@@ -114,7 +115,8 @@ const PLATFORM_COPY = {
       sub: 'Cinq couches composent votre français. On diagnostique celle qui vous freine.',
       attribution: "Basé sur plus de 7 000 heures d'enseignement du français à des anglophones.",
       seeMore: 'Voir la méthodologie complète',
-      seeMoreHref: '/fr/exam-prep',
+      // /fr/tcf-canada not yet built (MS-1); pointing to /fr until it ships
+      seeMoreHref: '/fr',
     },
     finalCta: {
       h2: 'Arrêtez de deviner ce qui bloque votre français.',

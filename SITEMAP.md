@@ -186,6 +186,28 @@ Four tiers plus à la carte, per Session 4 lock:
 
 ---
 
+## French-locale tree (`/fr/*`)
+
+Le Méthodic has a narrow French-locale tree at `/fr/*` for SEO and
+marketing reach into French Canada and French-speaking immigrants.
+No Next.js i18n framework; pages are hand-rolled with `lang="fr"` props.
+
+Three pages currently exist:
+
+| Path | Purpose | Status |
+|---|---|---|
+| `/fr` | French-language platform landing | live, swept 2026-05-30 |
+| `/fr/library` | French version of /library Stripe store | live, swept 2026-05-30 |
+
+Note: `/fr/exam-prep` existed as legacy and was removed 2026-05-31
+via F-340 (308 redirects to `/fr`).
+
+French-locale tree expansion to mirror the full English tree is NOT
+planned for V1. Future decision pending. If French-locale strategy
+formalizes in V1.1 or later, this section gets expanded.
+
+---
+
 ## Auth gateway
 
 | Path | Purpose | Status |

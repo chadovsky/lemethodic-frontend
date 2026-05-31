@@ -36,11 +36,10 @@ const EXCLUDED_PREFIXES = [
 ] as const
 
 // V-016g — /library + /fr/library stubs are also marketing surfaces.
-// /fr/exam-prep still has its own page; /exam-prep now redirects to /tcf-canada (F-332).
+// /exam-prep -> /tcf-canada (F-332); /fr/exam-prep -> /fr (F-340).
 const EXCLUDED_EXACT: ReadonlySet<string> = new Set([
   '/',
   '/fr',
-  '/fr/exam-prep',
   '/library',
   '/fr/library',
 ])

@@ -53,7 +53,6 @@ const STATIC_ROUTES: RouteSpec[] = [
   { path: '/la-bibliotheque/practice', slug: 'la-bibliotheque-practice', isDynamic: false },
   { path: '/la-bibliotheque/test', slug: 'la-bibliotheque-test', isDynamic: false },
   { path: '/fr', slug: 'fr', isDynamic: false },
-  { path: '/fr/exam-prep', slug: 'fr-exam-prep', isDynamic: false },
   { path: '/fr/library', slug: 'fr-library', isDynamic: false },
   { path: '/cours/methode-tcf-canada/intro', slug: 'la-methode-intro', isDynamic: false },
   { path: '/onboarding', slug: 'onboarding', isDynamic: false },

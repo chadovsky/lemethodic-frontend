@@ -75,7 +75,8 @@ export default function LandingFooter({ lang }: LandingFooterProps) {
           >
             {[
               // F-300a — product surface links added ahead of legal.
-              { href: lang === 'fr' ? '/fr/exam-prep' : '/tcf-canada', label: copy.examPrep },
+              // /fr/tcf-canada not yet built (MS-1); /fr until it ships (F-340)
+              { href: lang === 'fr' ? '/fr' : '/tcf-canada', label: copy.examPrep },
               { href: '/library', label: copy.library },
               { href: '/privacy', label: copy.privacy },
               { href: '/terms', label: copy.terms },

@@ -4514,6 +4514,15 @@ Milestone: M2
 **Scope:** Add countdown widget (days to exam date from `/onboarding`), streak widget, daily target widget, calendar widget, next lesson resume widget to `/dashboard`. M2 visual coherence scope expansion per recent feedback.
 **Owner:** Frontend Engineering
 
+### F-340: [FE] /fr/exam-prep redirect + SITEMAP French section
+
+**Priority:** HIGH (closes legacy dead end from F-332)
+**Status:** in-progress
+**Filed:** 2026-05-31
+**Source:** F-332 deleted /exam-prep; /fr/exam-prep became a dead end pointing at a 308 redirect chain with stale hreflang
+**Scope:** 308 redirect /fr/exam-prep to /fr; delete app/fr/exam-prep/; update 3 internal Link hrefs; document French-locale tree in SITEMAP.md. Non-visual change (redirect + nav exclusion list cleanup).
+**Owner:** Frontend Engineering
+
 ### F-339: [FE] Em-dash cleanup pass, PRODUCT.md and ROADMAP.md
 
 **Priority:** LOW

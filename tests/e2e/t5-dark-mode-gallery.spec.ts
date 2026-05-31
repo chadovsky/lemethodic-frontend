@@ -45,7 +45,6 @@ const AUTH_ROUTES = [
 const PUBLIC_ROUTES = [
   '/',
   '/fr',
-  '/fr/exam-prep',
   '/fr/library',
   '/library',
   '/signup',
