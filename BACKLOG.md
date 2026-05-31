@@ -2405,12 +2405,46 @@ Milestone: M1
 Milestone: M1
 
 **Priority:** MEDIUM (post-F-300a; /library currently 404)
-**Status:** Queued
+**Status:** not done, scope-rewrite-owing
 **Filed:** 2026-05-07
 **Source:** F-300a — Library product card links to /library which doesn't exist yet
 **Dependencies:** F-300a; library inventory (Chadi authoring book covers + listings + free resources)
 **Scope:** new `/library` and `/fr/library` routes with a books / resources catalog. Cards per book (cover image + title + format + buy/download CTA + free-resource flag). Filter or category navigation TBD. Visual continuity with platform landing — V-012 warm tokens, ed-paper book cards, peach-deep CTAs.
 **Owner:** Engineering (build) + Chadi (inventory + copy)
+
+**Scope rewrite note (Session 1 lock, 2026-05-31):** LemonSqueezy era. Scope rewrite owing per Session 1 lock: /library is now Stripe-backed store with 4 categories (Livres, Audio, Telechargements, Ressources gratuites). See SITEMAP.md /library section and PRODUCT.md /library positioning. Detailed scope rewrite in MS-7 (ROADMAP-marketing.md).
+
+### F-300d: Library catalog content authoring
+Milestone: M1
+
+**Priority:** MEDIUM
+**Status:** not done, scope-rewrite-owing
+**Filed:** 2026-05-31 (recreated)
+**Scope rewrite note (Session 1 lock, 2026-05-31):** LemonSqueezy era. Scope rewrite owing per Session 1 lock: /library is now Stripe-backed store with 4 categories (Livres, Audio, Telechargements, Ressources gratuites). See SITEMAP.md /library section and PRODUCT.md /library positioning. Detailed scope rewrite in MS-7 (ROADMAP-marketing.md).
+
+### F-300e: Library checkout + payment flow
+Milestone: M6
+
+**Priority:** MEDIUM
+**Status:** not done, scope-rewrite-owing
+**Filed:** 2026-05-31 (recreated)
+**Scope rewrite note (Session 1 lock, 2026-05-31):** LemonSqueezy era. Scope rewrite owing per Session 1 lock: /library is now Stripe-backed store with 4 categories (Livres, Audio, Telechargements, Ressources gratuites). Payment processing now Stripe (not LemonSqueezy). See SITEMAP.md /library/checkout and PRODUCT.md /library positioning. Detailed scope rewrite in MS-7 (ROADMAP-marketing.md).
+
+### F-300f: Library subscriber discount logic
+Milestone: M6
+
+**Priority:** MEDIUM
+**Status:** not done, scope-rewrite-owing
+**Filed:** 2026-05-31 (recreated)
+**Scope rewrite note (Session 1 lock, 2026-05-31):** LemonSqueezy era. Scope rewrite owing per Session 1 lock: Subscriber discounts now 15% Engagement / 25% Maitrise / 30% Sprint applied at Stripe checkout. See SITEMAP.md /library/checkout and PRODUCT.md service architecture section. Detailed scope rewrite in MS-7 (ROADMAP-marketing.md).
+
+### F-300g: Library bundle definition and display
+Milestone: M6
+
+**Priority:** MEDIUM
+**Status:** not done, scope-rewrite-owing
+**Filed:** 2026-05-31 (recreated)
+**Scope rewrite note (Session 1 lock, 2026-05-31):** LemonSqueezy era. Scope rewrite owing per Session 1 lock: 3 bundles defined (TCF Canada Complete Pack $79, Anglophone Starter Pack $49, Sprint Companion $99). See SITEMAP.md /library section. Detailed scope rewrite in MS-7 (ROADMAP-marketing.md).
 
 ### V-016a.fe — Writing submit polling consumer
 Milestone: DONE
@@ -4392,5 +4426,109 @@ Excluded (plaintext contexts, unchanged): `AppShell.tsx` mobile top-bar brand la
 
 - `pnpm build` clean. 402 unit tests pass. Pre-existing CouchesBreakdown failure unchanged.
 - Adjacent deferred: `AppShell.tsx` mobile top-bar has inline `Le Méthodic` span (SERIF_FONT, not a Wordmark). Out of scope for this sweep — defer to a dedicated wordmark/typography pass.
+
+---
+
+## Deviation tickets (Session 6, 2026-05-31)
+
+These tickets are driven by the Sessions 1-5 lock review. They represent gaps between the current codebase state and the canonical locked direction in PRODUCT.md and SITEMAP.md.
+
+### F-331: Homepage tagline reconciliation
+Milestone: MS-1
+
+**Priority:** HIGH
+**Status:** 📋 Queued
+**Filed:** 2026-05-31
+**Source:** Session 2 Direction C lock (PRODUCT.md homepage positioning section)
+**Scope:** Apply Direction C copy from PRODUCT.md to `/` homepage. Replace current "Pass TCF Canada / Get to Quebec" + rotating exam list with locked H1 "There's a method to French. Now there's Le Methodic.", Sub copy, Primary CTA "See how it works", Secondary CTA "Start with a free placement". MS-1 milestone.
+**Owner:** Frontend Engineering
+
+### F-332: /exam-prep consolidation
+Milestone: MS-1
+
+**Priority:** HIGH
+**Status:** 📋 Queued
+**Filed:** 2026-05-31
+**Source:** SITEMAP.md legacy section: /exam-prep duplicate resolved by redirect
+**Scope:** Redirect `/exam-prep` (308) to `/tcf-canada`. Closes May 24 MOCK-002 deferred ticket. MS-1 milestone.
+**Owner:** Frontend Engineering
+
+### F-333: /library repositioning
+Milestone: MS-7
+
+**Priority:** MEDIUM
+**Status:** 📋 Queued
+**Filed:** 2026-05-31
+**Source:** Session 1 lock: /library repositioned from LemonSqueezy stub to Stripe store
+**Scope:** Update existing `/library` stub to reflect Stripe store positioning. Implement 4-category navigation skeleton (Livres, Audio, Telechargements, Ressources gratuites). MS-7 milestone for full launch.
+**Owner:** Frontend Engineering
+
+### F-334: /cours route migration from /la-methode
+Milestone: M2
+
+**Priority:** HIGH
+**Status:** 📋 Queued
+**Filed:** 2026-05-31
+**Source:** Session 3 lock: surface renamed from /la-methode to /cours per SITEMAP.md
+**Scope:** Rename `/la-methode` to `/cours/methode-tcf-canada`. Set 308 redirect from `/la-methode` to new route. Update internal navigation, sidebar, links. Update lesson sub-routes from `/la-methode/[lesson]` to `/cours/methode-tcf-canada/lecon-N`.
+**Owner:** Frontend Engineering
+
+### F-335: L'Examen unification refactor
+Milestone: M3
+
+**Priority:** HIGH
+**Status:** 📋 Queued
+**Filed:** 2026-05-31
+**Source:** Session 3 lock: L'Examen unified under one umbrella per SITEMAP.md
+**Scope:** Refactor `/l-examen` to serve as umbrella for 4 sections. Add `/comprehension-orale`, `/comprehension-ecrite` as net-new surfaces. Move existing `/l-examen` Taches 1/2/3 under `/l-examen/expression-orale/tache-N`. Fold `/ecrit` (L'Ecrit) under `/l-examen/expression-ecrite`. Set 308 redirects from old routes.
+**Owner:** Frontend Engineering
+
+### F-336: Comprehension surface implementation
+Milestone: M3
+
+**Priority:** HIGH
+**Status:** 📋 Queued
+**Filed:** 2026-05-31
+**Source:** Session 3 lock: comprehension sections are net-new product capability
+**Scope:** Build `/l-examen/comprehension-orale` and `/comprehension-ecrite` from scratch. Net-new product capability. Includes content authoring (listening audio assets, reading passages), exercise UI, scoring, history. Depends on F-335.
+**Dependencies:** F-335
+**Owner:** Frontend Engineering + Chadi (content authoring)
+
+### F-337: CLB mapping in Progres
+Milestone: M3
+
+**Priority:** HIGH
+**Status:** 📋 Queued
+**Filed:** 2026-05-31
+**Source:** SITEMAP.md /progres/clb: primary persona anchor surface
+**Scope:** Add `/progres/clb` page showing user's current CLB level per skill plus projected Express Entry points plus gap-to-target. Primary persona anchor.
+**Owner:** Frontend Engineering
+
+### F-338: Dashboard widget expansion to Coursera density
+Milestone: M2
+
+**Priority:** HIGH
+**Status:** 📋 Queued
+**Filed:** 2026-05-31
+**Source:** M2 visual coherence scope expansion per recent feedback (also reflected in ROADMAP.md M2 status note)
+**Scope:** Add countdown widget (days to exam date from `/onboarding`), streak widget, daily target widget, calendar widget, next lesson resume widget to `/dashboard`. M2 visual coherence scope expansion per recent feedback.
+**Owner:** Frontend Engineering
+
+---
+
+## Marketing track (cross-referenced from ROADMAP-marketing.md)
+
+Marketing milestones are tracked in detail in ROADMAP-marketing.md. Top-level references below so the backlog reflects all work, not just product.
+
+- MS-0, marketing surfaces audit
+- MS-1, homepage rewrite + 3 exam landings (F-331, F-332 belong here)
+- MS-2, public method + free placement test
+- MS-3, pricing + founder + coaching booking
+- MS-4, help and legal table-stakes
+- MS-5, blog scaffolding + 5 posts (deferrable to post-soft-beta)
+- MS-6, remaining exam landings (deferrable to post-soft-beta)
+- MS-7, /library store launch (deferrable to post-soft-beta)
+
+---
 
 End of BACKLOG.md.
