@@ -68,10 +68,10 @@ describe('CouchesBreakdown', () => {
   it('each couche badge has a data-cefr-token attribute from CEFR_PASTEL_MAP', () => {
     render(<CouchesBreakdown />)
     const badges = screen.getAllByTestId('couche-badge')
-    // C1 (Le Fond, index 0) → fp-sage
-    expect(badges[0].getAttribute('data-cefr-token')).toContain('fp-sage')
-    // B1 (Les Réflexes Anglais, index 3) → fp-butter
-    expect(badges[3].getAttribute('data-cefr-token')).toContain('fp-butter')
+    // C1 (Le Fond, index 0) → lm-pastel-sage
+    expect(badges[0].getAttribute('data-cefr-token')).toContain('lm-pastel-sage')
+    // B1 (Les Réflexes Anglais, index 3) → lm-pastel-butter
+    expect(badges[3].getAttribute('data-cefr-token')).toContain('lm-pastel-butter')
   })
 
   it('gloss elements are always in the DOM regardless of hover state', () => {
