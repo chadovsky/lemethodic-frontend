@@ -4670,13 +4670,16 @@ Milestone: M2
 Milestone: M2
 
 **Priority:** P0
-**Status:** QUEUED
+**Status:** SHIPPED
 **Filed:** 2026-06-01
+**Shipped:** 2026-06-01
 **Source:** F-350 finding P0-3
-**Scope:** Remove fontStyle: 'italic' from all display headings (H1, H2 and comparable large text) across 67 affected files. Primary targets: DashboardGreeting.tsx, LessonList.tsx, VocabBrowse.tsx, l-examen page, CouchesBreakdown.tsx, lesson detail headers, speaking session headers. Document Flashcard/QuizQuestion French-word italic as explicit exception if intentional.
-**Acceptance:** No fontStyle: 'italic' on any H1 or display-size heading. DESIGN.md s8 compliant.
-**Dependencies:** F-351 (t1-v2 must land first to confirm fonts render without italic as compensation)
+**Scope:** Remove fontStyle: 'italic' and Tailwind italic class across all affected files. Sweep via scripts/t2-italic-sweep.py. Add global em/cite/dfn { font-style: normal } override to app/globals.css.
+**Exceptions (French-word typographic convention, skipped):** ChunkRow.tsx:32 (chunk.chunkFr), Flashcard.tsx:60 (chunk.fr front), Flashcard.tsx:126 (chunk.fr back), QuizQuestion.tsx:109 (question.chunk.fr).
+**Changes:** 65 files, 136 fontStyle: italic removed, 10 Tailwind italic tokens removed.
+**Dependencies:** F-351 (shipped)
 **Owner:** Frontend Engineering
+**Verification:** pnpm build clean (45 routes). 401/402 tests pass (1 pre-existing CouchesBreakdown failure unrelated).
 
 ### F-353: [M2] t3-v2 — Hardcoded hex token sweep
 Milestone: M2

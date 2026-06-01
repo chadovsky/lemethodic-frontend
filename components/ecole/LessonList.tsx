@@ -22,7 +22,6 @@ export default function LessonList() {
         <h1
           style={{
             fontFamily: SERIF_FONT,
-            fontStyle: 'italic',
             fontWeight: 500,
             fontSize: 'clamp(32px, 4vw, 52px)',
             lineHeight: 1.1,
@@ -111,7 +110,6 @@ function Section({
           id={`section-${id}-heading`}
           style={{
             fontFamily: SERIF_FONT,
-            fontStyle: 'italic',
             fontWeight: 500,
             fontSize: 'clamp(24px, 2.8vw, 34px)',
             lineHeight: 1.2,

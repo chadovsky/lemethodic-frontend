@@ -30,7 +30,6 @@ export default function EndOfDeck({ total, onRestart }: EndOfDeckProps) {
       <h2
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontWeight: 500,
           fontSize: 'clamp(24px, 3.2vw, 34px)',
           lineHeight: 1.15,

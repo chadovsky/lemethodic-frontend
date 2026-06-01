@@ -92,7 +92,6 @@ export default function PracticeCTA({ detail }: PracticeCTAProps) {
             fontSize: 14,
             lineHeight: 1.55,
             color: INK_SOFT,
-            fontStyle: 'italic',
           }}
         >
           {promptPreview}

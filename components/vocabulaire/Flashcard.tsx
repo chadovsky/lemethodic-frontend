@@ -136,7 +136,6 @@ export default function Flashcard({ chunk, flipped, onFlip }: FlashcardProps) {
           data-testid="flashcard-en"
           style={{
             fontFamily: SERIF_FONT,
-            fontStyle: 'italic',
             fontWeight: 500,
             fontSize: '28px',
             lineHeight: 1.15,

@@ -83,7 +83,6 @@ export default function AppShell({ children }: AppShellProps) {
           style={{
             marginLeft: 8,
             fontFamily: SERIF_FONT,
-            fontStyle: 'italic',
             fontWeight: 400,
             fontSize: '1.125rem',
             letterSpacing: '-0.01em',

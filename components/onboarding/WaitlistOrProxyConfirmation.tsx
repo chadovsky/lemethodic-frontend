@@ -80,7 +80,6 @@ export default function WaitlistOrProxyConfirmation({
             style={{
               fontFamily: SERIF,
               fontWeight: 400,
-              fontStyle: 'italic',
               fontSize: 'clamp(2rem, 4.5vw, 3rem)',
               lineHeight: 1.15,
               letterSpacing: '-0.015em',

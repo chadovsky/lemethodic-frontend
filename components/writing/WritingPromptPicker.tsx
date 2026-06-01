@@ -136,7 +136,6 @@ export default function WritingPromptPicker() {
           <h1
             style={{
               fontFamily: SERIF,
-              fontStyle: 'italic',
               fontWeight: 400,
               fontSize: 'clamp(32px, 4.5vw, 48px)',
               lineHeight: 1.1,
@@ -203,7 +202,6 @@ export default function WritingPromptPicker() {
                   <h2
                     style={{
                       fontFamily: SERIF,
-                      fontStyle: 'italic',
                       fontWeight: 400,
                       fontSize: 'clamp(22px, 2.6vw, 28px)',
                       letterSpacing: '-0.01em',

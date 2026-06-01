@@ -187,7 +187,6 @@ export default function ProgressDashboardDesktop() {
           <h1
             style={{
               fontFamily: SERIF,
-              fontStyle: 'italic',
               fontWeight: 400,
               fontSize: 'clamp(36px, 5vw, 56px)',
               lineHeight: 1.1,
@@ -446,7 +445,6 @@ function TodayBody({ today, language }: { today: TodayActionResponse; language: 
       <p
         style={{
           fontFamily: SERIF,
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(20px, 2vw, 26px)',
           lineHeight: 1.25,
@@ -469,7 +467,6 @@ function BottleneckBody({ couche, language }: { couche: Couche; language: 'en' |
       <p
         style={{
           fontFamily: SERIF,
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 22,
           lineHeight: 1.2,
@@ -495,7 +492,6 @@ function DaysToExamBody({ days, language }: { days: number; language: 'en' | 'fr
       <p
         style={{
           fontFamily: SERIF,
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 36,
           lineHeight: 1,
@@ -568,7 +564,6 @@ function PerCoucheRow({
               <p
                 style={{
                   fontFamily: SERIF,
-                  fontStyle: 'italic',
                   fontWeight: 400,
                   fontSize: 22,
                   lineHeight: 1,
@@ -620,7 +615,7 @@ function RecentActivityList({
               day: 'numeric',
             })}
           </span>
-          <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 16, color: 'var(--lm-warm-espresso)' }}>
+          <span style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 16, color: 'var(--lm-warm-espresso)' }}>
             {r.cefrLevel ?? '—'}
           </span>
         </li>

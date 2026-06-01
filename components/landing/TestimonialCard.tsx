@@ -3,7 +3,7 @@
 // excluded testimonials from launch per "What's NOT here" doc note #7).
 // Filed for use when post-soft-beta beta cohort quotes land.
 //
-// Pattern per F-214 spec: serif headline (Source Serif italic, ed-accent),
+// Pattern per F-214 spec: serif headline (Source Serif , ed-accent),
 // ed-accent left rule, generous padding, ed-paper bg with 1px ed-rule.
 // Editorial restraint — no avatar circles, no star ratings, no quote
 // marks. Just the words.
@@ -40,7 +40,6 @@ export default function TestimonialCard({
         style={{
           fontFamily: SERIF_FONT,
           fontWeight: 400,
-          fontStyle: 'italic',
           fontSize: 'clamp(1.25rem, 2vw, 1.5rem)',
           lineHeight: LINE_HEIGHT.heading,
           letterSpacing: LETTER_SPACING.heading,

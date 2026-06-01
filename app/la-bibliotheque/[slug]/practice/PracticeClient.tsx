@@ -235,7 +235,6 @@ function SessionConfigCard({
       <h1
         style={{
           fontFamily: 'var(--font-source-serif), Georgia, serif',
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(28px, 3.6vw, 36px)',
           lineHeight: 1.15,
@@ -615,7 +614,6 @@ function SessionEndCard({
       <h2
         style={{
           fontFamily: 'var(--font-source-serif), Georgia, serif',
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(26px, 3vw, 34px)',
           lineHeight: 1.15,
@@ -754,7 +752,6 @@ function TierLockedCard({
       <h2
         style={{
           fontFamily: 'var(--font-source-serif), Georgia, serif',
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(24px, 2.8vw, 30px)',
           lineHeight: 1.15,
@@ -825,7 +822,6 @@ function ErrorCard({
       <h2
         style={{
           fontFamily: 'var(--font-source-serif), Georgia, serif',
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 22,
           color: 'var(--lm-text-primary)',
@@ -884,7 +880,6 @@ function EmptyCard({ copy }: { copy: ReturnType<typeof vocabCopy> }) {
       <h2
         style={{
           fontFamily: 'var(--font-source-serif), Georgia, serif',
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(22px, 2.4vw, 28px)',
           lineHeight: 1.15,

@@ -24,7 +24,6 @@ export default function CouchesPreview() {
       <h2
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontWeight: 500,
           fontSize: 'clamp(22px, 2.6vw, 30px)',
           lineHeight: 1.2,
@@ -71,7 +70,6 @@ export default function CouchesPreview() {
               aria-hidden="true"
               style={{
                 fontFamily: SERIF_FONT,
-                fontStyle: 'italic',
                 fontWeight: 500,
                 fontSize: '0.8125rem',
                 color: 'var(--text-muted)',

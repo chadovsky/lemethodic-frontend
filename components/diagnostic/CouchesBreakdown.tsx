@@ -73,7 +73,6 @@ export default function CouchesBreakdown() {
             <span
               style={{
                 fontFamily: SERIF_FONT,
-                fontStyle: 'italic',
                 fontWeight: 500,
                 fontSize: 'clamp(15px, 1.6vw, 18px)',
                 color: 'var(--text-primary)',

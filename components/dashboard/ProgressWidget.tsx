@@ -29,7 +29,6 @@ export default function ProgressWidget() {
       <h2
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontWeight: 500,
           fontSize: 'clamp(22px, 2.6vw, 30px)',
           lineHeight: 1.2,

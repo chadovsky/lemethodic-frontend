@@ -78,7 +78,6 @@ export default function CouchesLayer({
             data-testid="couche-name"
             style={{
               fontFamily: SERIF_FONT,
-              fontStyle: 'italic',
               fontWeight: 400,
               fontSize: '0.9375rem',
               lineHeight: 1.2,

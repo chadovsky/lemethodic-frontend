@@ -486,7 +486,6 @@ function SubmissionForm({
         <h1
           style={{
             fontFamily: SERIF,
-            fontStyle: 'italic',
             fontWeight: 400,
             fontSize: 'clamp(28px, 4vw, 40px)',
             lineHeight: 1.15,
@@ -709,7 +708,6 @@ function PromptBody({ text, muted = false }: { text: string; muted?: boolean }) 
         whiteSpace: 'pre-wrap',
         margin: 0,
         color: muted ? ED_MUTED : ED_FG,
-        fontStyle: muted ? 'italic' : 'normal',
       }}
     >
       {parts.map((p, i) =>
@@ -789,7 +787,6 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
       <h1
         style={{
           fontFamily: SERIF,
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(32px, 4.5vw, 48px)',
           lineHeight: 1.1,
@@ -821,7 +818,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
           <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: ED_MUTED, margin: 0, marginBottom: 6 }}>
             {copy.resultScore}
           </p>
-          <p style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: 'italic', fontSize: 36, color: 'var(--lm-warm-espresso)', margin: 0 }}>
+          <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 36, color: 'var(--lm-warm-espresso)', margin: 0 }}>
             {overallScore != null ? overallScore : '—'}
           </p>
         </div>
@@ -829,7 +826,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
           <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: ED_MUTED, margin: 0, marginBottom: 6 }}>
             {copy.resultBand}
           </p>
-          <p style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: 'italic', fontSize: 36, color: 'var(--lm-warm-espresso)', margin: 0 }}>
+          <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 36, color: 'var(--lm-warm-espresso)', margin: 0 }}>
             {cefrBand != null ? cefrBand : '—'}
           </p>
         </div>
@@ -855,7 +852,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
           <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: ED_MUTED, margin: 0 }}>
             {secondaryLabel ?? ''}
           </p>
-          <p style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: 'italic', fontSize: 22, color: 'var(--lm-warm-espresso)', margin: 0 }}>
+          <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 22, color: 'var(--lm-warm-espresso)', margin: 0 }}>
             {secondaryValue}
           </p>
         </div>
@@ -866,7 +863,6 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
         <p
           style={{
             fontFamily: SERIF,
-            fontStyle: 'italic',
             fontWeight: 400,
             fontSize: 18,
             lineHeight: 1.55,
@@ -881,7 +877,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
 
       {/* V-016a.dashboard — per-couche breakdown. Each card renders:
           - score (numeric; 0 displays as 0, "Coming soon" only when null)
-          - examiner remark (serif italic, the methodology voice in French)
+          - examiner remark (serif , the methodology voice in French)
           - coaching block (EN primary + FR secondary, sans-serif tutor voice)
           - transformation sub-card ("Try this" action step)
           Missing entries render "Coming soon" badge with reduced opacity. */}
@@ -927,7 +923,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
                 )}
               </div>
               {remark && (
-                <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 15, lineHeight: 1.6, color: ED_FG, margin: 0 }}>
+                <p style={{ fontFamily: SERIF, fontSize: 15, lineHeight: 1.6, color: ED_FG, margin: 0 }}>
                   {remark}
                 </p>
               )}
@@ -942,7 +938,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
                     </p>
                   )}
                   {coaching?.coaching_fr && (
-                    <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.5, color: ED_FG_SOFT, margin: 0, fontStyle: 'italic' }}>
+                    <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.5, color: ED_FG_SOFT, margin: 0 }}>
                       <span style={{ fontStyle: 'normal', fontWeight: 600, fontSize: 10, letterSpacing: '0.08em', color: ED_MUTED, marginRight: 6 }}>
                         {copy.resultCoachingFrLabel}
                       </span>
@@ -972,7 +968,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
                 </div>
               )}
               {!hasAnyBody && !missing && (
-                <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.5, color: ED_MUTED, margin: 0, fontStyle: 'italic' }}>
+                <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.5, color: ED_MUTED, margin: 0 }}>
                   {language === 'fr' ? 'Pas de commentaire pour cette couche.' : 'No feedback for this layer.'}
                 </p>
               )}
@@ -1045,7 +1041,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
                     </span>
                   </div>
                   {observation && (
-                    <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 14, lineHeight: 1.55, color: ED_FG, margin: 0 }}>
+                    <p style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.55, color: ED_FG, margin: 0 }}>
                       {observation}
                     </p>
                   )}
@@ -1060,7 +1056,7 @@ function ResultView({ prompt, result, language, copy, onReset, onTryAgain }: Res
                         </p>
                       )}
                       {coach?.coaching_fr && (
-                        <p style={{ fontFamily: SANS, fontSize: 12, lineHeight: 1.5, color: ED_FG_SOFT, margin: 0, fontStyle: 'italic' }}>
+                        <p style={{ fontFamily: SANS, fontSize: 12, lineHeight: 1.5, color: ED_FG_SOFT, margin: 0 }}>
                           <span style={{ fontStyle: 'normal', fontWeight: 600, fontSize: 10, letterSpacing: '0.08em', color: ED_MUTED, marginRight: 6 }}>
                             {copy.resultCoachingFrLabel}
                           </span>
@@ -1182,7 +1178,6 @@ function AnalyzingPanel({ pollCount, copy, onCancel }: AnalyzingPanelProps) {
       <h2
         style={{
           fontFamily: SERIF,
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(22px, 2.6vw, 30px)',
           lineHeight: 1.2,
@@ -1253,7 +1248,6 @@ function FailedPanel({ title, message, retryLabel, onRetry }: FailedPanelProps) 
       <h2
         style={{
           fontFamily: SERIF,
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(22px, 2.6vw, 30px)',
           lineHeight: 1.2,
@@ -1315,7 +1309,7 @@ function LoadingSkeleton() {
 function NotFoundState({ message, backLabel }: { message: string; backLabel: string }) {
   return (
     <div role="alert" style={{ padding: '48px 16px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-      <h1 style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 28, color: ED_FG, margin: 0 }}>{message}</h1>
+      <h1 style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 28, color: ED_FG, margin: 0 }}>{message}</h1>
       <Link
         href="/l-examen/expression-ecrite"
         style={{

@@ -10,7 +10,6 @@ export default function AccountPage() {
       <h1
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontWeight: 500,
           fontSize: 'clamp(28px, 3.5vw, 44px)',
           lineHeight: 1.15,

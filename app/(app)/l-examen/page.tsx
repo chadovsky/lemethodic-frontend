@@ -62,7 +62,6 @@ export default function LExamenHubPage() {
         <h1
           style={{
             fontFamily: SERIF_FONT,
-            fontStyle: 'italic',
             fontSize: 'clamp(2rem, 5vw, 3rem)',
             fontWeight: 400,
             color: INK,
@@ -135,7 +134,6 @@ export default function LExamenHubPage() {
               <p
                 style={{
                   fontFamily: SERIF_FONT,
-                  fontStyle: 'italic',
                   fontSize: '1.25rem',
                   fontWeight: 400,
                   color: PAPER,

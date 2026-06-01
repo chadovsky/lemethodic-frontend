@@ -21,7 +21,6 @@ export default function EmptyState({ onReset }: { onReset: () => void }) {
       <p
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontWeight: 500,
           fontSize: 'clamp(18px, 1.6vw, 22px)',
           lineHeight: 1.3,

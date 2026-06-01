@@ -27,7 +27,6 @@ export default function DashboardGreeting() {
         data-testid="dashboard-greeting"
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontWeight: 500,
           fontSize: 'clamp(32px, 4vw, 52px)',
           lineHeight: 1.1,

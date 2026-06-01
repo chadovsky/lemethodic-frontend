@@ -232,7 +232,6 @@ export default function EcoleDesktop() {
           <h1
             style={{
               fontFamily: SERIF,
-              fontStyle: 'italic',
               fontWeight: 400,
               fontSize: 'clamp(36px, 5vw, 56px)',
               lineHeight: 1.1,
@@ -368,7 +367,6 @@ export default function EcoleDesktop() {
                     <p
                       style={{
                         fontFamily: SERIF,
-                        fontStyle: 'italic',
                         fontWeight: 400,
                         fontSize: 22,
                         lineHeight: 1.2,
@@ -409,7 +407,6 @@ export default function EcoleDesktop() {
                   <p
                     style={{
                       fontFamily: SERIF,
-                      fontStyle: 'italic',
                       fontWeight: 400,
                       fontSize: 36,
                       lineHeight: 1,
@@ -461,7 +458,6 @@ function PhaseSection({ title, rangeLabel, lessons, language, copy }: PhaseSecti
         <h2
           style={{
             fontFamily: SERIF,
-            fontStyle: 'italic',
             fontWeight: 400,
             fontSize: 'clamp(22px, 2.4vw, 28px)',
             letterSpacing: '-0.01em',
@@ -540,7 +536,6 @@ function LessonCard({ lesson, copy }: LessonCardProps) {
         <span
           style={{
             fontFamily: SERIF,
-            fontStyle: 'italic',
             fontWeight: 400,
             fontSize: 18,
             color: 'var(--lm-warm-espresso)',
@@ -726,7 +721,6 @@ function LessonGridEmpty({
       <p
         style={{
           fontFamily: SERIF,
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 22,
           lineHeight: 1.25,

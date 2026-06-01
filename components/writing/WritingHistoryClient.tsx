@@ -89,7 +89,6 @@ export default function WritingHistoryClient() {
         <h1
           style={{
             fontFamily: SERIF,
-            fontStyle: 'italic',
             fontWeight: 400,
             fontSize: 'clamp(28px, 4vw, 40px)',
             lineHeight: 1.1,
@@ -134,7 +133,6 @@ export default function WritingHistoryClient() {
           <p
             style={{
               fontFamily: SERIF,
-              fontStyle: 'italic',
               fontWeight: 400,
               fontSize: 18,
               color: ED_MUTED,
@@ -175,7 +173,7 @@ export default function WritingHistoryClient() {
                     </p>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 22, color: 'var(--lm-warm-espresso)', margin: 0, lineHeight: 1 }}>
+                    <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 22, color: 'var(--lm-warm-espresso)', margin: 0, lineHeight: 1 }}>
                       {item.overall_score}
                     </p>
                     <p style={{ fontFamily: SANS, fontWeight: 500, fontSize: 11, color: ED_MUTED, margin: 0, marginTop: 2 }}>

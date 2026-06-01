@@ -305,7 +305,6 @@ export default function TopNav() {
               <span
                 style={{
                   fontFamily: SERIF,
-                  fontStyle: 'italic',
                   fontWeight: 400,
                   fontSize: 14,
                   color: 'var(--lm-warm-espresso)',

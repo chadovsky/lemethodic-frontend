@@ -178,7 +178,6 @@ export default function DetectedModuleCard({ module: m, detection, onLearnTap }:
               margin: 0,
               fontFamily: DISPLAY_FONT,
               fontWeight: 500,
-              fontStyle: 'italic',
               fontSize: 14,
               lineHeight: '21px',
               color: INK,

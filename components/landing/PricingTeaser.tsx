@@ -145,7 +145,6 @@ export default function PricingTeaser() {
                   style={{
                     fontFamily: SERIF_FONT,
                     fontWeight: 400,
-                    fontStyle: 'italic',
                     fontSize: 'clamp(1.5rem, 2vw, 1.75rem)',
                     lineHeight: 1,
                     color: 'var(--text-primary)',

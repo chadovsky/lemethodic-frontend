@@ -43,7 +43,6 @@ export default function PastScorePanel() {
           <span
             style={{
               fontFamily: SERIF_FONT,
-              fontStyle: 'italic',
               fontWeight: 500,
               fontSize: 'clamp(26px, 2.8vw, 34px)',
               lineHeight: 1,

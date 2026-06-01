@@ -35,7 +35,6 @@ export default function ProductDemo() {
             className="text-balance"
             style={{
               fontFamily: SERIF_FONT,
-              fontStyle: 'italic',
               fontWeight: 400,
               fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)',
               lineHeight: 1.15,
@@ -130,7 +129,6 @@ export default function ProductDemo() {
               <p
                 style={{
                   fontFamily: SERIF_FONT,
-                  fontStyle: 'italic',
                   fontWeight: 400,
                   fontSize: 'clamp(1rem, 2vw, 1.375rem)',
                   lineHeight: 1.7,
@@ -262,7 +260,6 @@ export default function ProductDemo() {
                   color: ED.muted,
                   margin: 0,
                   marginTop: 14,
-                  fontStyle: 'italic',
                   textAlign: 'right' as const,
                 }}
               >

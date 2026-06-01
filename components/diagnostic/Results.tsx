@@ -14,7 +14,6 @@ const EVAL_DATE = new Intl.DateTimeFormat('fr-CA', { dateStyle: 'long' }).format
 
 const SECTION_HEADING: React.CSSProperties = {
   fontFamily: SERIF_FONT,
-  fontStyle: 'italic',
   fontWeight: 500,
   fontSize: 'clamp(22px, 2.5vw, 30px)',
   lineHeight: 1.2,
@@ -56,7 +55,6 @@ export default function Results() {
             data-testid="results-score"
             style={{
               fontFamily: SERIF_FONT,
-              fontStyle: 'italic',
               fontWeight: 500,
               fontSize: 'clamp(52px, 6vw, 80px)',
               lineHeight: 1,

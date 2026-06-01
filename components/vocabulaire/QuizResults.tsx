@@ -50,7 +50,6 @@ export default function QuizResults({ score, total, onRestart }: QuizResultsProp
         data-testid="quiz-results-score"
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontWeight: 500,
           fontSize: 'clamp(48px, 7vw, 72px)',
           lineHeight: 1,

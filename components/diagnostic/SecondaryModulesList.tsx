@@ -230,7 +230,6 @@ function SecondaryModuleRow({
             style={{
               fontFamily: DISPLAY_FONT,
               fontWeight: 500,
-              fontStyle: 'italic',
               fontSize: 13,
               color: INK_SOFT,
             }}

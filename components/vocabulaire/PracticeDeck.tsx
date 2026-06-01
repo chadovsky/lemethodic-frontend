@@ -63,7 +63,6 @@ export default function PracticeDeck() {
         <h1
           style={{
             fontFamily: SERIF_FONT,
-            fontStyle: 'italic',
             fontWeight: 500,
             fontSize: 'clamp(32px, 4vw, 52px)',
             lineHeight: 1.1,

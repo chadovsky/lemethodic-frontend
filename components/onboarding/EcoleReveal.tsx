@@ -2,7 +2,7 @@
 
 // F-201 — closing reveal screen migrated to the editorial system.
 // Celebration weight comes from typography: the persona label is
-// oversized (clamp 40-56px) in Source Serif 4 italic, --ed-accent navy.
+// oversized (clamp 40-56px) in Source Serif 4 , --ed-accent navy.
 // The plan summary card is --ed-paper on --ed-bg with 1px --ed-rule
 // border. No confetti, no checkmarks, no green badges — the persona
 // label + plan specifics carry the moment per F-201 design call.
@@ -219,13 +219,12 @@ export default function EcoleReveal({ data, language, onContinue }: EcoleRevealP
           >
             {labels.eyebrow}
           </p>
-          {/* Persona label — oversized Source Serif italic in navy.
+          {/* Persona label — oversized Source Serif in navy.
               This IS the celebration. */}
           <h1
             style={{
               fontFamily: SERIF,
               fontWeight: 400,
-              fontStyle: 'italic',
               fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
               lineHeight: 1.1,
               letterSpacing: '-0.015em',
@@ -350,7 +349,6 @@ export default function EcoleReveal({ data, language, onContinue }: EcoleRevealP
               <span
                 style={{
                   fontFamily: SERIF,
-                  fontStyle: 'italic',
                   fontWeight: 400,
                   fontSize: 18,
                   color: ED_ACCENT,

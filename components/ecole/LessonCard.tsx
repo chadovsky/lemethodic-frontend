@@ -91,7 +91,6 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
           data-testid="lesson-card-number"
           style={{
             fontFamily: SERIF_FONT,
-            fontStyle: 'italic',
             fontWeight: 500,
             fontSize: '1.5rem',
             lineHeight: 1,
@@ -127,7 +126,6 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
       <h3
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontWeight: 500,
           fontSize: 'clamp(18px, 1.6vw, 22px)',
           lineHeight: 1.2,

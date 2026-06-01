@@ -207,7 +207,6 @@ export default function PricingSection({ lang }: { lang: Lang }) {
                       fontSize: '0.75rem',
                       lineHeight: 1.5,
                       color: ED.muted,
-                      fontStyle: 'italic',
                       margin: 0,
                     }}
                   >

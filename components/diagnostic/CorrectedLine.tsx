@@ -81,7 +81,6 @@ export default function CorrectedLine({ segments, coachingNote, showCoaching = f
           style={{
             margin: 0,
             fontFamily: DISPLAY_FONT,
-            fontStyle: 'italic',
             fontWeight: 400,
             fontSize: 12,
             lineHeight: '18px',

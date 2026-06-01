@@ -85,7 +85,6 @@ export default function TopicDetail({ slug }: { slug: string }) {
           <h1
             style={{
               fontFamily: 'var(--font-source-serif), Georgia, serif',
-              fontStyle: 'italic',
               fontWeight: 400,
               fontSize: 'clamp(32px, 4vw, 44px)',
               lineHeight: 1.1,
@@ -442,7 +441,6 @@ function EmptyCard({ title, body }: { title: string; body: string }) {
       <h2
         style={{
           fontFamily: 'var(--font-source-serif), Georgia, serif',
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(22px, 2.4vw, 28px)',
           lineHeight: 1.15,
@@ -493,7 +491,6 @@ function ChunksError({
       <h2
         style={{
           fontFamily: 'var(--font-source-serif), Georgia, serif',
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 22,
           color: 'var(--lm-text-primary)',

@@ -64,7 +64,6 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
             data-testid="lesson-detail-number"
             style={{
               fontFamily: SERIF_FONT,
-              fontStyle: 'italic',
               fontWeight: 500,
               fontSize: 'clamp(28px, 3vw, 40px)',
               lineHeight: 1,
@@ -78,7 +77,6 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
           <h1
             style={{
               fontFamily: SERIF_FONT,
-              fontStyle: 'italic',
               fontWeight: 500,
               fontSize: 'clamp(28px, 3.5vw, 44px)',
               lineHeight: 1.15,
@@ -165,7 +163,6 @@ function ContentSection({
         id={`lesson-section-${id}-heading`}
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontWeight: 500,
           fontSize: 'clamp(22px, 2.6vw, 30px)',
           lineHeight: 1.2,

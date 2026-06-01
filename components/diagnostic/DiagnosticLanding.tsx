@@ -13,7 +13,6 @@ export default function DiagnosticLanding({ taches }: { taches: readonly Tache[]
         <h1
           style={{
             fontFamily: SERIF_FONT,
-            fontStyle: 'italic',
             fontWeight: 500,
             fontSize: 'clamp(32px, 4vw, 52px)',
             lineHeight: 1.1,
@@ -46,7 +45,6 @@ export default function DiagnosticLanding({ taches }: { taches: readonly Tache[]
         <h2
           style={{
             fontFamily: SERIF_FONT,
-            fontStyle: 'italic',
             fontWeight: 500,
             fontSize: 'clamp(24px, 2.8vw, 34px)',
             lineHeight: 1.2,
@@ -118,7 +116,6 @@ export default function DiagnosticLanding({ taches }: { taches: readonly Tache[]
           <h2
             style={{
               fontFamily: SERIF_FONT,
-              fontStyle: 'italic',
               fontWeight: 500,
               fontSize: 'clamp(24px, 2.8vw, 34px)',
               lineHeight: 1.2,

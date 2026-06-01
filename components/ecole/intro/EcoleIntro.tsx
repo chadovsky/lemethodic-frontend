@@ -215,7 +215,7 @@ const CTA = {
 
 // ── Render helpers ────────────────────────────────────────────────────────
 
-// Inline *italic* spans rendered as Source Serif 4 italic in ed-accent.
+// Inline ** spans rendered as Source Serif 4 in ed-accent.
 // Used for "Le Goulet" emphasis in the How it works section. Token form:
 // "*phrase*" splits the string and wraps the captured group.
 function renderEmphasis(body: string): ReactNode {
@@ -228,7 +228,6 @@ function renderEmphasis(body: string): ReactNode {
           key={i}
           style={{
             fontFamily: SERIF,
-            fontStyle: 'italic',
             fontWeight: 400,
             color: ED_ACCENT,
           }}
@@ -329,7 +328,6 @@ export default function EcoleIntro() {
             className="text-balance"
             style={{
               fontFamily: SERIF,
-              fontStyle: 'italic',
               fontWeight: 400,
               fontSize: 'clamp(20px, 2.2vw, 24px)',
               lineHeight: 1.5,
@@ -358,7 +356,6 @@ export default function EcoleIntro() {
             <h2
               style={{
                 fontFamily: SERIF,
-                fontStyle: 'italic',
                 fontWeight: 400,
                 fontSize: 'clamp(40px, 5.5vw, 64px)',
                 lineHeight: 1.1,
@@ -373,7 +370,6 @@ export default function EcoleIntro() {
               className="text-balance"
               style={{
                 fontFamily: SERIF,
-                fontStyle: 'italic',
                 fontWeight: 400,
                 fontSize: 'clamp(19px, 2vw, 22px)',
                 lineHeight: 1.55,
@@ -401,7 +397,6 @@ export default function EcoleIntro() {
                   <p
                     style={{
                       fontFamily: SERIF,
-                      fontStyle: 'italic',
                       fontWeight: 400,
                       fontSize: 'clamp(18px, 1.6vw, 20px)',
                       letterSpacing: '0.02em',
@@ -458,13 +453,12 @@ export default function EcoleIntro() {
             ))}
           </div>
 
-          {/* Closer — larger Source Serif 4 italic, centered, ed-fg */}
+          {/* Closer — larger Source Serif 4 , centered, ed-fg */}
           <Reveal>
             <p
               className="text-balance"
               style={{
                 fontFamily: SERIF,
-                fontStyle: 'italic',
                 fontWeight: 400,
                 fontSize: 'clamp(22px, 2.4vw, 28px)',
                 lineHeight: 1.45,
@@ -494,7 +488,6 @@ export default function EcoleIntro() {
             <h2
               style={{
                 fontFamily: SERIF,
-                fontStyle: 'italic',
                 fontWeight: 400,
                 fontSize: 'clamp(40px, 5.5vw, 56px)',
                 lineHeight: 1.1,
@@ -578,7 +571,6 @@ export default function EcoleIntro() {
             <h2
               style={{
                 fontFamily: SERIF,
-                fontStyle: 'italic',
                 fontWeight: 400,
                 fontSize: 'clamp(40px, 5.5vw, 56px)',
                 lineHeight: 1.1,
@@ -726,7 +718,6 @@ export default function EcoleIntro() {
                     <span
                       style={{
                         fontFamily: SERIF,
-                        fontStyle: 'italic',
                         fontWeight: 400,
                         fontSize: 'clamp(20px, 2vw, 24px)',
                         color: ED_ACCENT,
@@ -772,7 +763,6 @@ export default function EcoleIntro() {
           <p
             style={{
               fontFamily: SERIF,
-              fontStyle: 'italic',
               fontWeight: 400,
               fontSize: 'clamp(22px, 2.4vw, 28px)',
               lineHeight: 1.4,

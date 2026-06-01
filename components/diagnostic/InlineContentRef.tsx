@@ -91,7 +91,7 @@ export default function InlineContentRef({ ref_ }: Props) {
                 <strong style={{ color: INK, fontWeight: 700 }} {...props} />
               ),
               em: (props) => (
-                <em style={{ fontStyle: 'italic', color: INK }} {...props} />
+                <em style={{ color: INK }} {...props} />
               ),
               ul: (props) => (
                 <ul

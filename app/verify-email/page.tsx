@@ -290,7 +290,6 @@ function Heading({ children }: { children: React.ReactNode }) {
     <h1
       style={{
         fontFamily: SERIF,
-        fontStyle: 'italic',
         fontWeight: 400,
         fontSize: 'clamp(28px, 3.6vw, 36px)',
         lineHeight: 1.15,

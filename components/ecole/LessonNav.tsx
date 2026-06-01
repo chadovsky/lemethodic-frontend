@@ -91,7 +91,6 @@ function NavLink({
       <span
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontWeight: 500,
           fontSize: '1rem',
           lineHeight: 1.3,

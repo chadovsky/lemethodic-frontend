@@ -75,7 +75,6 @@ export default function RecommendationsStub() {
                 data-testid="recommendation-layer"
                 style={{
                   fontFamily: SERIF_FONT,
-                  fontStyle: 'italic',
                   fontWeight: 500,
                   fontSize: 'clamp(14px, 1.5vw, 16px)',
                   color: 'var(--text-primary)',

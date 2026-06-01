@@ -35,7 +35,6 @@ export default async function ComprehensionOraleExercisePage({ params }: Props) 
       <h1
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontSize: 'clamp(1.5rem, 4vw, 2rem)',
           fontWeight: 400,
           color: INK,

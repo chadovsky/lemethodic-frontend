@@ -178,7 +178,7 @@ export default function MorePageClient() {
                 flexShrink: 0,
               }}
             >
-              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 24, color: 'var(--lm-warm-espresso)' }}>
+              <span style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 24, color: 'var(--lm-warm-espresso)' }}>
                 {avatarInitial}
               </span>
             </div>
@@ -238,7 +238,7 @@ export default function MorePageClient() {
               <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: ED_MUTED }}>
                 {copy.profile.daysLabel}
               </span>
-              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 18, color: 'var(--lm-warm-espresso)' }}>
+              <span style={{ fontFamily: SERIF, fontSize: 18, color: 'var(--lm-warm-espresso)' }}>
                 {examDays}
               </span>
             </div>

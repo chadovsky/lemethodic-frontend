@@ -50,7 +50,6 @@ export default function TacheShell({ tache }: { tache: Tache }) {
           data-testid="tache-shell-title"
           style={{
             fontFamily: SERIF_FONT,
-            fontStyle: 'italic',
             fontWeight: 500,
             fontSize: 'clamp(24px, 2.8vw, 36px)',
             lineHeight: 1.2,
@@ -73,7 +72,6 @@ export default function TacheShell({ tache }: { tache: Tache }) {
             data-testid="tache-shell-prompt"
             style={{
               fontFamily: SERIF_FONT,
-              fontStyle: 'italic',
               fontWeight: 400,
               fontSize: 'clamp(18px, 2vw, 24px)',
               lineHeight: 1.5,

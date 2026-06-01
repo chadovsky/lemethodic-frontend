@@ -20,7 +20,6 @@ export default function Hero() {
             className="text-balance ed-hero-rise ed-hero-rise-delay-1"
             style={{
               fontFamily: SERIF_FONT,
-              fontStyle: 'italic',
               fontWeight: 400,
               fontSize: 'clamp(2.75rem, 6.5vw, 5.5rem)',
               lineHeight: 1.05,

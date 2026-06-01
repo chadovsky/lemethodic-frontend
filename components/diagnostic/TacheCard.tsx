@@ -45,7 +45,6 @@ export default function TacheCard({ tache }: { tache: Tache }) {
         data-testid="tache-card-title"
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontWeight: 500,
           fontSize: 'clamp(20px, 2.2vw, 24px)',
           lineHeight: 1.25,

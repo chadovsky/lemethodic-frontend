@@ -23,7 +23,6 @@ export default function MockExamenPage() {
       <h1
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
           fontWeight: 400,
           color: INK,

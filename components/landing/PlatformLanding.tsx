@@ -304,7 +304,6 @@ export default function PlatformLanding({ lang }: Props) {
               className="text-balance"
               style={{
                 fontFamily: SERIF_FONT,
-                fontStyle: 'italic',
                 fontWeight: 400,
                 fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
                 lineHeight: 1.1,
@@ -321,7 +320,6 @@ export default function PlatformLanding({ lang }: Props) {
               className="text-balance"
               style={{
                 fontFamily: SERIF_FONT,
-                fontStyle: 'italic',
                 fontWeight: 400,
                 fontSize: 'clamp(1.125rem, 1.8vw, 1.375rem)',
                 lineHeight: 1.55,
@@ -363,7 +361,6 @@ export default function PlatformLanding({ lang }: Props) {
                 color: ED.muted,
                 margin: 0,
                 marginTop: 'clamp(40px, 5vw, 64px)',
-                fontStyle: 'italic',
               }}
             >
               {copy.methodology.attribution}
@@ -802,7 +799,6 @@ function BottleneckVisual({ language }: { language: Lang }) {
         key={active}
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(2rem, 3.5vw, 2.75rem)',
           lineHeight: 1.05,

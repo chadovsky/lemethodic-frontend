@@ -200,7 +200,6 @@ export default function TranscriptReviewPanel({
                     fontSize: 12,
                     lineHeight: '18px',
                     color: INK_SOFT,
-                    fontStyle: 'italic',
                     margin: '0 0 14px',
                   }}
                 >

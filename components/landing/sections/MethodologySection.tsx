@@ -26,13 +26,12 @@ export default function MethodologySection({ lang }: { lang: Lang }) {
       }}
     >
       <div className="mx-auto" style={{ maxWidth: 720 }}>
-        {/* Heading — Source Serif 4 italic ed-accent navy */}
+        {/* Heading — Source Serif 4 ed-accent navy */}
         <RevealOnScroll>
           <h2
             className="text-balance"
             style={{
               fontFamily: SERIF_FONT,
-              fontStyle: 'italic',
               fontWeight: 400,
               fontSize: 'clamp(2.5rem, 5.5vw, 4rem)',
               lineHeight: 1.1,
@@ -45,13 +44,12 @@ export default function MethodologySection({ lang }: { lang: Lang }) {
           </h2>
         </RevealOnScroll>
 
-        {/* Intro framing line — Source Serif 4 italic ed-muted */}
+        {/* Intro framing line — Source Serif 4 ed-muted */}
         <RevealOnScroll delay={0.08}>
           <p
             className="text-balance"
             style={{
               fontFamily: SERIF_FONT,
-              fontStyle: 'italic',
               fontWeight: 400,
               fontSize: 'clamp(1.25rem, 2vw, 1.5rem)',
               lineHeight: 1.5,
@@ -114,13 +112,12 @@ export default function MethodologySection({ lang }: { lang: Lang }) {
           />
         </RevealOnScroll>
 
-        {/* Closer kicker — Source Serif 4 italic ed-fg, centered */}
+        {/* Closer kicker — Source Serif 4 ed-fg, centered */}
         <RevealOnScroll delay={0.16 + METHODOLOGY.couches.length * 0.08 + 0.2}>
           <p
             className="text-balance"
             style={{
               fontFamily: SERIF_FONT,
-              fontStyle: 'italic',
               fontWeight: 400,
               fontSize: 'clamp(1.375rem, 2.2vw, 1.625rem)',
               lineHeight: 1.45,

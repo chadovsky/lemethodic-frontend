@@ -87,7 +87,6 @@ function CoucheStackVisual({ language }: { language: 'en' | 'fr' }) {
         key={active}
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: 'clamp(28px, 3vw, 36px)',
           lineHeight: 1.1,
@@ -151,7 +150,6 @@ function InterferenceVisual() {
         className="ed-pair-fade"
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: '1.25rem',
           lineHeight: 1.2,
@@ -171,7 +169,6 @@ function InterferenceVisual() {
         className="ed-pair-fade ed-pair-fade-delay"
         style={{
           fontFamily: SERIF_FONT,
-          fontStyle: 'italic',
           fontWeight: 400,
           fontSize: '1.5rem',
           lineHeight: 1.2,
