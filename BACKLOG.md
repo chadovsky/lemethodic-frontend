@@ -4696,17 +4696,21 @@ Milestone: M2
 **Owner:** Frontend Engineering
 **Verification:** pnpm build clean. 401/402 tests pass (pre-existing CouchesBreakdown failure).
 
-### F-354: [M2] t4-v2 — couche bar + pastel card cleanup (Part A superseded by F-356)
+### F-354: [M2] t4-v2 — couche bar fix (Part B shipped); pastel cards deferred to Chadi
 Milestone: M2
 
 **Priority:** P1
-**Status:** QUEUED
+**Status:** PARTIAL — Part B SHIPPED, Part C QUEUED (Chadi design pass)
 **Filed:** 2026-06-01
+**Part A superseded:** 2026-06-01 by F-356 (redirect removed, pages now live)
+**Part B shipped:** 2026-06-01
 **Source:** F-350 findings P1-3, P1-4
-**Scope:** ~~(A) Remove app/(app)/la-methode page files~~ — superseded by F-356 (redirect removed, pages now live). (B) Fix CouchesBreakdown.tsx:118 to apply var(--couche-pieges) to Les Pieges Anglais bar fill. (C) Replace --lm-pastel-* card backgrounds in MethodologyPreview.tsx and SpeakingLanding.tsx with var(--paper-tint) / var(--paper-edge).
-**Acceptance:** Les Pieges Anglais bar renders in vermillion. No pastel backgrounds on section cards.
+**Part A scope (superseded by F-356):** Remove app/(app)/la-methode page files -- redirect removed instead.
+**Part B scope (SHIPPED):** CouchesBreakdown.tsx bar fill: added barColor field to COUCHES config. 4 dominant couches get var(--couche-default), Les Pieges Anglais gets var(--couche-pieges) = var(--accent) (vermillion). Single-source-of-truth at the COUCHES data constant. MethodologyPreview.tsx already had var(--accent) on Les Pieges Anglais (headingColor/nameColor) -- no change needed there.
+**Part C scope (QUEUED, Chadi design pass):** Replace --lm-pastel-* card backgrounds in MethodologyPreview.tsx and SpeakingLanding.tsx with var(--paper-tint) / var(--paper-edge).
 **Dependencies:** None (standalone)
 **Owner:** Frontend Engineering
+**Part B verification:** pnpm build clean. 401/402 tests pass.
 
 ### F-355: [M2] t5-v2 — Dashboard "Bonjour" hero gesture
 Milestone: M2

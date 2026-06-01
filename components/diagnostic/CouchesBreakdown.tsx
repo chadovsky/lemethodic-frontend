@@ -14,31 +14,37 @@ const COUCHES: {
   name: string
   score: CefrLevel
   gloss: string
+  barColor: string
 }[] = [
   {
     name: 'Le Propos',
     score: 'C1',
     gloss: 'Vous maîtrisez les structures attendues.',
+    barColor: 'var(--couche-default)',
   },
   {
     name: 'Le Plan',
     score: 'B2',
     gloss: 'Vos idées sont articulées mais manquent encore de diversité lexicale.',
+    barColor: 'var(--couche-default)',
   },
   {
     name: 'La Construction',
     score: 'B2',
     gloss: 'Les structures de phrases sont globalement fluides.',
+    barColor: 'var(--couche-default)',
   },
   {
     name: 'Les Pièges Anglais',
     score: 'B1',
     gloss: "Quelques calques de l'anglais subsistent sous pression.",
+    barColor: 'var(--couche-pieges)',
   },
   {
     name: 'La Musique',
     score: 'B2',
     gloss: 'Votre débit et votre intonation sont appropriés au contexte.',
+    barColor: 'var(--couche-default)',
   },
 ]
 
@@ -114,7 +120,7 @@ export default function CouchesBreakdown() {
                 height: '100%',
                 width: mounted ? `${CEFR_PCT[couche.score]}%` : '0%',
                 borderRadius: 3,
-                backgroundColor: 'var(--cta-utility)',
+                backgroundColor: couche.barColor,
                 transition: 'width 600ms var(--lm-ease, ease)',
               }}
             />
