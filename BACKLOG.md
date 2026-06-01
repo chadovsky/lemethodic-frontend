@@ -4689,15 +4689,15 @@ Milestone: M2
 **Dependencies:** F-348 (alias layer must be live)
 **Owner:** Frontend Engineering
 
-### F-354: [M2] t4-v2 — /la-methode dead code + couche bar + pastel card cleanup
+### F-354: [M2] t4-v2 — couche bar + pastel card cleanup (Part A superseded by F-356)
 Milestone: M2
 
-**Priority:** P0/P1 mixed
+**Priority:** P1
 **Status:** QUEUED
 **Filed:** 2026-06-01
-**Source:** F-350 findings P0-1, P1-3, P1-4
-**Scope:** (A) Remove app/(app)/la-methode/page.tsx and app/(app)/la-methode/[id]/page.tsx (dead code, blocked by redirect in next.config.mjs:14-16). Confirm all nav/sidebar links target /cours/methode-tcf-canada. (B) Fix CouchesBreakdown.tsx:118 to apply var(--couche-pieges) to Les Pieges Anglais bar fill. (C) Replace --lm-pastel-* card backgrounds in MethodologyPreview.tsx and SpeakingLanding.tsx with var(--paper-tint) / var(--paper-edge).
-**Acceptance:** /la-methode page file deleted. Les Pieges Anglais bar renders in vermillion. No pastel backgrounds on section cards.
+**Source:** F-350 findings P1-3, P1-4
+**Scope:** ~~(A) Remove app/(app)/la-methode page files~~ — superseded by F-356 (redirect removed, pages now live). (B) Fix CouchesBreakdown.tsx:118 to apply var(--couche-pieges) to Les Pieges Anglais bar fill. (C) Replace --lm-pastel-* card backgrounds in MethodologyPreview.tsx and SpeakingLanding.tsx with var(--paper-tint) / var(--paper-edge).
+**Acceptance:** Les Pieges Anglais bar renders in vermillion. No pastel backgrounds on section cards.
 **Dependencies:** None (standalone)
 **Owner:** Frontend Engineering
 
@@ -4712,6 +4712,20 @@ Milestone: M2
 **Acceptance:** Greeting renders in Instrument Serif. No italic. Vermillion underline accent on the name. Respects prefers-reduced-motion (skip animation, show static underline).
 **Dependencies:** F-351 (t1-v2), F-352 (t2-v2)
 **Owner:** Frontend Engineering
+
+### F-356: [M2] Fix /la-methode dead route — remove redirect from next.config.mjs
+Milestone: M2
+
+**Priority:** P0
+**Status:** SHIPPED
+**Filed:** 2026-06-01
+**Shipped:** 2026-06-01
+**Source:** M-VISUAL v2 audit P0-1; supersedes F-354 Part A
+**Scope:** Remove the two /la-methode redirect rules (source /la-methode and /la-methode/:path*) from next.config.mjs that were 308-redirecting to /cours/methode-tcf-canada. app/(app)/la-methode/page.tsx and la-methode/[id]/page.tsx now serve directly. /cours/methode-tcf-canada is unchanged as a separate marketing route.
+**Acceptance:** /la-methode returns 200 from the app router (confirmed in build route table: static route listed). Other redirects (/ecole, /vocabulaire, /diagnostic, /speaking, /writing, /exam-prep) unchanged.
+**Dependencies:** None
+**Owner:** Frontend Engineering
+**Verification:** pnpm build clean (45 routes, /la-methode and /la-methode/[id] appear in route table as live pages). 401/402 tests pass (1 pre-existing CouchesBreakdown failure).
 
 ---
 
