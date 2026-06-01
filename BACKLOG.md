@@ -4566,10 +4566,17 @@ Milestone: M3
 Milestone: M2
 
 **Priority:** HIGH
-**Status:** 📋 Queued
+**Status:** Functional shell SHIPPED -- 72424f9 (2026-06-01). Visual treatment deferred to Chadi's design pass.
 **Filed:** 2026-05-31
 **Source:** M2 visual coherence scope expansion per recent feedback (also reflected in ROADMAP.md M2 status note)
 **Scope:** Add countdown widget (days to exam date from `/onboarding`), streak widget, daily target widget, calendar widget, next lesson resume widget to `/dashboard`. M2 visual coherence scope expansion per recent feedback.
+**Functional shell notes:**
+- Countdown: wired to `user.examDate` from auth store (no extra fetch)
+- Streak: derived from `api.recordings.list()` consecutive recording days; TODO(BE) for dedicated streak endpoint
+- Daily target: static mock (1 session); TODO(BE) -- `/api/users/me/daily-target` does not exist yet; BE ticket needed before production-ready
+- Calendar: derived from `api.recordings.list()` activity dots per day; TODO(BE) for dedicated activity-calendar endpoint
+- Next lesson: wired to `api.lessons.list()` -- first `in_progress` or `unlocked` lesson
+- Each widget has loading skeleton, empty state, error state, token-only colours (no hardcoded hex)
 **Owner:** Frontend Engineering
 
 ### F-340: [FE] /fr/exam-prep redirect + SITEMAP French section
