@@ -4640,6 +4640,77 @@ Milestone: M2
 **Dependencies:** F-348 (alias block must exist until sweep is complete)
 **Owner:** Frontend Engineering
 
+### F-350: [DOC] M-VISUAL Audit v2 — DESIGN.md v2 surface coverage
+Milestone: M2
+
+**Priority:** HIGH
+**Status:** SHIPPED
+**Filed:** 2026-06-01
+**Source:** M2 v2 sprint unblocked by F-348/F-349 (t10/t11); spec required before fix passes
+**Scope:** Read-only static analysis of all primary surfaces against DESIGN.md v2 (Atelier Francais direction). Produces docs/m2-visual-audit-v2-2026-06-01.md with per-surface compliance findings, P0/P1/P2 issue list, and recommended fix passes t1-v2 through t5-v2.
+**Key findings:** 4 P0 issues (la-methode dead route, lib/typography.ts v1 constants, 67-file italic sweep, lang="en" defeating font switching); 5 P1 issues (171 hardcoded hex, l-examen inline hex, Pieges Anglais bar color, pastel card backgrounds, Dashboard hero); 5 P2 cosmetic items.
+**Output:** docs/m2-visual-audit-v2-2026-06-01.md
+**Owner:** Frontend Engineering
+
+### F-351: [M2] t1-v2 — Typography bridge (lib/typography.ts + lang fix)
+Milestone: M2
+
+**Priority:** P0
+**Status:** QUEUED
+**Filed:** 2026-06-01
+**Source:** F-350 finding P0-2 + P0-4
+**Scope:** Update lib/typography.ts: DISPLAY_FONT to 'var(--f-display)', SANS_FONT to 'var(--f-ui)', SERIF_FONT to 'var(--f-body)'. Update OnboardingScreen.tsx:29 DISPLAY_FONT export and line 40 SANS constant. Fix app/layout.tsx lang="en" to lang="fr". Unlocks t11 font loading across all 144 consumers.
+**Acceptance:** Every page-level H1 renders Instrument Serif (--f-display). Nav/button labels render Instrument Sans (--f-ui). No system-ui fallback for type. lang="fr" on html element.
+**Dependencies:** None (standalone)
+**Owner:** Frontend Engineering
+
+### F-352: [M2] t2-v2 — Italic display sweep
+Milestone: M2
+
+**Priority:** P0
+**Status:** QUEUED
+**Filed:** 2026-06-01
+**Source:** F-350 finding P0-3
+**Scope:** Remove fontStyle: 'italic' from all display headings (H1, H2 and comparable large text) across 67 affected files. Primary targets: DashboardGreeting.tsx, LessonList.tsx, VocabBrowse.tsx, l-examen page, CouchesBreakdown.tsx, lesson detail headers, speaking session headers. Document Flashcard/QuizQuestion French-word italic as explicit exception if intentional.
+**Acceptance:** No fontStyle: 'italic' on any H1 or display-size heading. DESIGN.md s8 compliant.
+**Dependencies:** F-351 (t1-v2 must land first to confirm fonts render without italic as compensation)
+**Owner:** Frontend Engineering
+
+### F-353: [M2] t3-v2 — Hardcoded hex token sweep
+Milestone: M2
+
+**Priority:** P1
+**Status:** QUEUED
+**Filed:** 2026-06-01
+**Source:** F-350 finding P1-1 + P1-2
+**Scope:** Replace 171 hardcoded hex values across 71 TSX files with canonical token references. Priority: l-examen/page.tsx (6 inline constants), TestClient.tsx (14), speaking session files (19 combined), diagnostic components. Defer #ffffff on CTA text. After sweep: dark mode renders correctly on all audited surfaces.
+**Dependencies:** F-348 (alias layer must be live)
+**Owner:** Frontend Engineering
+
+### F-354: [M2] t4-v2 — /la-methode dead code + couche bar + pastel card cleanup
+Milestone: M2
+
+**Priority:** P0/P1 mixed
+**Status:** QUEUED
+**Filed:** 2026-06-01
+**Source:** F-350 findings P0-1, P1-3, P1-4
+**Scope:** (A) Remove app/(app)/la-methode/page.tsx and app/(app)/la-methode/[id]/page.tsx (dead code, blocked by redirect in next.config.mjs:14-16). Confirm all nav/sidebar links target /cours/methode-tcf-canada. (B) Fix CouchesBreakdown.tsx:118 to apply var(--couche-pieges) to Les Pieges Anglais bar fill. (C) Replace --lm-pastel-* card backgrounds in MethodologyPreview.tsx and SpeakingLanding.tsx with var(--paper-tint) / var(--paper-edge).
+**Acceptance:** /la-methode page file deleted. Les Pieges Anglais bar renders in vermillion. No pastel backgrounds on section cards.
+**Dependencies:** None (standalone)
+**Owner:** Frontend Engineering
+
+### F-355: [M2] t5-v2 — Dashboard "Bonjour" hero gesture
+Milestone: M2
+
+**Priority:** P1
+**Status:** QUEUED
+**Filed:** 2026-06-01
+**Source:** F-350 finding P1-5; DESIGN.md v2 s9
+**Scope:** Implement locked "Bonjour, [name]." hero in DashboardGreeting.tsx: var(--f-display) font (Instrument Serif), no italic, vermillion SVG accent line under the name (var(--accent) stroke, drawn in on mount). This is the flagship in-product moment per DESIGN.md s9.
+**Acceptance:** Greeting renders in Instrument Serif. No italic. Vermillion underline accent on the name. Respects prefers-reduced-motion (skip animation, show static underline).
+**Dependencies:** F-351 (t1-v2), F-352 (t2-v2)
+**Owner:** Frontend Engineering
+
 ---
 
 End of BACKLOG.md.
