@@ -8,6 +8,7 @@ import ProductDemo from '@/components/landing/ProductDemo'
 import PricingTeaser from '@/components/landing/PricingTeaser'
 import Footer from '@/components/landing/Footer'
 import AuthRedirect from '@/components/auth/AuthRedirect'
+import { OrganizationJsonLd, CourseJsonLd, FaqJsonLd } from '@/components/seo/JsonLd'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -16,12 +17,20 @@ export const metadata: Metadata = {
     'Method-based oral exam prep for anglophone TCF Canada candidates pursuing Quebec PR.',
   alternates: {
     canonical: '/',
+    languages: {
+      'x-default': '/',
+      en: '/',
+      fr: '/fr',
+    },
   },
 }
 
 export default function Home() {
   return (
     <>
+      <OrganizationJsonLd />
+      <CourseJsonLd />
+      <FaqJsonLd />
       {/* Redirect authenticated users to their dashboard server-side equivalent.
           Client-side only — no httpOnly cookie is exposed to middleware. */}
       <AuthRedirect to="/dashboard" />

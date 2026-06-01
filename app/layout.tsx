@@ -6,6 +6,7 @@ import TopNav from '@/components/nav/TopNav'
 import StickyHeader from '@/components/layout/StickyHeader'
 import QueryProvider from '@/components/QueryProvider'
 import { ThemeProvider } from '@/components/ThemeProvider'
+import { PlausibleAnalytics } from '@/components/analytics/Plausible'
 
 // M2 t11 — Type A font stack per DESIGN.md v2 (Atelier Français):
 //   Instrument Serif — display/hero/wordmark (--f-display)
@@ -56,16 +57,30 @@ const dmMono = DM_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://lemethodic.com'),
   title: 'Le Méthodic',
   description: 'Method-based oral exam prep for anglophone French exam candidates pursuing Quebec PR.',
   generator: 'v0.app',
   manifest: '/manifest.json',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
   openGraph: {
     title: 'Le Méthodic',
     description: 'Method-based oral exam prep for anglophone French exam candidates pursuing Quebec PR.',
     url: 'https://lemethodic.com',
     siteName: 'Le Méthodic',
     type: 'website',
+    locale: 'en_US',
+    // Place a 1200x630 JPEG at /public/og-default.jpg to activate OG preview images.
+    // Set NEXT_PUBLIC_OG_IMAGE=/og-default.jpg in Vercel env to override per-deploy.
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Le Méthodic',
+    description: 'Method-based oral exam prep for anglophone French exam candidates pursuing Quebec PR.',
   },
   icons: {
     icon: [
@@ -104,6 +119,7 @@ export default function RootLayout({
             <TopNav />
             {children}
             {process.env.NODE_ENV === 'production' && <Analytics />}
+            <PlausibleAnalytics />
           </QueryProvider>
         </ThemeProvider>
       </body>

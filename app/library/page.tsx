@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/library',
     languages: {
+      'x-default': '/library',
       en: '/library',
       fr: '/fr/library',
     },
