@@ -1,5 +1,5 @@
-import { render, screen, within, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 vi.mock('next/link', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -10,13 +10,44 @@ vi.mock('next/link', () => ({
   ),
 }))
 
-// DashboardGreeting uses useAuthStore; provide a null-user stub so
-// tests remain deterministic and show "Bonjour" (no name).
+// Stub useAuthStore: hydrated user with an exam date 30 days from now
+const FUTURE_DATE = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10)
 vi.mock('@/lib/auth', () => ({
-  useAuthStore: (selector: (s: { user: null }) => unknown) => selector({ user: null }),
+  useAuthStore: (selector: (s: { user: { examDate: string }; hydrated: boolean }) => unknown) =>
+    selector({ user: { examDate: FUTURE_DATE }, hydrated: true }),
+}))
+
+// Stub api: recordings returns empty list; lessons returns one unlocked lesson
+vi.mock('@/lib/api', () => ({
+  api: {
+    recordings: {
+      list: vi.fn().mockResolvedValue([]),
+    },
+    lessons: {
+      list: vi.fn().mockResolvedValue([
+        {
+          id: 1,
+          lessonNumber: 3,
+          code: 'L003',
+          title: 'Le rythme de la phrase',
+          shortDescription: '',
+          status: 'unlocked',
+          quizAttempts: 0,
+          quizBestScore: null,
+          completedAt: null,
+          phase: 1,
+          sublineEn: null,
+        },
+      ]),
+    },
+  },
 }))
 
 import Dashboard from '@/components/dashboard/Dashboard'
+
+beforeEach(() => {
+  vi.clearAllMocks()
+})
 
 describe('Dashboard', () => {
   it('renders the welcome heading "Bonjour"', () => {
@@ -33,60 +64,54 @@ describe('Dashboard', () => {
     expect(screen.getByTestId('dashboard-today')).toHaveTextContent(expected)
   })
 
-  it('renders all 4 widget cards', () => {
+  it('renders all 5 widget headings', () => {
     render(<Dashboard />)
     expect(
-      screen.getByRole('heading', { level: 2, name: /progression/i }),
+      screen.getByRole('heading', { level: 2, name: /compte à rebours/i }),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('heading', { level: 2, name: /activité récente/i }),
+      screen.getByRole('heading', { level: 2, name: /série active/i }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 2, name: /objectif du jour/i }),
     ).toBeInTheDocument()
     expect(
       screen.getByRole('heading', { level: 2, name: /prochaine leçon/i }),
     ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { level: 2, name: /score diagnostic/i }),
-    ).toBeInTheDocument()
   })
 
-  it('"Prochaine leçon" CTA links to /cours/methode-tcf-canada/lecon-5', () => {
+  it('countdown widget shows days remaining when examDate is set', () => {
     render(<Dashboard />)
-    const cta = screen.getByRole('link', { name: /reprendre/i })
-    expect(cta).toHaveAttribute('href', '/cours/methode-tcf-canada/lecon-5')
+    const days = screen.getByTestId('countdown-days')
+    expect(Number(days.textContent)).toBeGreaterThan(0)
   })
 
-  it('"Score Diagnostic" CTA links to /l-examen', () => {
+  it('daily target widget shows static value of 1', () => {
     render(<Dashboard />)
-    const cta = screen.getByRole('link', { name: /voir le détail/i })
-    expect(cta).toHaveAttribute('href', '/l-examen')
+    expect(screen.getByTestId('daily-target-value')).toHaveTextContent('1')
   })
 
-  it('Score Diagnostic widget shows the placeholder score C1', () => {
+  it('streak widget resolves to 0 for a new user with no recordings', async () => {
     render(<Dashboard />)
-    expect(screen.getByTestId('diagnostic-score-value')).toHaveTextContent('C1')
-  })
-
-  // MOCK-007 — fixture-driven lesson title (lesson 5 from lib/data/lessons.ts)
-  it('Prochaine leçon widget shows the fixture lesson title', () => {
-    render(<Dashboard />)
-    expect(
-      screen.getByText(/leçon 5\s*:\s*le rythme de la phrase française/i),
-    ).toBeInTheDocument()
-  })
-
-  // MOCK-007 — 5 activity rows
-  it('renders 5 activity rows from fixture', () => {
-    render(<Dashboard />)
-    const list = screen.getByRole('list', { name: /activité récente/i })
-    expect(within(list).getAllByRole('listitem')).toHaveLength(5)
-  })
-
-  // MOCK-007 — progress bar data-testids with settled widths
-  it('ProgressWidget bars have correct data-testid and settled width for Le Fond', async () => {
-    render(<Dashboard />)
-    const bar = screen.getByTestId('progress-bar-le-fond')
     await waitFor(() => {
-      expect(bar).toHaveStyle({ width: '80%' })
+      expect(screen.getByTestId('streak-count')).toHaveTextContent('0')
+    })
+  })
+
+  it('next lesson widget renders the unlocked lesson title after load', async () => {
+    render(<Dashboard />)
+    await waitFor(() => {
+      expect(screen.getByTestId('next-lesson-title')).toHaveTextContent(
+        /leçon 3.*rythme/i,
+      )
+    })
+  })
+
+  it('next lesson CTA links to the correct lesson route', async () => {
+    render(<Dashboard />)
+    await waitFor(() => {
+      const cta = screen.getByRole('link', { name: /reprendre/i })
+      expect(cta).toHaveAttribute('href', '/cours/methode-tcf-canada/lecon-3')
     })
   })
 })

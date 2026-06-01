@@ -1,8 +1,9 @@
 import DashboardGreeting from './DashboardGreeting'
-import ProgressWidget from './ProgressWidget'
-import RecentActivityWidget from './RecentActivityWidget'
+import CountdownWidget from './CountdownWidget'
+import StreakWidget from './StreakWidget'
+import DailyTargetWidget from './DailyTargetWidget'
+import CalendarWidget from './CalendarWidget'
 import NextLessonWidget from './NextLessonWidget'
-import DiagnosticScoreWidget from './DiagnosticScoreWidget'
 
 export default function Dashboard() {
   return (
@@ -10,10 +11,11 @@ export default function Dashboard() {
       <DashboardGreeting />
 
       <div className="dashboard-grid">
-        <ProgressWidget />
-        <RecentActivityWidget />
+        <CountdownWidget />
+        <StreakWidget />
+        <DailyTargetWidget />
         <NextLessonWidget />
-        <DiagnosticScoreWidget />
+        <CalendarWidget />
       </div>
     </div>
   )
