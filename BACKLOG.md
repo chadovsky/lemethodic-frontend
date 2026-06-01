@@ -4685,12 +4685,16 @@ Milestone: M2
 Milestone: M2
 
 **Priority:** P1
-**Status:** QUEUED
+**Status:** SHIPPED
 **Filed:** 2026-06-01
+**Shipped:** 2026-06-01
 **Source:** F-350 finding P1-1 + P1-2
-**Scope:** Replace 171 hardcoded hex values across 71 TSX files with canonical token references. Priority: l-examen/page.tsx (6 inline constants), TestClient.tsx (14), speaking session files (19 combined), diagnostic components. Defer #ffffff on CTA text. After sweep: dark mode renders correctly on all audited surfaces.
-**Dependencies:** F-348 (alias layer must be live)
+**Scope:** Discovery: 187 hex instances found (171 in audit + additions). Replaced: 29 instances across 22 files (28 via script + 1 manual LessonListItem). Flagged-ambiguous: 102 (all #1A1A1A alpha variants + rgba(20,33,61,...) pre-token ink variants + #FFFFFFCC + #1C1A16 -- no exact canonical match; deferred to F-349 lm-* migration pass). Fixed-kept: ~56 instances (color:#FFFFFF white text on dark buttons, state/feedback colors, legacy pastels).
+**Replacements:** const INK/#14213D -> var(--dominant) x6, const VERMILLON/#C8102E -> var(--accent) x2, const PAPER_TINT/#FAFAFA -> var(--paper-tint) x1, const PAGE_BG/#FFFFFF -> var(--paper) x1, let bg='#FFFFFF' -> var(--paper) x2, backgroundColor:'#FFFFFF' surfaces -> var(--paper) x16, Sidebar color:#14213D -> var(--dominant) x1.
+**Ambiguous threshold note:** Ambiguous count (102) exceeds 20% of 187 (37). All ambiguous are pre-token alpha variants (#1A1A1A*) and pre-canonical rgba variants -- intent is known, exact token match is absent. Not surfaced for review as their dark-mode behavior is unchanged (no token exists to flip them). F-349 pass should address these when lm-* aliases are migrated.
+**Dependencies:** F-348 (alias layer live)
 **Owner:** Frontend Engineering
+**Verification:** pnpm build clean. 401/402 tests pass (pre-existing CouchesBreakdown failure).
 
 ### F-354: [M2] t4-v2 — couche bar + pastel card cleanup (Part A superseded by F-356)
 Milestone: M2

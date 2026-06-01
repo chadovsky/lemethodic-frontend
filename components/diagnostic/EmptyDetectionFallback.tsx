@@ -29,7 +29,7 @@ export default function EmptyDetectionFallback() {
   return (
     <div
       style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--paper)',
         borderRadius: 20,
         padding: '28px 22px',
         display: 'flex',

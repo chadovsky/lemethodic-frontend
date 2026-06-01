@@ -292,7 +292,7 @@ export default function Sidebar({
             background: 'transparent',
             border: 'none',
             cursor: 'pointer',
-            color: '#14213D',
+            color: 'var(--dominant)',
             borderRadius: 4,
             padding: 0,
             flexShrink: 0,

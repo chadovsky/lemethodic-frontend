@@ -153,7 +153,7 @@ export default function DetectedModuleCard({ module: m, detection, onLearnTap }:
       {detection?.supporting_quote ? (
         <div
           style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--paper)',
             borderRadius: 14,
             padding: '12px 14px',
             display: 'flex',
@@ -202,7 +202,7 @@ export default function DetectedModuleCard({ module: m, detection, onLearnTap }:
                   fontWeight: 700,
                   fontSize: 13,
                   color: INK,
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: 'var(--paper)',
                   border: 'none',
                   borderRadius: 100,
                   padding: '8px 14px',

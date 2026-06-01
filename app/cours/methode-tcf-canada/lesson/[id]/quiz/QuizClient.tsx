@@ -216,7 +216,7 @@ export default function QuizClient({ lessonId }: { lessonId: string }) {
           const isSelected = selectedOption === i
           const isThisCorrect = i === question.correctIndex
 
-          let bg = '#FFFFFF'
+          let bg = 'var(--paper)'
           let border = '1.5px solid #1A1A1A14'
           let textColor = INK
 

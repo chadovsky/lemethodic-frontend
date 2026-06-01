@@ -380,7 +380,7 @@ export default function Paywall() {
                   fontWeight: 700,
                   fontSize: 14,
                   transition: 'all 0.2s',
-                  backgroundColor: billing === b ? '#FFFFFF' : 'transparent',
+                  backgroundColor: billing === b ? 'var(--paper)' : 'transparent',
                   color: billing === b ? INK : INK_MUTED,
                   boxShadow: billing === b ? '0 1px 6px rgba(0,0,0,0.08)' : 'none',
                   outline: 'none',
@@ -483,7 +483,7 @@ export default function Paywall() {
                   width: 22,
                   height: 22,
                   borderRadius: '50%',
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: 'var(--paper)',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
                   transition: 'left 0.2s',
                 }}
@@ -763,7 +763,7 @@ export default function Paywall() {
                     gridTemplateColumns: '1fr 88px 88px',
                     padding: '12px 16px',
                     gap: 8,
-                    backgroundColor: i % 2 === 0 ? '#FFFFFF' : '#1A1A1A04',
+                    backgroundColor: i % 2 === 0 ? 'var(--paper)' : '#1A1A1A04',
                     borderTop: '1px solid #1A1A1A0A',
                   }}
                 >

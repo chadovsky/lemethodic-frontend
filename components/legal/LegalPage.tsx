@@ -18,7 +18,7 @@ import LandingFooter from '../landing/LandingFooter'
 import { BRAND } from '../landing/copy'
 import { DISPLAY_FONT, INK } from '../onboarding/OnboardingScreen'
 
-const PAGE_BG = '#FFFFFF'
+const PAGE_BG = 'var(--paper)'
 
 interface LegalPageProps {
   // Filename in docs/, e.g. "privacy-policy.md"

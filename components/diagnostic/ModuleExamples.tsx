@@ -38,7 +38,7 @@ export default function ModuleExamples({ examples }: Props) {
         <div
           key={i}
           style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--paper)',
             border: '1.5px solid #1A1A1A12',
             borderRadius: 14,
             padding: '14px 16px',

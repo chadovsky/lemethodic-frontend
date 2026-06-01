@@ -161,7 +161,7 @@ export default function InlineContentRef({ ref_ }: Props) {
       return (
         <div
           style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--paper)',
             border: '1.5px dashed #1A1A1A24',
             borderRadius: 14,
             padding: '14px 16px',

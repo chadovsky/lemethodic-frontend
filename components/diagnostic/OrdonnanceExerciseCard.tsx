@@ -23,7 +23,7 @@ export default function OrdonnanceExerciseCard({
   return (
     <div
       style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--paper)',
         border: '1.5px solid #1A1A1A12',
         borderRadius: 16,
         padding: '16px 16px',

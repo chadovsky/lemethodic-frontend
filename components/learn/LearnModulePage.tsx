@@ -277,7 +277,7 @@ export default function LearnModulePage({ moduleId }: Props) {
                   fontWeight: 600,
                   fontSize: 12,
                   color: INK_SOFT,
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: 'var(--paper)',
                   borderRadius: 100,
                   padding: '6px 12px',
                 }}
@@ -290,7 +290,7 @@ export default function LearnModulePage({ moduleId }: Props) {
           {/* Long-form description */}
           <div
             style={{
-              backgroundColor: '#FFFFFF',
+              backgroundColor: 'var(--paper)',
               borderRadius: 20,
               padding: '20px 20px',
             }}

@@ -1199,7 +1199,7 @@ function BottomBar({
         transform: 'translateX(-50%)',
         width: '100%',
         maxWidth: 440,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--paper)',
         borderTop: '1px solid #1A1A1A14',
         padding: '20px 24px calc(20px + var(--lm-safe-bottom)) 24px',
         zIndex: 30,

@@ -63,7 +63,7 @@ export default function LessonBody({ lesson }: LessonBodyProps) {
             height: 600,
             border: 'none',
             borderRadius: 12,
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--paper)',
           }}
         />
         <a

@@ -75,7 +75,7 @@ export default function SecondaryModulesList({ modules, detections }: Props) {
   return (
     <div
       style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--paper)',
         borderRadius: 20,
         overflow: 'hidden',
       }}

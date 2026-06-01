@@ -1,7 +1,7 @@
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 
-const INK       = '#14213D'
-const VERMILLON = '#C8102E'
+const INK       = 'var(--dominant)'
+const VERMILLON = 'var(--accent)'
 const INK_SOFT  = 'rgba(20, 33, 61, 0.62)'
 const PAPER     = '#FFFFFF'
 const RULE      = 'rgba(20, 33, 61, 0.10)'

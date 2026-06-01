@@ -41,7 +41,7 @@ function NumberCircle({ number, status }: { number: number; status: LessonStatus
   const isInProgress = status === 'in-progress'
   const isLocked     = status === 'locked'
 
-  const bg = isComplete ? CTA_BG : isInProgress ? '#FFFFFF' : '#1A1A1A10'
+  const bg = isComplete ? CTA_BG : isInProgress ? 'var(--paper)' : '#1A1A1A10'
   const border = isInProgress ? `2px solid ${CTA_BG}` : 'none'
   const color = isComplete ? '#FFFFFF' : isInProgress ? CTA_BG : INK_MUTED
 
