@@ -4558,7 +4558,7 @@ Milestone: M3
 **Priority:** HIGH
 **Status:** ✅ Shipped
 **Filed:** 2026-05-31
-**Shipped:** 2026-06-01
+**Shipped:** 2026-06-01 (df218f0)
 **Source:** SITEMAP.md /progres/clb: primary persona anchor surface
 **Scope:** Add `/progres/clb` page showing user's current CLB level per skill plus projected Express Entry points plus gap-to-target. Primary persona anchor.
 **Owner:** Frontend Engineering
