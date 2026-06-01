@@ -8,8 +8,8 @@
 //   - Today's Focus (medium, 2×1): TodayActionResponse → CTA
 //   - Bottleneck (small, 1×1): lowest-scoring scored couche
 //   - Streak (small, 1×1): placeholder until streak BE field lands
-//   - Per-couche row (4 cols wide): 5 small scored tiles incl. Voix
-//     unscored placeholder per V-009
+//   - Per-couche row (4 cols wide): 5 scored tiles; legacy recordings
+//     without la_voix show "–" graceful empty state
 //   - Recent activity (4 cols wide): RecordingSummary list
 //
 // Bento collapses at <lg to a 2-column variant; mobile <md uses the
@@ -63,7 +63,6 @@ const COPY = {
     streakLabel: 'Streak',
     streakComingSoon: 'Coming soon.',
     perCoucheLabel: 'Per-couche detail',
-    voixComingSoon: 'Coming soon',
     recentLabel: 'Recent activity',
     recentEmpty: 'No activity yet.',
     loadError: "Couldn't load your dashboard.",
@@ -82,7 +81,6 @@ const COPY = {
     streakLabel: 'Série',
     streakComingSoon: 'Bientôt.',
     perCoucheLabel: 'Détail par couche',
-    voixComingSoon: 'Bientôt',
     recentLabel: 'Activité récente',
     recentEmpty: 'Aucune activité pour le moment.',
     loadError: 'Impossible de charger le tableau de bord.',
@@ -141,7 +139,7 @@ export default function ProgressDashboardDesktop() {
     return map
   }, [latestCouches])
 
-  // Bottleneck = lowest-scoring scored couche (Voix excluded — unscored).
+  // Bottleneck = lowest-scoring couche across all 5 (including la_voix since V-009.be).
   const bottleneck = useMemo(() => {
     if (latestCouches.length === 0) return null
     return [...latestCouches].sort((a, b) => a.score - b.score)[0] ?? null
@@ -273,7 +271,6 @@ export default function ProgressDashboardDesktop() {
                 <Tile label={copy.perCoucheLabel}>
                   <PerCoucheRow
                     couchesByKey={couchesByKey}
-                    voixComingSoonLabel={copy.voixComingSoon}
                     language={language}
                   />
                 </Tile>
@@ -371,18 +368,19 @@ function EmptyMessage({ children }: { children: React.ReactNode }) {
 // ── Radar tile body ────────────────────────────────────────────────────────
 
 function RadarTile({ couches, language }: { couches: Couche[]; language: 'en' | 'fr' }) {
-  // Build a 5-axis dataset including Voix as unscored placeholder so the
-  // shape stays pentagonal regardless of BE scoring availability.
+  // Build a 5-axis dataset. Legacy recordings without la_voix score
+  // fall back to 0 on the radar axis; unscored flag preserves the
+  // pentagonal shape while signalling absence to the renderer.
   const data = useMemo(() => {
     const byKey = new Map<CoucheKey, number>()
     for (const c of couches) byKey.set(c.key, toPercent(c.score))
     return COUCHE_ORDER.map((key) => {
-      const score = byKey.get(key as CoucheKey) ?? 0
+      const score = byKey.get(key) ?? 0
       return {
         axis: BRAND_LABEL[key][language],
         user: score,
         target: 75,
-        unscored: !byKey.has(key as CoucheKey),
+        unscored: !byKey.has(key),
       }
     })
   }, [couches, language])
@@ -513,11 +511,9 @@ function DaysToExamBody({ days, language }: { days: number; language: 'en' | 'fr
 
 function PerCoucheRow({
   couchesByKey,
-  voixComingSoonLabel,
   language,
 }: {
   couchesByKey: Map<CoucheKey, Couche>
-  voixComingSoonLabel: string
   language: 'en' | 'fr'
 }) {
   return (
@@ -529,8 +525,7 @@ function PerCoucheRow({
       }}
     >
       {COUCHE_ORDER.map((key) => {
-        const isVoix = key === 'la_voix'
-        const c = isVoix ? null : couchesByKey.get(key as CoucheKey) ?? null
+        const c = couchesByKey.get(key) ?? null
         const score = c ? toPercent(c.score) : null
         const brand = BRAND_LABEL[key][language]
         return (
@@ -541,7 +536,6 @@ function PerCoucheRow({
               borderRadius: 4,
               border: `1px solid ${ED_RULE}`,
               backgroundColor: 'var(--lm-warm-cream)',
-              opacity: isVoix ? 0.6 : 1,
             }}
           >
             <p
@@ -556,11 +550,7 @@ function PerCoucheRow({
             >
               {brand}
             </p>
-            {isVoix ? (
-              <p style={{ fontFamily: SANS, fontSize: 11, color: ED_MUTED, margin: 0, fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                {voixComingSoonLabel}
-              </p>
-            ) : score !== null ? (
+            {score !== null ? (
               <p
                 style={{
                   fontFamily: SERIF,

@@ -241,7 +241,7 @@ export interface RecordingSummary {
 // Prononciation was historically a 5th defensive key; the F-088
 // `couches` response only carries the 4 official TCF criteria, so the
 // type was narrowed to match.
-export type CoucheKey = 'le_fond' | 'les_moules_des_idees' | 'les_moules' | 'les_reflexes_anglais'
+export type CoucheKey = 'le_fond' | 'les_moules_des_idees' | 'les_moules' | 'les_reflexes_anglais' | 'la_voix'
 
 export interface Couche {
   key: CoucheKey
@@ -650,10 +650,7 @@ export interface WritingPrompt {
 // still renders without crashing — the consumer is expected to fall back
 // to "Analysis pending" or skip the section per-couche.
 export interface WritingCoucheFeedback {
-  // ExtendedCoucheKey ('le_fond' | ... | 'la_voix') lives in
-  // lib/coucheBrandLabels.ts; inlined here to avoid a circular-import
-  // smell since coucheBrandLabels already imports from this file.
-  key: CoucheKey | 'la_voix'
+  key: CoucheKey
   score: number
   // Per-couche feedback. BE may emit it under either `analyse` (matches
   // diagnostic Couche convention) or `feedback` (writing-specific).
@@ -734,8 +731,8 @@ export interface WritingExamProfile {
 }
 
 // V-016a.dashboard — full rich feedback envelope. `methode_en_couches` is
-// the rich per-couche map (consumer reads keys via ExtendedCoucheKey via
-// coucheBrandLabels.ts); `exam_profile` carries the TCF rubric breakdown
+// the rich per-couche map (consumer reads keys via CoucheKey);
+// `exam_profile` carries the TCF rubric breakdown
 // and overall scoring. The narrative side-fields (summary, errors,
 // strengths, next_steps, next_step, tcf_canada_evaluation) are present
 // in the BE payload but not surfaced by the V-016a.dashboard UI pass —

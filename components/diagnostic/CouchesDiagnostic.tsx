@@ -16,9 +16,9 @@ const TRACK        = 'var(--lm-border-subtle)'
 const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 // ─── types ───────────────────────────────────────────────────────────────────
-// V-009 — `unscored` flag for the La Voix placeholder row. BE doesn't
-// score Voice today; consumers append an unscored row at the bottom of
-// the bars list with name + "Coming soon" badge instead of bar+score.
+// `unscored` flag: true for legacy recordings that predate V-009.be
+// scoring. Renders an empty track with a "–" placeholder instead of
+// bar + score.
 interface CoucheRow {
   name: string
   score: number
@@ -31,15 +31,12 @@ interface Props {
 }
 
 // ─── default mock data — sorted ascending (worst first) ──────────────────────
-// V-009 — extended to 5 brand-label rows (Aisance / Cohérence / Correction /
-// Étendue / Voix). Voix is unscored ("Coming soon" placeholder) until
-// V-009.be lands BE-side scoring.
 const DEFAULT_ROWS: CoucheRow[] = [
   { name: 'Aisance',    score: 45, cefr: 'A2' },
   { name: 'Cohérence',  score: 62, cefr: 'B2' },
   { name: 'Correction', score: 71, cefr: 'B2' },
   { name: 'Étendue',    score: 78, cefr: 'C1' },
-  { name: 'Voix',       score: 0,  cefr: '',   unscored: true },
+  { name: 'Voix',       score: 72, cefr: 'C1' },
 ]
 
 // ─── target band constants ────────────────────────────────────────────────────
@@ -80,9 +77,9 @@ function CoucheBarRow({ name, score, cefr, unscored, index, animate }: CoucheRow
         </span>
       </div>
 
-      {/* CENTER — bar track. V-009: unscored rows render only the empty
-          track (no fill, no dot, no target band) to signal "not yet
-          scored". The track stays for layout symmetry with scored rows. */}
+      {/* CENTER — bar track. Legacy recordings without la_voix scoring
+          render only the empty track (no fill, no dot, no target band).
+          The track stays for layout symmetry with scored rows. */}
       <div
         style={{
           flex: 1,
@@ -168,14 +165,12 @@ function CoucheBarRow({ name, score, cefr, unscored, index, animate }: CoucheRow
             style={{
               fontFamily: DISPLAY_FONT,
               fontWeight: 500,
-              fontSize: 10,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
+              fontSize: 15,
               color: INK_MUTED,
-              lineHeight: 1.2,
+              lineHeight: 1,
             }}
           >
-            Coming soon
+            &ndash;
           </span>
         ) : (
           <>

@@ -689,6 +689,7 @@ const KNOWN_COUCHE_KEYS: ReadonlySet<CoucheKey> = new Set<CoucheKey>([
   'les_moules_des_idees',
   'les_moules',
   'les_reflexes_anglais',
+  'la_voix',
 ])
 
 // Exposed so tests / future tickets can reuse the mapper without a round-trip.
@@ -696,9 +697,9 @@ export function mapDiagnosticBlock(
   recordingId: number,
   d: RawDiagnosticBlock,
 ): Diagnostic {
-  // F-088 — read the `couches` array directly. Backend always emits
-  // all 4 TCF couches in canonical order; defensive filter is here in
-  // case a legacy row ever lands without the field populated.
+  // F-088 — read the `couches` array directly. Backend emits up to 5
+  // couches (la_voix added by V-009.be); defensive filter drops any row
+  // with an unrecognised key or missing data.
   // P-100.5 / F-110.1 — read backend's `key` field uniformly (matches
   // mapRecordingSummary). `couches_array` dual-emits both `key` and
   // `internal_key` during the transition window, so reading `key`
