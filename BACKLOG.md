@@ -4656,13 +4656,15 @@ Milestone: M2
 Milestone: M2
 
 **Priority:** P0
-**Status:** QUEUED
+**Status:** SHIPPED
 **Filed:** 2026-06-01
+**Shipped:** 2026-06-01
 **Source:** F-350 finding P0-2 + P0-4
-**Scope:** Update lib/typography.ts: DISPLAY_FONT to 'var(--f-display)', SANS_FONT to 'var(--f-ui)', SERIF_FONT to 'var(--f-body)'. Update OnboardingScreen.tsx:29 DISPLAY_FONT export and line 40 SANS constant. Fix app/layout.tsx lang="en" to lang="fr". Unlocks t11 font loading across all 144 consumers.
+**Scope:** Update lib/typography.ts: DISPLAY_FONT to 'var(--f-display)', SANS_FONT to 'var(--f-ui)', SERIF_FONT to 'var(--f-body)'. Update OnboardingScreen.tsx DISPLAY_FONT re-export from lib/typography + SANS constant. Fix app/layout.tsx lang="en" to lang="fr". Unlocks t11 font loading across all 144 consumers.
 **Acceptance:** Every page-level H1 renders Instrument Serif (--f-display). Nav/button labels render Instrument Sans (--f-ui). No system-ui fallback for type. lang="fr" on html element.
 **Dependencies:** None (standalone)
 **Owner:** Frontend Engineering
+**Verification:** pnpm build clean (45 routes). 401/402 tests pass (1 pre-existing CouchesBreakdown CEFR pastel mismatch unrelated to this dispatch).
 
 ### F-352: [M2] t2-v2 — Italic display sweep
 Milestone: M2

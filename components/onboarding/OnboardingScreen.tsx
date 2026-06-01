@@ -17,28 +17,24 @@
 
 import Image from 'next/image'
 import { ReactNode } from 'react'
+import { SANS_FONT } from '@/lib/typography'
 
 // ── Legacy exports (preserved for unmigrated surfaces) ─────────────────────
-// Tied to Cabinet Grotesk / FluentPath palette. New onboarding chrome uses
-// the editorial system below; these exist only for backward compatibility
-// while F-2xx tickets migrate other consumers.
+export { DISPLAY_FONT } from '@/lib/typography'
 export const INK = 'var(--text-primary)'
 export const INK_SOFT = 'var(--text-secondary)'
 export const INK_MUTED = 'var(--text-muted)'
 export const PAPER = '#FFFFFFCC'
 export const CTA_DISABLED = '#1A1A1A4D'
-export const DISPLAY_FONT = 'var(--font-cabinet), "Cabinet Grotesk", -apple-system, "Segoe UI", system-ui, sans-serif'
 
-// ── Editorial chrome tokens (F-201 — local re-exports of lib/typography) ───
-// Inlined refs to CSS variables so primitives below don't need to import
-// from lib/typography on every render. Same values, locally-scoped names.
+// ── Editorial chrome tokens ─────────────────────────────────────────────────
 const ED_BG = 'var(--lm-bg-base)'
 const ED_FG = 'var(--lm-text-primary)'
 const ED_MUTED = 'var(--lm-text-tertiary)'
 const ED_RULE = 'var(--lm-border-subtle)'
 const ED_PAPER = 'var(--lm-bg-surface)'
 const ED_ACCENT = 'var(--cta-primary)'
-const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
+const SANS = SANS_FONT
 
 // ── Progress dots ─────────────────────────────────────────────────────────────
 

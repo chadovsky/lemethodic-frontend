@@ -1,11 +1,11 @@
-// M2 t6 — typography constants per DESIGN.md v1 canonical font stack.
-// Cabinet Grotesk (display/hero), Geist (UI/body), Source Serif 4 (lesson).
-// CSS variable indirection: a single source-of-truth swap in layout.tsx
-// touches every inline style={{...}} consumer consistently.
+// M2 t1-v2 — typography constants updated to DESIGN.md v2 Type A font stack.
+// Instrument Serif (display/hero), Crimson Pro (lesson body), Instrument Sans (FR UI),
+// Inter (EN UI), DM Mono (metadata). CSS variable indirection: a single source-of-truth
+// swap touches every inline style={{...}} consumer consistently.
 
-export const DISPLAY_FONT = 'var(--font-cabinet), "Cabinet Grotesk", -apple-system, "Segoe UI", system-ui, sans-serif'
-export const SANS_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
-export const SERIF_FONT = 'var(--font-source-serif), Georgia, "Times New Roman", serif'
+export const DISPLAY_FONT = 'var(--f-display), "Instrument Serif", Georgia, serif'
+export const SANS_FONT = 'var(--f-ui), "Instrument Sans", -apple-system, system-ui, sans-serif'
+export const SERIF_FONT = 'var(--f-body), "Crimson Pro", Georgia, "Times New Roman", serif'
 
 export const TYPE_SCALE = {
   caption: '0.875rem',  // 14px
@@ -19,9 +19,8 @@ export const TYPE_SCALE = {
   display: '6rem',      // 96px
 } as const
 
-// M2 t6 — semantic type scale per DESIGN.md v1.
-// display1/display2/h1: Cabinet Grotesk (upright grotesque — no italic).
-// h2: Geist, product heading weight. h3+: Geist throughout.
+// M2 t1-v2 — semantic type scale per DESIGN.md v2.
+// display1/display2/h1: Instrument Serif. h2+: Instrument Sans throughout.
 export const TYPE = {
   display1: {
     size: 'clamp(40px, 6vw, 88px)',
