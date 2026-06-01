@@ -4616,6 +4616,30 @@ Marketing milestones are tracked in detail in ROADMAP-marketing.md. Top-level re
 - MS-6, remaining exam landings (deferrable to post-soft-beta)
 - MS-7, /library store launch (deferrable to post-soft-beta)
 
+### F-348: [M2] Global CSS token wiring + legacy --lm-* alias
+Milestone: M2
+
+**Priority:** HIGH
+**Status:** SHIPPED (main 803da83 — tokens already present from M2 t10, 2026-05-30; dispatch confirmed all gates pass 2026-06-01)
+**Filed:** 2026-06-01
+**Source:** M2 dispatch — DESIGN.md v2 Palette A canonical tokens + dark mode block + legacy alias layer
+**Scope:** :root Palette A + .dark blocks in app/globals.css; @theme inline exposes canonical tokens as Tailwind utilities (bg-paper, text-ink, bg-dominant, bg-accent); --lm-* names aliased to canonical where mapping exists (--lm-bg-*, --lm-text-*, --lm-border-*, --lm-brand*, --lm-couche-*). Decorative and motion --lm-* with no canonical mapping kept at own values (--lm-success/warning/error/info, --lm-warm-peach/sage/pastel-*, --lm-ease*/duration*, --lm-safe-*, --lm-bg-blur).
+**Acceptance:** :root and .dark contain --paper/#FFFFFF, --ink/#0F1419, --dominant/#14213D, --accent/#C8102E (light) and --paper/#0E1626, --ink/#E5E9F0, --dominant/#38598F, --accent/#E23A54 (dark). @theme inline maps all four to --color-* Tailwind utilities. Build passes. Dark mode flips automatically.
+**Files:** app/globals.css (Tailwind v4 project -- no tailwind.config)
+**Branch:** main
+**Owner:** Frontend Engineering
+
+### F-349: [M2-followup] Migrate --lm-* usages to canonical token names
+Milestone: M2
+
+**Priority:** LOW
+**Status:** QUEUED
+**Filed:** 2026-06-01
+**Source:** F-348 alias layer; 823 --lm-* occurrences across 87 files remain
+**Scope:** Sweep all --lm-* references across the FE and replace with var(--paper), var(--ink), var(--dominant), var(--accent), var(--paper-tint), var(--paper-edge), var(--rule), var(--ink-soft), var(--ink-faint) as appropriate. Remove the alias block from app/globals.css when sweep is complete. Decorative tokens (--lm-pastel-*, --lm-warm-peach, --lm-warm-sage) and motion tokens (--lm-ease*, --lm-duration*) stay as-is unless a canonical replacement is defined first.
+**Dependencies:** F-348 (alias block must exist until sweep is complete)
+**Owner:** Frontend Engineering
+
 ---
 
 End of BACKLOG.md.
