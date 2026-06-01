@@ -4552,15 +4552,17 @@ Milestone: M3
 **Dependencies:** F-335
 **Owner:** Frontend Engineering + Chadi (content authoring)
 
-### F-337: [FE+BE] CLB mapping in Progres
+### F-337: [FE] CLB mapping in Progres
 Milestone: M3
 
 **Priority:** HIGH
-**Status:** 📋 Queued
+**Status:** ✅ Shipped
 **Filed:** 2026-05-31
+**Shipped:** 2026-06-01
 **Source:** SITEMAP.md /progres/clb: primary persona anchor surface
 **Scope:** Add `/progres/clb` page showing user's current CLB level per skill plus projected Express Entry points plus gap-to-target. Primary persona anchor.
 **Owner:** Frontend Engineering
+**Notes:** Gap-to-target UI omitted: no targetClb field in onboarding profile (q0_* fields are exam-type selection only). Listening/reading/writing always show "not yet assessed" -- app records expression orale only; other skills land when TCF Canada result wiring ships. IRCC CRS table source: F-337 dispatch (verified). Non-visual Playwright captures: deferred per F-225 debt.
 
 ### F-338: [FE] Dashboard widget expansion to Coursera density
 Milestone: M2
