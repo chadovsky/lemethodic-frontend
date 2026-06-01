@@ -3032,12 +3032,28 @@ Milestone: M2
 Milestone: M3
 
 **Priority:** HIGH (BE-side dependency for V-009 to render real Voice data instead of placeholder)
-**Status:** Queued (BE-side; lemethodic-backend ticket)
+**Status:** Shipped (BE commit 4fe3354, 2026-05-22)
 **Filed:** 2026-05-06
 **Source:** V-009 ship — FE renders Voix as "Coming soon" placeholder until BE scoring lands
 **Dependencies:** V-009 (FE-side surface ready)
-**Scope:** BE-side. Add `la_voix` to `CoucheKey` enum + scoring pipeline in `analysis.py` (or wherever the 4 existing couches are scored). Update `app/services/couche_labels.py` to emit brand labels (`displayLabelEn: "Voice"`, `displayLabelFr: "Voix"` for la_voix; same brand-label override for the other 4 couches so FE can drop its `BRAND_LABEL` override eventually). Diagnostic API response should return 5 couche scores once la_voix scoring is wired. La Voix scoring source: pronunciation/vowel-quality/liaison/rhythm metrics from the audio analysis pipeline (the existing speech-to-text + audio features could feed it). Scoring algorithm dimensions are a BE pedagogical pick — **no blocking owner input pending** (the 4 pedagogical decisions previously associated with V-009.be belonged to V-016a writing path; those shipped 2026-05-12 under V-016a + V-016a.fix).
+**Scope:** BE-side. Add `la_voix` to `CoucheKey` enum + scoring pipeline in `analysis.py`. BE now returns 5 couche scores including `la_voix` in the diagnostic `couches` array.
 **Owner:** Backend Engineering
+
+### V-009.be.fe — [FE] Unblock diagnostic 5th-couche after V-009.be
+Milestone: M3
+
+**Priority:** HIGH (5th couche still gated as "Coming soon" after BE ships scoring)
+**Status:** Shipped SHA TBD
+**Filed:** 2026-06-01
+**Source:** V-009.be shipped (BE 4fe3354) — FE gate removal needed
+**Dependencies:** V-009.be (BE scoring live)
+
+**Changes:**
+- `lib/types.ts` — `CoucheKey` extended with `'la_voix'` (was 4-key union)
+- `lib/api.ts` — `KNOWN_COUCHE_KEYS` adds `'la_voix'`; mapper now passes la_voix couche through to `Diagnostic.couches`
+- `lib/coucheBrandLabels.ts` — `ExtendedCoucheKey` removed; `BRAND_LABEL` + `COUCHE_ORDER` now typed as `CoucheKey` throughout
+- `components/diagnostic/CouchesDiagnostic.tsx` — "Coming soon" badge replaced with "–" graceful empty state for legacy recordings without la_voix; DEFAULT_ROWS mock updated with real score
+- `components/dashboard/ProgressDashboardDesktop.tsx` — `isVoix` special-casing removed from `PerCoucheRow`; `voixComingSoon` copy key removed; `PerCoucheRow` uses standard absent-score "–" path for legacy recordings; radar `key as CoucheKey` casts removed
 
 ### V-008 — [FE] Card 2 interference example direction reversed
 Milestone: M2
@@ -4772,6 +4788,29 @@ Milestone: M2-defer
 **Reference:** Docker Desktop dark + light screenshots provided 2026-06-01
 **Dependencies:** F-338 (functional shell, shipped); F-355 (DashboardGreeting hero gesture, queued)
 **Owner:** Chadi (founder design pass); Frontend Engineering (implementation once design locked)
+
+---
+
+## Phase 2 -- Web Performance Layer
+
+**SEO-L1** ✅ [FE] Layer 1 SEO + measurement scaffold -- SHA a061fbc (2026-06-01)
+- app/sitemap.ts: 8 public routes with EN/FR hreflang alternates
+- app/robots.ts: allows *, Googlebot, GPTBot, PerplexityBot, Google-Extended, ClaudeBot; disallows all app/auth routes
+- components/seo/JsonLd.tsx: Organization + Course + FAQPage (5 items, schema.org JSON-LD)
+- components/analytics/Plausible.tsx: Plausible script gated on NEXT_PUBLIC_PLAUSIBLE_DOMAIN
+- app/layout.tsx: metadataBase (https://lemethodic.com), robots default, Twitter card, Plausible wired
+- app/(app)/layout.tsx: robots noindex/nofollow group-level for all authenticated routes
+- Hreflang x-default added to /, /fr, /library, /fr/library
+- .env.example: NEXT_PUBLIC_PLAUSIBLE_DOMAIN + NEXT_PUBLIC_OG_IMAGE documented
+- Discovery: i18n is manual file-system routing (no Next.js i18n config); 2 EN/FR pairs exist; html lang="fr" hardcoded in root layout (needs i18n routing ticket to fix properly); no OG image yet (place public/og-default.jpg + set NEXT_PUBLIC_OG_IMAGE to activate)
+- Title template deferred: all 20+ existing pages use full branded titles; migration requires each to use { absolute: '...' } (follow-up ticket)
+- Build: green (48 routes). Tests: 425/426 (1 pre-existing CouchesBreakdown token regression, unrelated)
+
+**SEO-L1-FOLLOW** 📋 [FE] SEO follow-up items (deferred from SEO-L1)
+- OG image: create public/og-default.jpg (1200x630) and set NEXT_PUBLIC_OG_IMAGE on Vercel
+- Title template: migrate all page titles to short form + { absolute } so root layout template applies
+- html lang: fix root layout lang="fr" once i18n routing is added (requires next.config.mjs i18n or middleware)
+- Fathom: if founder prefers Fathom over Plausible, swap NEXT_PUBLIC_PLAUSIBLE_DOMAIN for FATHOM_SITE_ID in components/analytics/Plausible.tsx
 
 ---
 
