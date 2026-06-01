@@ -4747,4 +4747,30 @@ Milestone: M2
 
 ---
 
+### M-DASHBOARD: [M2-defer, FOUNDER-LED] Dashboard + global nav architectural redesign
+Milestone: M2-defer
+
+**Priority:** HIGH
+**Status:** QUEUED for Chadi design pass
+**Filed:** 2026-06-01
+**Source:** Founder direction 2026-06-01; Docker Desktop dark + light screenshots as visual reference
+**Constraint:** FOUNDER-LED. Agent does NOT make aesthetic decisions on this ticket.
+**Scope:**
+- Resolve dual-nav: sidebar (global nav) vs top bar (contextual?) currently read as competing systems; reconcile into one coherent hierarchy or visually differentiate with clear ownership
+- Resolve "Methode" naming collision: top bar label = TCF prep section; sidebar label = La Methode product. Same word, different referents. Needs a naming resolution before redesign can land.
+- Holistic redesign of /dashboard: structured widgets inviting study and practice; current 5-widget functional shell (F-338, SHA 72424f9) to be revisited as part of the redesign
+- Visual treatment informed by Docker Desktop inspiration (2026-06-01 screenshots):
+  * Icon style and sizing
+  * Font choices (clean, modern, readable)
+  * Line spacing and vertical rhythm
+  * Dark + light mode palette balance
+  * UI component scales
+  * Top search bar (Ctrl+K style command palette)
+  * Notification icon with badge
+**Reference:** Docker Desktop dark + light screenshots provided 2026-06-01
+**Dependencies:** F-338 (functional shell, shipped); F-355 (DashboardGreeting hero gesture, queued)
+**Owner:** Chadi (founder design pass); Frontend Engineering (implementation once design locked)
+
+---
+
 End of BACKLOG.md.
