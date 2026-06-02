@@ -11,20 +11,20 @@ test.describe('Landing footer — desktop (1280×800)', () => {
     await expect(page.getByTestId('footer-column')).toHaveCount(3)
   })
 
-  test('ToS link navigates to /legal/tos', async ({ page }) => {
+  test('Mentions légales link navigates to /mentions-legales', async ({ page }) => {
     await page.goto('/')
-    const link = page.getByRole('link', { name: /terms of service/i })
+    const link = page.getByRole('link', { name: /mentions légales/i })
     await link.scrollIntoViewIfNeeded()
     await link.click()
-    await expect(page).toHaveURL(/\/legal\/tos/, { timeout: 15_000 })
+    await expect(page).toHaveURL(/\/mentions-legales/, { timeout: 15_000 })
   })
 
-  test('Privacy link navigates to /legal/privacy', async ({ page }) => {
+  test('Politique de confidentialité link navigates to /confidentialite', async ({ page }) => {
     await page.goto('/')
-    const link = page.getByRole('link', { name: /privacy policy/i })
+    const link = page.getByRole('link', { name: /politique de confidentialité/i })
     await link.scrollIntoViewIfNeeded()
     await link.click()
-    await expect(page).toHaveURL(/\/legal\/privacy/, { timeout: 15_000 })
+    await expect(page).toHaveURL(/\/confidentialite/, { timeout: 15_000 })
   })
 
   test('sticky header is visible after scrolling to bottom', async ({ page }) => {

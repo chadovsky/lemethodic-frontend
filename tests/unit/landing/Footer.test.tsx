@@ -23,16 +23,22 @@ describe('Footer', () => {
     expect(screen.getByTestId('footer-copyright')).toHaveTextContent('© 2026 Le Méthodic')
   })
 
-  it('ToS link points to /legal/tos', () => {
+  it('Mentions légales link points to /mentions-legales', () => {
     render(<Footer />)
-    const tos = screen.getByRole('link', { name: /terms of service/i })
-    expect(tos).toHaveAttribute('href', '/legal/tos')
+    const mentions = screen.getByRole('link', { name: /mentions légales/i })
+    expect(mentions).toHaveAttribute('href', '/mentions-legales')
   })
 
-  it('Privacy link points to /legal/privacy', () => {
+  it('Politique de confidentialité link points to /confidentialite', () => {
     render(<Footer />)
-    const privacy = screen.getByRole('link', { name: /privacy policy/i })
-    expect(privacy).toHaveAttribute('href', '/legal/privacy')
+    const privacy = screen.getByRole('link', { name: /politique de confidentialité/i })
+    expect(privacy).toHaveAttribute('href', '/confidentialite')
+  })
+
+  it('CGV link points to /cgv', () => {
+    render(<Footer />)
+    const cgv = screen.getByRole('link', { name: /cgv/i })
+    expect(cgv).toHaveAttribute('href', '/cgv')
   })
 
   it('has a contentinfo landmark', () => {

@@ -59,13 +59,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     },
     {
-      url: `${BASE}/privacy`,
+      url: `${BASE}/mentions-legales`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.2,
     },
     {
-      url: `${BASE}/terms`,
+      url: `${BASE}/confidentialite`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.2,
+    },
+    {
+      url: `${BASE}/cgv`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.2,

@@ -61,6 +61,12 @@ const nextConfig = {
       { source: '/fr/exam-prep', destination: '/fr', permanent: true },
       { source: '/fr/exam-prep/:path*', destination: '/fr/:path*', permanent: true },
 
+      // F-370: legal route migration to canonical French paths (308 permanent).
+      { source: '/terms', destination: '/mentions-legales', permanent: true },
+      { source: '/terms/:path*', destination: '/mentions-legales/:path*', permanent: true },
+      { source: '/privacy', destination: '/confidentialite', permanent: true },
+      { source: '/privacy/:path*', destination: '/confidentialite/:path*', permanent: true },
+
       // /vocabulaire -> /bibliotheque (updated: skip the legacy /la-bibliotheque hop)
       { source: '/vocabulaire', destination: '/bibliotheque', permanent: true },
       { source: '/vocabulaire/:path*', destination: '/bibliotheque/:path*', permanent: true },

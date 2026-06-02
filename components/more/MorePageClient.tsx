@@ -315,8 +315,8 @@ export default function MorePageClient() {
         <Section id="about" title={copy.sections.about}>
           <Row label={copy.about.version} value={APP_VERSION} />
           <RowLink label={copy.about.support} href={`mailto:${SUPPORT_EMAIL}`} value={SUPPORT_EMAIL} external />
-          <RowLink label={copy.about.terms} href="/terms" />
-          <RowLink label={copy.about.privacy} href="/privacy" />
+          <RowLink label={copy.about.terms} href="/mentions-legales" />
+          <RowLink label={copy.about.privacy} href="/confidentialite" />
           <RowLink label={copy.about.refund} href="/refund" />
         </Section>
       </div>

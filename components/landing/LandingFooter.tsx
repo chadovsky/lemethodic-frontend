@@ -78,8 +78,8 @@ export default function LandingFooter({ lang }: LandingFooterProps) {
               // /fr/tcf-canada not yet built (MS-1); /fr until it ships (F-340)
               { href: lang === 'fr' ? '/fr' : '/tcf-canada', label: copy.examPrep },
               { href: '/library', label: copy.library },
-              { href: '/privacy', label: copy.privacy },
-              { href: '/terms', label: copy.terms },
+              { href: '/confidentialite', label: copy.privacy },
+              { href: '/mentions-legales', label: copy.terms },
               { href: '/refund', label: copy.refund },
             ].map(({ href, label }) => (
               <Link
