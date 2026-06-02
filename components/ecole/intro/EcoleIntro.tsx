@@ -297,7 +297,7 @@ export default function EcoleIntro() {
           padding: 'var(--lm-safe-top) clamp(16px, 3vw, 32px) 0',
         }}
       >
-        <Wordmark size="nav" href="/cours/methode-tcf-canada" />
+        <Wordmark size="nav" href="/la-methode" />
       </header>
 
       {/* ── Section 1 — Frame ─────────────────────────────────────── */}
@@ -775,7 +775,7 @@ export default function EcoleIntro() {
           </p>
           <button
             type="button"
-            onClick={() => router.push('/cours/methode-tcf-canada')}
+            onClick={() => router.push('/la-methode')}
             className="ed-btn-press"
             style={{
               fontFamily: SANS,

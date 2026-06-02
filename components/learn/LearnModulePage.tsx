@@ -144,7 +144,7 @@ export default function LearnModulePage({ moduleId }: Props) {
         message={loadError}
         onRetry={() => setRetryKey((k) => k + 1)}
         backLabel={copy.backToEcole}
-        onBack={() => router.push('/cours/methode-tcf-canada')}
+        onBack={() => router.push('/la-methode')}
       />
     )
   }
@@ -335,7 +335,7 @@ export default function LearnModulePage({ moduleId }: Props) {
               <>
                 <button
                   type="button"
-                  onClick={() => router.push(`/cours/methode-tcf-canada/lecon-${linkedLessonNumber}`)}
+                  onClick={() => router.push(`/la-methode/lecon-${linkedLessonNumber}`)}
                   style={{
                     width: '100%',
                     minHeight: 56,
@@ -385,7 +385,7 @@ export default function LearnModulePage({ moduleId }: Props) {
             ) : (
               <button
                 type="button"
-                onClick={() => router.push('/cours/methode-tcf-canada')}
+                onClick={() => router.push('/la-methode')}
                 style={{
                   width: '100%',
                   minHeight: 56,

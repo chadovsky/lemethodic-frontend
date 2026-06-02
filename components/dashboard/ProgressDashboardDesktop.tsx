@@ -230,7 +230,7 @@ export default function ProgressDashboardDesktop() {
                   cta={
                     data.today
                       ? {
-                          href: '/cours/methode-tcf-canada',
+                          href: '/la-methode',
                           label: copy.todayCta,
                         }
                       : null

@@ -7,8 +7,8 @@ test.describe('Auth flow — redirect gate', () => {
     await expect(page).toHaveURL('/')
   })
 
-  test('unauthenticated visitor on /cours/methode-tcf-canada is redirected to /', async ({ page }) => {
-    await page.goto('/cours/methode-tcf-canada')
+  test('unauthenticated visitor on /la-methode is redirected to /', async ({ page }) => {
+    await page.goto('/la-methode')
     await expect(page).toHaveURL('/')
   })
 
@@ -23,9 +23,9 @@ test.describe('Auth flow — redirect gate', () => {
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
   })
 
-  test('authenticated user on /cours/methode-tcf-canada sees the app shell', async ({ page }) => {
+  test('authenticated user on /la-methode sees the app shell', async ({ page }) => {
     await injectAuthToken(page)
-    await page.goto('/cours/methode-tcf-canada')
+    await page.goto('/la-methode')
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
   })
 

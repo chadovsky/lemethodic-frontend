@@ -41,6 +41,10 @@ const nextConfig = {
       { source: '/profile', destination: '/profil', permanent: true },
       { source: '/profile/:path*', destination: '/profil/:path*', permanent: true },
 
+      // /account -> /profil (F-372: /account stub had no unique content vs /profil)
+      { source: '/account', destination: '/profil', permanent: true },
+      { source: '/account/:path*', destination: '/profil/:path*', permanent: true },
+
       // Auth surfaces
       { source: '/signup', destination: '/inscription', permanent: true },
       { source: '/login', destination: '/connexion', permanent: true },

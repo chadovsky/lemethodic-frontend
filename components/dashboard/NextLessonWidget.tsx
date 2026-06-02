@@ -106,7 +106,7 @@ export default function NextLessonWidget() {
           </p>
 
           <Link
-            href={`/cours/methode-tcf-canada/lecon-${lesson.lessonNumber}`}
+            href={`/la-methode/lecon-${lesson.lessonNumber}`}
             className="ed-btn-press"
             style={{
               alignSelf: 'flex-start',

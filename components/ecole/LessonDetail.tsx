@@ -21,9 +21,9 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' && lesson.lessonNumber < TOTAL_LESSONS) {
-        router.push(`/cours/methode-tcf-canada/lecon-${lesson.lessonNumber + 1}`)
+        router.push(`/la-methode/lecon-${lesson.lessonNumber + 1}`)
       } else if (e.key === 'ArrowLeft' && lesson.lessonNumber > 1) {
-        router.push(`/cours/methode-tcf-canada/lecon-${lesson.lessonNumber - 1}`)
+        router.push(`/la-methode/lecon-${lesson.lessonNumber - 1}`)
       }
     }
     window.addEventListener('keydown', handler)
@@ -35,7 +35,7 @@ export default function LessonDetail({ lesson }: { lesson: Lesson }) {
       <Breadcrumb
         testId="lesson-breadcrumb"
         items={[
-          { label: "La Méthode", href: '/cours/methode-tcf-canada' },
+          { label: "La Méthode", href: '/la-methode' },
           { label: `Leçon ${lesson.lessonNumber} : ${lesson.title}` },
         ]}
       />

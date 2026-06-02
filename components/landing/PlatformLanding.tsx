@@ -150,7 +150,7 @@ export default function PlatformLanding({ lang }: Props) {
   // otherwise → /onboarding to finish (or resume) the questionnaire.
   useEffect(() => {
     if (hydrated && token && verified) {
-      router.replace(user?.targetLevel ? '/cours/methode-tcf-canada' : '/onboarding')
+      router.replace(user?.targetLevel ? '/la-methode' : '/onboarding')
     }
   }, [hydrated, token, verified, user, router])
   useEffect(() => {

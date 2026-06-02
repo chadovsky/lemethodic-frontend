@@ -378,7 +378,7 @@ export default function EcoleDesktop() {
                       {nextLesson.title}
                     </p>
                     <Link
-                      href={`/cours/methode-tcf-canada/lecon-${nextLesson.lessonNumber}`}
+                      href={`/la-methode/lecon-${nextLesson.lessonNumber}`}
                       className="ed-cta-warm-hover ed-btn-press"
                       style={{
                         display: 'inline-flex',
@@ -594,7 +594,7 @@ function LessonCard({ lesson, copy }: LessonCardProps) {
   )
   if (isLocked) return card
   return (
-    <Link href={`/cours/methode-tcf-canada/lecon-${lesson.lessonNumber}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+    <Link href={`/la-methode/lecon-${lesson.lessonNumber}`} style={{ textDecoration: 'none', color: 'inherit' }}>
       {card}
     </Link>
   )

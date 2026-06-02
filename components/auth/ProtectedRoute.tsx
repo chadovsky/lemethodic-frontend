@@ -24,7 +24,13 @@ import { useVerifyAuth } from '@/hooks/useVerifyAuth'
 
 const LOADER_BG = 'var(--lm-pastel-peach)' // peach, matches /onboarding so the redirect is seamless
 
-export default function ProtectedRoute({ children }: { children: ReactNode }) {
+export default function ProtectedRoute({
+  children,
+  redirectTo = '/',
+}: {
+  children: ReactNode
+  redirectTo?: string
+}) {
   const router = useRouter()
   const token = useAuthStore((s) => s.token)
   const hydrated = useAuthStore((s) => s.hydrated)
@@ -42,9 +48,9 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (hydrated && !token) {
-      router.replace('/')
+      router.replace(redirectTo)
     }
-  }, [hydrated, token, router])
+  }, [hydrated, token, router, redirectTo])
 
   if (!hydrated || !token || !verified) {
     return <div style={{ minHeight: '100dvh', backgroundColor: LOADER_BG }} />

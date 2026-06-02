@@ -68,7 +68,7 @@ export default function LessonCard({ lesson }: { lesson: Lesson }) {
 
   return (
     <Link
-      href={`/cours/methode-tcf-canada/lecon-${lesson.lessonNumber}`}
+      href={`/la-methode/lecon-${lesson.lessonNumber}`}
       data-testid="lesson-card"
       data-lesson-id={lesson.lessonNumber}
       data-lesson-state={vs}

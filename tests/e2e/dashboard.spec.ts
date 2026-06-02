@@ -115,7 +115,7 @@ test.describe('Dashboard — desktop (1280×800)', () => {
     await page.goto('/dashboard')
     await expect(page.getByTestId('next-lesson-title')).toBeVisible()
     const link = page.getByRole('link', { name: /reprendre/i })
-    await expect(link).toHaveAttribute('href', '/cours/methode-tcf-canada/lecon-2')
+    await expect(link).toHaveAttribute('href', '/la-methode/lecon-2')
   })
 
   test('calendar widget renders the month grid', async ({ page }) => {

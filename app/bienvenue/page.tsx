@@ -343,7 +343,7 @@ function BienvenueForm() {
 
 export default function BienvenuePage() {
   return (
-    <ProtectedRoute>
+    <ProtectedRoute redirectTo="/inscription">
       <BienvenueForm />
     </ProtectedRoute>
   )

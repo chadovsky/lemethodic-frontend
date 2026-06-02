@@ -23,7 +23,7 @@ export default function LessonNav({ currentId }: { currentId: number }) {
       {prevNumber !== null ? (
         <NavLink
           testId="lesson-nav-prev"
-          href={`/cours/methode-tcf-canada/lecon-${prevNumber}`}
+          href={`/la-methode/lecon-${prevNumber}`}
           direction="prev"
           lessonNumber={prevNumber}
         />
@@ -33,7 +33,7 @@ export default function LessonNav({ currentId }: { currentId: number }) {
       {nextNumber !== null ? (
         <NavLink
           testId="lesson-nav-next"
-          href={`/cours/methode-tcf-canada/lecon-${nextNumber}`}
+          href={`/la-methode/lecon-${nextNumber}`}
           direction="next"
           lessonNumber={nextNumber}
         />

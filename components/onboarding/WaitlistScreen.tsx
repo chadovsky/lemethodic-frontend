@@ -142,7 +142,7 @@ export default function WaitlistScreen() {
   // submit response, send them to /ecole — they shouldn't see this screen.
   useEffect(() => {
     if (!response || !response.waitlist) {
-      router.replace('/cours/methode-tcf-canada')
+      router.replace('/la-methode')
     }
   }, [response, router])
 

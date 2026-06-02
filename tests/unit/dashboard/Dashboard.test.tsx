@@ -111,7 +111,7 @@ describe('Dashboard', () => {
     render(<Dashboard />)
     await waitFor(() => {
       const cta = screen.getByRole('link', { name: /reprendre/i })
-      expect(cta).toHaveAttribute('href', '/cours/methode-tcf-canada/lecon-3')
+      expect(cta).toHaveAttribute('href', '/la-methode/lecon-3')
     })
   })
 })
