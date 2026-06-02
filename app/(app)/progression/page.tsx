@@ -1,4 +1,4 @@
-// P-230 — /progress is the Overall Progress dashboard.
+// P-230 — /progression is the Overall Progress dashboard.
 // V-015d — desktop ≥md gets ProgressDashboardDesktop bento; mobile <md
 // keeps the existing ProgressDashboard stacked layout (gates via
 // fp-mobile-only / fp-desktop-only in globals.css).
@@ -7,7 +7,7 @@ import ProgressDashboard from '@/components/dashboard/ProgressDashboard'
 import ProgressDashboardDesktop from '@/components/dashboard/ProgressDashboardDesktop'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
-export default function ProgressPage() {
+export default function ProgressionPage() {
   return (
     <ProtectedRoute>
       <div className="fp-mobile-only">

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
@@ -84,7 +84,7 @@ export default function EndOfDeck({ total, onRestart }: EndOfDeckProps) {
         </button>
         <Link
           data-testid="end-of-deck-back-to-list"
-          href="/la-bibliotheque"
+          href="/bibliotheque"
           className="ed-btn-press"
           style={{
             minHeight: 48,

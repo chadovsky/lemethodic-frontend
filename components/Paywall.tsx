@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // F-VISUAL-001 X.3.1 — paywall audit. All chrome (text, bg, rule,
 // CTA) was already consuming var(--ed-*) tokens, which X.1 aliased
@@ -162,7 +162,7 @@ export default function Paywall() {
   }
 
   const handleStartTrial = () => {
-    router.push('/signup?trial=true')
+    router.push('/inscription?trial=true')
   }
 
   // TODO(F-060): revisit whether "skipped trial" still needs to create an
@@ -170,7 +170,7 @@ export default function Paywall() {
   // through /signup with trial=false preserves the user's preference so
   // Stripe wiring can pick it up later.
   const handleMaybeLater = () => {
-    router.push('/signup?trial=false')
+    router.push('/inscription?trial=false')
   }
 
   const isAnnual = billing === 'annual'

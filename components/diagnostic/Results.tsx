@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import Breadcrumb from '@/components/common/Breadcrumb'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
 import { CEFR_PASTEL_MAP } from '@/lib/data/cefr'
@@ -27,7 +27,7 @@ export default function Results() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 40, paddingTop: 8 }}>
       <Breadcrumb
         items={[
-          { label: "L'Examen", href: '/l-examen' },
+          { label: "L'Examen", href: '/examen' },
           { label: 'Résultats' },
         ]}
       />
@@ -124,7 +124,7 @@ export default function Results() {
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', paddingTop: 8 }}>
         <Link
           data-testid="results-action-recommencer"
-          href="/l-examen/diagnostic/tache/1"
+          href="/maitre/diagnostic/tache/1"
           className="ed-btn-press"
           style={{
             fontFamily: SANS_FONT,
@@ -160,7 +160,7 @@ export default function Results() {
         </Link>
         <Link
           data-testid="results-action-dashboard"
-          href="/dashboard"
+          href="/carte"
           className="ed-btn-press"
           style={{
             fontFamily: SANS_FONT,

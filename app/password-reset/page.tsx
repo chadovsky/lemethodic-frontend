@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // F-310.fe.reset — /password-reset.
 //
@@ -68,7 +68,7 @@ function PasswordResetInner() {
       >
         Remember it now?{' '}
         <Link
-          href="/login"
+          href="/connexion"
           style={{
             color: 'var(--lm-text-primary)',
             fontWeight: 600,
@@ -249,7 +249,7 @@ function ConfirmForm({ token }: { token: string }) {
     try {
       await api.auth.passwordResetConfirm(token, newPassword)
       setDone(true)
-      setTimeout(() => router.push('/login'), 2000)
+      setTimeout(() => router.push('/connexion'), 2000)
     } catch (err) {
       setError(
         err instanceof ApiError

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -67,7 +67,7 @@ export default function PastScorePanel() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <Link
           data-testid="diagnostic-past-score-link"
-          href="/l-examen/diagnostic/results"
+          href="/maitre/diagnostic/results"
           className="ed-btn-press"
           style={{
             padding: '10px 16px',

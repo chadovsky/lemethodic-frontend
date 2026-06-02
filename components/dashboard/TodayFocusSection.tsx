@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // P-230 — Today's focus (Block 5 Dialogue Box). The single tutor-voice card
 // that says "do this right now."
@@ -139,11 +139,11 @@ function resolveCta(action: ActionBlock): { href: string; label: string } {
       }
       if (action.tache_application) {
         const n = action.tache_application.replace('tache_', '')
-        return { href: `/l-examen/expression-orale/tache-${n}`, label: 'Start practice' }
+        return { href: `/examen/expression-orale/tache-${n}`, label: 'Start practice' }
       }
-      return { href: '/l-examen/expression-orale', label: 'Start practice' }
+      return { href: '/examen/expression-orale', label: 'Start practice' }
     case 'free_practice':
-      return { href: '/l-examen/expression-orale', label: 'Open Speaking' }
+      return { href: '/examen/expression-orale', label: 'Open Speaking' }
     case 'path_complete':
       return { href: '/cours/methode-tcf-canada', label: 'Browse modules' }
     case 'no_path':

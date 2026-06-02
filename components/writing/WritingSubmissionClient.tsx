@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // V-013a — Writing submission view + result. Single-page state machine:
 // idle → submitting → result. Fetches the prompt by id, renders prompt_fr
@@ -356,7 +356,7 @@ export default function WritingSubmissionClient({ promptId }: Props) {
       <div style={{ maxWidth: 720, margin: '0 auto', padding: 'clamp(20px, 3vw, 32px) clamp(16px, 4vw, 32px) 96px' }}>
         {/* Back link */}
         <Link
-          href="/l-examen/expression-ecrite"
+          href="/examen/expression-ecrite"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -1311,7 +1311,7 @@ function NotFoundState({ message, backLabel }: { message: string; backLabel: str
     <div role="alert" style={{ padding: '48px 16px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
       <h1 style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 28, color: ED_FG, margin: 0 }}>{message}</h1>
       <Link
-        href="/l-examen/expression-ecrite"
+        href="/examen/expression-ecrite"
         style={{
           fontFamily: SANS,
           fontWeight: 600,

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
@@ -40,7 +40,7 @@ export default function Quiz() {
       <header style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <Link
           data-testid="quiz-back-to-list"
-          href="/la-bibliotheque"
+          href="/bibliotheque"
           style={{
             fontFamily: SANS_FONT,
             fontWeight: 500,

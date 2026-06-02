@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -210,7 +210,7 @@ export default function Tache3Session({ topicSlug }: Tache3SessionProps) {
             onClick={() => {
               if (confirm('End this session?')) {
                 recorder.reset()
-                router.push('/l-examen/expression-orale')
+                router.push('/examen/expression-orale')
               }
             }}
             aria-label="Go back"

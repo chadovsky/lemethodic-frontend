@@ -9,7 +9,7 @@ const PLACEHOLDER_EXERCISES = [
   { label: 'Documents sonores courts', desc: '30 secondes, QCM' },
   { label: 'Documents sonores longs', desc: '3 à 5 minutes, QCM' },
   { label: 'Monologues et dialogues', desc: 'Compréhension contextuelle' },
-  { label: 'Annonces et messages', desc: 'Repérage d\'informations' },
+  { label: 'Annonces et messages', desc: "Repérage d'informations" },
 ]
 
 export const metadata = {

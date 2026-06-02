@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // F-310.fe.verify — /verify-email landing.
 //
@@ -33,17 +33,17 @@ type ConfirmState =
 // behavior, so the change can only ADD a useful redirect, never break
 // the existing path.
 function safeNextPath(raw: string | null): string {
-  if (!raw) return '/login'
+  if (!raw) return '/connexion'
   let decoded: string
   try {
     decoded = decodeURIComponent(raw)
   } catch {
-    return '/login'
+    return '/connexion'
   }
-  if (!decoded.startsWith('/')) return '/login'
-  if (decoded.startsWith('//')) return '/login'
-  if (decoded.includes('://')) return '/login'
-  if (decoded.startsWith('/verify-email')) return '/login'
+  if (!decoded.startsWith('/')) return '/connexion'
+  if (decoded.startsWith('//')) return '/connexion'
+  if (decoded.includes('://')) return '/connexion'
+  if (decoded.startsWith('/verify-email')) return '/connexion'
   return decoded
 }
 
@@ -150,7 +150,7 @@ function VerifyEmailInner() {
       >
         Already verified?{' '}
         <Link
-          href="/login"
+          href="/connexion"
           style={{
             color: 'var(--lm-text-primary)',
             fontWeight: 600,

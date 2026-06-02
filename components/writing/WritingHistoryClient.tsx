@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // V-013a — Writing history list. Calls api.writing.history(); if BE
 // returns 404 (endpoint not yet shipped), renders empty state with
@@ -69,7 +69,7 @@ export default function WritingHistoryClient() {
     <div className="ed-page-enter" style={{ minHeight: '100dvh', backgroundColor: ED_BG, fontFamily: SANS }}>
       <div style={{ maxWidth: 720, margin: '0 auto', padding: 'clamp(20px, 3vw, 32px) clamp(16px, 4vw, 32px) 96px' }}>
         <Link
-          href="/l-examen/expression-ecrite"
+          href="/examen/expression-ecrite"
           style={{
             display: 'inline-flex',
             alignItems: 'center',

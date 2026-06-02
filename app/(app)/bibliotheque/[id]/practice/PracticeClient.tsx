@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // F-VISUAL-001 X.4.3 — flashcard 3D flip motion added to FlashcardView
 // below. perspective wrapper + transform-style: preserve-3d on the card
@@ -148,7 +148,7 @@ export default function PracticeClient({ slug }: { slug: string }) {
     >
       <div className="mx-auto max-w-2xl px-5 md:px-8 py-10 md:py-14 lg:py-16">
         <Link
-          href={`/la-bibliotheque/${encodeURIComponent(slug)}`}
+          href={`/bibliotheque/${encodeURIComponent(slug)}`}
           className="ed-btn-press inline-flex items-center gap-1.5 mb-6"
           style={{
             fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
@@ -668,7 +668,7 @@ function SessionEndCard({
           {copy.practice.practiceAgain}
         </button>
         <Link
-          href={`/la-bibliotheque/${encodeURIComponent(slug)}`}
+          href={`/bibliotheque/${encodeURIComponent(slug)}`}
           className="ed-btn-press"
           style={{
             height: 44,
@@ -688,7 +688,7 @@ function SessionEndCard({
           {copy.practice.backToTopic}
         </Link>
         <Link
-          href="/la-bibliotheque"
+          href="/bibliotheque"
           className="ed-btn-press"
           style={{
             height: 44,

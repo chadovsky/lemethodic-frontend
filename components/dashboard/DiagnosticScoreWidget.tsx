@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 import { DIAGNOSTIC_SCORE } from '@/lib/data/dashboard'
 
@@ -58,7 +58,7 @@ export default function DiagnosticScoreWidget() {
       </div>
 
       <Link
-        href="/l-examen"
+        href="/examen"
         className="ed-btn-press"
         style={{
           alignSelf: 'flex-start',

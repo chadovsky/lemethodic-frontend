@@ -26,8 +26,8 @@ const SERIF = 'var(--font-source-serif), Georgia, serif'
 // Routes that should NOT render the in-product top nav. Marketing,
 // conversion funnel, legal, and auth surfaces have their own chrome.
 const EXCLUDED_PREFIXES = [
-  '/signup',
-  '/login',
+  '/inscription',
+  '/connexion',
   '/onboarding',
   '/paywall',
   '/privacy',
@@ -81,9 +81,9 @@ const COPY = {
 
 const NAV_LINKS = [
   { key: 'ecole' as const, href: '/la-methode', match: ['/la-methode', '/cluster', '/learn'] },
-  { key: 'speaking' as const, href: '/l-examen/expression-orale', match: ['/l-examen/expression-orale'] },
-  { key: 'writing' as const, href: '/l-examen/expression-ecrite', match: ['/l-examen/expression-ecrite'] },
-  { key: 'progress' as const, href: '/progress', match: ['/progress', '/l-examen'] },
+  { key: 'speaking' as const, href: '/examen/expression-orale', match: ['/examen/expression-orale'] },
+  { key: 'writing' as const, href: '/examen/expression-ecrite', match: ['/examen/expression-ecrite'] },
+  { key: 'progress' as const, href: '/progression', match: ['/progression', '/examen'] },
 ] as const
 
 function isLinkActive(href: string, match: readonly string[], pathname: string): boolean {

@@ -17,8 +17,8 @@ const MARKETING_EXACT: ReadonlySet<string> = new Set([
 ])
 
 const MARKETING_PREFIXES = [
-  '/signup',
-  '/login',
+  '/inscription',
+  '/connexion',
   '/legal',
   '/method',
   '/about',
@@ -44,8 +44,8 @@ function isMarketingPath(pathname: string): boolean {
 const MOBILE_NAV = [
   { href: '/method', label: 'La Méthode' },
   { href: '/examens', label: 'Examens' },
-  { href: '/login', label: 'Sign in' },
-  { href: '/signup', label: 'Get started' },
+  { href: '/connexion', label: 'Sign in' },
+  { href: '/inscription', label: 'Get started' },
 ] as const
 
 export default function StickyHeader() {
@@ -110,7 +110,7 @@ export default function StickyHeader() {
               Examens
             </Link>
             <Link
-              href="/login"
+              href="/connexion"
               style={{
                 fontFamily: SANS_FONT,
                 fontWeight: 600,

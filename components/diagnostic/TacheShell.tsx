@@ -1,4 +1,4 @@
-import Breadcrumb from '@/components/common/Breadcrumb'
+﻿import Breadcrumb from '@/components/common/Breadcrumb'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
 import type { Tache } from '@/lib/data/taches'
 import Timer from './Timer'
@@ -7,7 +7,7 @@ import TacheNav from './TacheNav'
 
 export default function TacheShell({ tache }: { tache: Tache }) {
   const breadcrumbItems = [
-    { label: "L'Examen", href: '/l-examen' },
+    { label: "L'Examen", href: '/examen' },
     { label: `Tâche ${tache.id}` },
   ]
 

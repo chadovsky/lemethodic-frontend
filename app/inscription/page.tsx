@@ -1,6 +1,6 @@
 import SignupForm from '@/components/auth/SignupForm'
 
-export default async function SignupPage({
+export default async function InscriptionPage({
   searchParams,
 }: {
   searchParams: Promise<{ tier?: string }>

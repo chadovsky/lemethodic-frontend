@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
@@ -106,7 +106,7 @@ export default function QuizResults({ score, total, onRestart }: QuizResultsProp
         </button>
         <Link
           data-testid="quiz-results-back-to-list"
-          href="/la-bibliotheque"
+          href="/bibliotheque"
           className="ed-btn-press"
           style={{
             minHeight: 48,

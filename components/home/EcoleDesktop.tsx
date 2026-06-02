@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // V-016c — desktop /ecole layout (Option C: lesson-centric).
 // Lesson grid is the hero of this surface; right rail carries the
@@ -322,7 +322,7 @@ export default function EcoleDesktop() {
                   title={hasExamDate ? copy.emptyNoEnrollmentTitle : copy.emptyNoExamTitle}
                   body={hasExamDate ? copy.emptyNoEnrollmentBody : copy.emptyNoExamBody}
                   ctaLabel={hasExamDate ? copy.emptyNoEnrollmentCta : copy.emptyNoExamCta}
-                  ctaHref={hasExamDate ? '/l-examen' : '/profile'}
+                  ctaHref={hasExamDate ? '/examen' : '/profil'}
                 />
               ) : (
                 <>

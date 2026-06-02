@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // P-234 — cluster detail orchestrator. Fetches detail + user state in
 // parallel; renders 3 sections (header, lesson body, practice CTA). v1
@@ -91,7 +91,7 @@ export default function ClusterDetailPage({ slug }: ClusterDetailPageProps) {
           }}
         >
           <Link
-            href="/progress"
+            href="/progression"
             aria-label="Back to Progress"
             style={{
               display: 'inline-flex',
@@ -166,7 +166,7 @@ function NotFoundState() {
         The link may be stale, or this cluster isn't part of the current curriculum.
       </p>
       <Link
-        href="/progress"
+        href="/progression"
         style={{
           fontFamily: DISPLAY_FONT,
           fontWeight: 700,

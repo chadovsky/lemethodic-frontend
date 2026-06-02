@@ -25,10 +25,10 @@ const EXPANDED_WIDTH = 240
 const COLLAPSED_WIDTH = 64
 
 const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Tableau de bord', icon: <Home size={20} strokeWidth={1.5} /> },
+  { href: '/carte', label: 'Tableau de bord', icon: <Home size={20} strokeWidth={1.5} /> },
   { href: '/la-methode', label: 'La Méthode', icon: <GraduationCap size={20} strokeWidth={1.5} /> },
-  { href: '/la-bibliotheque', label: 'La Bibliothèque', icon: <BookOpen size={20} strokeWidth={1.5} /> },
-  { href: '/l-examen', label: "L'Examen", icon: <FileText size={20} strokeWidth={1.5} /> },
+  { href: '/bibliotheque', label: 'La Bibliothèque', icon: <BookOpen size={20} strokeWidth={1.5} /> },
+  { href: '/examen', label: "L'Examen", icon: <FileText size={20} strokeWidth={1.5} /> },
   { href: '/account', label: 'Compte', icon: <User size={20} strokeWidth={1.5} /> },
 ]
 
@@ -153,7 +153,7 @@ export default function Sidebar({
         {!collapsed && (
           <>
             <Link
-              href="/dashboard"
+              href="/carte"
               data-testid="sidebar-wordmark"
               onClick={onLinkClick}
               style={{ textDecoration: 'none', display: 'inline-block' }}

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useRef, useEffect, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
@@ -252,7 +252,7 @@ export default function SignupForm({ tier }: SignupFormProps) {
       >
         Already have an account?{' '}
         <Link
-          href="/login"
+          href="/connexion"
           style={{
             color: 'var(--cta-primary)',
             fontWeight: 600,

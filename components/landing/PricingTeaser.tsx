@@ -181,7 +181,7 @@ export default function PricingTeaser() {
               </p>
 
               <Link
-                href={`/signup?tier=${tier.slug}`}
+                href={`/inscription?tier=${tier.slug}`}
                 data-testid="tier-cta"
                 className="ed-btn-press"
                 style={{

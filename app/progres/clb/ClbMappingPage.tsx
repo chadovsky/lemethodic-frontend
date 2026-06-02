@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // F-337 — /progres/clb: CLB level per skill + Express Entry CRS points.
 // Data source: api.recordings.list() for speaking CLB.
@@ -238,7 +238,7 @@ function EmptyState() {
           Votre niveau CLB apparaitra ici après votre premier enregistrement dans L&apos;Examen.
         </p>
         <Link
-          href="/l-examen/expression-orale"
+          href="/examen/expression-orale"
           style={{
             display: 'inline-block',
             padding: '12px 28px',

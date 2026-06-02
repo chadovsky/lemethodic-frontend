@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { Fragment, useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
@@ -249,7 +249,7 @@ export default function HomeScreen({
           }}
         >
           <Link
-            href="/profile"
+            href="/profil"
             aria-label={`${displayName}'s profile`}
             style={{ textDecoration: 'none', WebkitTapHighlightColor: 'transparent' }}
           >
@@ -372,7 +372,7 @@ export default function HomeScreen({
               </div>
             ) : (
               <Link
-                href="/profile"
+                href="/profil"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -460,7 +460,7 @@ export default function HomeScreen({
                 ]}
                 illustrationSrc="/illustration-language.jpg"
                 illustrationAlt="Speech bubble illustration"
-                href="/l-examen/expression-orale/tache-2/agence-voyages"
+                href="/examen/expression-orale/tache-2/agence-voyages"
               />
             </div>
 
@@ -660,7 +660,7 @@ function LessonListEmpty({ hasExamDate }: { hasExamDate: boolean }) {
     ? 'The diagnostic takes a few minutes and unlocks the lesson sequence calibrated to your level.'
     : "Tell us when you sit the TCF and we'll calibrate the 27-lesson sequence to your timeline."
   const ctaLabel = hasExamDate ? 'Start diagnostic' : 'Set exam date'
-  const ctaHref = hasExamDate ? '/l-examen' : '/profile'
+  const ctaHref = hasExamDate ? '/examen' : '/profil'
   return (
     <div
       style={{

@@ -1,17 +1,17 @@
-import type { MetadataRoute } from 'next'
+﻿import type { MetadataRoute } from 'next'
 
 const BASE = 'https://lemethodic.com'
 
 // Routes that require authentication or are not intended for indexing.
 const PRIVATE = [
-  '/dashboard',
+  '/carte',
   '/la-methode/',
-  '/la-bibliotheque/',
-  '/l-examen/',
+  '/bibliotheque/',
+  '/examen/',
   '/account',
   '/admin/',
-  '/login',
-  '/signup',
+  '/connexion',
+  '/inscription',
   '/verify-email',
   '/password-reset',
   '/onboarding/waitlist',

@@ -8,8 +8,8 @@ const COLUMNS = [
     links: [
       { label: 'Examens', href: '/examens' },
       { label: 'La Méthode', href: '/la-methode' },
-      { label: 'La Bibliothèque', href: '/la-bibliotheque' },
-      { label: "L'Examen", href: '/l-examen' },
+      { label: 'La Bibliothèque', href: '/bibliotheque' },
+      { label: "L'Examen", href: '/examen' },
     ],
   },
   {

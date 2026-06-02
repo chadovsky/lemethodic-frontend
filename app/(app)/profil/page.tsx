@@ -122,7 +122,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 // ─── page ─────────────────────────────────────────────────────────────────────
-export default function ProfilePage() {
+export default function ProfilPage() {
   const router = useRouter()
   return (
     <ProtectedRoute>

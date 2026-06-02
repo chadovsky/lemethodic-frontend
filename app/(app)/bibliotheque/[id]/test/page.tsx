@@ -4,14 +4,14 @@ import TestClient from './TestClient'
 // F-323 — Le Vocabulaire test route. Sibling of /practice. Auth-gated.
 
 interface Props {
-  params: Promise<{ slug: string }>
+  params: Promise<{ id: string }>
 }
 
 export default async function VocabularyTestPage({ params }: Props) {
-  const { slug } = await params
+  const { id } = await params
   return (
     <ProtectedRoute>
-      <TestClient slug={slug} />
+      <TestClient slug={id} />
     </ProtectedRoute>
   )
 }

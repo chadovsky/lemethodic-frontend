@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // Tâche 2 — role-play conversation session (F-062).
 //
@@ -505,7 +505,7 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
       if (result.recordingId == null) {
         throw new Error('Analysis returned no recording id.')
       }
-      router.push(`/l-examen/diagnostic?session=${result.recordingId}`)
+      router.push(`/examen/diagnostic?session=${result.recordingId}`)
     } catch (err) {
       finalizingRef.current = false
       handleApiError(err, 'Could not finalize the session. Retry?')
@@ -747,7 +747,7 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
           onExit={() => {
             if (confirm('End this session?')) {
               recorder.reset()
-              router.push('/l-examen/expression-orale/tache-2')
+              router.push('/examen/expression-orale/tache-2')
             }
           }}
           turnDisplay={phase === 'briefing' ? null : turnDisplay}

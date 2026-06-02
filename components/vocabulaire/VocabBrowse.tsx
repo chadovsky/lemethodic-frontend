@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -80,7 +80,7 @@ export default function VocabBrowse() {
         >
           <Link
             data-testid="vocab-cta-practice"
-            href="/la-bibliotheque/practice"
+            href="/bibliotheque/practice"
             className="ed-btn-press"
             style={{
               minHeight: 44,
@@ -102,7 +102,7 @@ export default function VocabBrowse() {
           </Link>
           <Link
             data-testid="vocab-cta-test"
-            href="/la-bibliotheque/test"
+            href="/bibliotheque/test"
             className="ed-btn-press"
             style={{
               minHeight: 44,

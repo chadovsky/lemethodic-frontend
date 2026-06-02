@@ -33,7 +33,7 @@ export default function Home() {
       <FaqJsonLd />
       {/* Redirect authenticated users to their dashboard server-side equivalent.
           Client-side only — no httpOnly cookie is exposed to middleware. */}
-      <AuthRedirect to="/dashboard" />
+      <AuthRedirect to="/carte" />
       <main className="ed-page-enter">
         <Hero />
         <PersonaMatch />

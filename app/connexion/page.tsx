@@ -41,7 +41,7 @@ function mapApiError(err: ApiError): string {
   }
 }
 
-export default function LoginPage() {
+export default function ConnexionPage() {
   const router = useRouter()
   const token = useAuthStore((s) => s.token)
   const hydrated = useAuthStore((s) => s.hydrated)
@@ -57,7 +57,7 @@ export default function LoginPage() {
   }, [])
   useEffect(() => {
     if (hydrated && token) {
-      router.replace('/dashboard')
+      router.replace('/carte')
     }
   }, [hydrated, token, router])
 
@@ -75,7 +75,7 @@ export default function LoginPage() {
     try {
       const { token, user } = await api.auth.login(email.trim(), password)
       useAuthStore.getState().setAuth(token, user)
-      router.push('/dashboard')
+      router.push('/carte')
     } catch (err) {
       if (err instanceof ApiError) {
         setError(mapApiError(err))
