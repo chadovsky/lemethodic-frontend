@@ -61,7 +61,7 @@ function shouldHideOn(pathname: string): boolean {
 
 const COPY = {
   en: {
-    nav: { ecole: 'Méthode', speaking: 'Oral', writing: 'Écrit', progress: 'Progrès' },
+    nav: { seance: 'Séance', ecole: 'Méthode', speaking: 'Oral', writing: 'Écrit', progress: 'Progrès', maitre: 'Maître' },
     menu: {
       profile: 'Profile',
       settings: 'Settings',
@@ -72,11 +72,11 @@ const COPY = {
     skipToContent: 'Skip to content',
   },
   fr: {
-    nav: { ecole: 'Méthode', speaking: 'Oral', writing: 'Écrit', progress: 'Progrès' },
+    nav: { seance: 'Séance', ecole: 'Méthode', speaking: 'Oral', writing: 'Écrit', progress: 'Progrès', maitre: 'Maître' },
     menu: {
       profile: 'Profil',
       settings: 'Paramètres',
-      account: 'Compte',
+      account: 'Abonnement',
       about: 'À propos',
       logout: 'Se déconnecter',
     },
@@ -85,10 +85,12 @@ const COPY = {
 } as const
 
 const NAV_LINKS = [
+  { key: 'seance' as const, href: '/seance', match: ['/seance'] },
   { key: 'ecole' as const, href: '/la-methode', match: ['/la-methode', '/cluster', '/learn'] },
   { key: 'speaking' as const, href: '/examen/expression-orale', match: ['/examen/expression-orale'] },
   { key: 'writing' as const, href: '/examen/expression-ecrite', match: ['/examen/expression-ecrite'] },
   { key: 'progress' as const, href: '/progression', match: ['/progression', '/examen'] },
+  { key: 'maitre' as const, href: '/maitre', match: ['/maitre'] },
 ] as const
 
 function isLinkActive(href: string, match: readonly string[], pathname: string): boolean {
@@ -345,7 +347,12 @@ export default function TopNav() {
                 {(['profile', 'settings', 'account', 'about'] as const).map((section) => (
                   <Link
                     key={section}
-                    href={section === 'about' ? '/a-propos' : `/more#${section}`}
+                    href={
+                      section === 'profile' ? '/profil' :
+                      section === 'settings' ? '/parametres' :
+                      section === 'account' ? '/abonnement' :
+                      '/a-propos'
+                    }
                     role="menuitem"
                     onClick={() => setMenuOpen(false)}
                     style={{

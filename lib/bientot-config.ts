@@ -15,6 +15,15 @@ export const FEATURES: Record<FeatureKey, FeatureStatus> = {
   'examens/general': 'bientot',
   'blog': 'bientot',
   'pieges': 'bientot',
+  // F-371: in-product surface scaffolds
+  'seance': 'bientot',
+  'ile': 'bientot',
+  'ile-activites': 'bientot',
+  'ile-tache': 'bientot',
+  'maitre': 'bientot',
+  'examen-checkpoint': 'bientot',
+  'parametres': 'bientot',
+  'abonnement': 'bientot',
 }
 
 // Returns true only when the key is explicitly set to 'bientot'.
