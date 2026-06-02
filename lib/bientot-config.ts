@@ -13,6 +13,8 @@ export const FEATURES: Record<FeatureKey, FeatureStatus> = {
   'examens/dalf': 'bientot',
   'examens/delf': 'bientot',
   'examens/general': 'bientot',
+  'blog': 'bientot',
+  'pieges': 'bientot',
 }
 
 // Returns true only when the key is explicitly set to 'bientot'.

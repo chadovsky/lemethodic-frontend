@@ -30,6 +30,9 @@ const MARKETING_PREFIXES = [
   '/terms',
   '/examens',
   '/a-propos',
+  '/faq',
+  '/tarifs',
+  '/pieges',
 ] as const
 
 function isMarketingPath(pathname: string): boolean {
@@ -44,6 +47,8 @@ function isMarketingPath(pathname: string): boolean {
 const MOBILE_NAV = [
   { href: '/method', label: 'La Méthode' },
   { href: '/examens', label: 'Examens' },
+  { href: '/tarifs', label: 'Tarifs' },
+  { href: '/pieges', label: 'Les Pièges' },
   { href: '/connexion', label: 'Sign in' },
   { href: '/inscription', label: 'Get started' },
 ] as const
@@ -108,6 +113,32 @@ export default function StickyHeader() {
               }}
             >
               Examens
+            </Link>
+            <Link
+              href="/tarifs"
+              style={{
+                fontFamily: SANS_FONT,
+                fontWeight: 500,
+                fontSize: '0.875rem',
+                color: 'var(--text-primary)',
+                textDecoration: 'none',
+                letterSpacing: '0.01em',
+              }}
+            >
+              Tarifs
+            </Link>
+            <Link
+              href="/pieges"
+              style={{
+                fontFamily: SANS_FONT,
+                fontWeight: 500,
+                fontSize: '0.875rem',
+                color: 'var(--text-primary)',
+                textDecoration: 'none',
+                letterSpacing: '0.01em',
+              }}
+            >
+              Les Pièges
             </Link>
             <Link
               href="/connexion"

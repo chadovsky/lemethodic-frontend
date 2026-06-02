@@ -7,7 +7,9 @@ const COLUMNS = [
     heading: 'Product',
     links: [
       { label: 'Examens', href: '/examens' },
+      { label: 'Tarifs', href: '/tarifs' },
       { label: 'La Méthode', href: '/la-methode' },
+      { label: 'Les Pièges Anglais', href: '/pieges' },
       { label: 'La Bibliothèque', href: '/bibliotheque' },
       { label: "L'Examen", href: '/examen' },
     ],
@@ -18,6 +20,7 @@ const COLUMNS = [
       { label: 'À propos', href: '/a-propos' },
       { label: 'Method', href: '/method' },
       { label: 'Blog', href: '/blog' },
+      { label: 'FAQ', href: '/faq' },
     ],
   },
   {
