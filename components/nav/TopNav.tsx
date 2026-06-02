@@ -78,7 +78,7 @@ const COPY = {
 } as const
 
 const NAV_LINKS = [
-  { key: 'ecole' as const, href: '/cours/methode-tcf-canada', match: ['/cours/methode-tcf-canada', '/cluster', '/learn'] },
+  { key: 'ecole' as const, href: '/la-methode', match: ['/la-methode', '/cluster', '/learn'] },
   { key: 'speaking' as const, href: '/l-examen/expression-orale', match: ['/l-examen/expression-orale'] },
   { key: 'writing' as const, href: '/l-examen/expression-ecrite', match: ['/l-examen/expression-ecrite'] },
   { key: 'progress' as const, href: '/progress', match: ['/progress', '/l-examen'] },
@@ -182,7 +182,7 @@ export default function TopNav() {
         }}
       >
         {/* LEFT — wordmark */}
-        <Wordmark size="nav" href="/cours/methode-tcf-canada" />
+        <Wordmark size="nav" href="/la-methode" />
 
         {/* CENTER — nav links */}
         <ul
@@ -338,7 +338,7 @@ export default function TopNav() {
                 {(['profile', 'settings', 'account', 'about'] as const).map((section) => (
                   <Link
                     key={section}
-                    href={`/more#${section}`}
+                    href={section === 'about' ? '/a-propos' : `/more#${section}`}
                     role="menuitem"
                     onClick={() => setMenuOpen(false)}
                     style={{

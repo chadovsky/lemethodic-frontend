@@ -8,9 +8,12 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      // /ecole -> /cours/methode-tcf-canada (collapse old 2-hop chain)
-      { source: '/ecole', destination: '/cours/methode-tcf-canada', permanent: true },
-      { source: '/ecole/:path*', destination: '/cours/methode-tcf-canada/:path*', permanent: true },
+      // /ecole -> /la-methode (canonical route; /cours was the legacy 2-hop destination)
+      { source: '/ecole', destination: '/la-methode', permanent: true },
+      { source: '/ecole/:path*', destination: '/la-methode/:path*', permanent: true },
+      // /cours/methode-tcf-canada -> /la-methode (F-361: legacy /cours route removed)
+      { source: '/cours/methode-tcf-canada', destination: '/la-methode', permanent: true },
+      { source: '/cours/methode-tcf-canada/:path*', destination: '/la-methode/:path*', permanent: true },
       // /exam-prep -> /tcf-canada (MS-1 owns the destination page)
       { source: '/exam-prep', destination: '/tcf-canada', permanent: true },
       { source: '/exam-prep/:path*', destination: '/tcf-canada/:path*', permanent: true },

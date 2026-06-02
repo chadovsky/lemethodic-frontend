@@ -6,7 +6,7 @@ const COLUMNS = [
   {
     heading: 'Product',
     links: [
-      { label: 'La Méthode', href: '/cours/methode-tcf-canada' },
+      { label: 'La Méthode', href: '/la-methode' },
       { label: 'La Bibliothèque', href: '/la-bibliotheque' },
       { label: "L'Examen", href: '/l-examen' },
     ],
@@ -14,7 +14,7 @@ const COLUMNS = [
   {
     heading: 'Company',
     links: [
-      { label: 'About', href: '/about' },
+      { label: 'À propos', href: '/a-propos' },
       { label: 'Method', href: '/method' },
       { label: 'Blog', href: '/blog' },
     ],

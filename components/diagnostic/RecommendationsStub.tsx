@@ -8,7 +8,7 @@ const ROWS = [
     chipColor: 'var(--lm-pastel-sky)',
     suggestion:
       'Renforcer les structures syntaxiques pour fluidifier vos réponses spontanées.',
-    cta: { label: 'Renforcer La Construction', href: '/cours/methode-tcf-canada' },
+    cta: { label: 'Renforcer La Construction', href: '/la-methode' },
   },
   {
     layer: 'Le Propos',

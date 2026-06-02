@@ -8,7 +8,6 @@ const PRIVATE = [
   '/la-methode/',
   '/la-bibliotheque/',
   '/l-examen/',
-  '/cours/',
   '/account',
   '/admin/',
   '/login',
