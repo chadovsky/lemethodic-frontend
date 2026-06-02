@@ -73,6 +73,19 @@ The growth engine. Each page targets a specific anglicism, false cognate, or str
 | `/faq` | Frequently asked questions. | live |
 | `/tarifs` | Pricing. Single plan, no tier ladder. | live |
 
+### La Librairie
+
+The public digital book store. Sells the Book-Lab French catalog (books, audio, downloads, and free resources) through LemonSqueezy. Digital products only. Note: /librairie (the public store) is distinct from /la-bibliotheque (the in-app vocabulary product for authenticated learners). These are two separate surfaces with separate purposes.
+
+| Path | Purpose | Status |
+|---|---|---|
+| `/librairie` | Book store hub. Four categories: Livres, Audio, Téléchargements, Ressources gratuites. LemonSqueezy-backed. | bientôt |
+| `/librairie/livres` | Books from the Book-Lab French catalog. | bientôt |
+| `/librairie/audio` | Audio packs from the Book-Lab French catalog. | bientôt |
+| `/librairie/telechargements` | Digital downloads from the Book-Lab French catalog. | bientôt |
+| `/librairie/ressources-gratuites` | Free resources, email-gated lead magnets. | bientôt |
+| `/librairie/[item-slug]` | Individual product page. | bientôt |
+
 ### Programmatic SEO
 
 | Path | Purpose | Status |

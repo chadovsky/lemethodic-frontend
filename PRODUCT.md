@@ -166,6 +166,8 @@ The examiner voice is **OpenAI TTS-1-HD**, not Le Maître. The voice separation 
 
 **L'École (/l-ecole):** the academic and methodology surface. The credibility layer made navigable: the 5-couche framework explained, the academic collaboration described, the methodology as a readable artifact for users who want to understand why the product works the way it does.
 
+**La Librairie (/librairie):** the public digital book store. Sells the Book-Lab French catalog (books, audio, downloads, and free resources) through LemonSqueezy. Digital products only, which is exactly what LemonSqueezy is built for. La Librairie is a public-zone e-commerce surface. It is not coaching, and it is distinct from La Bibliothèque (/la-bibliotheque), which is the authenticated in-app vocabulary corpus for active learners.
+
 ### Pedagogical coherence
 
 > **La Méthode:** you learn the patterns.
