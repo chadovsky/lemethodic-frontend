@@ -34,6 +34,7 @@ const MARKETING_PREFIXES = [
   '/faq',
   '/tarifs',
   '/pieges',
+  '/librairie',
 ] as const
 
 function isMarketingPath(pathname: string): boolean {

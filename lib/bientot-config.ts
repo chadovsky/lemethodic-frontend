@@ -15,6 +15,12 @@ export const FEATURES: Record<FeatureKey, FeatureStatus> = {
   'examens/general': 'bientot',
   'blog': 'bientot',
   'pieges': 'bientot',
+  // F-369: public librairie surfaces
+  'librairie': 'bientot',
+  'librairie-livres': 'bientot',
+  'librairie-audio': 'bientot',
+  'librairie-telechargements': 'bientot',
+  'librairie-ressources-gratuites': 'bientot',
   // F-371: in-product surface scaffolds
   'seance': 'bientot',
   'ile': 'bientot',

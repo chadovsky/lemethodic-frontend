@@ -40,6 +40,7 @@ const EXCLUDED_PREFIXES = [
   '/tarifs',
   '/blog',
   '/pieges',
+  '/librairie',
 ] as const
 
 // V-016g — /library + /fr/library stubs are also marketing surfaces.

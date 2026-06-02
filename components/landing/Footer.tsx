@@ -12,6 +12,7 @@ const COLUMNS = [
       { label: 'Les Pièges Anglais', href: '/pieges' },
       { label: 'La Bibliothèque', href: '/bibliotheque' },
       { label: "L'Examen", href: '/examen' },
+      { label: 'La Librairie', href: '/librairie' },
     ],
   },
   {
