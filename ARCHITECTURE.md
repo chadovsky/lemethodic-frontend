@@ -394,6 +394,172 @@ monetized launch. M5.5 closed them.
   variables; .env.example and .env.production.example use placeholder
   values only. Status: PASS.
 
+## 13. Telemetry infrastructure
+
+**Page analytics.** Plausible (or equivalent privacy-first analytics) for page-level traffic. EU data residency. No cookies required; no GDPR consent gate for page analytics.
+
+**Product event tracking.** PostHog (or equivalent) for structured product events. EU-hosted instance or EU data residency mode. Events fire client-side (FE) and are optionally proxied through the BE to prevent adblocker interference.
+
+**Canonical event taxonomy (seed list).**
+
+| Event | When fired |
+|---|---|
+| signup_completed | User completes registration |
+| bienvenue_started | User opens /bienvenue |
+| bienvenue_completed | User submits Target Profile |
+| first_ile_opened | User opens their first île |
+| first_tache_submitted | User submits their first oral Tâche |
+| first_score_received | Le Maître returns per-couche scores |
+| day7_active | User has a session on day 7 after signup |
+| day30_active | User has a session on day 30 after signup |
+| subscription_started | User purchases a paid tier |
+| dispute_submitted | User files a score dispute |
+| account_deleted | User deletes their account |
+
+**Audit log (BE).** Schema: `user_action_log` table with columns: `user_id`, `action_type`, `target_id`, `metadata` (jsonb), `timestamp`. Middleware captures key server-side actions (login, île opened, Tâche submitted, dispute filed, account changes). Retention: 90 days by default. The audit log is the support debugging layer, not the BI layer; PostHog is BI.
+
+---
+
+## 14. Error monitoring
+
+**Sentry.** Browser SDK on FE (Next.js integration), server SDK on BE (FastAPI integration). EU data residency (Sentry EU endpoint). Source maps for FE are uploaded at deploy time so stack traces resolve to source.
+
+**Alerting policy.** Critical errors (unhandled exceptions affecting user data or payment flow): immediate email to founder. Non-critical errors (UI exceptions, non-fatal 5xx): daily digest email.
+
+**Scope.** All unhandled exceptions and 5xx responses are captured automatically. Selected 4xx errors (429 rate limit, 403 tier mismatch) are tracked as performance signals, not error alerts.
+
+---
+
+## 15. Email infrastructure
+
+**Transactional provider.** Postmark (or equivalent). EU data residency for GDPR compliance. All transactional email routes through a single provider with a single verified domain (lemethodic.com).
+
+**Transactional templates.**
+- signup_verification: email verification link on new account creation
+- password_reset: password reset link (1h TTL)
+- payment_receipt: LemonSqueezy order confirmation mirror
+- dispute_response: auto-response on dispute submission confirming 5 business day SLA
+- account_deletion_confirmation: confirmation after self-serve account deletion
+
+**Lifecycle series.**
+- Welcome D0: sent immediately on signup_completed; introduces La Méthode and first action
+- Welcome D3: re-engagement if no Tâche submitted; surfaces the free tier value
+- Welcome D7: progress check-in; shows score prediction if available
+- D14 inactive: re-engagement for users with no session in 14 days
+- D30 inactive: save offer or escalation for users with no session in 30 days
+- Pre-cancel save: triggered by cancel intent event from LemonSqueezy
+- Post-cancel feedback: triggered by subscription_cancelled event; short survey
+
+---
+
+## 16. Cookie consent
+
+**In-house banner.** No third-party consent management platform (CMP). The banner is built and owned by Le Méthodic. Granular categories: necessary, analytics, marketing. EU-compliant posture: explicit opt-in required for non-necessary cookies; deny-equivalent option; granular preferences page accessible from footer.
+
+**Persistence.** Consent choices are stored in localStorage keyed by consent version. When the consent schema changes, the version increments and the banner re-presents.
+
+**Telemetry integration.** PostHog and any marketing pixels fire only after analytics consent is granted. Plausible (cookieless) fires regardless of consent state.
+
+**Position and treatment.** AESTHETIC INPUT NEEDED (F-381): founder decides position (top bar or bottom bar), copy tone, and color treatment.
+
+---
+
+## 17. Accessibility posture
+
+**Target standard.** WCAG 2.1 Level AA across every shipped surface.
+
+**Tooling.** Axe DevTools (browser extension + CI integration) for automated checks. Lighthouse accessibility audit in CI. Manual keyboard navigation walkthrough per new surface.
+
+**Known risks from current implementation.**
+- The 60% opacity bientôt pattern likely fails WCAG 1.4.3 (contrast minimum). Replacement treatment needed before Phase 2.5 closes.
+- Focus management on modal and sheet components (LearnModuleSheet, TurnReviewSheet) needs `inert` attribute or equivalent on background content.
+- Alt text audit across all public-zone images (blog posts, exam landings, /a-propos illustrations).
+- ARIA labels on all interactive components (recording controls, progress indicators, couche score bars).
+
+**CI gate.** Lighthouse accessibility score must not regress below 90 on primary routes. Axe must report zero violations of impact level "critical" or "serious" on every route in the Playwright e2e suite.
+
+---
+
+## 18. Content versioning
+
+**Model.** Each row in `islands`, `island_activities`, `pieges_catalog`, and related content tables carries a `content_version` integer (default 1) and a `published_at` timestamp. A user's active session binds to the `content_version` that was current when they opened the île or activity. Version bumps are explicit author actions, not automatic on edit.
+
+**In-progress user policy.** If an author updates content while a user has an open session bound to the prior version, the user finishes their session on the old version. On their next session open, the platform detects the version delta and prompts: "This content has been updated. Start fresh with the new version?" The user can accept (rebind) or continue with their current version (carry forward). The system never silently changes in-progress experience.
+
+**Migration policy.** If a content change is purely additive (new examples added, typos fixed), no version bump is required. If a change alters the scoring rubric, the island structure, or the Tâche prompt, a version bump is required and the in-progress prompt fires.
+
+---
+
+## 19. Performance budget
+
+**Targets by surface category.**
+
+| Category | LCP target | TTFB target | INP target |
+|---|---|---|---|
+| Public landing (/) | under 2.5s | under 800ms | under 200ms |
+| SEO content (/pieges/[slug], /blog/[slug]) | under 2.5s | under 600ms | under 200ms |
+| Authenticated app (/carte, /ile/[id]) | under 3s | under 1s | under 200ms |
+| Tâche recording flow (/ile/[id]/tache) | under 2s | under 800ms | under 100ms (recording path is latency-critical) |
+
+**CI gate.** Lighthouse CI is integrated into the Vercel preview deploy workflow. A budget regression on any of the three metrics above on a primary route fails the check and surfaces in the PR.
+
+**Image optimization.** `next.config.mjs` currently sets `images.unoptimized: true`. Before Phase 3 (SEO growth), this must be re-evaluated: unoptimized images on SEO content pages will hurt LCP scores. Plan: enable Next.js image optimization selectively on public-zone routes.
+
+---
+
+## 20. PWA configuration
+
+**Manifest.** `public/manifest.json` with name, short_name, icons (192px and 512px), theme_color, background_color, display: standalone, start_url: /carte (authenticated entry point after install).
+
+**Service worker.** Offline shell: the app chrome (nav, layout) is cached. Content routes (/carte, /ile, /bibliotheque) show a "You are offline" state that links back to cached content where available. Recording and Tâche flows require connectivity; they show a clear offline message rather than failing silently.
+
+**Install prompt.** The browser's `beforeinstallprompt` event is deferred and surfaced at an appropriate engagement moment (after first completed Tâche, or after day 3 active). The prompt fires once per user. AESTHETIC INPUT NEEDED (F-398): founder decides timing and visual treatment.
+
+---
+
+## 21. GDPR posture (consolidated)
+
+Le Méthodic processes personal data as a controller. The product's GDPR posture:
+
+**Data minimization.** Only the data needed for the product to function is collected. No third-party advertising pixels. No cross-site tracking.
+
+**Data residency.** All first-party data (Postgres, Redis, Spaces) is hosted in DigitalOcean FRA1 (Frankfurt, EU). All third-party services used must offer EU data residency: Sentry EU endpoint, PostHog EU cloud or self-hosted, Postmark EU data processing agreement, ElevenLabs EU data processing agreement.
+
+**Data export (right to portability).** Authenticated users can download a JSON archive of all their data from /profil: account fields, Target Profile, all Tâche attempts with transcripts and scores, recording metadata, subscription history, detected modules per session.
+
+**Data deletion (right to be forgotten).** Authenticated users can delete their account self-serve from /profil. Deletion is a cascade: all user data is removed or anonymized within 30 days. Audio files on DO Spaces are deleted. Recordings are anonymized (user_id set to NULL, audio_url deleted, transcript_text deleted). The account row is soft-deleted with a `deleted_at` timestamp, then hard-deleted after 30 days.
+
+**Cookie consent.** See section 16.
+
+**Data processing agreements.** DPAs in place with: DigitalOcean, Vercel, Postmark, PostHog, Sentry, ElevenLabs, OpenAI, Anthropic, AssemblyAI, Mistral, LemonSqueezy.
+
+---
+
+## 22. Bill 96 posture (Quebec French primacy)
+
+Quebec's An Act Respecting French, the Official and Common Language of Quebec (Bill 96) imposes French primacy in commercial dealings with Quebec consumers. Le Méthodic's compliance posture:
+
+**Customer-facing documents.** All contracts (CGV, subscription terms) are authored in French. English translations are provided as accommodation. The French version governs.
+
+**Customer support.** All support correspondence templates exist in French. Quebec-identified users receive French-first responses. English is offered only on explicit user request.
+
+**Refund responses.** Refund response templates are authored in French.
+
+**Marketing emails.** Quebec-segmented lists receive French-first emails.
+
+**Product UI.** The product offers a French UI from onboarding. The adaptive bilingual rule (PRODUCT.md section 10) ensures French-primary interaction at B2 and above.
+
+**Audit checklist (maintained alongside support templates).**
+- All CGV sections authored in French: Y/N
+- Subscription cancellation flow available in French: Y/N
+- All auto-response emails have French version: Y/N
+- All support macros have French version: Y/N
+- Marketing list Quebec segment receives French-first: Y/N
+
+Acceptance (F-386): documented audit with all checklist items Y, verified by Chadi before Phase 2.5 closes.
+
+---
+
 ## 12. Architectural decisions log
 
 Locked decisions, with the date and the reason.

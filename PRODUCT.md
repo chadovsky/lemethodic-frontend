@@ -431,6 +431,69 @@ Old internal names for these surfaces are legacy. The M-RENAME migration will br
 
 ---
 
+## 18. Production-readiness doctrine (F-373 through F-389)
+
+The following concepts were added to the product spec as part of the Phase 2 and Phase 2.5 production-readiness pass (2026-06-02). They extend but do not modify the locked sections above.
+
+### Mic permission as a first-class onboarding step
+
+Before a user's first Tâche, the product requests microphone permission via a full-screen onboarding step that runs an audio level test, records a 3-second sample, and plays it back for confirmation. This step is not a system-level permission dialog: it is a Le Méthodic-designed UX that sets expectation and confirms the hardware is working. The fallback when mic access is denied or unavailable is a designed surface, not an error state. The step fires once per user and is persisted in the user profile after completion. iOS Safari quirks (getUserMedia over HTTPS only, no background audio context) are documented and handled.
+
+AESTHETIC INPUT NEEDED (F-373): founder decides between full-screen onboarding step and subtle in-context prompt.
+
+### Recording management
+
+Users have a right to see, replay, download, and delete every recording they have produced. The feature surfaces at /profil or /parametres as a chronological list with per-recording actions. The BE stores `created_at`, `retention_policy`, and `deleted_at` on each recording. GDPR data export includes recordings. This is not a vanity feature: it is a compliance posture and a trust mechanism.
+
+### Transcript correction as part of every oral Tâche flow
+
+After AssemblyAI returns a transcript and before scoring, the user sees the transcript in an editable view. They confirm or correct it, then submit to Le Maître. The rationale: STT errors corrupt the couche scoring. Giving the user a confirmation step removes a significant source of perceived unfairness in Le Maître's feedback.
+
+AESTHETIC INPUT NEEDED (F-375): founder decides between inline edit, side panel, and modal.
+
+### Mock exam mode
+
+/examen/[checkpoint] is a fully timed, four-section TCF mock exam (four sections, total timer, section timers, submit, aggregated scoring). It is not a bientôt surface: it is a Phase 2 product requirement. Completing it produces a predicted exam score that is distinct from the session-level Le Maître score.
+
+### Score prediction
+
+Every authenticated user with at least three Tâche attempts sees a current predicted exam score. The prediction uses a rolling window weighted by recency and couche. It is surfaced prominently on /carte or /progression with explicit framing ("Based on your last 5 Tâches, you would score CLB 6. You need CLB 7."). This is a motivational surface and a conversion signal: the gap between current prediction and target drives upgrade intent.
+
+AESTHETIC INPUT NEEDED (F-379): founder decides location and prominence (card, sidebar, top banner).
+
+### Score dispute / appeal as a trust mechanism
+
+Every Tâche result has a "Request human review" button. The user adds a comment and submits. The BE stores the dispute in a queue (user, attempt ID, AI score, user comment, status: pending / reviewed / resolved). The founder triages the queue weekly. An auto-response email confirms receipt (SLA 5 business days). The dispute is logged regardless of outcome. This mechanism exists because AI scoring is not perfect: acknowledging that and providing recourse is the trust-building move. The SLA is a written commitment.
+
+### First-time user tour
+
+After /bienvenue completes and the user lands on /carte for the first time, a 30-second guided tour (3-5 coachmarks or equivalent) points at primary surfaces. The tour is skippable. Completion is persisted in localStorage and optionally synced to the BE user profile. The tour fires exactly once.
+
+AESTHETIC INPUT NEEDED (F-378): founder decides between modal sequence, floating coachmarks, and minimal tooltips.
+
+### 14-day money-back guarantee
+
+Le Méthodic offers a 14-day no-questions-asked money-back guarantee on all paid tiers. This is a written commitment surfaced on /tarifs (each paid tier card) and on /cgv (refund policy section). It is not a marketing claim: it is a binding policy enforced via the dispute and refund queue.
+
+AESTHETIC INPUT NEEDED (F-389): founder decides badge placement, design treatment, and exact wording.
+
+### Bill 96 compliance posture
+
+Quebec's Bill 96 requires that commercial dealings with consumers in Quebec use French as the primary language of communication. Le Méthodic's posture:
+- All customer support correspondence templates have a French version.
+- All contract language (CGV, subscription terms) is authored in French, with an English translation provided as accommodation.
+- Refund response templates are in French by default.
+- Marketing emails to Quebec contacts are sent in French by default, with opt-in English.
+- The product UI offers a French toggle from the first session.
+
+This audit is documented in PRODUCT.md (this entry) and the compliance checklist is maintained alongside the customer support template library. Acceptance: documented audit and 100 percent French primacy for Quebec customer touchpoints.
+
+### Activation telemetry as an instrumented product layer
+
+The product fires structured events at every meaningful user milestone: signup_completed, bienvenue_started, bienvenue_completed, first_ile_opened, first_tache_submitted, first_score_received, day7_active, day30_active. PostHog (or equivalent) is the event store. Cohort retention curves are visible to the founder. This is not an optional layer: telemetry is how the founder sees whether the product is working.
+
+---
+
 ## Editorial rules
 
 **Em-dash hard rule.** Never use em-dash in any output, including prose, file contents, code comments, diagram labels, or conversational responses. Use commas, colons, parentheses, or sentence breaks instead. This is a recurring violation that requires explicit vigilance in every response.

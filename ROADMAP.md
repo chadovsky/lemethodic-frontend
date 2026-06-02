@@ -53,6 +53,8 @@ The product is one complete website from launch. Every surface is present. Unbui
 
 The forward path is the sequence of wiring functionality behind a complete facade, not a sequence of versions.
 
+Phase shape as of 2026-06-02: Phase 1 scaffolds the complete site shell. Phase 2 wires the first exam end to end and adds the primary UX completeness layer (mic, recording management, transcript correction, mock exam, empty states, user tour, score prediction, dispute flow). Phase 2.5 closes compliance and operational gaps that must be live before payment: cookie consent, password reset, email verification, GDPR export/delete, contact surface, Bill 96 posture, a11y remediation, audit logging, and the 14-day guarantee. Phase 3 lights the growth engine: SEO library, trust signals, calculator lead magnet, public sample lesson, telemetry, search, help center, performance budget, PWA. Phase 4 activates payment via LemonSqueezy, adds error monitoring, email infrastructure, in-app notifications, feedback collection, and the admin dashboard. Phase 5 flips bientôt surfaces live as content is built, indefinitely.
+
 ---
 
 ### Phase 1: Complete scaffold
@@ -85,12 +87,50 @@ The exam-agnostic spine is lit for the first exam (TCF Canada). A user completes
 - The île with oral and listening: Tâche flow with Le Maître tutor and examiner voice separation
 - Le Maître conversation and the five-couche gate: Le Propos, Le Plan, La Construction, Les Pièges Anglais, La Musique all scored and gated
 - Progression and CLB: user advances through CLB bands, state persists
+- F-373: Mic permission and test flow (first-time mic access UX before first Tâche)
+- F-374: Recording management (user-facing recording list at /profil with replay, download, delete; GDPR-aligned)
+- F-375: Transcript correction UX (confirm or correct AssemblyAI transcript before scoring)
+- F-376: Mock exam mode wired (/examen/[checkpoint] fully timed, four sections, scoring, removes bientôt)
+- F-377: Empty states batch (all in-product surfaces have designed empty states)
+- F-378: First-time user tour (30-second guided tour after /bienvenue, skippable, once only)
+- F-379: Score prediction surfaced (/carte or /progression shows predicted exam score)
+- F-380: Score dispute / appeal flow (request human review on any Tâche result, 5 business day SLA)
 
 **Acceptance:**
 - A user can complete the full loop from onboarding through a scored Tâche and back to /carte
 - Le Maître (ElevenLabs Chadi-clone) plays in lesson narration. OpenAI TTS-1-HD plays in Tâches only. Voices do not cross.
 - CLB progression updates after a completed session
+- Mic permission flow invoked once per user before first Tâche
+- Every in-product surface has a designed empty state; no blank or unhandled states
 - F-225 Playwright captures for all loop surfaces
+
+---
+
+### Phase 2.5: Pre-monetization production-readiness
+
+Most compliance and auth completeness gaps must ship before payment goes live. Trust signals and telemetry must be in place before SEO growth begins. This phase gates Phase 4 (payment) and Phase 3 (growth) by ensuring the product is legally compliant, operationally sound, and trustworthy to EU and Quebec visitors.
+
+**Scope:**
+- F-381: Cookie consent banner (EU-compliant, granular categories, governs telemetry firing)
+- F-382: Password reset flow (forgot password page, reset confirmation page)
+- F-383: Email verification on signup (verify page, resend option, lock policy)
+- F-384: Account deletion and data export (GDPR rights: export JSON archive, delete account)
+- F-385: /contact route and form (public, submits to founder inbox)
+- F-386: Bill 96 compliance audit (French primacy for Quebec customer touchpoints, documented)
+- F-387: A11y WCAG 2.1 AA audit and remediation (Axe, Lighthouse, every shipped surface)
+- F-388: Audit logs and telemetry storage (BE: user_action_log schema and middleware)
+- F-389: Money-back guarantee surfaced (14-day guarantee on /tarifs and /cgv)
+
+**Acceptance:**
+- EU visitors see cookie consent banner on first visit; choices persist; telemetry respects choices
+- Password reset and email verification flows work end to end
+- User can export all their data and delete their account self-serve
+- /contact renders and routes to founder inbox
+- Bill 96 audit documented in PRODUCT.md
+- Every shipped surface passes WCAG 2.1 AA on Axe and Lighthouse
+- Every meaningful user action is logged and queryable
+- 14-day money-back guarantee is visible on every paid tier card on /tarifs
+- F-225 Playwright captures for all new surfaces
 
 ---
 
@@ -103,12 +143,25 @@ The Pièges SEO library lit, Tarifs page live. These surfaces drive acquisition 
 - /tarifs: pricing tiers visible with LemonSqueezy as merchant of record. Purchase flow visible but not yet active (links to waitlist or contact until Phase 4 completes)
 - Exam landing pages: /tcf-canada, /tef-canada, /tcf-quebec (bientôt for unlit exams)
 - /methode public explainer: 5-couche overview, free placement test
+- F-390: Trust signals on / (testimonials, founder credibility row, social proof badges)
+- F-391: Free CLB/TCF score calculator at /outils/clb (lead magnet, SEO-optimized, no auth)
+- F-392: Sample lesson preview (one île publicly accessible without auth, partial Tâche grading)
+- F-393: Activation funnel telemetry (PostHog events: signup, bienvenue, first île, first Tâche, day7, day30)
+- F-394: Site-wide search (BE search index, header typeahead, /recherche results page)
+- F-395: Help center at /aide (MDX-backed docs, ~10 initial articles, distinct from /faq)
+- F-396: Content versioning model (BE: in-progress users stay on their version; migration policy)
+- F-397: Performance budget (LCP, TTFB, INP targets, Lighthouse CI gate)
+- F-398: PWA install flow (manifest, service worker, deferred install prompt)
 
 **Acceptance:**
 - /les-pieges-anglais index and at least 5 article slugs live
 - /tarifs renders the full tier ladder with LemonSqueezy pricing, no Stripe references
 - Three exam landings live with full content
 - /methode and /placement live
+- Trust signals visible above the fold on /
+- CLB calculator at /outils/clb works and ranks for at least one calculator-intent keyword within 30 days
+- Funnel dashboard visible to founder with events firing on real user actions
+- /aide renders with at least 10 articles
 - F-225 Playwright captures for all growth surfaces
 
 ---
@@ -123,12 +176,20 @@ LemonSqueezy wired end to end. Revenue infrastructure operational. Switched on o
 - At least one tier completes an end-to-end purchase
 - Tier enforcement: free token rejected from paid endpoints (server-side, already done in M5.5)
 - Subscriber discounts apply in /la-bibliotheque store
+- F-399: Error monitoring (Sentry browser and server SDK, alerting policy, EU data residency)
+- F-400: Email infrastructure (Postmark or equivalent, transactional and lifecycle templates, EU data residency)
+- F-401: In-app notifications (BE notifications table, FE bell icon, dropdown, /notifications page)
+- F-402: Customer feedback (NPS at engagement milestones, exit survey on cancel)
+- F-403: Admin dashboard at /admin (users, revenue, content health, dispute queue, telemetry)
 
 **Acceptance:**
 - At least one tier purchases end to end via LemonSqueezy
 - Paywall gates correctly
 - Auth hardening and token control prerequisites landed
 - No Stripe references in any user-facing surface or new code
+- Errors surface in Sentry; founder receives alerts for critical issues
+- All transactional emails fire reliably; lifecycle series triggers on schedule
+- Founder can manage operations without database access via /admin
 
 **Note:** LemonSqueezy is the merchant of record. It handles VAT and payment compliance, which reduces the need for immediate LLC formation. LLC timing is a separate decision that does not gate Phase 4.
 

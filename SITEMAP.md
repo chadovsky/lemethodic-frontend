@@ -72,6 +72,15 @@ The growth engine. Each page targets a specific anglicism, false cognate, or str
 |---|---|---|
 | `/faq` | Frequently asked questions. | live |
 | `/tarifs` | Pricing. Single plan, no tier ladder. | live |
+| `/contact` | Contact form. Submits to founder inbox via Postmark (or mailto fallback until Phase 4 wires Postmark). Public. | live |
+| `/aide` | Help center hub. MDX-backed, distinct from /faq (faq = short answers, aide = depth). Public. Nav: StickyHeader. | live |
+| `/aide/[slug]` | Individual help article. Sections: getting started, method explainer, exam coverage, technical setup, account and billing. Public. | live |
+
+### Outils (public tools, no auth)
+
+| Path | Purpose | Status |
+|---|---|---|
+| `/outils/clb` | Free CLB/TCF score calculator. Lead magnet. User enters section scores, gets CLB equivalents, optional email capture. SEO-optimized. No auth required. Nav: StickyHeader. | live |
 
 ### La Librairie
 
@@ -85,6 +94,12 @@ The public digital book store. Sells the Book-Lab French catalog (books, audio, 
 | `/librairie/telechargements` | Digital downloads from the Book-Lab French catalog. | bientôt |
 | `/librairie/ressources-gratuites` | Free resources, email-gated lead magnets. | bientôt |
 | `/librairie/[item-slug]` | Individual product page. | bientôt |
+
+### Search
+
+| Path | Purpose | Status |
+|---|---|---|
+| `/recherche` | Search results page. Full-text search across pièges, îles, blog posts, and bibliothèque entries. Authenticated. Nav: TopNav. | live |
 
 ### Programmatic SEO
 
@@ -170,7 +185,7 @@ Unified exam-format practice hub across all four skills. Oral expression and wri
 | Path | Purpose | Status |
 |---|---|---|
 | `/examen` | Exam-format practice hub. All four skills listed with live or bientôt state. | live |
-| `/examen/[checkpoint]` | Checkpoint session: a timed, scored sequence across one or more skills. | bientôt |
+| `/examen/[checkpoint]` | Checkpoint session: a timed, scored sequence across one or more skills. Full timed TCF mock (four sections, total timer, section timers, submit, aggregated scoring) when F-376 ships. | bientôt (live with F-376) |
 
 ### L'École (bientôt)
 
@@ -193,9 +208,18 @@ Structured courses anchored to the 5-couche spine. The spine exists; course cont
 
 | Path | Purpose | Status |
 |---|---|---|
-| `/profil` | Account overview and personal information. | live |
+| `/profil` | Account overview and personal information. Includes recording management (replay, download, delete per F-374). | live |
 | `/parametres` | Display, audio, and notification preferences. | bientôt |
 | `/abonnement` | Subscription management. | bientôt |
+| `/notifications` | In-app notifications list. Full page view; mark-as-read; types: dispute response, payment receipt, content updates, milestones. Authenticated. Nav: TopNav. | live |
+
+## Internal
+
+Internal surfaces not in the public navigation. Accessed only by the founder.
+
+| Path | Purpose | Status |
+|---|---|---|
+| `/admin` | Admin dashboard (founder-only, gated to founder email). Surfaces: users list (filter, search, impersonate), revenue (LemonSqueezy data), content health, dispute queue, support inbox, telemetry summary. No StickyHeader or TopNav; its own minimal chrome. | live |
 
 ---
 

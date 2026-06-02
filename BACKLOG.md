@@ -2117,6 +2117,985 @@ Milestone: M1
 
 **Scope:** Single file. Independent commit. ~10 min work.
 
+---
+
+# Phase 2 additions (production-readiness pass, 2026-06-02)
+
+## F-373 -- Mic permission and test flow (FE)
+Phase: 2
+Milestone: Phase 2
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.
+**Type:** FE onboarding UX.
+**Priority:** HIGH -- required before the first user attempts a Tâche.
+
+**Scope:**
+Full-screen onboarding step that fires once per user before their first Tâche. The step: (1) requests microphone permission via getUserMedia, (2) runs a real-time audio level test with a visual meter (VU-style), (3) records a 3-second sample and plays it back, (4) confirms the user can hear themselves. On iOS Safari: getUserMedia requires HTTPS (always the case in production) and may silently fail without a prior user gesture; the implementation uses a button-gated call, not an autoplay trigger. If permission is denied or the device has no mic, a designed fallback surface explains the limitation and offers keyboard entry as an alternative for applicable Tâche types.
+
+Persistence: completion flag stored in localStorage (`mic_test_completed: true`) and optionally synced to the BE user profile. The step is skipped on all subsequent sessions.
+
+AESTHETIC INPUT NEEDED: founder decides between full-screen onboarding step and subtle in-context prompt. Filed as decision gate; do not implement until founder confirms the approach.
+
+**Acceptance:**
+- Mic permission flow invoked exactly once per user before the first Tâche.
+- Audio level meter shows real-time input level during the test.
+- 3-second sample plays back after recording.
+- Fallback state renders for denied permission or missing mic.
+- iOS Safari quirks handled (HTTPS gate, gesture requirement documented in code).
+- F-225 Playwright captures at 1440px and 375px.
+
+**Dependencies:** None (standalone FE onboarding component).
+
+**Owner:** FE.
+
+---
+
+## F-374 -- Recording management (FE + BE pair)
+Phase: 2
+Milestone: Phase 2
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.
+**Type:** FE + BE (see BE BACKLOG for BE-side scope).
+**Priority:** MEDIUM (GDPR posture, user trust).
+
+**BE-side cross-ref:** BE-F-374 -- extend recording storage with `created_at`, `retention_policy`, `deleted_at` columns; GDPR data export includes recordings.
+
+**FE scope:**
+User-facing recording list at /profil (or /parametres, Chadi to decide). Surface: chronological list of all recordings the user has produced, with per-recording: (1) replay (audio player inline or in a sheet), (2) download (presigned URL to DO Spaces), (3) delete (soft-delete with confirmation dialog; hard-delete cascades on the BE within 30 days per GDPR policy). Empty state: "No recordings yet. Complete a Tâche to see your history here."
+
+GDPR data export includes recordings: the /profil export button (F-384 scope) bundles recording metadata and audio file URLs.
+
+**Acceptance:**
+- User can replay any recording they have produced.
+- User can download any recording.
+- User can delete any recording; deletion is confirmed and reflected immediately in the list.
+- Empty state renders when no recordings exist.
+- F-225 Playwright captures.
+
+**Dependencies:** BE-F-374 (BE schema extension); F-384 (data export).
+
+**Owner:** FE (list UI) + BE (lifecycle columns and GDPR export).
+
+---
+
+## F-375 -- Transcript correction UX (FE)
+Phase: 2
+Milestone: Phase 2
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.
+**Type:** FE only.
+**Priority:** HIGH -- removes the biggest source of perceived scoring unfairness.
+
+**Scope:**
+After AssemblyAI returns a transcript and before the transcript is sent to Le Maître for scoring, the user sees the transcript in an editable view. They can confirm it as-is or correct STT errors (typos, mishearings, proper nouns), then submit. The corrected transcript is what Le Maître scores.
+
+The step is not optional: every oral Tâche flow includes it. The confirmation is a single tap if no corrections are needed; it adds under 10 seconds to the flow for users who trust the transcript.
+
+AESTHETIC INPUT NEEDED: founder decides between inline edit (transcript words are individually tappable and editable), side panel (transcript on left, edit form on right), and modal (fullscreen correction view). Filed as decision gate; implement only after founder confirms.
+
+**Acceptance:**
+- Every oral Tâche flow includes a transcript-confirm step before scoring.
+- User can edit any word in the transcript before submitting.
+- Confirmed or corrected transcript is what reaches Le Maître for scoring.
+- The step is skippable only if the transcript is confirmed as-is (no bypass of the step entirely).
+- F-225 Playwright captures.
+
+**Dependencies:** Existing AssemblyAI STT pipeline; no new BE endpoints required (the corrected transcript is submitted in the existing Tâche finalization payload).
+
+**Owner:** FE.
+
+---
+
+## F-376 -- Mock exam mode wired (FE + BE pair)
+Phase: 2
+Milestone: Phase 2
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.
+**Type:** FE + BE (see BE BACKLOG for orchestration scope).
+**Priority:** HIGH -- removes bientôt from /examen/[checkpoint].
+
+**BE-side cross-ref:** BE-F-376 -- orchestration of full-exam scoring (four sections, aggregated score, section scores).
+
+**FE scope:**
+/examen/[checkpoint] renders a fully timed TCF mock exam:
+- Total timer visible in the header (configurable duration per checkpoint config)
+- Four sections (expression orale, comprehension orale, comprehension ecrite, expression ecrite) in sequence
+- Per-section timer
+- Submit flow with confirmation
+- Results page showing aggregated score and per-section breakdown
+- Score prediction integration: mock exam result feeds the F-379 score prediction model
+
+The bientôt label is removed from /examen/[checkpoint] once this ships.
+
+**Acceptance:**
+- User can start a full timed mock TCF from /examen/[checkpoint].
+- Total timer and section timers count down visibly.
+- All four sections are navigable in sequence.
+- Submit flow works end to end.
+- Aggregated score and per-section breakdown are displayed after submission.
+- /examen/[checkpoint] no longer renders a bientôt state.
+- F-225 Playwright captures at 1440px and 375px.
+
+**Dependencies:** BE-F-376 (orchestration and scoring).
+
+**Owner:** FE (timer UI, section navigation, results display) + BE (exam scoring orchestration).
+
+---
+
+## F-377 -- Empty states batch (FE)
+Phase: 2
+Milestone: Phase 2
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.
+**Type:** FE only.
+**Priority:** HIGH -- no in-product surface should render blank or unhandled.
+
+**Scope:**
+Designed empty states across all in-product authenticated surfaces:
+- /carte: "Start your first séance to see your progress here." CTA: "Begin now."
+- /bibliotheque: "Your vocabulary list will grow as you complete sessions." CTA: "Explore chunks."
+- /maitre: "You haven't had a session with Le Maître yet." CTA: "Start a session."
+- /examen: "No exam attempts yet. Take a timed practice exam to see your results." CTA: "Start a practice exam."
+- /progression: "No progress data yet. Complete your first île to start tracking." CTA: "Go to /carte."
+- /parametres: "No preferences configured yet." (self-explanatory, no CTA needed)
+- /abonnement: "No active subscription. See plans below." CTA: "View /tarifs."
+- /maitre/diagnostic: "Complete your first Tâche to see a diagnostic." CTA: "Start a Tâche."
+
+Each empty state has: an icon or illustration, copy appropriate to the surface, a primary next-action CTA. Copy follows the product register (clean utility, no motivational language).
+
+AESTHETIC INPUT NEEDED: founder picks illustration/icon style and copy tone per surface. Filed as decision gate; do not ship final copy without founder review.
+
+**Acceptance:**
+- No in-product surface renders a blank or unhandled empty state.
+- Each empty state has an icon/illustration, copy, and a primary CTA.
+- F-225 Playwright captures for each empty state at 1440px and 375px.
+
+**Dependencies:** None (each empty state is a standalone conditional render).
+
+**Owner:** FE.
+
+---
+
+## F-378 -- First-time user tour (FE)
+Phase: 2
+Milestone: Phase 2
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.
+**Type:** FE only.
+**Priority:** MEDIUM (onboarding UX; reduces first-session confusion).
+
+**Scope:**
+After /bienvenue completes and the user lands on /carte for the first time, a 30-second guided tour fires. The tour consists of 3-5 coachmarks (or equivalent) pointing at primary surfaces: the Atlas island map, the Le Maître entry point, the progression indicator, and the account/settings area.
+
+The tour is skippable via an "X" or "Skip tour" button. Completion (or skip) is persisted in localStorage as `tour_completed: true` and optionally synced to the BE user profile (`onboarding_tour_completed_at` timestamp). The tour fires exactly once per user lifetime.
+
+AESTHETIC INPUT NEEDED: founder decides between modal-sequence (step-by-step overlay), floating coachmarks (spotlight + tooltip on each surface), and minimal tooltips (simple popover with no backdrop). Filed as decision gate.
+
+**Acceptance:**
+- Tour fires exactly once, on first /carte visit after /bienvenue.
+- Tour covers 3-5 primary surfaces.
+- Tour is skippable at any step.
+- Completion and skip both persist the completed flag; no re-trigger.
+- F-225 Playwright captures.
+
+**Dependencies:** /bienvenue flow completion; /carte render.
+
+**Owner:** FE.
+
+---
+
+## F-379 -- Score prediction surfaced (FE + BE pair)
+Phase: 2
+Milestone: Phase 2
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.
+**Type:** FE + BE (see BE BACKLOG for compute scope).
+**Priority:** HIGH -- motivational surface and conversion signal.
+
+**BE-side cross-ref:** BE-F-379 -- rolling-window score prediction compute (last N Tâche scores, weighted by recency and couche).
+
+**FE scope:**
+Display the predicted exam score prominently on /carte or /progression. Exact placement TBD (see AESTHETIC INPUT below). The prediction surface shows:
+- The predicted CLB or band ("Based on your last 5 Tâches, you would score CLB 6.")
+- The target CLB or band from the user's Target Profile ("You need CLB 7.")
+- A simple delta framing ("You are 1 CLB band away from your target.")
+
+The surface is hidden when the user has fewer than 3 Tâche attempts (insufficient data). It updates after each Tâche submission.
+
+AESTHETIC INPUT NEEDED: founder decides location (card on /carte, sidebar widget, top banner on /progression) and prominence. Filed as decision gate.
+
+**Acceptance:**
+- Every authenticated user with at least 3 Tâche attempts sees a current predicted score.
+- Prediction is not shown with fewer than 3 attempts.
+- Prediction updates after each new Tâche submission.
+- F-225 Playwright captures.
+
+**Dependencies:** BE-F-379 (prediction compute endpoint).
+
+**Owner:** FE (display) + BE (compute).
+
+---
+
+## F-380 -- Score dispute / appeal flow (FE + BE pair)
+Phase: 2
+Milestone: Phase 2
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.
+**Type:** FE + BE (see BE BACKLOG for queue and email scope).
+**Priority:** MEDIUM (trust mechanism; the SLA is a written commitment).
+
+**BE-side cross-ref:** BE-F-380 -- dispute queue schema, auto-response email, internal triage interface.
+
+**FE scope:**
+- A "Request human review" button on every Tâche result page (visible after score is rendered).
+- Clicking opens a short form: text area for user comment (what they disagree with and why), pre-filled with the Tâche attempt ID.
+- Submission posts to the BE dispute endpoint.
+- Post-submission: confirmation screen ("Your review request has been received. We will respond within 5 business days.").
+- The user's pending disputes are visible in /profil or /parametres as a list with status (pending / reviewed / resolved).
+
+**Acceptance:**
+- "Request human review" button is visible on every Tâche result.
+- User can submit a dispute with a comment.
+- Confirmation screen is shown after submission.
+- Pending disputes are visible in the user's profile with status.
+- F-225 Playwright captures.
+
+**Dependencies:** BE-F-380 (dispute queue endpoint).
+
+**Owner:** FE (button, form, confirmation, list) + BE (queue, email, triage).
+
+---
+
+# Phase 2.5 additions (pre-monetization production-readiness, 2026-06-02)
+
+## F-381 -- Cookie consent banner (FE)
+Phase: 2.5
+Milestone: Phase 2.5
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.5.
+**Type:** FE only.
+**Priority:** HIGH (EU compliance gate before payment).
+
+**Scope:**
+Build an in-house cookie consent banner without a third-party CMP. Granular categories: necessary (always on), analytics (PostHog, Plausible), marketing (lifecycle emails based on behavior). EU-compliant posture: explicit opt-in required for non-necessary categories; deny-equivalent option ("Refuse all non-necessary"); granular preferences page accessible from footer at /parametres#cookies.
+
+Consent choices are stored in localStorage keyed by a consent version string. When the consent schema changes (new category added, cookie purpose changes), the version increments and the banner re-presents.
+
+Telemetry integration: PostHog fires only after analytics consent is granted. Plausible (cookieless) fires regardless.
+
+AESTHETIC INPUT NEEDED: founder decides position (top bar vs bottom bar), copy tone (plain vs formal), and color treatment (neutral vs accented). Filed as decision gate.
+
+**Acceptance:**
+- EU visitors see the banner on first visit.
+- Consent choices persist across sessions and page refreshes.
+- PostHog does not fire before analytics consent is granted.
+- Deny-equivalent option is present and works.
+- Granular preferences page renders at /parametres#cookies.
+- F-225 Playwright captures.
+
+**Dependencies:** PostHog integration (F-393); no other dependencies.
+
+**Owner:** FE.
+
+---
+
+## F-382 -- Password reset flow (FE + BE pair)
+Phase: 2.5
+Milestone: Phase 2.5
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.5.
+**Type:** FE + BE (see BE BACKLOG for endpoint scope).
+**Priority:** HIGH (auth completeness; required before charging users).
+
+**Note:** The BE password reset endpoints were scaffolded in F-310 Phase B (shipped 2026-05-12). This ticket wires the FE UI to those existing endpoints.
+
+**BE-side cross-ref:** BE-F-382 -- password reset token endpoint and email send (already exists per F-310; verify it is production-configured with RESEND_API_KEY).
+
+**FE scope:**
+- /mot-de-passe-oublie: "Forgot password" page. Email input, submit button, confirmation message ("If this email is registered, a reset link has been sent.").
+- /reinitialiser-mot-de-passe/[token]: "Reset password" page. New password field, confirm password field, submit. Success state routes to /connexion with a toast.
+- Error states: expired token (with "Request a new link" CTA), invalid token, password mismatch.
+
+**Acceptance:**
+- User can request a password reset from /connexion.
+- Reset email is received (production RESEND_API_KEY configured).
+- User can set a new password via the reset link.
+- Expired and invalid token states are handled with user-facing copy.
+- F-225 Playwright captures.
+
+**Dependencies:** BE-F-382 (endpoints exist per F-310 Phase B; verify env vars set).
+
+**Owner:** FE.
+
+---
+
+## F-383 -- Email verification on signup (FE + BE pair)
+Phase: 2.5
+Milestone: Phase 2.5
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.5.
+**Type:** FE + BE (see BE BACKLOG for endpoint scope).
+**Priority:** HIGH (auth completeness; spam and cost control).
+
+**Note:** The BE email verification endpoints were scaffolded in F-310 Phase B (shipped 2026-05-12). Existing soft-beta accounts were grandfathered as verified. This ticket wires the FE UI for new accounts.
+
+**BE-side cross-ref:** BE-F-383 -- verification token on signup, email send, lock policy (account stays usable for X days, locks after). Confirm policy decision with Chadi before implementing FE gating.
+
+**FE scope:**
+- Post-signup: show a verification-pending screen ("Check your inbox. We sent a link to [email]. It expires in 24 hours.") with a "Resend verification email" button.
+- /verifier-email/[token]: verification confirmation page. Success state routes to /carte. Expired token state shows "Your link has expired. Request a new one below" with a resend button.
+- Unverified-but-active state: a dismissible banner on /carte ("Please verify your email to keep full access.") shown until verification completes. The banner is not a hard gate during the X-day grace period.
+- Post-grace-period gate: if the lock policy activates, redirect unverified users to the verification-pending screen on any gated route.
+
+**Acceptance:**
+- New accounts receive a verification email on signup.
+- Verification link works and routes to /carte on success.
+- Expired token state is handled with a resend option.
+- Unverified-but-active banner renders on /carte.
+- F-225 Playwright captures.
+
+**Dependencies:** BE-F-383 (endpoints exist per F-310 Phase B; verify lock policy and RESEND_API_KEY).
+
+**Owner:** FE.
+
+---
+
+## F-384 -- Account deletion and data export (FE + BE pair)
+Phase: 2.5
+Milestone: Phase 2.5
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.5.
+**Type:** FE + BE (see BE BACKLOG for export and deletion endpoints).
+**Priority:** HIGH (GDPR rights; required before charging EU users).
+
+**BE-side cross-ref:** BE-F-384 -- data export endpoint (JSON archive), deletion endpoint (cascade or anonymize per GDPR policy).
+
+**FE scope (account settings section at /profil):**
+
+**Data export flow:**
+- "Download your data" button in /profil.
+- Clicking triggers a request to the BE export endpoint.
+- The BE generates a JSON archive (async if large) and returns a download URL.
+- FE shows a spinner during generation, then auto-downloads or shows a "Download ready" link.
+- Archive includes: account fields, Target Profile, all Tâche attempts with transcripts and per-couche scores, recording metadata, subscription history, detected modules per session.
+
+**Account deletion flow:**
+- "Delete my account" button in /profil (destructive action, visually distinct).
+- Clicking opens a confirmation modal: "This will permanently delete all your data. This cannot be undone." Two buttons: "Cancel" and "Delete my account permanently."
+- Confirming sends a deletion request to the BE.
+- FE signs the user out and routes to / with a toast: "Your account has been deleted."
+
+**Acceptance:**
+- User can download a JSON archive of all their data.
+- Archive contains all data categories listed above.
+- User can delete their account after explicit confirmation.
+- Post-deletion: user is signed out and routed to /.
+- F-225 Playwright captures.
+
+**Dependencies:** BE-F-384 (export and deletion endpoints).
+
+**Owner:** FE (settings UI) + BE (export and deletion).
+
+---
+
+## F-385 -- /contact route and form (FE, minimal BE)
+Phase: 2.5
+Milestone: Phase 2.5
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.5.
+**Type:** FE primarily (minimal BE or mailto fallback).
+**Priority:** MEDIUM (public-facing trust signal; support channel).
+
+**Scope:**
+Public route at /contact. Form fields: name, email, subject (dropdown: general question, billing, technical issue, content feedback, other), message (textarea). Submit behavior:
+
+Phase 2.5 ship: form submits via `mailto:admin@lemethodic.com` as a fallback (no BE endpoint yet). A flag in the component marks the mailto behavior so Phase 4 wires Postmark in-place.
+
+Phase 4 upgrade (F-400 scope): replace the mailto fallback with a Postmark API call from a Next.js Route Handler. The form component itself does not change.
+
+Success state: "Message received. We will respond within 2 business days." Error state: "Something went wrong. You can also reach us at admin@lemethodic.com."
+
+Nav: StickyHeader (public zone).
+
+**Acceptance:**
+- /contact renders on the public domain without auth.
+- Form submits and user sees confirmation.
+- mailto fallback sends to admin@lemethodic.com.
+- Component has a flag for Phase 4 Postmark wiring.
+- F-225 Playwright captures.
+
+**Dependencies:** None for the mailto fallback.
+
+**Owner:** FE.
+
+---
+
+## F-386 -- Bill 96 compliance audit (policy + content)
+Phase: 2.5
+Milestone: Phase 2.5
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.5.
+**Type:** Policy and content (no FE code, no BE code).
+**Priority:** HIGH (legal compliance for Quebec users; required before charging Quebec users).
+
+**Scope:**
+Audit all customer-facing English copy and ensure French primacy for Quebec residents. Deliverables:
+1. All support correspondence templates: author French versions alongside existing English.
+2. CGV and subscription terms: confirm French version is the governing language; add note that English is provided as accommodation.
+3. Refund response templates: author French version.
+4. Marketing email templates: confirm French versions exist for Quebec-segmented sends.
+
+Document the policy in PRODUCT.md (already added in the 2026-06-02 production-readiness pass: section 18, Bill 96 compliance posture).
+
+**Acceptance:**
+- Documented audit in PRODUCT.md with all checklist items verified Y.
+- French versions of all customer support templates exist alongside English.
+- CGV French-primary language confirmed.
+- Refund response template has French version.
+- Owner: Chadi (content authoring) + Engineering (PRODUCT.md update).
+
+**Dependencies:** CGV at /cgv (already shipped); PRODUCT.md section 18.
+
+**Owner:** Chadi (content) + Engineering (doc update).
+
+---
+
+## F-387 -- A11y WCAG 2.1 AA audit and remediation (FE)
+Phase: 2.5
+Milestone: Phase 2.5
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.5.
+**Type:** FE primarily.
+**Priority:** HIGH (legal and product quality; blocks European market credibility).
+
+**Scope:**
+Run Axe DevTools (browser extension) and Lighthouse across every shipped surface. Fix all violations at "critical" and "serious" impact levels. Known risk areas from ARCHITECTURE.md section 17:
+
+- 60% opacity bientôt pattern: likely fails WCAG 1.4.3 (contrast minimum 4.5:1 for text). The fix is a treatment that preserves the "coming soon" signal without relying solely on opacity. Options: overlay text on a solid muted chip, use a hatch pattern or icon alongside the reduced opacity, increase the text contrast independently of the background opacity.
+- Focus management: modal and sheet components (LearnModuleSheet, TurnReviewSheet) must trap focus and restore it on close. Use the `inert` attribute on background content or equivalent.
+- Alt text: audit all images across public-zone routes (/pieges/[slug], /blog/[slug], /examens/tcf, /a-propos, /). Every non-decorative image needs descriptive alt text. Decorative images need `alt=""`.
+- ARIA labels: recording controls (mic button, stop button, playback), progress indicators (couche score bars, CLB level indicator), interactive components without visible text labels.
+
+**CI gate added (per ARCHITECTURE.md section 17):** Lighthouse accessibility score must not drop below 90 on primary routes. Axe must report zero critical or serious violations in the Playwright e2e suite.
+
+**Acceptance:**
+- Every shipped surface passes WCAG 2.1 AA on Axe (zero critical/serious violations).
+- Lighthouse accessibility score is 90 or above on every primary route.
+- 60% opacity bientôt pattern replaced with a contrast-passing treatment.
+- Focus management is correct on all modals and sheets.
+- All non-decorative images have alt text.
+- All interactive components have ARIA labels.
+- F-225 Playwright captures.
+
+**Dependencies:** None (standalone remediation pass).
+
+**Owner:** FE.
+
+---
+
+## F-388 -- Audit logs / telemetry storage (BE only)
+Phase: 2.5
+Milestone: Phase 2.5
+
+**Filed:** 2026-06-02.
+**Status:** Queued (BE-only; cross-ref in FE BACKLOG for visibility).
+**Tag:** Phase 2.5.
+**Type:** BE only. No FE scope.
+**Priority:** HIGH (support debugging; required before charging users).
+
+**BE-side cross-ref:** BE-F-388 -- user_action_log schema, middleware, retention policy. Full spec in BE BACKLOG.
+
+**FE note:** No FE scope for F-388. PostHog event firing (F-393) is the FE-side telemetry complement.
+
+---
+
+## F-389 -- Money-back guarantee surfaced (FE content)
+Phase: 2.5
+Milestone: Phase 2.5
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 2.5.
+**Type:** FE content.
+**Priority:** HIGH (trust signal; required before charging users; written commitment once surfaced).
+
+**Scope:**
+Add a visible 14-day no-questions-asked money-back guarantee badge on:
+- /tarifs: each paid tier card (Core and Sprint). The badge or copy must be visible without scrolling on both tiers at desktop and mobile viewports.
+- /cgv: refund policy section. Add an explicit "14-day guarantee" paragraph at the top of the refund section, before the detailed terms.
+
+The guarantee is a written commitment, not a marketing claim. Once surfaced, it becomes binding. Confirm wording with Chadi before shipping.
+
+AESTHETIC INPUT NEEDED: founder decides badge placement (inside tier card, below price line, above CTA), design treatment (shield icon, checkmark, text-only), and exact wording. Filed as decision gate.
+
+**Acceptance:**
+- 14-day guarantee is visible on every paid tier card on /tarifs (Core and Sprint).
+- 14-day guarantee is stated in the refund section of /cgv.
+- Copy has been approved by Chadi.
+- F-225 Playwright captures at 1440px and 375px.
+
+**Dependencies:** /tarifs (already live); /cgv (already live).
+
+**Owner:** FE (badge component, copy integration).
+
+---
+
+# Phase 3 additions (growth surface, 2026-06-02)
+
+## F-390 -- Trust signals on / (FE content)
+Phase: 3
+Milestone: Phase 3
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 3.
+**Type:** FE content.
+**Priority:** HIGH (conversion; required before paid growth).
+
+**Scope:**
+Add a testimonials section (3-5 quotes from anglophone learners who have improved their TCF or French production scores), a founder credibility row (7,000 hours of tutoring, Book-Lab co-founder, French tutor background, academic collaboration with French university professors), social proof badges (student count, exam pass rate, average score improvement), and a success stories link.
+
+AESTHETIC INPUT NEEDED: founder picks layout (section order relative to other hero content), photo treatment (real photos of learners vs anonymized), testimonial source and copy (with explicit attribution), and whether social proof numbers are surfaced at launch or added post-launch when real data exists.
+
+**Acceptance:**
+- Landing page surfaces at least three testimonials with attribution.
+- Founder credibility row is visible above the fold or within one scroll.
+- F-225 Playwright captures.
+
+**Owner:** Chadi (copy and testimonial sources) + FE (implementation).
+
+---
+
+## F-391 -- Free CLB/TCF score calculator (FE)
+Phase: 3
+Milestone: Phase 3
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 3.
+**Type:** FE only, no auth required.
+**Priority:** HIGH (SEO lead magnet; first growth surface).
+
+**Scope:**
+New public surface at /outils/clb. The tool: user enters their TCF section scores (expression orale, comprehension orale, comprehension ecrite, expression ecrite, each scored 0-699 or CLB equivalent), gets their CLB equivalents and a predicted overall CLB band. Optional email capture for a "full CLB report" lead magnet.
+
+SEO optimization: page title, meta description, and H1 targeting "calcul CLB TCF", "TCF CLB calculator", "score TCF CLB equivalence" intent clusters. Served in French and English via hreflang. No auth required.
+
+AESTHETIC INPUT NEEDED: founder decides form UX (single-page form vs step-by-step), result presentation (table vs visual chart vs text summary), share affordances (copy result, share link).
+
+**Acceptance:**
+- /outils/clb renders publicly without auth.
+- Calculator produces accurate CLB equivalents for any TCF section score combination.
+- Email capture is present and optional.
+- Page ranks for at least one calculator-intent keyword within 30 days of launch.
+- F-225 Playwright captures.
+
+**Owner:** FE (calculator logic and UI). CLB-TCF mapping table: Chadi review required before ship.
+
+---
+
+## F-392 -- Sample lesson preview (FE + BE pair)
+Phase: 3
+Milestone: Phase 3
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 3.
+**Type:** FE + BE (see BE BACKLOG for public île access scope).
+**Priority:** HIGH (conversion; "try before you buy" flow).
+
+**BE-side cross-ref:** BE-F-392 -- make one île publicly accessible without auth, with partial Tâche grading (Le Maître returns feedback but does not save the attempt to the user's progression).
+
+**FE scope:**
+An unauthenticated visitor at /ile/[preview-id] can access a single designated île (the "sample île"). They can complete the dialogue, strands, activities, and submit a Tâche. Le Maître returns per-couche feedback. The feedback is shown but not saved to any user profile. After the Tâche result is shown, a conversion surface appears: "This is one of N islands. Subscribe to track your progress and access all of them."
+
+Watermarking or partial grading: AESTHETIC INPUT NEEDED on how the preview differs from the authenticated experience (full grading vs first-couche-only teaser vs full grading with subscription prompt overlaid).
+
+**Acceptance:**
+- Unauthenticated visitor can complete the sample île end to end including a graded Tâche.
+- Conversion surface appears after the sample Tâche result.
+- The sample île does not require an account.
+- F-225 Playwright captures.
+
+**Owner:** FE + BE.
+
+---
+
+## F-393 -- Activation funnel telemetry (FE + BE pair)
+Phase: 3
+Milestone: Phase 3
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 3.
+**Type:** FE + BE (see BE BACKLOG for event capture scope).
+**Priority:** HIGH (founder visibility; required before paid acquisition).
+
+**BE-side cross-ref:** BE-F-393 -- BE event capture or proxy for server-side events.
+
+**FE scope:**
+Wire PostHog (or equivalent, EU-hosted) event tracking for the canonical activation event taxonomy:
+- signup_completed: fires on successful /inscription submission
+- bienvenue_started: fires on /bienvenue first render
+- bienvenue_completed: fires on /bienvenue final step submission
+- first_ile_opened: fires on first /ile/[id] render
+- first_tache_submitted: fires on first Tâche finalization
+- first_score_received: fires on first Le Maître score return
+- day7_active: fires on first session 7 days after signup
+- day30_active: fires on first session 30 days after signup
+
+All events respect the F-381 cookie consent gate: they fire only after analytics consent is granted.
+
+**Acceptance:**
+- All 8 events fire on real user actions (verified by PostHog event inspector).
+- Events fire only after analytics consent is granted (F-381).
+- Cohort retention dashboard is visible to founder in PostHog.
+- F-225 Playwright captures (visual-only; event firing is verified via PostHog inspector).
+
+**Dependencies:** F-381 (cookie consent gate); PostHog account provisioned.
+
+**Owner:** FE (event wiring) + BE (server-side event proxy if needed).
+
+---
+
+## F-394 -- Site-wide search (FE + BE pair)
+Phase: 3
+Milestone: Phase 3
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 3.
+**Type:** FE + BE (see BE BACKLOG for search index).
+**Priority:** MEDIUM (discovery; improves retention).
+
+**BE-side cross-ref:** BE-F-394 -- search index over pièges, îles, blog posts, bibliothèque entries; search endpoint with typeahead and full results.
+
+**FE scope:**
+- Header search bar with typeahead (appears on all authenticated TopNav surfaces). Icon-expanded (shows full bar on click) or always-visible: AESTHETIC INPUT NEEDED.
+- /recherche: full search results page, organized by content type (pièges, îles, bibliothèque, blog).
+- Search query is sent to the BE search endpoint on each keypress with a 300ms debounce.
+- Loading state: skeleton rows during fetch.
+- Empty state: "No results for [query]. Try searching for a piège, an island topic, or a vocabulary chunk."
+
+AESTHETIC INPUT NEEDED: founder decides header placement (always visible vs icon-expanded vs command-palette triggered).
+
+**Acceptance:**
+- User can find any piece of content by keyword from the header.
+- /recherche renders results organized by content type.
+- Empty state renders for no results.
+- F-225 Playwright captures.
+
+**Dependencies:** BE-F-394 (search index and endpoint).
+
+**Owner:** FE (header bar, results page) + BE (index and endpoint).
+
+---
+
+## F-395 -- Help center at /aide (FE content + structure)
+Phase: 3
+Milestone: Phase 3
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 3.
+**Type:** FE content and structure.
+**Priority:** MEDIUM (support load reduction; trust signal).
+
+**Scope:**
+MDX-backed help center at /aide and /aide/[slug]. Sections:
+- Getting started (what is Le Méthodic, how do islands work, what is a Tâche)
+- Method explainer (5-couche deep dive, one article per couche)
+- Exam coverage (TCF Canada, which exams are supported, how to change your Target Profile)
+- Technical setup (mic setup, browser requirements, troubleshooting)
+- Account and billing (subscription management, password reset, data export, refund policy)
+
+Distinct from /faq (faq = short Q&A, aide = depth and prose). Navigation: left sidebar on desktop (article tree), top nav on mobile. Public zone, no auth.
+
+AESTHETIC INPUT NEEDED: founder picks article-card style (for /aide hub page), sidebar nav style, and tree structure (flat list vs categorized).
+
+**Acceptance:**
+- /aide renders with at least 10 initial articles.
+- /aide/[slug] renders individual articles with MDX.
+- Sidebar nav works on desktop; mobile nav works on mobile.
+- All article slugs return 200.
+- F-225 Playwright captures.
+
+**Owner:** FE (template and nav structure) + Chadi (article content).
+
+---
+
+## F-396 -- Content versioning model (BE only)
+Phase: 3
+Milestone: Phase 3
+
+**Filed:** 2026-06-02.
+**Status:** Queued (BE-only; cross-ref in FE BACKLOG for visibility).
+**Tag:** Phase 3.
+**Type:** BE only. No FE scope.
+**Priority:** MEDIUM (required before large content updates; protects in-progress users).
+
+**BE-side cross-ref:** BE-F-396 -- content version schema, migration policy, in-progress user binding. Full spec in BE BACKLOG.
+
+**FE note:** FE consumes the content_version field on content payloads and renders the version-change prompt if the BE flags a delta. This is a Phase 3 follow-up to the BE schema ship.
+
+---
+
+## F-397 -- Performance budget (operational + light FE)
+Phase: 3
+Milestone: Phase 3
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 3.
+**Type:** Operational and light FE.
+**Priority:** MEDIUM (SEO and UX quality; required before paid SEO investment).
+
+**Scope:**
+Define LCP, TTFB, and INP targets for public surfaces (especially /pieges, /pieges/[slug], /blog/[slug]) per the targets in ARCHITECTURE.md section 19.
+
+Set up Lighthouse CI checks in the Vercel preview deploy workflow. If a primary route's LCP, TTFB, or INP exceeds the budget, the check fails and the PR is flagged.
+
+Evaluate `images.unoptimized: true` in next.config.mjs: SEO content pages with many images will fail LCP targets without optimization. Plan: enable Next.js image optimization selectively on public-zone routes (or globally, if no side effects are found).
+
+**Acceptance:**
+- Lighthouse CI is integrated into the Vercel preview deploy workflow.
+- Budget regression on any primary route fails the CI check.
+- All primary public routes meet the LCP, TTFB, and INP targets in ARCHITECTURE.md section 19.
+- F-225 Playwright captures (for visual verification; performance is measured by Lighthouse).
+
+**Dependencies:** None.
+
+**Owner:** FE + Engineering.
+
+---
+
+## F-398 -- PWA install flow (FE)
+Phase: 3
+Milestone: Phase 3
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 3.
+**Type:** FE only.
+**Priority:** LOW (post-growth surface; enhances mobile retention).
+
+**Scope (per ARCHITECTURE.md section 20):**
+- `public/manifest.json`: name "Le Méthodic", short_name "Le Méthodic", icons (192px and 512px, warm palette), theme_color (from CSS token `--ed-accent`), background_color (from `--ed-bg`), display: standalone, start_url: /carte.
+- Service worker (using Workbox or equivalent): caches the app shell (nav, layout, fonts). Content routes show an offline state. Recording and Tâche flows fail explicitly when offline rather than silently.
+- Deferred install prompt (`beforeinstallprompt` event): captured and stored. Surfaced after the first completed Tâche (or day 3 active, whichever comes first). Fires once per user.
+
+AESTHETIC INPUT NEEDED: founder decides install prompt timing (immediately after first Tâche vs after day 3 vs on return visit) and visual treatment (bottom sheet, toast, modal).
+
+**Acceptance:**
+- Site is installable as a PWA on Android Chrome and iOS Safari (Add to Home Screen).
+- Install prompt fires at the configured engagement moment.
+- Service worker caches the app shell.
+- Offline state renders for content routes.
+- Recording and Tâche flows show a clear offline message (not a silent failure).
+- F-225 Playwright captures.
+
+**Dependencies:** manifest.json and service worker are standalone; deferred install prompt requires the engagement trigger events to be wired.
+
+**Owner:** FE.
+
+---
+
+# Phase 4 additions (payment + operations, 2026-06-02)
+
+## F-399 -- Error monitoring wire (FE + BE pair)
+Phase: 4
+Milestone: Phase 4
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 4.
+**Type:** FE + BE (see BE BACKLOG for server SDK scope).
+**Priority:** HIGH (operational requirement; required before GA launch).
+
+**BE-side cross-ref:** BE-F-399 -- Sentry server SDK on BE (FastAPI), source maps, alerting.
+
+**FE scope:**
+Wire Sentry browser SDK into the Next.js app. EU data residency (Sentry EU endpoint). Source maps uploaded at Vercel deploy time.
+
+Configuration:
+- Capture all unhandled exceptions and promise rejections.
+- Capture Next.js router transitions that throw.
+- Attach user context (user_id only, no PII) to error events when authenticated.
+- Release tagging: each Vercel deploy gets a Sentry release tag so errors are attributable to the specific deploy.
+
+Alerting policy (shared with BE-F-399): critical errors in payment flow or user data operations trigger an immediate email to the founder. Non-critical errors are grouped in a daily digest.
+
+**Acceptance:**
+- Sentry captures FE errors in the EU-hosted instance.
+- Source maps resolve stack traces to source code.
+- User context is attached to errors for authenticated users.
+- A test error thrown in a safe path confirms the event appears in Sentry within 60 seconds.
+- F-225 Playwright captures (non-functional for this ticket; verify via Sentry dashboard).
+
+**Dependencies:** Sentry account with EU data residency configured.
+
+**Owner:** FE.
+
+---
+
+## F-400 -- Email infrastructure (FE + BE pair)
+Phase: 4
+Milestone: Phase 4
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 4.
+**Type:** FE + BE (see BE BACKLOG for Postmark wire and template management).
+**Priority:** HIGH (required before GA; transactional emails must fire before charging users).
+
+**BE-side cross-ref:** BE-F-400 -- Postmark wire, transactional template IDs, lifecycle series trigger logic.
+
+**FE scope:**
+Phase 4 upgrades the F-385 /contact form from mailto fallback to a Postmark API call via a Next.js Route Handler. The form component itself is unchanged (just the submit handler). The Route Handler calls Postmark's inbound message API with the form payload and returns a success or error response.
+
+No other FE scope: all email sending is BE-side. The FE email infrastructure ticket is purely the /contact Postmark upgrade.
+
+**Acceptance:**
+- /contact form submits via Postmark (Route Handler) rather than mailto.
+- Founder receives contact form submissions in inbox.
+- The FE component is identical to the F-385 ship (no visual changes).
+
+**Dependencies:** F-385 (/contact form shipped); Postmark account configured (BE-F-400).
+
+**Owner:** FE (Route Handler wiring).
+
+---
+
+## F-401 -- In-app notifications (FE + BE pair)
+Phase: 4
+Milestone: Phase 4
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 4.
+**Type:** FE + BE (see BE BACKLOG for notifications table and admin send endpoint).
+**Priority:** MEDIUM (engagement driver).
+
+**Note:** This ticket F-401 is filed here in Phase 4 of the FE BACKLOG. It is distinct from the shipped F-401 in the BE BACKLOG which was the M5.5 rate-limiting ticket. No ID collision on the FE side; the BE BACKLOG uses BE-F-401 for the rate-limiting entry (now marked Shipped).
+
+**BE-side cross-ref:** BE-F-401-notifications -- notifications table (user_id, type, payload, read_at), admin send endpoint.
+
+**FE scope:**
+- Bell icon in TopNav with unread count badge (shows count when unread > 0, hidden when 0).
+- Dropdown list: last 10 notifications with type icon, summary text, timestamp, and unread highlight. Tapping a notification marks it as read.
+- "Mark all as read" action.
+- /notifications: full notifications page (all notifications, paginated, filter by type).
+- Notification types: dispute_response (your dispute on Tâche [N] has been reviewed), payment_receipt (your subscription is active), content_updates (new pièges articles, new îles), milestones_reached (first île completed, CLB band up).
+
+**Acceptance:**
+- Bell icon shows unread count.
+- Dropdown renders last 10 notifications.
+- Tapping a notification marks it as read.
+- /notifications page renders with pagination.
+- F-225 Playwright captures.
+
+**Dependencies:** BE-F-401-notifications (notifications table and API).
+
+**Owner:** FE.
+
+---
+
+## F-402 -- Customer feedback (FE + BE pair)
+Phase: 4
+Milestone: Phase 4
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 4.
+**Type:** FE + BE (see BE BACKLOG for feedback storage).
+**Priority:** MEDIUM (product intelligence; non-blocking for launch).
+
+**Note:** This ticket F-402 is filed here in Phase 4 of the FE BACKLOG. It is distinct from the shipped F-402 in the BE BACKLOG which was the M5.5 FK indexes ticket. No ID collision on the FE side.
+
+**BE-side cross-ref:** BE-F-402-feedback -- feedback table (NPS responses, exit survey responses), aggregate view.
+
+**FE scope:**
+- NPS prompt: a non-intrusive bottom-right floating card ("How likely are you to recommend Le Méthodic? 0-10"). Fires after: first completed Tâche (first engagement milestone), first month of activity (day-30 active trigger), subscription renewal. Each trigger fires once per user.
+- Exit survey: fires when a user initiates cancellation from /abonnement. Short form: reason for cancelling (dropdown: price, not enough time, found an alternative, achieved my goal, other) + optional open text. Submitted before the cancellation completes.
+- Both prompts are dismissible without answering. Non-response is recorded as a dismissal, not as a response.
+
+**Acceptance:**
+- NPS prompt fires at each milestone, at most once per trigger type per user.
+- Exit survey fires on cancel initiation.
+- Both are dismissible.
+- Response data is visible to founder in the BE aggregate view.
+- F-225 Playwright captures.
+
+**Dependencies:** BE-F-402-feedback (storage and aggregate view).
+
+**Owner:** FE.
+
+---
+
+## F-403 -- Admin dashboard (BE + FE, internal-only)
+Phase: 4
+Milestone: Phase 4
+
+**Filed:** 2026-06-02.
+**Status:** Queued.
+**Tag:** Phase 4.
+**Type:** FE + BE (see BE BACKLOG for admin API endpoints).
+**Priority:** HIGH (operational requirement; founder must be able to manage operations without DB access).
+
+**Note:** This ticket F-403 is filed here in Phase 4 of the FE BACKLOG. It is distinct from the shipped F-403 in the BE BACKLOG which was the M5.5 N+1 fixes ticket. No ID collision on the FE side.
+
+**BE-side cross-ref:** BE-F-403-admin -- admin endpoints (users, revenue, content health, dispute queue, telemetry summary, impersonate).
+
+**FE scope:**
+Authenticated route at /admin. Gated to founder email (the BE enforces this; FE redirects non-founder users who authenticate to /carte with a 403 toast). No StickyHeader or TopNav; its own minimal chrome (logo wordmark, signout button, section tabs).
+
+Sections:
+- Users: searchable/filterable list (email, signup date, subscription tier, last active). Click user row to see their profile (Target Profile, session history, active subscription). Impersonate button for support.
+- Revenue: LemonSqueezy order and subscription summary (pulled from LemonSqueezy API via BE). MRR, total orders, recent transactions.
+- Content health: island publish status, version, last updated. Pièges catalog: live vs bientôt count. Blog: published vs draft count.
+- Dispute queue: all open disputes with user, Tâche attempt ID, AI score, user comment, status, timestamp. Founder can mark as reviewed and add a resolution note.
+- Telemetry: activation funnel summary (signup count, bienvenue_completed rate, first_tache_submitted rate, day7 retention, day30 retention). Sourced from PostHog or the BE audit_log.
+
+**Acceptance:**
+- /admin is accessible only to the founder email.
+- All five sections render with real data.
+- Founder can view users, impersonate for support, see revenue, manage dispute queue.
+- F-225 Playwright captures (at a test/fixture data state; no production data in screenshots).
+
+**Dependencies:** BE-F-403-admin (admin endpoints); LemonSqueezy API key; F-393 (telemetry data).
+
+**Owner:** FE (admin UI) + BE (admin endpoints).
+
 **Related:** Worth a future ticket to address `typescript.ignoreBuildErrors: true` itself — silently passing builds with type errors is technical debt. But that's a separate cleanup session blocked on first fixing all latent TS errors.
 
 ---
