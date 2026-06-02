@@ -1,29 +1,29 @@
 # Le Méthodic, Marketing Track Roadmap
 
 **Status:** Canonical
-**Last updated:** 2026-05-31
+**Last updated:** 2026-06-02
 **Related artifacts:** ROADMAP.md (product track), SITEMAP.md (surfaces), PRODUCT.md (positioning), BACKLOG.md
 
 ## Purpose
 
 Marketing site work and product work are different workstreams. Different cadence, different dispatch patterns, different success metrics. Product milestones (M0 through M8 in ROADMAP.md) cover engineering on the authenticated app. This file covers the public site, the SEO funnel, and the store.
 
-Per Session 5 lock (Option C, parallel track), the two roadmaps ship independently. M8 soft-beta requires both tracks ready.
+Per Session 5 lock (Option C, parallel track), the two roadmaps ship independently. Opening to a first audience is a marketing decision about scale, not a product version gate. The product is complete at any audience size.
 
 ## Milestone sequence
 
-8 milestones. MS-0 through MS-4 ship before soft-beta. MS-5 through MS-7 can ship post-soft-beta without breaking the launch claim.
+8 milestones. MS-0 through MS-4 ship before opening to a first audience. MS-5 through MS-7 can follow at any cadence without blocking the first audience opening.
 
-| ID | Scope | Dependencies | Pre-soft-beta |
+| ID | Scope | Dependencies | Pre-launch |
 |---|---|---|---|
 | MS-0 | Audit current marketing surfaces | None | Yes |
 | MS-1 | Homepage rewrite, top 3 exam landings | MS-0 | Yes |
 | MS-2 | Public method explainer, free placement test | MS-0 | Yes |
-| MS-3 | Pricing page, founder page, coaching booking | MS-0, M6 Stripe (for booking) | Yes |
+| MS-3 | Pricing page, founder page, coaching booking | MS-0, Phase 4 (LemonSqueezy) | Yes |
 | MS-4 | Help and legal table-stakes | MS-0 | Yes |
 | MS-5 | Blog scaffolding, first 5 posts | MS-0 | No |
 | MS-6 | Remaining exam landings, cluster hubs | MS-1 | No |
-| MS-7 | `/library` store launch | M6 Stripe, MS-3, catalog ready | No |
+| MS-7 | `/library` store launch | Phase 4 (LemonSqueezy), MS-3, catalog ready | No |
 
 ---
 
@@ -80,10 +80,10 @@ Per Session 5 lock (Option C, parallel track), the two roadmaps ship independent
 **Deliverables.**
 - `/tarifs` with 4-tier ladder visible (Découverte, Engagement, Maîtrise, Sprint), à la carte options, subscriber discounts
 - `/chadi` founder page (photo, intro video, bio emphasizing 7000+ tutoring hours, 28-book Book-Lab catalog, 5-couche method authorship)
-- `/coaching` 1-on-1 booking with Chadi (Stripe-backed payment, calendar integration)
+- `/coaching` 1-on-1 booking with Chadi (LemonSqueezy-backed payment, calendar integration)
 - `/coaching/trial-class` free first session route
 
-**Dependencies.** MS-0 audit. M6 Stripe milestone complete (for `/coaching` booking and payment). PRODUCT.md tier descriptions current.
+**Dependencies.** MS-0 audit. Phase 4 (LemonSqueezy) milestone complete (for `/coaching` booking and payment). PRODUCT.md tier descriptions current.
 
 **Acceptance.** All 4 routes live. `/coaching` can take a booking, charge $99 (or free for trial-class), and add session to Chadi's calendar. Tier ladder on `/tarifs` matches PRODUCT.md exactly.
 
@@ -148,10 +148,10 @@ Per Session 5 lock (Option C, parallel track), the two roadmaps ship independent
 - `/library/telechargements` populated with 5 to 8 download items
 - `/library/ressources-gratuites` populated with 5 to 8 lead magnets (email-gated)
 - `/library/[item-slug]` individual product pages
-- `/library/checkout` Stripe checkout with subscriber discount logic (15% Engagement, 25% Maîtrise, 30% Sprint)
+- `/library/checkout` LemonSqueezy checkout with subscriber discount logic (15% Engagement, 25% Maîtrise, 30% Sprint)
 - 3 bundles: TCF Canada Complete Pack ($79), Anglophone Starter Pack ($49), Sprint Companion ($99)
 
-**Dependencies.** M6 Stripe complete. MS-3 pricing page live. Book-Lab catalog ready with at least 8 titles in deliverable format.
+**Dependencies.** Phase 4 (LemonSqueezy) complete. MS-3 pricing page live. Book-Lab catalog ready with at least 8 titles in deliverable format.
 
 **Acceptance.** Store accepts payments, applies discounts correctly per tier, delivers digital products via email or download link. Free resources require email capture and trigger drip campaign. Bundles purchasable at advertised prices.
 
@@ -161,11 +161,11 @@ Per Session 5 lock (Option C, parallel track), the two roadmaps ship independent
 
 | Marketing milestone | Depends on product milestone |
 |---|---|
-| MS-3 (coaching booking) | M6 (Stripe + LLC) |
-| MS-7 (store) | M6 (Stripe + LLC), MS-3 |
+| MS-3 (coaching booking) | Phase 4 (LemonSqueezy) |
+| MS-7 (store) | Phase 4 (LemonSqueezy), MS-3 |
 
 If product milestone slips, dependent marketing milestone slips with it. Otherwise tracks are independent.
 
-## Status as of 2026-05-31
+## Status as of 2026-06-02
 
 All 8 milestones unstarted. Ready for backlog ticketing in BACKLOG.md.

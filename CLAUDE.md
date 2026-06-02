@@ -11,9 +11,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Four principles
 
 1. **No silent assumptions.** If you don't know what a function does or what shape an API returns, read the code. Don't guess.
-2. **Scope is sacred.** A 50-line feature stays 50 lines. Don't expand to 500 because "it might be useful later." V1.1+ is a real place we put things.
+2. **Scope is sacred.** A 50-line feature stays 50 lines. Don't expand to 500 because "it might be useful later." Deferred surfaces go to the bientôt queue, not a future version.
 3. **Don't touch what wasn't requested.** Orthogonal changes (formatting, refactoring, renaming) are forbidden in feature work. Open a separate PR if it matters.
 4. **No "it works" without evidence.** Run the tests. Say which ones passed. If they failed, fix the test or fix the code — don't skip it.
+
+## Canonical names and complete-site doctrine
+
+**Product spine (canonical):**
+- Le Méthodic (the product)
+- La Méthode (the core loop, route /la-methode)
+- La Bibliothèque (the resource library, route /la-bibliotheque)
+- L'Examen (the diagnostic and exam tools, route /l-examen)
+- /carte (the Atlas hub, home after onboarding)
+- The five couches: Le Propos, Le Plan, La Construction, Les Pièges Anglais, La Musique
+
+**Forbidden names:** FluentPath, FluentPrep, Le Cours, Le Raccourci, Guide tier, Sophie, Stripe (in user-facing copy or new code), and version language used as a product state (V1, V1.1, V2, beta, soft-beta as a product label).
+
+**Complete-site doctrine:** The product is one complete website from launch. Every surface is present. Unbuilt parts show as bientôt, not as missing routes or errors. Lighting a surface up is content plus a feature flag, never a version bump. The spine is exam-agnostic; a Target Profile (exam, threshold, deadline, persona) overlays it. All four skills are present from the start. TCF is the first exam lit, not the only one.
+
+**Payment:** LemonSqueezy is the merchant of record for all new payment code. No Stripe references in new code or user-facing surfaces.
 
 ## Commands
 
@@ -44,7 +60,7 @@ Every ticket that touches a visible surface must have e2e coverage that:
 
 If the change is genuinely non-visual (BE-only, config, deps, copy that doesn't affect layout, doc updates), note `non-visual change — verification skipped` on the PRD entry instead.
 
-**Debt accepted (2026-05-23):** UI-001 through BE-005 shipped before this amendment landed. Their individual receipts are lost (production today is the layered superset). A one-time full-surface battery will be captured at soft-beta launch and serve as the canonical baseline.
+**Debt accepted (2026-05-23):** UI-001 through BE-005 shipped before this amendment landed. Their individual receipts are lost (production today is the layered superset). A one-time full-surface battery will be captured at first audience launch and serve as the canonical baseline.
 
 The rule exists because mobile-first development without desktop verification has shipped broken desktop layouts repeatedly. Automating it removes the ceremony cost so the rule actually gets followed.
 
@@ -151,14 +167,14 @@ The editorial system established by F-200 has these reusable primitives:
 - **API clients** live in `lib/api/<feature>.ts`. Schema reconciliation (BE shape → FE shape) happens here, not in components. Examples: `lib/api/lessons.ts`, `lib/api/vocab.ts`, `lib/api/taches.ts`.
 - **Feature helpers** live in `lib/<feature>/*`: `lib/taches/normalize.ts`, `lib/vocab/params.ts`.
 - **Fixtures** in `lib/data/*` are being phased out as BE wiring lands. Don't add new fixture files for features that have BE endpoints.
-- **Flatten hierarchical BE shapes** for V1.0 surfaces. Hierarchy comes back V1.1+ (see BE-004 vocab reconciliation precedent: BE returns nested topics→subtopics→chunks, FE flattens to a single chunk list with topic metadata inline).
+- **Flatten hierarchical BE shapes** for current surfaces. Hierarchy is deferred to the bientôt queue (see BE-004 vocab reconciliation precedent: BE returns nested topics→subtopics→chunks, FE flattens to a single chunk list with topic metadata inline).
 - **Auth** wraps the authed `(app)` route group via `ProtectedRoute`. Sidebar has signout. hCaptcha is on the auth surfaces. EXCLUDED_PREFIXES in TopNav governs marketing-nav hiding.
 
 ### FastAPI BE is preserved (Architecture Path A, locked 2026-05-23)
 
 - The BE repo `chadovsky/lemethodic-backend` (branch: `master`) is 53.8K LOC of FastAPI + SQLAlchemy + Postgres on DigitalOcean FRA1 (production: `seal-app-75fiu.ondigitalocean.app`). **Do not propose rewriting it** in Next.js Route Handlers, Prisma, Drizzle, or anything else.
 - We wire to existing `/api/*` endpoints. New endpoints require BE work in the other repo, not Next.js Route Handlers in this one.
-- **BE surfaces deferred to V1.1+** (do not wire in V1.0 entries): `/api/writing/*`, `/api/analytics/*`, `/api/today/*`, `/api/modules` + `/api/users/me/recurring_modules`, `/api/oral/generate-structure`. These endpoints exist and work, but the FE surfaces for them are V1.1.
+- **BE surfaces in the bientôt queue** (do not wire yet): `/api/writing/*`, `/api/analytics/*`, `/api/today/*`, `/api/modules` + `/api/users/me/recurring_modules`, `/api/oral/generate-structure`. These endpoints exist and work, but the FE surfaces for them are deferred.
 
 ### Build config gotchas
 
