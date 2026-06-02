@@ -33,6 +33,8 @@ const EXCLUDED_PREFIXES = [
   '/privacy',
   '/terms',
   '/refund',
+  '/examens',
+  '/a-propos',
 ] as const
 
 // V-016g — /library + /fr/library stubs are also marketing surfaces.

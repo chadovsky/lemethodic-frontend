@@ -28,6 +28,8 @@ const MARKETING_PREFIXES = [
   '/refund',
   '/privacy',
   '/terms',
+  '/examens',
+  '/a-propos',
 ] as const
 
 function isMarketingPath(pathname: string): boolean {
@@ -41,6 +43,7 @@ function isMarketingPath(pathname: string): boolean {
 // Primary marketing nav items shown in the mobile hamburger menu.
 const MOBILE_NAV = [
   { href: '/method', label: 'La Méthode' },
+  { href: '/examens', label: 'Examens' },
   { href: '/login', label: 'Sign in' },
   { href: '/signup', label: 'Get started' },
 ] as const
@@ -91,21 +94,35 @@ export default function StickyHeader() {
         >
           <Wordmark size="showcase" animateReveal href="/" />
 
-          {/* Desktop: Sign in link */}
-          <Link
-            href="/login"
-            className="hidden md:inline-flex"
-            style={{
-              fontFamily: SANS_FONT,
-              fontWeight: 600,
-              fontSize: '0.875rem',
-              color: 'var(--text-primary)',
-              textDecoration: 'none',
-              letterSpacing: '0.01em',
-            }}
-          >
-            Sign in
-          </Link>
+          {/* Desktop: public nav links + Sign in */}
+          <div className="hidden md:flex" style={{ alignItems: 'center', gap: 28 }}>
+            <Link
+              href="/examens"
+              style={{
+                fontFamily: SANS_FONT,
+                fontWeight: 500,
+                fontSize: '0.875rem',
+                color: 'var(--text-primary)',
+                textDecoration: 'none',
+                letterSpacing: '0.01em',
+              }}
+            >
+              Examens
+            </Link>
+            <Link
+              href="/login"
+              style={{
+                fontFamily: SANS_FONT,
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                color: 'var(--text-primary)',
+                textDecoration: 'none',
+                letterSpacing: '0.01em',
+              }}
+            >
+              Sign in
+            </Link>
+          </div>
 
           {/* Mobile: hamburger / close toggle */}
           <button

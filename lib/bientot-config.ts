@@ -8,7 +8,12 @@ export type FeatureStatus = 'live' | 'bientot'
 export type FeatureKey = string
 
 // Seed empty. Subsequent tickets populate this record as surfaces are wired.
-export const FEATURES: Record<FeatureKey, FeatureStatus> = {}
+export const FEATURES: Record<FeatureKey, FeatureStatus> = {
+  'examens/tef': 'bientot',
+  'examens/dalf': 'bientot',
+  'examens/delf': 'bientot',
+  'examens/general': 'bientot',
+}
 
 // Returns true only when the key is explicitly set to 'bientot'.
 // Unknown keys default to live by absence, so adding a key is opt-in.
