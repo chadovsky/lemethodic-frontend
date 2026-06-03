@@ -6167,28 +6167,15 @@ Build the seven typed mold components in /components/iles/molds/ and create /_de
 
 ## F-406: /ile/[theme] real page (syllabus view)
 
-**Status:** Queued
+**Status:** Shipped (localStorage interim; BE wiring deferred to F-410/F-417 Round 2)
 **Phase:** Phase 2
 **Priority:** P0
 
-Replace the /ile/[id] bientôt scaffold with the real syllabus view. Dynamic route reads user's current_level from BE, imports the MDX content for (theme, level), renders the mold components in sequence.
+Route `[id]` renamed to `[theme]`. Server page wraps client `IleShell` which reads `current_level` from localStorage (default `b1`), dynamically imports the MDX, renders full mold sequence. Hero image via next/image with graceful fallback. Level badge + duration + "En cours" progress chip (localStorage-persisted). Bientôt state when (theme, level) MDX absent. Le Maître close as disabled seam (opacity 0.45). Sub-routes `activites/` and `tache/` updated to `theme` param.
 
-**Scope:**
-- app/(app)/ile/[theme]/page.tsx (dynamic route)
-- MDX import resolution: /content/iles/[theme]/[level].mdx based on user.current_level
-- Renders Le Maître intro audio at the top
-- Renders the 7 mold sections in syllabus order
-- Completion state per section (calls BE user_progress endpoint)
-- La Tâche section locked until rest is complete
-- Le Maître close audio at the bottom (revealed when all complete)
+**Filed follow-up:** migrate `current_level` + `ile_started_*` localStorage keys to F-410 / F-417 BE endpoints (Round 2).
 
-**Acceptance:**
-- /ile/[one of the launch themes] renders the full B1 île
-- All 7 mold sections render with their sample data
-- Progress state persists via BE (F-423 + F-424 must be live)
-- Tâche lock state respected
-
-**Dependencies:** F-404, F-405, F-423 (islands + user_progress schema), F-424 (target_profile).
+**Dependencies:** F-404, F-405.
 **Branch:** main.
 
 ---

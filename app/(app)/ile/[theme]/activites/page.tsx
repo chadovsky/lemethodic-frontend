@@ -5,7 +5,7 @@ export const metadata = {
   title: 'Activités | Le Méthodic',
 }
 
-type Params = Promise<{ id: string }>
+type Params = Promise<{ theme: string }>
 
 const ACTIVITY_TYPES = [
   {
@@ -31,7 +31,7 @@ const ACTIVITY_TYPES = [
 ]
 
 export default async function IleActivitesPage({ params }: { params: Params }) {
-  const { id } = await params
+  const { theme } = await params
 
   return (
     <main
@@ -49,7 +49,7 @@ export default async function IleActivitesPage({ params }: { params: Params }) {
           margin: '0 0 8px',
         }}
       >
-        Île {id}
+        Île {theme}
       </p>
       <h1
         style={{

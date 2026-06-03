@@ -2602,17 +2602,20 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 ---
 
-### F-406 — /ile/[id] page rendering MDX (local state, BE wiring deferred)
+### F-406 — /ile/[theme] page — full syllabus view (localStorage interim)
 
-**Status:** Partial (local state; progress/level BE wiring deferred to Round 2, F-417/F-410)
-**Commit:** feat(iles): Dialogue mold + /ile tracer bullet (sample data, MDX wired)
-**Effort:** 1 session (combined with F-405)
+**Status:** Shipped
+**Commit:** TBD (post-squash)
+**Effort:** 2 sessions (tracer bullet in F-405 session; completed here)
 
-**Scope:** Updated `app/(app)/ile/[id]/page.tsx` to replace the bientot stub. Dynamic import of MDX by theme slug (level hardcoded to `b1` with BE seam comment for F-410). Le Maitre intro/close placeholders rendered at top/bottom (audio deferred to F-417). Sample island at `content/iles/_sample/b1.mdx` (famille theme, B1, 8-turn Dialogue, 2 comprehension checks). Dev demo route at `/dev/molds` rendering Dialogue in isolation (note: `/_dev/molds` is not routable in Next.js App Router; `_` prefix creates a private folder excluded from routing).
+**Scope:** Route renamed `[id]` → `[theme]`. Server page at `app/(app)/ile/[theme]/page.tsx` thin-wraps client `components/iles/IleShell.tsx`. IleShell reads `current_level` from localStorage (default `b1`), dynamically imports `content/iles/${theme}/${level}.mdx`, renders full mold sequence. Hero image via `next/image` with `onError` fallback (placeholder letter). Île header: display_title, level badge, duration chip, "En cours" progress chip (localStorage-persisted start timestamp). Bientôt state when (theme, level) MDX is absent. Le Maître close kept as disabled seam (opacity 0.45, same pattern as Tâche). Sub-routes `activites/` and `tache/` updated to `theme` param.
 
 **BE seams committed in code:**
-- `CURRENT_LEVEL = 'b1'` hardcoded in page.tsx (resolve from target_profile F-410 in Round 2)
-- Le Maitre close placeholder always visible (gate behind user_progress F-417 in Round 2)
+- `current_level` from localStorage (migrate to F-410 target_profile in Round 2)
+- Per-île progress via `ile_started_${theme}_${level}` localStorage key (migrate to F-417 user_progress in Round 2)
+- Le Maître intro/close audio deferred to F-417
+
+**Filed follow-up:** migrate `current_level` + `ile_started_*` localStorage keys to F-410 / F-417 BE endpoints (Round 2).
 
 ---
 

@@ -1,4 +1,4 @@
-// SITEMAP marks this surface as live, but the canonical /ile/[id]/tache path
+// SITEMAP marks this surface as live, but the canonical /ile/[theme]/tache path
 // needs Phase 2 wiring to route to the appropriate tache type based on ile
 // metadata. Current tache content lives at /examen/expression-orale and
 // /examen/expression-ecrite.
@@ -10,10 +10,10 @@ export const metadata = {
   title: 'La Tâche | Le Méthodic',
 }
 
-type Params = Promise<{ id: string }>
+type Params = Promise<{ theme: string }>
 
 export default async function IleTachePage({ params }: { params: Params }) {
-  const { id } = await params
+  const { theme } = await params
 
   return (
     <main
@@ -31,7 +31,7 @@ export default async function IleTachePage({ params }: { params: Params }) {
           margin: '0 0 8px',
         }}
       >
-        Île {id}
+        Île {theme}
       </p>
       <h1
         style={{
