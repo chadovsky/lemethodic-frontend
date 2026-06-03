@@ -43,7 +43,7 @@ export const LECONS: LeconEntry[] = [
     title: 'Au café',
     themeSlug: 'cafe',
     section: 'fondations',
-    status: 'bientot',
+    status: 'available',
   },
   { number: 3,  title: 'Leçon 3',  themeSlug: '', section: 'fondations', status: 'bientot' },
   { number: 4,  title: 'Leçon 4',  themeSlug: '', section: 'fondations', status: 'bientot' },

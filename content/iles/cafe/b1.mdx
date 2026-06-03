@@ -1,0 +1,90 @@
+{/*
+  STUB — contenu de démonstration.
+  À remplacer par le contenu Chadi avant mise en ligne.
+  Ce fichier existe uniquement pour rendre le shell /ile/cafe et afficher le héro.
+*/}
+
+import Dialogue from '@/components/iles/molds/Dialogue'
+import ActeDeParole from '@/components/iles/molds/ActeDeParole'
+import Tache from '@/components/iles/molds/Tache'
+
+export const meta = {
+  theme: 'cafe',
+  level: 'b1',
+  display_title: 'Au café',
+  prerequisites: [],
+  estimated_minutes: 15,
+  persona_priority: ['visa-urgent', 'habit-builder'],
+  image_set: '/iles/cafe',
+  maitre_audio: {
+    intro: '/iles/cafe/audio/b1/intro.mp3',
+    close: '/iles/cafe/audio/b1/close.mp3',
+  },
+  actes_de_parole: ['commander-une-boisson', 'exprimer-preference'],
+}
+
+<div
+  style={{
+    fontFamily: 'var(--f-mono)',
+    fontSize: 11,
+    letterSpacing: '0.06em',
+    textTransform: 'uppercase',
+    color: 'var(--ink-faint)',
+    border: '1px dashed var(--rule)',
+    borderRadius: 'var(--r-sm)',
+    padding: '8px 14px',
+    marginBottom: 32,
+  }}
+>
+  Contenu de démonstration — à remplacer par le contenu Chadi avant mise en ligne.
+</div>
+
+<Dialogue
+  audio="/iles/cafe/audio/b1/dialogue.mp3"
+  transcript={[
+    { speaker: "Serveur", text: "Bonjour, vous avez choisi?" },
+    { speaker: "Cliente", text: "Oui, je voudrais un cafe creme, s'il vous plait." },
+    { speaker: "Serveur", text: "Tres bien. Et avec ca?" },
+    { speaker: "Cliente", text: "Un croissant, s'il vous plait. C'est combien?" },
+    { speaker: "Serveur", text: "Alors, quatre euros cinquante en tout." },
+    { speaker: "Cliente", text: "Voila. Merci beaucoup." },
+    { speaker: "Serveur", text: "Je vous en prie. Bonne journee!" },
+  ]}
+  comprehensionChecks={[
+    {
+      type: 'mcq',
+      question: "Qu'est-ce que la cliente commande a boire?",
+      options: [
+        "Un cafe noir",
+        "Un cafe creme",
+        "Un the",
+        "Un jus d'orange",
+      ],
+      correctIndex: 1,
+    },
+    {
+      type: 'vrai-faux',
+      question: "La commande totale coute cinq euros.",
+      options: ["Vrai", "Faux"],
+      correctIndex: 1,
+    },
+  ]}
+/>
+
+<ActeDeParole
+  fonction="Commander une boisson au café"
+  formules={[
+    { text: "Je voudrais un cafe, s'il vous plait." },
+    { text: "Un the au lait, s'il vous plait." },
+    { text: "Vous avez des croissants?" },
+    { text: "L'addition, s'il vous plait." },
+  ]}
+  register="courant"
+/>
+
+<Tache
+  prompt="Vous etes dans un cafe parisien. Commandez une boisson et une viennoiserie. Demandez le prix et remerciez le serveur."
+  scenario="Vous arretez dans un cafe du quartier avant une reunion importante. Le serveur vous accueille et attend votre commande."
+  targetLength="1-2 minutes"
+  type="oral"
+/>

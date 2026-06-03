@@ -6356,3 +6356,32 @@ static manifest as the single source of truth for all 27 leçons.
 
 **non-visual change:** Playwright captures deferred (no new route; this is a data-source swap on an existing surface — one-time battery captures the baseline).
 **Branch:** main.
+
+---
+
+## F-433: Café content stub (renders île shell + hero)
+
+**Status:** Shipped
+**Phase:** Phase 1
+**Priority:** P1
+
+Add a minimal café MDX stub so /ile/cafe renders the full shell (hero image,
+Le Maître panel, mold sequence) rather than the bientôt fallback card.
+
+**Scope:**
+- `content/iles/cafe/b1.mdx`: café-themed stub lesson (Dialogue + ActeDeParole + Tache). Marked with top-of-file comment and inline stub notice banner.
+- `content/methode/lecons.ts`: café entry flipped from `bientot` to `available` — La Méthode leçon 2 card is now clickable.
+- Audio paths are stubs (`/iles/cafe/audio/b1/*.mp3`); Dialogue renders without audio until Chadi authors the real lesson.
+
+**IMPORTANT — this MDX is placeholder content.**
+The French copy is minimal and unreviewed. Chadi must replace the entire body
+(Dialogue + ActeDeParole + Tache) and remove the stub notice banner before
+any audience launch.
+
+**Acceptance:**
+- Build green.
+- /ile/cafe shows the café hero (public/iles/cafe/hero.png) then the stub molds.
+- Leçon 2 (Au café) on /la-methode is now a clickable link.
+- No console errors.
+
+**Branch:** main.
