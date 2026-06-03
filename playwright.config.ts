@@ -1,16 +1,21 @@
 import { defineConfig } from '@playwright/test'
 
+const isCI = !!process.env.CI
+
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  forbidOnly: isCI,
+  retries: isCI ? 2 : 0,
   reporter: 'list',
+  timeout: 30_000,
   use: {
     baseURL: 'http://localhost:3000',
     screenshot: 'off',
     video: 'off',
     trace: 'off',
+    actionTimeout: 10_000,
+    navigationTimeout: 15_000,
   },
   projects: [
     {
@@ -31,9 +36,11 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev',
+    // CI: full prod build then start — avoids on-demand compilation hangs.
+    // Local: dev server with reuseExistingServer so re-runs are fast.
+    command: isCI ? 'pnpm build && pnpm start' : 'pnpm dev',
     url: 'http://localhost:3000',
-    reuseExistingServer: true,
-    timeout: 120_000,
+    reuseExistingServer: !isCI,
+    timeout: 300_000,
   },
 })

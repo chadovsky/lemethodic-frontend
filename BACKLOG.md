@@ -6478,3 +6478,4 @@ stale hrefs (/dashboard, /la-bibliotheque, /l-examen, /cours/methode-tcf-canada)
 - [Shipped] F-436 CI: GitHub Actions unit + e2e gate (d371548+)
 
 - [Shipped] M-RENAME slug sweep (CI-caught): 6 unit assertions + 11 component stale hrefs fixed (3512cea) — CI is now source of truth
+- [Shipped] CI-E2E-FIX: Playwright webServer switched from pnpm dev to pnpm build && pnpm start in CI; per-test timeout 30s; webServer timeout 5min; e2e job cap 20 min; Node 20 → 22 bump — fixes 1h18m CI hang

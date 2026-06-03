@@ -20,7 +20,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies
@@ -32,7 +32,13 @@ jobs:
   e2e:
     name: E2E tests (Playwright)
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: unit
+    env:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_PLAUSIBLE_DOMAIN: ""
+      NEXT_PUBLIC_OG_IMAGE: ""
+      NEXT_PUBLIC_PREPLY_URL: https://preply.com
 
     steps:
       - uses: actions/checkout@v4
@@ -43,7 +49,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies
@@ -65,7 +71,7 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
 
-      # playwright.config.ts webServer block starts `pnpm dev` automatically.
+      # playwright.config.ts webServer block runs `pnpm build && pnpm start` in CI.
       # All /api/** routes are mocked in tests — no backend secrets required.
       - name: Run Playwright e2e tests
         run: pnpm test:e2e
