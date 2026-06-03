@@ -11,6 +11,7 @@ import {
   BookOpen,
   FileText,
   User,
+  PlayCircle,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -25,6 +26,7 @@ const EXPANDED_WIDTH = 240
 const COLLAPSED_WIDTH = 64
 
 const NAV_ITEMS = [
+  { href: '/seance', label: 'La Séance', icon: <PlayCircle size={20} strokeWidth={1.5} /> },
   { href: '/carte', label: 'Tableau de bord', icon: <Home size={20} strokeWidth={1.5} /> },
   { href: '/la-methode', label: 'La Méthode', icon: <GraduationCap size={20} strokeWidth={1.5} /> },
   { href: '/bibliotheque', label: 'La Bibliothèque', icon: <BookOpen size={20} strokeWidth={1.5} /> },

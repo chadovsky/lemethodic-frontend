@@ -6385,3 +6385,35 @@ any audience launch.
 - No console errors.
 
 **Branch:** main.
+
+---
+
+## F-434: /seance -- linear daily session view (Phase 2)
+
+**Status:** Shipped
+**Phase:** Phase 2
+**Priority:** P1
+
+Linear daily session view. Reads current ile + level from localStorage.
+Presents a curated subset of molds from the ile in sequence, one step at
+a time, with a segmented progress indicator and a stub streak chip.
+Completion is persisted to localStorage. Empty state if no ile is available.
+Sceance nav item added as the first entry in the primary sidebar nav.
+
+**Scope:**
+- lib/seance/sessions.ts: static session definitions for _sample-b1 (5 steps) and cafe-b1 (3 steps). Reuses existing mold component prop types.
+- components/seance/SeancePlayer.tsx: 'use client' linear session player -- reads localStorage, renders one mold per step, Continuer/Terminer flow, persists completion.
+- app/(app)/seance/page.tsx: replaces bientot placeholder; server metadata + SeancePlayer.
+- components/layout/Sidebar.tsx: adds Seance (PlayCircle icon) as first nav item.
+- tests/unit/layout/Sidebar.test.tsx: updated from stale hrefs to match current nav + Seance (pre-existing test drift from past nav refactor, corrected in scope of this ticket).
+
+**BE SEAM -- F-407:** Streak chip is a stub ('-- jour(s)'); real streak requires production scoring (F-407, pending). current_ile and seance_completed_* localStorage keys migrate to BE in Round 2.
+
+**Filed follow-up:** wire seance progress + streak to BE once scoring (F-407) and F-410/F-417 endpoints land.
+
+**Acceptance:**
+- Build green.
+- /seance renders a linear session from the current ile, progress advances, completion persists across reload, streak chip shows as stub, empty state handled, no console errors. Seance nav item routes here.
+
+**non-visual change:** Playwright captures deferred -- F-225 battery covers the baseline.
+**Branch:** main.
