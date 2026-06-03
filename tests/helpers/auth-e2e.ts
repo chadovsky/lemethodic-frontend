@@ -1,7 +1,8 @@
 import type { Page } from '@playwright/test'
 
 const FAKE_TOKEN = 'fake-jwt-token'
-const FAKE_USER = { id: 1, email: 'test@example.com', full_name: 'Test User' }
+// full_name: null so getInitials() returns the default 'CH' after setAuth maps the user.
+const FAKE_USER = { id: 1, email: 'test@example.com', full_name: null }
 
 /**
  * Inject a valid auth session into a Playwright page before navigation.
@@ -14,10 +15,22 @@ export async function injectAuthToken(page: Page): Promise<void> {
     localStorage.setItem('lemethodic_token', 'fake-jwt-token')
     localStorage.setItem(
       'lemethodic_user',
-      JSON.stringify({ id: 1, email: 'test@example.com', full_name: 'Test User' }),
+      JSON.stringify({ id: 1, email: 'test@example.com', full_name: null }),
     )
   })
-  await page.route('**/api/users/me', (route) => {
+  // Catch-all: return 200 empty for all backend API calls so no 401 can
+  // trigger clearAuth() and redirect mid-test. Registered first (lower
+  // priority in Playwright — last registered wins).
+  await page.route('**/api/**', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    })
+  })
+  // Specific: /api/auth/me must return the fake user for useVerifyAuth to
+  // set verified:true. Registered last → highest priority in Playwright.
+  await page.route('**/api/auth/me', (route) => {
     route.fulfill({
       status: 200,
       contentType: 'application/json',

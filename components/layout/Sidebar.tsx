@@ -116,7 +116,7 @@ export default function Sidebar({
         borderRight: '1px solid var(--rule-default)',
         display: 'flex',
         flexDirection: 'column',
-        transition: 'width 200ms ease',
+        transition: 'width 200ms ease, transform 300ms var(--lm-ease)',
         overflow: 'hidden',
       }}
     >
