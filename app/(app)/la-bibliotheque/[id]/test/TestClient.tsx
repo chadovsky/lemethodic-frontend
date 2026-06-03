@@ -170,7 +170,7 @@ export default function TestClient({ slug }: { slug: string }) {
     >
       <div className="mx-auto max-w-2xl px-5 md:px-8 py-10 md:py-14 lg:py-16">
         <Link
-          href={`/bibliotheque/${encodeURIComponent(slug)}`}
+          href={`/la-bibliotheque/${encodeURIComponent(slug)}`}
           className="ed-btn-press inline-flex items-center gap-1.5 mb-6"
           style={{
             fontFamily: 'var(--font-geist), -apple-system, system-ui, sans-serif',
@@ -1139,7 +1139,7 @@ function TestEndCard({
           {copy.test.testAgain}
         </button>
         <Link
-          href={`/bibliotheque/${encodeURIComponent(slug)}`}
+          href={`/la-bibliotheque/${encodeURIComponent(slug)}`}
           className="ed-btn-press"
           style={{
             height: 44,
@@ -1159,7 +1159,7 @@ function TestEndCard({
           {copy.practice.backToTopic}
         </Link>
         <Link
-          href="/bibliotheque"
+          href="/la-bibliotheque"
           className="ed-btn-press"
           style={{
             height: 44,
@@ -1430,7 +1430,7 @@ function SoftEmptyCard({
         {copy.test.softEmptyBody}
       </p>
       <Link
-        href={`/bibliotheque/${encodeURIComponent(slug)}/practice`}
+        href={`/la-bibliotheque/${encodeURIComponent(slug)}/practice`}
         className="ed-btn-press"
         style={{
           height: 48,

@@ -28,7 +28,7 @@ export default function FeedbackPlaceholderPage() {
         Feedback analysis is coming in F-058.
       </p>
       <Link
-        href="/examen/expression-orale"
+        href="/l-examen/expression-orale"
         style={{
           display: 'inline-block',
           marginTop: 8,

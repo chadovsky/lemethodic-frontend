@@ -21,7 +21,7 @@ import Sidebar from '@/components/layout/Sidebar'
 describe('Sidebar', () => {
   beforeEach(() => {
     mockUsePathname.mockReset()
-    mockUsePathname.mockReturnValue('/carte')
+    mockUsePathname.mockReturnValue('/tableau-de-bord')
   })
 
   it('renders the wordmark "Le Méthodic"', () => {
@@ -44,23 +44,23 @@ describe('Sidebar', () => {
     expect(links[0]).toHaveTextContent('La Séance')
     expect(links[0]).toHaveAttribute('href', '/seance')
     expect(links[1]).toHaveTextContent('Tableau de bord')
-    expect(links[1]).toHaveAttribute('href', '/carte')
+    expect(links[1]).toHaveAttribute('href', '/tableau-de-bord')
     expect(links[2]).toHaveTextContent('La Méthode')
     expect(links[2]).toHaveAttribute('href', '/la-methode')
     expect(links[3]).toHaveTextContent('La Bibliothèque')
-    expect(links[3]).toHaveAttribute('href', '/bibliotheque')
+    expect(links[3]).toHaveAttribute('href', '/la-bibliotheque')
     expect(links[4]).toHaveTextContent("L'Examen")
-    expect(links[4]).toHaveAttribute('href', '/examen')
+    expect(links[4]).toHaveAttribute('href', '/l-examen')
     expect(links[5]).toHaveTextContent('Compte')
     expect(links[5]).toHaveAttribute('href', '/profil')
   })
 
   it('marks the link matching the exact current pathname as active', () => {
-    mockUsePathname.mockReturnValue('/carte')
+    mockUsePathname.mockReturnValue('/tableau-de-bord')
     render(<Sidebar drawerOpen={false} />)
-    const carte = screen.getByTestId('sidebar-link-carte')
-    expect(carte).toHaveAttribute('data-active', 'true')
-    expect(carte).toHaveAttribute('aria-current', 'page')
+    const dashboard = screen.getByTestId('sidebar-link-tableau-de-bord')
+    expect(dashboard).toHaveAttribute('data-active', 'true')
+    expect(dashboard).toHaveAttribute('aria-current', 'page')
 
     const account = screen.getByTestId('sidebar-link-profil')
     expect(account).toHaveAttribute('data-active', 'false')
@@ -71,14 +71,14 @@ describe('Sidebar', () => {
     mockUsePathname.mockReturnValue('/seance')
     render(<Sidebar drawerOpen={false} />)
     expect(screen.getByTestId('sidebar-link-seance')).toHaveAttribute('data-active', 'true')
-    expect(screen.getByTestId('sidebar-link-carte')).toHaveAttribute('data-active', 'false')
+    expect(screen.getByTestId('sidebar-link-tableau-de-bord')).toHaveAttribute('data-active', 'false')
   })
 
   it('marks /la-methode link active when pathname is a nested la-methode route', () => {
     mockUsePathname.mockReturnValue('/la-methode/lesson/3')
     render(<Sidebar drawerOpen={false} />)
     expect(screen.getByTestId('sidebar-link-la-methode')).toHaveAttribute('data-active', 'true')
-    expect(screen.getByTestId('sidebar-link-carte')).toHaveAttribute('data-active', 'false')
+    expect(screen.getByTestId('sidebar-link-tableau-de-bord')).toHaveAttribute('data-active', 'false')
   })
 
   it('reflects drawerOpen prop on data-drawer-open attribute', () => {

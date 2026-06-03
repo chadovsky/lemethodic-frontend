@@ -80,7 +80,7 @@ export default function VocabBrowse() {
         >
           <Link
             data-testid="vocab-cta-practice"
-            href="/bibliotheque/practice"
+            href="/la-bibliotheque/practice"
             className="ed-btn-press"
             style={{
               minHeight: 44,
@@ -102,7 +102,7 @@ export default function VocabBrowse() {
           </Link>
           <Link
             data-testid="vocab-cta-test"
-            href="/bibliotheque/test"
+            href="/la-bibliotheque/test"
             className="ed-btn-press"
             style={{
               minHeight: 44,

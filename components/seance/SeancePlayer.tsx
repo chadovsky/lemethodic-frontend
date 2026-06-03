@@ -115,7 +115,7 @@ function CompletionScreen({ displayTitle, onRedo }: { displayTitle: string; onRe
             Refaire la séance
           </button>
           <Link
-            href="/carte"
+            href="/tableau-de-bord"
             style={{
               display: 'inline-flex',
               alignItems: 'center',

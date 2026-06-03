@@ -163,7 +163,7 @@ function BienvenueForm() {
     // FE-only stub. BE follow-up (F-366): persist to target_profiles
     // server-side (new table or user.target_profile column).
     localStorage.setItem('lm.targetProfile.v1', JSON.stringify(profile))
-    router.push('/carte')
+    router.push('/tableau-de-bord')
   }
 
   // ── Step 1: Q1 exam ──────────────────────────────────────────────────────────

@@ -58,7 +58,7 @@ export default function DiagnosticScoreWidget() {
       </div>
 
       <Link
-        href="/examen"
+        href="/l-examen"
         className="ed-btn-press"
         style={{
           alignSelf: 'flex-start',

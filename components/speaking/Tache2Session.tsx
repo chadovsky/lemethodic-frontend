@@ -747,7 +747,7 @@ export default function Tache2Session({ scenario = 'agence-voyages' }: Tache2Ses
           onExit={() => {
             if (confirm('End this session?')) {
               recorder.reset()
-              router.push('/examen/expression-orale/tache-2')
+              router.push('/l-examen/expression-orale/tache-2')
             }
           }}
           turnDisplay={phase === 'briefing' ? null : turnDisplay}

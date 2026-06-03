@@ -238,7 +238,7 @@ function EmptyState() {
           Votre niveau CLB apparaitra ici après votre premier enregistrement dans L&apos;Examen.
         </p>
         <Link
-          href="/examen/expression-orale"
+          href="/l-examen/expression-orale"
           style={{
             display: 'inline-block',
             padding: '12px 28px',

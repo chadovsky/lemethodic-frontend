@@ -500,7 +500,7 @@ export default function Tache1Session() {
           onExit={() => {
             if (confirm('End this session?')) {
               recorder.reset()
-              router.push('/examen/expression-orale')
+              router.push('/l-examen/expression-orale')
             }
           }}
           turnDisplay={showTurnIndicator ? turnDisplay : null}

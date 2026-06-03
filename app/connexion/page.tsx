@@ -57,7 +57,7 @@ export default function ConnexionPage() {
   }, [])
   useEffect(() => {
     if (hydrated && token) {
-      router.replace('/carte')
+      router.replace('/tableau-de-bord')
     }
   }, [hydrated, token, router])
 
@@ -75,7 +75,7 @@ export default function ConnexionPage() {
     try {
       const { token, user } = await api.auth.login(email.trim(), password)
       useAuthStore.getState().setAuth(token, user)
-      router.push('/carte')
+      router.push('/tableau-de-bord')
     } catch (err) {
       if (err instanceof ApiError) {
         setError(mapApiError(err))

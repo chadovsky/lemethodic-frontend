@@ -4,5 +4,5 @@ import { redirect } from 'next/navigation'
 // /examen/expression-orale/tache-1/interview. This redirect exists only
 // for anyone who navigates to the bare /tache-1 URL by hand.
 export default function Tache1Page() {
-  redirect('/examen/expression-orale/tache-1/interview')
+  redirect('/l-examen/expression-orale/tache-1/interview')
 }

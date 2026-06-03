@@ -69,7 +69,7 @@ export default function WritingHistoryClient() {
     <div className="ed-page-enter" style={{ minHeight: '100dvh', backgroundColor: ED_BG, fontFamily: SANS }}>
       <div style={{ maxWidth: 720, margin: '0 auto', padding: 'clamp(20px, 3vw, 32px) clamp(16px, 4vw, 32px) 96px' }}>
         <Link
-          href="/examen/expression-ecrite"
+          href="/l-examen/expression-ecrite"
           style={{
             display: 'inline-flex',
             alignItems: 'center',

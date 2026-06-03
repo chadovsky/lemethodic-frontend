@@ -160,7 +160,7 @@ export default function Results() {
         </Link>
         <Link
           data-testid="results-action-dashboard"
-          href="/carte"
+          href="/tableau-de-bord"
           className="ed-btn-press"
           style={{
             fontFamily: SANS_FONT,

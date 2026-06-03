@@ -88,9 +88,9 @@ const COPY = {
 const NAV_LINKS = [
   { key: 'seance' as const, href: '/seance', match: ['/seance'] },
   { key: 'ecole' as const, href: '/la-methode', match: ['/la-methode', '/cluster', '/learn'] },
-  { key: 'speaking' as const, href: '/examen/expression-orale', match: ['/examen/expression-orale'] },
-  { key: 'writing' as const, href: '/examen/expression-ecrite', match: ['/examen/expression-ecrite'] },
-  { key: 'progress' as const, href: '/progression', match: ['/progression', '/examen'] },
+  { key: 'speaking' as const, href: '/l-examen/expression-orale', match: ['/l-examen/expression-orale'] },
+  { key: 'writing' as const, href: '/l-examen/expression-ecrite', match: ['/l-examen/expression-ecrite'] },
+  { key: 'progress' as const, href: '/progression', match: ['/progression', '/l-examen'] },
   { key: 'maitre' as const, href: '/maitre', match: ['/maitre'] },
 ] as const
 

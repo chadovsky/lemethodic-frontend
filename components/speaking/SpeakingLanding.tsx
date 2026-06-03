@@ -221,7 +221,7 @@ export default function SpeakingLanding() {
             >
               Recommended right now
             </p>
-            <Link href="/examen/expression-orale/tache-2/agence-voyages" style={{ textDecoration: 'none' }}>
+            <Link href="/l-examen/expression-orale/tache-2/agence-voyages" style={{ textDecoration: 'none' }}>
               <div
                 style={{
                   backgroundColor: SAGE,

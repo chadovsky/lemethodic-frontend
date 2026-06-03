@@ -210,7 +210,7 @@ export default function Tache3Session({ topicSlug }: Tache3SessionProps) {
             onClick={() => {
               if (confirm('End this session?')) {
                 recorder.reset()
-                router.push('/examen/expression-orale')
+                router.push('/l-examen/expression-orale')
               }
             }}
             aria-label="Go back"

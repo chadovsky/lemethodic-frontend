@@ -106,7 +106,7 @@ export default function QuizResults({ score, total, onRestart }: QuizResultsProp
         </button>
         <Link
           data-testid="quiz-results-back-to-list"
-          href="/bibliotheque"
+          href="/la-bibliotheque"
           className="ed-btn-press"
           style={{
             minHeight: 48,

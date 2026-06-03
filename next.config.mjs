@@ -24,17 +24,17 @@ const nextConfig = {
       { source: '/l-examen/diagnostic', destination: '/maitre/diagnostic', permanent: true },
       { source: '/l-examen/diagnostic/:path*', destination: '/maitre/diagnostic/:path*', permanent: true },
 
-      // /l-examen -> /examen (exact + catch-all for remaining sub-routes)
-      { source: '/l-examen', destination: '/examen', permanent: true },
-      { source: '/l-examen/:path*', destination: '/examen/:path*', permanent: true },
+      // /examen -> /l-examen (canonical slug migration F-43x)
+      { source: '/examen', destination: '/l-examen', permanent: true },
+      { source: '/examen/:path*', destination: '/l-examen/:path*', permanent: true },
 
-      // /dashboard -> /carte
-      { source: '/dashboard', destination: '/carte', permanent: true },
-      { source: '/dashboard/:path*', destination: '/carte/:path*', permanent: true },
+      // /dashboard -> /tableau-de-bord
+      { source: '/dashboard', destination: '/tableau-de-bord', permanent: true },
+      { source: '/dashboard/:path*', destination: '/tableau-de-bord/:path*', permanent: true },
 
-      // /la-bibliotheque -> /bibliotheque
-      { source: '/la-bibliotheque', destination: '/bibliotheque', permanent: true },
-      { source: '/la-bibliotheque/:path*', destination: '/bibliotheque/:path*', permanent: true },
+      // /bibliotheque -> /la-bibliotheque (canonical slug migration F-43x)
+      { source: '/bibliotheque', destination: '/la-bibliotheque', permanent: true },
+      { source: '/bibliotheque/:path*', destination: '/la-bibliotheque/:path*', permanent: true },
 
       // /progress -> /progression
       { source: '/progress', destination: '/progression', permanent: true },
@@ -74,21 +74,21 @@ const nextConfig = {
       { source: '/privacy', destination: '/confidentialite', permanent: true },
       { source: '/privacy/:path*', destination: '/confidentialite/:path*', permanent: true },
 
-      // /vocabulaire -> /bibliotheque (updated: skip the legacy /la-bibliotheque hop)
-      { source: '/vocabulaire', destination: '/bibliotheque', permanent: true },
-      { source: '/vocabulaire/:path*', destination: '/bibliotheque/:path*', permanent: true },
+      // /vocabulaire -> /la-bibliotheque (direct to canonical)
+      { source: '/vocabulaire', destination: '/la-bibliotheque', permanent: true },
+      { source: '/vocabulaire/:path*', destination: '/la-bibliotheque/:path*', permanent: true },
 
-      // /diagnostic -> /examen (updated: legacy /diagnostic went to /l-examen)
-      { source: '/diagnostic', destination: '/examen', permanent: true },
-      { source: '/diagnostic/:path*', destination: '/examen/:path*', permanent: true },
+      // /diagnostic -> /l-examen (direct to canonical)
+      { source: '/diagnostic', destination: '/l-examen', permanent: true },
+      { source: '/diagnostic/:path*', destination: '/l-examen/:path*', permanent: true },
 
-      // /speaking -> /examen/expression-orale (updated from /l-examen/expression-orale)
-      { source: '/speaking', destination: '/examen/expression-orale', permanent: true },
-      { source: '/speaking/:path*', destination: '/examen/expression-orale/:path*', permanent: true },
+      // /speaking -> /l-examen/expression-orale (direct to canonical)
+      { source: '/speaking', destination: '/l-examen/expression-orale', permanent: true },
+      { source: '/speaking/:path*', destination: '/l-examen/expression-orale/:path*', permanent: true },
 
-      // /writing -> /examen/expression-ecrite (updated from /l-examen/expression-ecrite)
-      { source: '/writing', destination: '/examen/expression-ecrite', permanent: true },
-      { source: '/writing/:path*', destination: '/examen/expression-ecrite/:path*', permanent: true },
+      // /writing -> /l-examen/expression-ecrite (direct to canonical)
+      { source: '/writing', destination: '/l-examen/expression-ecrite', permanent: true },
+      { source: '/writing/:path*', destination: '/l-examen/expression-ecrite/:path*', permanent: true },
     ]
   },
 }

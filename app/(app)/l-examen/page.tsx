@@ -21,30 +21,30 @@ const SECTIONS: SectionCard[] = [
   {
     label: 'Compréhension orale',
     subtitle: 'Écoute et compréhension, TCF section 1',
-    href: '/examen/comprehension-orale',
+    href: '/l-examen/comprehension-orale',
     bientot: true,
   },
   {
     label: 'Compréhension écrite',
     subtitle: 'Lecture et compréhension, TCF section 2',
-    href: '/examen/comprehension-ecrite',
+    href: '/l-examen/comprehension-ecrite',
     bientot: true,
   },
   {
     label: 'Expression orale',
     subtitle: 'Tâches 1, 2 et 3, TCF section 3',
-    href: '/examen/expression-orale',
+    href: '/l-examen/expression-orale',
   },
   {
     label: 'Expression écrite',
     subtitle: 'Rédaction guidée, TCF section 4',
-    href: '/examen/expression-ecrite',
+    href: '/l-examen/expression-ecrite',
   },
 ]
 
 const SECONDARY: { label: string; href: string; bientot?: boolean }[] = [
   { label: 'Diagnostic', href: '/maitre/diagnostic' },
-  { label: 'Mock examen complet', href: '/examen/mock', bientot: true },
+  { label: 'Mock examen complet', href: '/l-examen/mock', bientot: true },
 ]
 
 export default function ExamenHubPage() {

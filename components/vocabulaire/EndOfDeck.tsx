@@ -84,7 +84,7 @@ export default function EndOfDeck({ total, onRestart }: EndOfDeckProps) {
         </button>
         <Link
           data-testid="end-of-deck-back-to-list"
-          href="/bibliotheque"
+          href="/la-bibliotheque"
           className="ed-btn-press"
           style={{
             minHeight: 48,
