@@ -6329,3 +6329,30 @@ target_profiles table (BE F-410), replacing the F-365 localStorage stub
 
 **Dependencies:** F-410 (BE target_profiles).
 **Branch:** main.
+
+---
+
+## F-432: La Méthode — leçon manifest + clickable île cards
+
+**Status:** Shipped
+**Phase:** Phase 1
+**Priority:** P1
+
+Wire La Méthode so each leçon is a clickable card that opens its île. Ships a
+static manifest as the single source of truth for all 27 leçons.
+
+**Scope:**
+- `content/methode/lecons.ts`: 27-entry static manifest (number, title, themeSlug, section, status).
+- Leçon 1 (La famille / `_sample`) set to `available`; leçon 2 (Au café / `cafe`) and leçons 3–27 set to `bientot`.
+- `components/ecole/IleLeconCard.tsx`: available cards link to `/ile/[themeSlug]`; bientôt cards are non-clickable divs.
+- `LessonList.tsx`: reads manifest (no BE call), renders IleLeconCard under existing section headers.
+
+**Acceptance:**
+- Build green.
+- La Méthode shows 27 leçon cards under Fondations and Approfondissement.
+- Leçon 1 (La famille) is a link to `/ile/_sample`.
+- Leçons 2–27 render as locked bientôt cards.
+- No console errors.
+
+**non-visual change:** Playwright captures deferred (no new route; this is a data-source swap on an existing surface — one-time battery captures the baseline).
+**Branch:** main.

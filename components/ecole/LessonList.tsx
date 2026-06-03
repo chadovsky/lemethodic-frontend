@@ -1,20 +1,11 @@
-'use client'
-
-import { useState, useEffect } from 'react'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
-import { fetchLessons } from '@/lib/api/lessons'
-import type { Lesson } from '@/lib/types'
-import LessonCard from './LessonCard'
+import { LECONS } from '@/content/methode/lecons'
+import type { LeconEntry } from '@/content/methode/lecons'
+import IleLeconCard from './IleLeconCard'
 
 export default function LessonList() {
-  const [lessons, setLessons] = useState<Lesson[]>([])
-
-  useEffect(() => {
-    fetchLessons().then(setLessons).catch(() => {})
-  }, [])
-
-  const fondations = lessons.filter((l) => l.phase === 1)
-  const approfondissement = lessons.filter((l) => l.phase === 2)
+  const fondations       = LECONS.filter((l) => l.section === 'fondations')
+  const approfondissement = LECONS.filter((l) => l.section === 'approfondissement')
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 48, paddingTop: 8 }}>
@@ -64,13 +55,13 @@ export default function LessonList() {
         id="fondations"
         title="Fondations"
         eyebrow="Leçons 1–16"
-        lessons={fondations}
+        lecons={fondations}
       />
       <Section
         id="approfondissement"
         title="Approfondissement"
         eyebrow="Leçons 17–27"
-        lessons={approfondissement}
+        lecons={approfondissement}
       />
     </div>
   )
@@ -80,12 +71,12 @@ function Section({
   id,
   title,
   eyebrow,
-  lessons,
+  lecons,
 }: {
   id: string
   title: string
   eyebrow: string
-  lessons: Lesson[]
+  lecons: LeconEntry[]
 }) {
   return (
     <section
@@ -130,9 +121,9 @@ function Section({
           padding: 0,
         }}
       >
-        {lessons.map((lesson) => (
-          <li key={lesson.id}>
-            <LessonCard lesson={lesson} />
+        {lecons.map((lecon) => (
+          <li key={lecon.number}>
+            <IleLeconCard lecon={lecon} />
           </li>
         ))}
       </ul>
