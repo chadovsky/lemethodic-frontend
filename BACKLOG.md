@@ -6479,3 +6479,5 @@ stale hrefs (/dashboard, /la-bibliotheque, /l-examen, /cours/methode-tcf-canada)
 
 - [Shipped] M-RENAME slug sweep (CI-caught): 6 unit assertions + 11 component stale hrefs fixed (3512cea) — CI is now source of truth
 - [Shipped] CI-E2E-FIX: Playwright webServer switched from pnpm dev to pnpm build && pnpm start in CI; per-test timeout 30s; webServer timeout 5min; e2e job cap 20 min; Node 20 → 22 bump — fixes 1h18m CI hang
+- [Shipped] E2E-STABILIZE-R1 (2da1114..7e3baa5): 4-cluster e2e stabilization sweep — (1) m0-audit networkidle→load; (2) /maitre/diagnostic → /l-examen/diagnostic in all components + beforeFiles rewrite in next.config.mjs + backward-compat redirect; (3) /signup→/inscription / /dashboard→/tableau-de-bord / wrong URL patterns in 5 e2e specs; (4) LessonList wired to BE API + LessonCard; lecon-N route parsing in [id] page; app/(app)/l-examen/diagnostic/page.tsx added. Unit: 433/433. Cluster specs: 18 fail → 9 pre-existing (Next.js HTTP-200-for-notFound, timer-urgency, ripple-reduced-motion, ArrowKey timing, spinner timing). Remaining clusters tracked: touch-targets 44px, dark-mode networkidle font, landing-hero copy, vocabulaire mobile.
+
