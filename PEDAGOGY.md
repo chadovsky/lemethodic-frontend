@@ -62,6 +62,8 @@ Every île is accessible through two surfaces:
 
 A learner may use either entry point freely. /seance does not require a completed syllabus pass.
 
+Phase 2 ships a LINEAR séance: it serves activities from the user's current île in order. The adaptive séance (queries the activity pool, targets the user's weak couche, skips recently-seen items, mixes across îles) is a Phase 3 upgrade. It requires île activities to be queryable database rows rather than MDX-embedded, so Phase 3 migrates activities into island_activities (BE F-415) and pièges into pieges_catalog (BE F-416), then turns on adaptive cross-île composition. The adaptive séance is a committed Phase 3 deliverable, not a maybe.
+
 ## Le Maître
 
 Le Maître is the unified tutor persona. Voice: ElevenLabs Chadi-clone (founder voice, distinct from the examiner voice used for Tâche consignes). Le Maître speaks at:
@@ -174,12 +176,8 @@ image_set: /iles/famille
 maitre_audio:
   intro: /iles/famille/audio/b1/intro.mp3
   close: /iles/famille/audio/b1/close.mp3
-couche_weights:
-  le_propos: 0.25
-  le_plan: 0.20
-  la_construction: 0.25
-  les_pieges_anglais: 0.20
-  la_musique: 0.10
+# couche weights are NOT in frontmatter — they live in scoring_rubrics (BE F-411),
+# looked up at scoring time by (exam, level, couche). See Content Schema note below.
 actes_de_parole: [se-presenter, decrire-relations, exprimer-affection]
 ```
 
@@ -214,7 +212,7 @@ The body of each MDX file is composed of seven typed React mold components. Each
 
 ### Architectural note
 
-Content (MDX) ships with the FE bundle. Pages import MDX directly via Next.js MDX support. The BE never reads content; it only tracks state (user_progress, scoring, conversations, recordings). This simplification removes the need for an MDX content loader endpoint and keeps content edits in the git/deploy workflow.
+The FE holds île LESSON content as MDX (dialogues, actes, chunks, rules, phonétique, activities, tâche prompts), imported directly via Next.js MDX support. The BE does NOT read this lesson content. But the BE is not merely a state tracker: it owns scoring (scoring_rubrics F-411), the pièges catalog (F-416), interference logging (F-413), target profiles (F-410), progress (F-417), and the RAG retrieval layer (F-420). Couche weights specifically live in scoring_rubrics (F-411), keyed by (exam, level, couche), never in MDX. Scoring looks them up from the user's exam (target_profiles) and the île's level.
 
 ### MDX vs Payload
 
@@ -243,6 +241,7 @@ Phase 2 does not ship:
 - /bibliotheque chunk persistence (Phase 3+)
 - Payment activation (Phase 4)
 - Pièges authoring catalog (Phase 3 authoring task)
+- Adaptive séance (linear séance at Phase 2; adaptive composition is Phase 3, requires island_activities migration)
 
 ## Dispatch Sequence
 

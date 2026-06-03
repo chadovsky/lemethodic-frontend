@@ -6264,7 +6264,7 @@ Replace the /maitre bientôt scaffold with the conversation hub plus active conv
 
 ---
 
-## F-410: /carte persona-adaptive primary CTA
+## F-429: /carte persona-adaptive primary CTA
 
 **Status:** Queued
 **Phase:** Phase 2
@@ -6285,10 +6285,11 @@ Update /carte (the dashboard) to surface a persona-adaptive primary CTA.
 
 **Dependencies:** F-424 (Target Profile persistence).
 **Branch:** main.
+**Renumbered 2026-06-03:** Was F-410, collided with BE F-410 (target_profiles). Unified F-namespace adopted across both repos. Depends on F-410 (BE target_profiles).
 
 ---
 
-## F-411: Le Maître intensity setting in /parametres
+## F-430: Le Maître intensity setting in /parametres
 
 **Status:** Queued
 **Phase:** Phase 2
@@ -6308,4 +6309,31 @@ Add Le Maître intensity setting (soft / balanced / strict) to /parametres.
 - Audio playback respects intensity (soft = intro + close only; balanced = + transitions; strict = + mid-activity feedback)
 
 **Dependencies:** F-424.
+**Branch:** main.
+**Renumbered 2026-06-03:** Was F-411, collided with BE F-411 (scoring_rubrics). Setting persists to BE target_profiles.maitre_intensity (BE F-410). Depends on F-410 (BE).
+
+---
+
+## F-431: Target Profile FE wiring (localStorage to BE)
+
+**Status:** Queued
+**Phase:** Phase 2
+**Priority:** P0
+
+Salvaged from dropped F-424. Wire /bienvenue Target Profile capture to the BE
+target_profiles table (BE F-410), replacing the F-365 localStorage stub
+(lm.targetProfile.v1).
+
+**Scope:**
+- /bienvenue submission POSTs to BE target-profile endpoint (exam, threshold_band, deadline_date, persona_tag, maitre_intensity)
+- On success, clear the localStorage stub
+- /carte and /parametres read profile from BE
+- Backwards compat: if BE returns null but localStorage has the v1 key, persist it on next save then clear
+
+**Acceptance:**
+- /bienvenue lands the profile in BE
+- localStorage stub cleared on first authenticated save
+- /carte (F-429) and /parametres (F-430) read from BE
+
+**Dependencies:** F-410 (BE target_profiles).
 **Branch:** main.

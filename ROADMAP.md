@@ -89,7 +89,7 @@ Every surface present, navigation reads as fully running, bientôt state system 
 3. **Vertical slices 2 through 7:** F-405 continues, adding each remaining mold one at a time (Chunks, ActeDeParole, Regle, Phonetique, Activite, Tache).
 4. **Surfaces expand:** F-407 (/activites + /tache), F-408 (/seance), F-409 (/maitre).
 5. **State and scoring:** F-425 (5-couche level-weighted), F-426 (activity scoring), F-427 (Le Maître orchestration), F-428 (level advancement gate stub).
-6. **Persona and settings:** F-410 (/carte adaptive CTA), F-411 (/parametres intensity).
+6. **Persona and settings:** F-429 (/carte adaptive CTA), F-430 (/parametres intensity).
 
 **Founder authoring track (parallel to Claude Code work):**
 
@@ -142,6 +142,7 @@ Most compliance and auth completeness gaps must ship before payment goes live. T
 The Pièges SEO library lit, Tarifs page live. These surfaces drive acquisition before payment is switched on.
 
 **Scope:**
+- Adaptive séance: migrate île activities to island_activities (BE F-415) and pièges to pieges_catalog (BE F-416), turn on weakness-targeted cross-île session composition. Committed Phase 3 deliverable carried over from the Phase 2 MDX content decision (2026-06-03).
 - /les-pieges-anglais SEO library: browseable, indexed, shareable articles on Anglophone interference patterns
 - /tarifs: pricing tiers visible with LemonSqueezy as merchant of record. Purchase flow visible but not yet active (links to waitlist or contact until Phase 4 completes)
 - Exam landing pages: /tcf-canada, /tef-canada, /tcf-quebec (bientôt for unlit exams)
