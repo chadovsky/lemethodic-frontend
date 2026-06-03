@@ -48,11 +48,11 @@ describe('TacheShell', () => {
     render(<TacheShell tache={TACHES[1]} />)
     expect(screen.getByTestId('tache-nav-prev')).toHaveAttribute(
       'href',
-      '/maitre/diagnostic/tache/1',
+      '/l-examen/diagnostic/tache/1',
     )
     expect(screen.getByTestId('tache-nav-next')).toHaveAttribute(
       'href',
-      '/maitre/diagnostic/tache/3',
+      '/l-examen/diagnostic/tache/3',
     )
   })
 
@@ -60,10 +60,10 @@ describe('TacheShell', () => {
     render(<TacheShell tache={TACHES[2]} />)
     expect(screen.getByTestId('tache-nav-prev')).toHaveAttribute(
       'href',
-      '/maitre/diagnostic/tache/2',
+      '/l-examen/diagnostic/tache/2',
     )
     const link = screen.getByTestId('tache-nav-results')
-    expect(link).toHaveAttribute('href', '/maitre/diagnostic/results')
+    expect(link).toHaveAttribute('href', '/l-examen/diagnostic/results')
     expect(link).toHaveTextContent(/voir les résultats/i)
     expect(screen.queryByTestId('tache-nav-next')).toBeNull()
   })

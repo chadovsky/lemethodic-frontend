@@ -1,11 +1,10 @@
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
-import { LECONS } from '@/content/methode/lecons'
-import type { LeconEntry } from '@/content/methode/lecons'
-import IleLeconCard from './IleLeconCard'
+import type { Lesson } from '@/lib/types'
+import LessonCard from './LessonCard'
 
-export default function LessonList() {
-  const fondations       = LECONS.filter((l) => l.section === 'fondations')
-  const approfondissement = LECONS.filter((l) => l.section === 'approfondissement')
+export default function LessonList({ lessons }: { lessons: Lesson[] }) {
+  const fondations = lessons.filter((l) => l.phase === 1)
+  const approfondissement = lessons.filter((l) => l.phase === 2)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 48, paddingTop: 8 }}>
@@ -55,13 +54,13 @@ export default function LessonList() {
         id="fondations"
         title="Fondations"
         eyebrow="Leçons 1–16"
-        lecons={fondations}
+        lessons={fondations}
       />
       <Section
         id="approfondissement"
         title="Approfondissement"
         eyebrow="Leçons 17–27"
-        lecons={approfondissement}
+        lessons={approfondissement}
       />
     </div>
   )
@@ -71,12 +70,12 @@ function Section({
   id,
   title,
   eyebrow,
-  lecons,
+  lessons,
 }: {
   id: string
   title: string
   eyebrow: string
-  lecons: LeconEntry[]
+  lessons: Lesson[]
 }) {
   return (
     <section
@@ -121,9 +120,9 @@ function Section({
           padding: 0,
         }}
       >
-        {lecons.map((lecon) => (
-          <li key={lecon.number}>
-            <IleLeconCard lecon={lecon} />
+        {lessons.map((lesson) => (
+          <li key={lesson.lessonNumber}>
+            <LessonCard lesson={lesson} />
           </li>
         ))}
       </ul>

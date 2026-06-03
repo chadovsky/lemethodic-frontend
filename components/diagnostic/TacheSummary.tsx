@@ -100,7 +100,7 @@ export default function TacheSummary() {
             </button>
             <Link
               data-testid={`tache-summary-relire-${row.id}`}
-              href={`/maitre/diagnostic/tache/${row.id}`}
+              href={`/l-examen/diagnostic/tache/${row.id}`}
               style={{
                 fontFamily: SANS_FONT,
                 fontWeight: 500,

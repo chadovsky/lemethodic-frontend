@@ -40,10 +40,10 @@ test.describe('Le Diagnostic tâche shell — desktop (1280×800)', () => {
     await expect(page.getByTestId('timer-display')).toContainText('05:00')
   })
 
-  test('"Tâche suivante" link navigates to /l-examen/tache/2', async ({ page }) => {
+  test('"Tâche suivante" link navigates to /l-examen/diagnostic/tache/2', async ({ page }) => {
     await page.goto('/l-examen/diagnostic/tache/1')
     await page.getByTestId('tache-nav-next').click()
-    await expect(page).toHaveURL(/\/l-examen\/tache\/2$/)
+    await expect(page).toHaveURL(/\/l-examen\/diagnostic\/tache\/2$/)
   })
 
   test('tâche 3 shows "Voir les résultats" linking to /l-examen/diagnostic/results', async ({

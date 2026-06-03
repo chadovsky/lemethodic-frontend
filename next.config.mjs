@@ -9,20 +9,31 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  async rewrites() {
+    return {
+      // Serve /l-examen/diagnostic/* from app/(app)/maitre/diagnostic pages.
+      // URL stays as /l-examen/diagnostic/... — no redirect to the browser.
+      // beforeFiles runs before file-based routing so it wins over [checkpoint].
+      beforeFiles: [
+        { source: '/l-examen/diagnostic', destination: '/maitre/diagnostic' },
+        { source: '/l-examen/diagnostic/:path*', destination: '/maitre/diagnostic/:path*' },
+      ],
+    }
+  },
+
   async redirects() {
     return [
       // F-367: canonical route migrations (308 permanent).
       // Specific rules must precede the catch-all for the same prefix.
 
-      // Legacy /l-examen/results + tache shorthand — redirect directly to
-      // canonical /maitre/diagnostic paths before the /l-examen catch-all fires.
-      { source: '/l-examen/results', destination: '/maitre/diagnostic/results', permanent: true },
-      { source: '/l-examen/results/:path*', destination: '/maitre/diagnostic/results/:path*', permanent: true },
-      { source: '/l-examen/tache/:n', destination: '/maitre/diagnostic/tache/:n', permanent: true },
+      // Legacy /l-examen shorthand → canonical /l-examen/diagnostic paths.
+      { source: '/l-examen/results', destination: '/l-examen/diagnostic/results', permanent: true },
+      { source: '/l-examen/results/:path*', destination: '/l-examen/diagnostic/results/:path*', permanent: true },
+      { source: '/l-examen/tache/:n', destination: '/l-examen/diagnostic/tache/:n', permanent: true },
 
-      // /l-examen/diagnostic -> /maitre/diagnostic (specific + wildcard before catch-all)
-      { source: '/l-examen/diagnostic', destination: '/maitre/diagnostic', permanent: true },
-      { source: '/l-examen/diagnostic/:path*', destination: '/maitre/diagnostic/:path*', permanent: true },
+      // Backward compat: /maitre/diagnostic → /l-examen/diagnostic (canonical).
+      { source: '/maitre/diagnostic', destination: '/l-examen/diagnostic', permanent: true },
+      { source: '/maitre/diagnostic/:path*', destination: '/l-examen/diagnostic/:path*', permanent: true },
 
       // /examen -> /l-examen (canonical slug migration F-43x)
       { source: '/examen', destination: '/l-examen', permanent: true },

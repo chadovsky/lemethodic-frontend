@@ -44,13 +44,13 @@ test.describe('Landing pricing — desktop (1280×800)', () => {
     await expect(tw).toBeVisible()
   })
 
-  test('Daily Bundle CTA navigates to /signup?tier=daily-bundle', async ({ page }) => {
+  test('Daily Bundle CTA navigates to /inscription?tier=daily-bundle', async ({ page }) => {
     await page.goto('/')
     const dailyCard = page.getByTestId('pricing-tier').filter({ hasText: 'Daily Bundle' })
     const cta = dailyCard.getByTestId('tier-cta')
     await cta.scrollIntoViewIfNeeded()
     await cta.click()
-    await expect(page).toHaveURL(/\/signup\?tier=daily-bundle/, { timeout: 15_000 })
+    await expect(page).toHaveURL(/\/inscription\?tier=daily-bundle/, { timeout: 15_000 })
   })
 })
 

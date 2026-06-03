@@ -126,7 +126,7 @@ async function auditRoute(
 
   try {
     const response = await page.goto(`http://localhost:3000${route.path}`, {
-      waitUntil: 'networkidle',
+      waitUntil: 'load',
       timeout: 20_000,
     })
 
@@ -182,7 +182,7 @@ async function auditRoute(
     })
     const mobilePage = await mobileCtx.newPage()
     await mobilePage.goto(`http://localhost:3000${route.path}`, {
-      waitUntil: 'networkidle',
+      waitUntil: 'load',
       timeout: 20_000,
     })
     await mobilePage.screenshot({

@@ -44,18 +44,18 @@ test.describe('Le Diagnostic results — desktop (1280×800)', () => {
     await expect(link).toHaveAttribute('href', '/l-examen/diagnostic/tache/2')
   })
 
-  test('"Recommencer le diagnostic" navigates to /l-examen/tache/1', async ({
+  test('"Recommencer le diagnostic" navigates to /l-examen/diagnostic/tache/1', async ({
     page,
   }) => {
     await page.goto('/l-examen/diagnostic/results')
     await page.getByTestId('results-action-recommencer').click()
-    await expect(page).toHaveURL(/\/l-examen\/tache\/1$/)
+    await expect(page).toHaveURL(/\/l-examen\/diagnostic\/tache\/1$/)
   })
 
-  test('"Retour au tableau de bord" navigates to /dashboard', async ({ page }) => {
+  test('"Retour au tableau de bord" navigates to /tableau-de-bord', async ({ page }) => {
     await page.goto('/l-examen/diagnostic/results')
     await page.getByTestId('results-action-dashboard').click()
-    await expect(page).toHaveURL(/\/dashboard$/)
+    await expect(page).toHaveURL(/\/tableau-de-bord$/)
   })
 
   test('does not contain any <audio> element', async ({ page }) => {

@@ -67,7 +67,7 @@ export default function PastScorePanel() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <Link
           data-testid="diagnostic-past-score-link"
-          href="/maitre/diagnostic/results"
+          href="/l-examen/diagnostic/results"
           className="ed-btn-press"
           style={{
             padding: '10px 16px',

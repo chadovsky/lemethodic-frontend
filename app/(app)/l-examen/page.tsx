@@ -43,7 +43,7 @@ const SECTIONS: SectionCard[] = [
 ]
 
 const SECONDARY: { label: string; href: string; bientot?: boolean }[] = [
-  { label: 'Diagnostic', href: '/maitre/diagnostic' },
+  { label: 'Diagnostic', href: '/l-examen/diagnostic' },
   { label: 'Mock examen complet', href: '/l-examen/mock', bientot: true },
 ]
 

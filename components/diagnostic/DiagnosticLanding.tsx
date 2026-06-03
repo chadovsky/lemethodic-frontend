@@ -148,7 +148,7 @@ export default function DiagnosticLanding({ taches }: { taches: readonly Tache[]
       <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
         <Link
           data-testid="diagnostic-cta-start"
-          href="/maitre/diagnostic/tache/1"
+          href="/l-examen/diagnostic/tache/1"
           className="ed-btn-press"
           style={{
             minHeight: 48,

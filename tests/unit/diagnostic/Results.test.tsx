@@ -43,11 +43,11 @@ describe('Results', () => {
     expect(screen.getAllByTestId('recommendation-row')).toHaveLength(3)
   })
 
-  it('renders "Recommencer le diagnostic" linking to /maitre/diagnostic/tache/1', () => {
+  it('renders "Recommencer le diagnostic" linking to /l-examen/diagnostic/tache/1', () => {
     render(<Results />)
     const link = screen.getByTestId('results-action-recommencer')
     expect(link).toHaveTextContent(/recommencer le diagnostic/i)
-    expect(link).toHaveAttribute('href', '/maitre/diagnostic/tache/1')
+    expect(link).toHaveAttribute('href', '/l-examen/diagnostic/tache/1')
   })
 
   it('renders "Retour au tableau de bord" linking to /tableau-de-bord', () => {
