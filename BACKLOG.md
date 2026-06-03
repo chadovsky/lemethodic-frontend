@@ -6134,15 +6134,16 @@ PEDAGOGY.md is canonical for learning design. When PRODUCT.md, SITEMAP.md, or AR
 
 ## F-405: /content/iles/ structure + 7 mold components + demo route
 
-**Status:** In Progress (4/7 molds shipped — Round 2A complete)
+**Status:** Shipped (7/7 molds complete — build green)
 **Phase:** Phase 2 (vertical slice 1, then extends)
 **Priority:** P0
 
 Build the seven typed mold components in /components/iles/molds/ and create /_dev/molds demo route showing each with sample data.
 
 **Shipped (Round 1 — b1947e1):** Dialogue
-**Shipped (Round 2A — this session):** ActeDeParole, Chunk, Regle
-**Remaining:** Phonetique (Le Son), Activite, Tache
+**Shipped (Round 2A):** ActeDeParole, Chunk, Regle
+**Shipped (Round 2B):** Son (Phonetique), Activite (4 subtypes), Tache
+**Remaining:** none — all 7 molds built
 
 **Scope:**
 - /content/iles/ folder created (empty, ready for authoring)

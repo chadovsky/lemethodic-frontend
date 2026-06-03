@@ -2,6 +2,9 @@ import Dialogue from '@/components/iles/molds/Dialogue'
 import Chunk from '@/components/iles/molds/Chunk'
 import ActeDeParole from '@/components/iles/molds/ActeDeParole'
 import Regle from '@/components/iles/molds/Regle'
+import Son from '@/components/iles/molds/Son'
+import Activite from '@/components/iles/molds/Activite'
+import Tache from '@/components/iles/molds/Tache'
 
 export const meta = {
   theme: '_sample',
@@ -83,4 +86,80 @@ export const meta = {
     { sentence: "Mes cousines sont gentilles et généreuses.", highlight: "gentilles et généreuses" },
   ]}
   piege="Certains adjectifs comme 'beau' et 'nouveau' changent de forme devant un nom masculin commençant par une voyelle: un bel homme, un nouvel ami."
+/>
+
+<Son
+  phoneme="/ʁ/"
+  description="Le R grasseye francais. Il se produit dans la gorge, pas a l'avant de la bouche comme en anglais."
+  words={[
+    { fr: "frere" },
+    { fr: "pere" },
+    { fr: "mere" },
+    { fr: "famille" },
+  ]}
+  minimalPairs={[
+    { a: "rue", b: "lue" },
+    { a: "roue", b: "loue" },
+    { a: "rie", b: "lie" },
+  ]}
+  articulationNote="Imaginez que vous faites un leger gargarisme. Le son vient du fond de la gorge — laissez l'air vibrer contre la luette. Ne bougez pas les levres."
+/>
+
+<Activite
+  subtype="comprehension"
+  question="Que fait le pere de Theo dans la vie?"
+  options={[
+    "Il est medecin",
+    "Il est professeur",
+    "Il est architecte",
+    "Il travaille dans la finance",
+  ]}
+  correctIndex={2}
+  feedbackCorrect="Exact. Le pere de Theo est architecte."
+  feedbackWrong="Attention — c'est la mere de Theo qui travaille dans la finance."
+/>
+
+<Activite
+  subtype="reflexe"
+  items={[
+    {
+      prompt: "Mon frere est very tall pour son age.",
+      expected: "Mon frere est tres grand pour son age.",
+    },
+    {
+      prompt: "Mes parents sont very supportifs dans tout ce que je fais.",
+      expected: "Mes parents me soutiennent dans tout ce que je fais.",
+    },
+    {
+      prompt: "On se voit every weekend en famille.",
+      expected: "On se voit tous les week-ends en famille.",
+    },
+  ]}
+/>
+
+<Activite
+  subtype="reemploi"
+  items={[
+    {
+      prompt: "Decrivez la profession d'un de vos parents en une phrase complete.",
+      modelAnswer: "Mon pere est ingenieur et travaille dans une grande entreprise depuis vingt ans.",
+    },
+    {
+      prompt: "Exprimez l'affection que vous ressentez pour un membre de votre famille.",
+      modelAnswer: "Ma soeur cadette est une source d'inspiration — son courage m'a toujours impressionne.",
+    },
+  ]}
+/>
+
+<Activite
+  subtype="conversation"
+  scenario="Vous rencontrez votre nouveau collegue lors d'une pause cafe. Il s'interesse a votre famille et vous pose des questions sur vos proches."
+  openingPrompt="Alors, vous venez d'une grande famille?"
+/>
+
+<Tache
+  prompt="Presentez votre famille a un responsable d'association qui vous accueille dans une rencontre communautaire. Decrivez qui sont vos proches, quels sont leurs metiers, et ce que la famille represente pour vous."
+  scenario="Vous participez a une rencontre communautaire a Montreal. Un benevole vous accueille et vous invite a vous presenter avec votre entourage."
+  targetLength="3-4 minutes"
+  type="oral"
 />

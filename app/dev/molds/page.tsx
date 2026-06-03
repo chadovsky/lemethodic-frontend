@@ -10,6 +10,9 @@ import Dialogue from '@/components/iles/molds/Dialogue'
 import ActeDeParole from '@/components/iles/molds/ActeDeParole'
 import Chunk from '@/components/iles/molds/Chunk'
 import Regle from '@/components/iles/molds/Regle'
+import Son from '@/components/iles/molds/Son'
+import Activite from '@/components/iles/molds/Activite'
+import Tache from '@/components/iles/molds/Tache'
 
 export const metadata = {
   title: 'Molds Dev | Le Méthodic',
@@ -275,10 +278,106 @@ export default function MoldsDevPage() {
         />
       </MoldSection>
 
-      {/* Molds 5–7: placeholders */}
-      <PlaceholderMold index={5} total={7} label="Le Son" />
-      <PlaceholderMold index={6} total={7} label="L'Activité" />
-      <PlaceholderMold index={7} total={7} label="La Tâche" />
+      {/* Mold 5: Le Son */}
+      <MoldSection
+        index={5}
+        total={7}
+        label="Le Son"
+        propsLine="Props: phoneme (IPA string) / description? (string) / words (Word[]: fr, audioSrc?) / minimalPairs (MinimalPair[]: a, b, audioA?, audioB?) / articulationNote? (string)"
+      >
+        <Son
+          phoneme="/ʁ/"
+          description="Le R grasseye francais. Il se produit dans la gorge, pas a l'avant de la bouche comme en anglais."
+          words={[
+            { fr: "frere" },
+            { fr: "pere" },
+            { fr: "mere" },
+            { fr: "famille" },
+          ]}
+          minimalPairs={[
+            { a: "rue", b: "lue" },
+            { a: "roue", b: "loue" },
+            { a: "rie", b: "lie" },
+          ]}
+          articulationNote="Imaginez que vous faites un leger gargarisme. Le son vient du fond de la gorge — laissez l'air vibrer contre la luette. Ne bougez pas les levres."
+        />
+      </MoldSection>
+
+      {/* Mold 6: L'Activite — all 4 subtypes */}
+      <MoldSection
+        index={6}
+        total={7}
+        label="L'Activite (4 subtypes)"
+        propsLine="Props: subtype ('comprehension' | 'reflexe' | 'reemploi' | 'conversation') + subtype-specific fields"
+      >
+        {/* 6a: comprehension */}
+        <p style={{ fontFamily: 'var(--f-mono)', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-faint)', margin: '0 0 12px' }}>
+          6a — comprehension
+        </p>
+        <Activite
+          subtype="comprehension"
+          question="Que fait le pere de Theo dans la vie?"
+          options={[
+            "Il est medecin",
+            "Il est professeur",
+            "Il est architecte",
+            "Il travaille dans la finance",
+          ]}
+          correctIndex={2}
+          feedbackCorrect="Exact. Le pere de Theo est architecte."
+          feedbackWrong="Attention — c'est la mere de Theo qui travaille dans la finance."
+        />
+
+        {/* 6b: reflexe */}
+        <p style={{ fontFamily: 'var(--f-mono)', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-faint)', margin: '0 0 12px' }}>
+          6b — reflexe
+        </p>
+        <Activite
+          subtype="reflexe"
+          items={[
+            { prompt: "Mon frere est very tall pour son age.", expected: "Mon frere est tres grand pour son age." },
+            { prompt: "Mes parents sont very supportifs.", expected: "Mes parents me soutiennent beaucoup." },
+            { prompt: "On se voit every weekend en famille.", expected: "On se voit tous les week-ends en famille." },
+          ]}
+        />
+
+        {/* 6c: reemploi */}
+        <p style={{ fontFamily: 'var(--f-mono)', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-faint)', margin: '0 0 12px' }}>
+          6c — reemploi
+        </p>
+        <Activite
+          subtype="reemploi"
+          items={[
+            { prompt: "Decrivez la profession d'un de vos parents en une phrase complete.", modelAnswer: "Mon pere est ingenieur et travaille dans une grande entreprise depuis vingt ans." },
+            { prompt: "Exprimez l'affection pour un membre de votre famille.", modelAnswer: "Ma soeur cadette est une source d'inspiration — son courage m'a toujours impressionne." },
+          ]}
+        />
+
+        {/* 6d: conversation */}
+        <p style={{ fontFamily: 'var(--f-mono)', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-faint)', margin: '0 0 12px' }}>
+          6d — conversation
+        </p>
+        <Activite
+          subtype="conversation"
+          scenario="Vous rencontrez votre nouveau collegue lors d'une pause cafe. Il s'interesse a votre famille."
+          openingPrompt="Alors, vous venez d'une grande famille?"
+        />
+      </MoldSection>
+
+      {/* Mold 7: La Tache */}
+      <MoldSection
+        index={7}
+        total={7}
+        label="La Tache"
+        propsLine="Props: prompt (string) / scenario (string) / targetLength (string) / type? ('oral' | 'writing', default 'oral')"
+      >
+        <Tache
+          prompt="Presentez votre famille a un responsable d'association qui vous accueille dans une rencontre communautaire. Decrivez qui sont vos proches, quels sont leurs metiers, et ce que la famille represente pour vous."
+          scenario="Vous participez a une rencontre communautaire a Montreal. Un benevole vous accueille et vous invite a vous presenter avec votre entourage."
+          targetLength="3-4 minutes"
+          type="oral"
+        />
+      </MoldSection>
     </main>
   )
 }
