@@ -7,11 +7,16 @@
 // the existing app/dev/bientot convention.
 
 import Dialogue from '@/components/iles/molds/Dialogue'
+import ActeDeParole from '@/components/iles/molds/ActeDeParole'
+import Chunk from '@/components/iles/molds/Chunk'
+import Regle from '@/components/iles/molds/Regle'
 
 export const metadata = {
   title: 'Molds Dev | Le Méthodic',
   robots: { index: false, follow: false },
 }
+
+// ─── Le Dialogue sample data ───────────────────────────────────────────────
 
 const SAMPLE_TRANSCRIPT = [
   { speaker: 'Leila', text: "Bonjour Theo. Tu veux voir des photos de ma famille?" },
@@ -35,6 +40,134 @@ const SAMPLE_CHECKS = [
     correctIndex: 1,
   },
 ]
+
+// ─── L'Acte de Parole sample data ──────────────────────────────────────────
+
+const SAMPLE_FORMULES = [
+  { text: "Pourriez-vous répéter, s'il vous plaît?" },
+  { text: "Je n'ai pas bien compris. Vous pouvez répéter?" },
+  { text: "Excusez-moi, pourriez-vous parler plus lentement?" },
+  { text: "Pardon, je n'ai pas saisi. Vous dites...?" },
+]
+
+// ─── Le Chunk sample data ──────────────────────────────────────────────────
+
+const SAMPLE_EXAMPLES = [
+  "Il a l'air d'être fatigué aujourd'hui.",
+  "Elle a l'air de connaître tout le monde ici.",
+  "Ils ont l'air de s'amuser beaucoup.",
+]
+
+// ─── La Règle sample data ──────────────────────────────────────────────────
+
+const SAMPLE_EXEMPLES = [
+  { sentence: "Mon frère est grand et sportif.", highlight: "grand et sportif" },
+  { sentence: "Ma sœur est grande et sportive.", highlight: "grande et sportive" },
+  { sentence: "Mes parents sont gentils et généreux.", highlight: "gentils et généreux" },
+  { sentence: "Mes cousines sont gentilles et généreuses.", highlight: "gentilles et généreuses" },
+]
+
+// ─── Section wrapper ────────────────────────────────────────────────────────
+
+function MoldSection({
+  index,
+  total,
+  label,
+  children,
+  propsLine,
+}: {
+  index: number
+  total: number
+  label: string
+  children: React.ReactNode
+  propsLine: string
+}) {
+  return (
+    <div style={{ marginBottom: 56 }}>
+      <p
+        style={{
+          fontFamily: 'var(--f-mono)',
+          fontSize: 10,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: 'var(--ink-faint)',
+          margin: '0 0 16px',
+          borderBottom: '1px solid var(--rule)',
+          paddingBottom: 12,
+        }}
+      >
+        Mold {index} of {total}: {label}
+      </p>
+
+      {children}
+
+      <div
+        style={{
+          background: 'var(--paper-tint)',
+          border: '1px solid var(--rule)',
+          borderRadius: 'var(--r-md)',
+          padding: '16px 20px',
+        }}
+      >
+        <p
+          style={{
+            fontFamily: 'var(--f-mono)',
+            fontSize: 11,
+            color: 'var(--ink-faint)',
+            margin: 0,
+          }}
+        >
+          {propsLine}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function PlaceholderMold({ index, total, label }: { index: number; total: number; label: string }) {
+  return (
+    <div
+      style={{
+        borderBottom: index < total ? '1px solid var(--rule)' : 'none',
+        paddingBottom: 32,
+        marginBottom: 32,
+      }}
+    >
+      <p
+        style={{
+          fontFamily: 'var(--f-mono)',
+          fontSize: 10,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: 'var(--ink-faint)',
+          margin: '0 0 12px',
+        }}
+      >
+        Mold {index} of {total}: {label}
+      </p>
+      <div
+        style={{
+          background: 'var(--paper-tint)',
+          border: '1px dashed var(--rule-strong)',
+          borderRadius: 'var(--r-lg)',
+          padding: '32px 24px',
+          textAlign: 'center',
+        }}
+      >
+        <p
+          style={{
+            fontFamily: 'var(--f-ui)',
+            fontSize: 13,
+            color: 'var(--ink-faint)',
+            margin: 0,
+          }}
+        >
+          {label} à venir (Round 3+)
+        </p>
+      </div>
+    </div>
+  )
+}
 
 export default function MoldsDevPage() {
   return (
@@ -84,101 +217,68 @@ export default function MoldsDevPage() {
         </p>
       </div>
 
-      {/* Section: Le Dialogue */}
-      <div style={{ marginBottom: 56 }}>
-        <p
-          style={{
-            fontFamily: 'var(--f-mono)',
-            fontSize: 10,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: 'var(--ink-faint)',
-            margin: '0 0 16px',
-            borderBottom: '1px solid var(--rule)',
-            paddingBottom: 12,
-          }}
-        >
-          Mold 1 of 7: Le Dialogue
-        </p>
-
+      {/* Mold 1: Le Dialogue */}
+      <MoldSection
+        index={1}
+        total={7}
+        label="Le Dialogue"
+        propsLine="Props: audio (string path) / transcript (Turn[]) / comprehensionChecks (ComprehensionCheck[])"
+      >
         <Dialogue
           audio="/iles/_sample/audio/b1/dialogue.mp3"
           transcript={SAMPLE_TRANSCRIPT}
           comprehensionChecks={SAMPLE_CHECKS}
         />
+      </MoldSection>
 
-        <div
-          style={{
-            background: 'var(--paper-tint)',
-            border: '1px solid var(--rule)',
-            borderRadius: 'var(--r-md)',
-            padding: '16px 20px',
-          }}
-        >
-          <p
-            style={{
-              fontFamily: 'var(--f-mono)',
-              fontSize: 11,
-              color: 'var(--ink-faint)',
-              margin: 0,
-            }}
-          >
-            Props: audio (string path) / transcript (Turn[]) / comprehensionChecks (ComprehensionCheck[])
-          </p>
-        </div>
-      </div>
+      {/* Mold 2: L'Acte de Parole */}
+      <MoldSection
+        index={2}
+        total={7}
+        label="L'Acte de Parole"
+        propsLine="Props: fonction (string) / formules (Formula[]: text, audio?) / register ('familier' | 'courant' | 'soutenu')"
+      >
+        <ActeDeParole
+          fonction="Demander poliment de répéter"
+          formules={SAMPLE_FORMULES}
+          register="courant"
+        />
+      </MoldSection>
 
-      {/* Placeholder rows for remaining 6 molds */}
-      {[
-        "L'Acte de Parole",
-        'Le Chunk',
-        'La Regle',
-        'Le Son',
-        "L'Activite",
-        'La Tache',
-      ].map((mold, i) => (
-        <div
-          key={mold}
-          style={{
-            borderBottom: i < 5 ? '1px solid var(--rule)' : 'none',
-            paddingBottom: 32,
-            marginBottom: 32,
-          }}
-        >
-          <p
-            style={{
-              fontFamily: 'var(--f-mono)',
-              fontSize: 10,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: 'var(--ink-faint)',
-              margin: '0 0 12px',
-            }}
-          >
-            Mold {i + 2} of 7: {mold}
-          </p>
-          <div
-            style={{
-              background: 'var(--paper-tint)',
-              border: '1px dashed var(--rule-strong)',
-              borderRadius: 'var(--r-lg)',
-              padding: '32px 24px',
-              textAlign: 'center',
-            }}
-          >
-            <p
-              style={{
-                fontFamily: 'var(--f-ui)',
-                fontSize: 13,
-                color: 'var(--ink-faint)',
-                margin: 0,
-              }}
-            >
-              {mold} a venir (Round 2+)
-            </p>
-          </div>
-        </div>
-      ))}
+      {/* Mold 3: Le Chunk */}
+      <MoldSection
+        index={3}
+        total={7}
+        label="Le Chunk"
+        propsLine="Props: chunk (string FR) / gloss (string EN) / examples (string[]) / audio? (string) / register? (string)"
+      >
+        <Chunk
+          chunk="avoir l'air de + infinitif"
+          gloss="to seem to / to look like one is"
+          examples={SAMPLE_EXAMPLES}
+          register="expression idiomatique"
+        />
+      </MoldSection>
+
+      {/* Mold 4: La Règle */}
+      <MoldSection
+        index={4}
+        total={7}
+        label="La Règle"
+        propsLine="Props: regle (string) / structure (string) / exemples (RegleExample[]: sentence, highlight) / piege? (string)"
+      >
+        <Regle
+          regle="En français, l'adjectif qualificatif s'accorde en genre et en nombre avec le nom qu'il qualifie."
+          structure="nom (masc. sg.) + adj. (masc. sg.)   /   nom (fém. sg.) + adj. (fém. sg.)"
+          exemples={SAMPLE_EXEMPLES}
+          piege="Certains adjectifs comme 'beau' et 'nouveau' changent de forme devant un nom masculin commençant par une voyelle: un bel homme, un nouvel ami."
+        />
+      </MoldSection>
+
+      {/* Molds 5–7: placeholders */}
+      <PlaceholderMold index={5} total={7} label="Le Son" />
+      <PlaceholderMold index={6} total={7} label="L'Activité" />
+      <PlaceholderMold index={7} total={7} label="La Tâche" />
     </main>
   )
 }

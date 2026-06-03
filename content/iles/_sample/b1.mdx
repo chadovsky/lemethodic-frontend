@@ -1,4 +1,7 @@
 import Dialogue from '@/components/iles/molds/Dialogue'
+import Chunk from '@/components/iles/molds/Chunk'
+import ActeDeParole from '@/components/iles/molds/ActeDeParole'
+import Regle from '@/components/iles/molds/Regle'
 
 export const meta = {
   theme: '_sample',
@@ -46,4 +49,38 @@ export const meta = {
       correctIndex: 1,
     },
   ]}
+/>
+
+<ActeDeParole
+  fonction="Demander poliment de répéter"
+  formules={[
+    { text: "Pourriez-vous répéter, s'il vous plaît?" },
+    { text: "Je n'ai pas bien compris. Vous pouvez répéter?" },
+    { text: "Excusez-moi, pourriez-vous parler plus lentement?" },
+    { text: "Pardon, je n'ai pas saisi. Vous dites...?" },
+  ]}
+  register="courant"
+/>
+
+<Chunk
+  chunk="avoir l'air de + infinitif"
+  gloss="to seem to / to look like one is"
+  examples={[
+    "Il a l'air d'être fatigué aujourd'hui.",
+    "Elle a l'air de connaître tout le monde ici.",
+    "Ils ont l'air de s'amuser beaucoup.",
+  ]}
+  register="expression idiomatique"
+/>
+
+<Regle
+  regle="En français, l'adjectif qualificatif s'accorde en genre et en nombre avec le nom qu'il qualifie."
+  structure="nom (masc. sg.) + adj. (masc. sg.)   /   nom (fém. sg.) + adj. (fém. sg.)"
+  exemples={[
+    { sentence: "Mon frère est grand et sportif.", highlight: "grand et sportif" },
+    { sentence: "Ma sœur est grande et sportive.", highlight: "grande et sportive" },
+    { sentence: "Mes parents sont gentils et généreux.", highlight: "gentils et généreux" },
+    { sentence: "Mes cousines sont gentilles et généreuses.", highlight: "gentilles et généreuses" },
+  ]}
+  piege="Certains adjectifs comme 'beau' et 'nouveau' changent de forme devant un nom masculin commençant par une voyelle: un bel homme, un nouvel ami."
 />
