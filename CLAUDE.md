@@ -210,6 +210,12 @@ A feature is done when:
 5. If at a 5-count milestone, tag pushed.
 6. Branch deleted locally and on origin.
 
+## CI
+
+- GitHub Actions runs on every push to main and every pull request.
+- Two jobs: `unit` (vitest) then `e2e` (Playwright, `needs: unit`). A failing job fails the workflow.
+- All `/api/**` calls are mocked in tests; no backend secrets are needed in CI.
+
 ## Collaboration Contract (Chadi + Claude.ai + Claude Code)
 
 ### Roles

@@ -6472,3 +6472,7 @@ stale hrefs (/dashboard, /la-bibliotheque, /l-examen, /cours/methode-tcf-canada)
 
 **non-visual change:** link target fix + test reconciliation only.
 **Branch:** main.
+
+## Infrastructure
+
+- [Shipped] F-436 CI: GitHub Actions unit + e2e gate (d371548+)
