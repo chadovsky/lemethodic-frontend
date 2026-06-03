@@ -660,7 +660,7 @@ function LessonListEmpty({ hasExamDate }: { hasExamDate: boolean }) {
     ? 'The diagnostic takes a few minutes and unlocks the lesson sequence calibrated to your level.'
     : "Tell us when you sit the TCF and we'll calibrate the 27-lesson sequence to your timeline."
   const ctaLabel = hasExamDate ? 'Start diagnostic' : 'Set exam date'
-  const ctaHref = hasExamDate ? '/examen' : '/profil'
+  const ctaHref = hasExamDate ? '/l-examen' : '/profil'
   return (
     <div
       style={{

@@ -36,9 +36,9 @@ interface TacheData {
 }
 
 const TACHES: TacheData[] = [
-  { number: 1, mode: 'tache_1', href: '/examen/expression-orale/tache-1/interview', metaIcon: 'message' },
-  { number: 2, mode: 'tache_2', href: '/examen/expression-orale/tache-2', metaIcon: 'mic' },
-  { number: 3, mode: 'tache_3', href: '/examen/expression-orale/tache-3/environnement', metaIcon: 'mic' },
+  { number: 1, mode: 'tache_1', href: '/l-examen/expression-orale/tache-1/interview', metaIcon: 'message' },
+  { number: 2, mode: 'tache_2', href: '/l-examen/expression-orale/tache-2', metaIcon: 'mic' },
+  { number: 3, mode: 'tache_3', href: '/l-examen/expression-orale/tache-3/environnement', metaIcon: 'mic' },
 ]
 
 // V-015c.copy — placeholder stubs. Real format/tips/examples copy is

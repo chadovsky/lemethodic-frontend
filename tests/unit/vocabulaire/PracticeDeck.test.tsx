@@ -17,7 +17,7 @@ describe('PracticeDeck', () => {
     expect(screen.getByRole('heading', { level: 1, name: /pratique/i })).toBeInTheDocument()
     expect(screen.getByText(/révisez vos chunks, un par un\./i)).toBeInTheDocument()
     const back = screen.getByTestId('practice-back-to-list')
-    expect(back).toHaveAttribute('href', '/bibliotheque')
+    expect(back).toHaveAttribute('href', '/la-bibliotheque')
   })
 
   it("starts on card 1 of 30 with the first chunk's French side visible", () => {
@@ -69,7 +69,7 @@ describe('PracticeDeck', () => {
       /vous avez terminé les 60 chunks\./i,
     )
     expect(screen.getByTestId('end-of-deck-restart')).toBeInTheDocument()
-    expect(screen.getByTestId('end-of-deck-back-to-list')).toHaveAttribute('href', '/bibliotheque')
+    expect(screen.getByTestId('end-of-deck-back-to-list')).toHaveAttribute('href', '/la-bibliotheque')
   })
 
   it('Recommencer from end-of-deck resets to card 1, front side', () => {

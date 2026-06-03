@@ -139,11 +139,11 @@ function resolveCta(action: ActionBlock): { href: string; label: string } {
       }
       if (action.tache_application) {
         const n = action.tache_application.replace('tache_', '')
-        return { href: `/examen/expression-orale/tache-${n}`, label: 'Start practice' }
+        return { href: `/l-examen/expression-orale/tache-${n}`, label: 'Start practice' }
       }
-      return { href: '/examen/expression-orale', label: 'Start practice' }
+      return { href: '/l-examen/expression-orale', label: 'Start practice' }
     case 'free_practice':
-      return { href: '/examen/expression-orale', label: 'Open Speaking' }
+      return { href: '/l-examen/expression-orale', label: 'Open Speaking' }
     case 'path_complete':
       return { href: '/la-methode', label: 'Browse modules' }
     case 'no_path':

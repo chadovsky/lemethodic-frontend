@@ -27,7 +27,7 @@ describe('Quiz', () => {
     expect(
       screen.getByText(/10 chunks, à vous de retrouver la traduction\./i),
     ).toBeInTheDocument()
-    expect(screen.getByTestId('quiz-back-to-list')).toHaveAttribute('href', '/bibliotheque')
+    expect(screen.getByTestId('quiz-back-to-list')).toHaveAttribute('href', '/la-bibliotheque')
   })
 
   it('starts on question 1 of 10 with Submit disabled', () => {
@@ -54,7 +54,7 @@ describe('Quiz', () => {
     expect(screen.getByTestId('quiz-results')).toBeInTheDocument()
     expect(screen.getByTestId('quiz-results-score')).toHaveTextContent(/10\s*\/\s*10/)
     expect(screen.getByTestId('quiz-results-restart')).toBeInTheDocument()
-    expect(screen.getByTestId('quiz-results-back-to-list')).toHaveAttribute('href', '/bibliotheque')
+    expect(screen.getByTestId('quiz-results-back-to-list')).toHaveAttribute('href', '/la-bibliotheque')
   })
 
   it('completing all 10 questions incorrectly shows the results panel with score 0/10', () => {

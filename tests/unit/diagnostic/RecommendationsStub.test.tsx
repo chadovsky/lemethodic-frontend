@@ -15,11 +15,11 @@ describe('RecommendationsStub', () => {
     expect(cta).toHaveAttribute('href', '/la-methode')
   })
 
-  it('second recommendation CTA links to /bibliotheque', () => {
+  it('second recommendation CTA links to /la-bibliotheque', () => {
     render(<RecommendationsStub />)
     const rows = screen.getAllByTestId('recommendation-row')
     const cta = within(rows[1]).getByTestId('recommendation-cta')
-    expect(cta).toHaveAttribute('href', '/bibliotheque')
+    expect(cta).toHaveAttribute('href', '/la-bibliotheque')
   })
 
   it('third recommendation CTA links to /maitre/diagnostic/tache/1', () => {

@@ -64,6 +64,6 @@ describe('QuizResults', () => {
   it('renders restart button and back-to-list link', () => {
     render(<QuizResults score={7} total={10} onRestart={() => {}} />)
     expect(screen.getByTestId('quiz-results-restart')).toBeInTheDocument()
-    expect(screen.getByTestId('quiz-results-back-to-list')).toHaveAttribute('href', '/bibliotheque')
+    expect(screen.getByTestId('quiz-results-back-to-list')).toHaveAttribute('href', '/la-bibliotheque')
   })
 })

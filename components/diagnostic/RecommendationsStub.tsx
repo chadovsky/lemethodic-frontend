@@ -16,7 +16,7 @@ const ROWS = [
     chipColor: 'var(--lm-pastel-sage)',
     suggestion:
       'Étoffer votre réservoir lexical sur les thèmes de la vie courante.',
-    cta: { label: 'Étoffer Le Propos', href: '/bibliotheque' },
+    cta: { label: 'Étoffer Le Propos', href: '/la-bibliotheque' },
   },
   {
     layer: 'La Musique',

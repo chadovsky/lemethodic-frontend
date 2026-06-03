@@ -50,11 +50,11 @@ describe('Results', () => {
     expect(link).toHaveAttribute('href', '/maitre/diagnostic/tache/1')
   })
 
-  it('renders "Retour au tableau de bord" linking to /dashboard', () => {
+  it('renders "Retour au tableau de bord" linking to /tableau-de-bord', () => {
     render(<Results />)
     const link = screen.getByTestId('results-action-dashboard')
     expect(link).toHaveTextContent(/retour au tableau de bord/i)
-    expect(link).toHaveAttribute('href', '/carte')
+    expect(link).toHaveAttribute('href', '/tableau-de-bord')
   })
 
   it('does NOT contain an <audio> element', () => {

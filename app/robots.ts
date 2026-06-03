@@ -5,9 +5,10 @@ const BASE = 'https://lemethodic.com'
 // Routes that require authentication or are not intended for indexing.
 const PRIVATE = [
   '/carte',
+  '/tableau-de-bord',
   '/la-methode/',
-  '/bibliotheque/',
-  '/examen/',
+  '/la-bibliotheque/',
+  '/l-examen/',
   '/account',
   '/admin/',
   '/connexion',

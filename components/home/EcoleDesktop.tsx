@@ -322,7 +322,7 @@ export default function EcoleDesktop() {
                   title={hasExamDate ? copy.emptyNoEnrollmentTitle : copy.emptyNoExamTitle}
                   body={hasExamDate ? copy.emptyNoEnrollmentBody : copy.emptyNoExamBody}
                   ctaLabel={hasExamDate ? copy.emptyNoEnrollmentCta : copy.emptyNoExamCta}
-                  ctaHref={hasExamDate ? '/examen' : '/profil'}
+                  ctaHref={hasExamDate ? '/l-examen' : '/profil'}
                 />
               ) : (
                 <>

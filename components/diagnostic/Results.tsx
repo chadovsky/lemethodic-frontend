@@ -27,7 +27,7 @@ export default function Results() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 40, paddingTop: 8 }}>
       <Breadcrumb
         items={[
-          { label: "L'Examen", href: '/examen' },
+          { label: "L'Examen", href: '/l-examen' },
           { label: 'Résultats' },
         ]}
       />
