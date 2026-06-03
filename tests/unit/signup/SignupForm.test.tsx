@@ -122,9 +122,9 @@ describe('SignupForm', () => {
     expect(screen.getByRole('button', { name: /create account/i })).not.toBeDisabled()
   })
 
-  it('renders "Sign in" link pointing to /login', () => {
+  it('renders "Sign in" link pointing to /connexion', () => {
     render(<SignupForm />)
-    expect(screen.getByRole('link', { name: /sign in/i })).toHaveAttribute('href', '/login')
+    expect(screen.getByRole('link', { name: /sign in/i })).toHaveAttribute('href', '/connexion')
   })
 
   it('shows "Signing up for: Daily Bundle" when tier="daily-bundle"', () => {

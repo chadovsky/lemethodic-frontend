@@ -31,7 +31,7 @@ const NAV_ITEMS = [
   { href: '/la-methode', label: 'La Méthode', icon: <GraduationCap size={20} strokeWidth={1.5} /> },
   { href: '/bibliotheque', label: 'La Bibliothèque', icon: <BookOpen size={20} strokeWidth={1.5} /> },
   { href: '/examen', label: "L'Examen", icon: <FileText size={20} strokeWidth={1.5} /> },
-  { href: '/account', label: 'Compte', icon: <User size={20} strokeWidth={1.5} /> },
+  { href: '/profil', label: 'Compte', icon: <User size={20} strokeWidth={1.5} /> },
 ]
 
 interface SidebarProps {

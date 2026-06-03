@@ -22,10 +22,10 @@ describe('StickyHeader', () => {
     expect(screen.getByTestId('wordmark')).toBeInTheDocument()
   })
 
-  it('Sign in link points to /login', () => {
+  it('Sign in link points to /connexion', () => {
     render(<StickyHeader />)
     const link = screen.getByRole('link', { name: /sign in/i })
-    expect(link).toHaveAttribute('href', '/login')
+    expect(link).toHaveAttribute('href', '/connexion')
   })
 
   it('has a banner landmark', () => {

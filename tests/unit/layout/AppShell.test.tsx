@@ -97,7 +97,7 @@ describe('AppShell', () => {
     fireEvent.click(hamburger)
     expect(hamburger).toHaveAttribute('aria-expanded', 'true')
 
-    fireEvent.click(screen.getByTestId('sidebar-link-account'))
+    fireEvent.click(screen.getByTestId('sidebar-link-profil'))
     expect(hamburger).toHaveAttribute('aria-expanded', 'false')
   })
 

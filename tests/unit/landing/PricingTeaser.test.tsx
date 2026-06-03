@@ -31,7 +31,7 @@ describe('PricingTeaser', () => {
     const ctas = screen.getAllByTestId('tier-cta')
     expect(ctas).toHaveLength(5)
     EXPECTED_SLUGS.forEach((slug, i) => {
-      expect(ctas[i]).toHaveAttribute('href', `/signup?tier=${slug}`)
+      expect(ctas[i]).toHaveAttribute('href', `/inscription?tier=${slug}`)
     })
   })
 

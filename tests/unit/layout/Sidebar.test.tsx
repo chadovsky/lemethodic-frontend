@@ -52,7 +52,7 @@ describe('Sidebar', () => {
     expect(links[4]).toHaveTextContent("L'Examen")
     expect(links[4]).toHaveAttribute('href', '/examen')
     expect(links[5]).toHaveTextContent('Compte')
-    expect(links[5]).toHaveAttribute('href', '/account')
+    expect(links[5]).toHaveAttribute('href', '/profil')
   })
 
   it('marks the link matching the exact current pathname as active', () => {
@@ -62,7 +62,7 @@ describe('Sidebar', () => {
     expect(carte).toHaveAttribute('data-active', 'true')
     expect(carte).toHaveAttribute('aria-current', 'page')
 
-    const account = screen.getByTestId('sidebar-link-account')
+    const account = screen.getByTestId('sidebar-link-profil')
     expect(account).toHaveAttribute('data-active', 'false')
     expect(account).not.toHaveAttribute('aria-current')
   })
@@ -114,7 +114,7 @@ describe('Sidebar', () => {
   it('inactive link row does not have sidebar-active-row class', () => {
     mockUsePathname.mockReturnValue('/seance')
     render(<Sidebar drawerOpen={false} />)
-    const inactiveLink = screen.getByTestId('sidebar-link-account')
+    const inactiveLink = screen.getByTestId('sidebar-link-profil')
     expect(inactiveLink.parentElement).not.toHaveClass('sidebar-active-row')
   })
 
