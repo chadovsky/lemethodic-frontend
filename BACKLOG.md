@@ -6476,3 +6476,5 @@ stale hrefs (/dashboard, /la-bibliotheque, /l-examen, /cours/methode-tcf-canada)
 ## Infrastructure
 
 - [Shipped] F-436 CI: GitHub Actions unit + e2e gate (d371548+)
+
+- [Shipped] M-RENAME slug sweep (CI-caught): 6 unit assertions + 11 component stale hrefs fixed (3512cea) — CI is now source of truth
