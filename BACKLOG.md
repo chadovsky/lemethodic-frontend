@@ -2119,6 +2119,123 @@ Milestone: M1
 
 ---
 
+## F-367: Path migration English to French canonical routes
+
+**Status:** Shipped (commit ec7c3c5)
+**Phase:** Phase 1
+**Priority:** P0
+
+Migrated 9 English routes to French canonical equivalents per locked product naming.
+
+**Shipped scope:**
+- /dashboard to /carte
+- /la-bibliotheque to /bibliotheque
+- /l-examen to /examen
+- /l-examen/diagnostic to /maitre/diagnostic
+- /progress to /progression
+- /profile to /profil
+- /signup to /inscription
+- /login to /connexion
+- /la-bibliotheque/[slug] to /bibliotheque/[id]
+
+33 files moved, 308 redirects added.
+
+**Backfilled to BACKLOG:** 2026-06-03 (entry was missing from prior dispatch).
+
+---
+
+## F-368: Public marketing scaffolds
+
+**Status:** Shipped (commit e2c5c03)
+**Phase:** Phase 1
+**Priority:** P0
+
+Created public marketing pages with bientôt patterns where content is pending.
+
+**Shipped scope:**
+- /faq (full content)
+- /tarifs (3 tiers, inactive CTAs until Phase 4 payment activation)
+- /blog (bientôt)
+- /pieges (bientôt with 3 placeholder sections)
+- /blog/[slug] (notFound)
+- /pieges/[slug] (notFound)
+
+Turbopack fix: HTML entities replaced with literal Unicode.
+
+**Backfilled to BACKLOG:** 2026-06-03 (entry was missing from prior dispatch).
+
+---
+
+## F-369: Librairie batch (Book-Lab French catalog scaffold)
+
+**Status:** Shipped (commit d5e5e5e)
+**Phase:** Phase 1
+**Priority:** P1
+
+Created /librairie hub plus 4 category pages plus [item-slug] route, all bientôt. Footer-only navigation (distinct from /la-bibliotheque vocab product).
+
+**Backfilled to BACKLOG:** 2026-06-03 (entry was missing from prior dispatch).
+
+---
+
+## F-370: Legal pages batch
+
+**Status:** Shipped (commit 04378be)
+**Phase:** Phase 1
+**Priority:** P0
+
+Created legal pages:
+- /mentions-legales
+- /confidentialite
+- /cgv
+
+Redirects: /terms to /cgv, /privacy to /confidentialite.
+
+**Backfilled to BACKLOG:** 2026-06-03 (entry was missing from prior dispatch).
+
+---
+
+## F-371: 8 hub bientôt scaffolds
+
+**Status:** Shipped (commit ebfb5d1)
+**Phase:** Phase 1
+**Priority:** P0
+
+Created 8 product-area scaffolds with bientôt pattern:
+- /seance
+- /ile/[id]
+- /ile/[id]/activites
+- /ile/[id]/tache
+- /maitre
+- /examen/[checkpoint]
+- /parametres
+- /abonnement
+
+/seance and /maitre added as primary TopNav entries.
+
+**Backfilled to BACKLOG:** 2026-06-03 (entry was missing from prior dispatch).
+
+---
+
+## F-372: Phase 1 cleanup sweep
+
+**Status:** Shipped (commit c7417c3)
+**Phase:** Phase 1
+**Priority:** P0
+
+Closed Phase 1 with cleanup pass:
+- /account deleted (duplicate of /profil)
+- Redirect-hop sweep across 17 component files and 12 test files
+- ProtectedRoute redirectTo prop added (scoped to /bienvenue)
+- /more#about kept (verified not duplicate of /a-propos)
+- (app) layout audit clean
+
+Deferred items: /la-methode vs /ecole disambiguation (founder doctrinal call), /progres/clb (Phase 3), /[seo] catch-all (Phase 3).
+
+**Backfilled to BACKLOG:** 2026-06-03 (entry was missing from prior dispatch).
+
+---
+
 # Phase 2 additions (production-readiness pass, 2026-06-02)
 
 ## F-373 -- Mic permission and test flow (FE)
@@ -5999,3 +6116,196 @@ Milestone: M3
 ---
 
 End of BACKLOG.md.
+
+## F-404: PEDAGOGY.md canonical doc
+
+**Status:** Shipped (this commit)
+**Phase:** Phase 2 (foundation)
+**Priority:** P0
+
+Created PEDAGOGY.md as the canonical pedagogy spine document. Captures the 7 molds, two-view pattern (/ile syllabus + /seance brain-game), Le Maître role and intensity setting, cross-level adaptation (one MDX per (theme, level), shared images per theme, couche weighting table), image pipeline (linocut/watercolor aesthetic, 4-6 style anchor references, prompt protocol), content schema (MDX frontmatter + 7 typed body components), Phase 2 scope, dispatch sequence, and validation path.
+
+PEDAGOGY.md is canonical for learning design. When PRODUCT.md, SITEMAP.md, or ARCHITECTURE.md conflict with it on learning design questions, PEDAGOGY.md wins.
+
+**Dependencies:** none.
+**Branch:** main.
+
+---
+
+## F-405: /content/iles/ structure + 7 mold components + demo route
+
+**Status:** Queued
+**Phase:** Phase 2 (vertical slice 1, then extends)
+**Priority:** P0
+
+Build the seven typed mold components in /components/iles/molds/ and create /_dev/molds demo route showing each with sample data.
+
+**Scope:**
+- /content/iles/ folder created (empty, ready for authoring)
+- Components: Dialogue, ActeDeParole, Chunks, Regle, Phonetique, Activite (with type prop for 4 sub-types), Tache (with type prop for oral or writing variants)
+- Each component has a fixed prop contract per PEDAGOGY.md schema spec
+- /_dev/molds demo route renders each mold with realistic sample data
+- All molds use Atelier Français palette and DESIGN.md v2 tokens
+
+**Acceptance:**
+- All 7 components compile and render
+- /_dev/molds demo route shows each mold rendering correctly with sample data
+- Components are props-driven (no hard-coded content)
+- Components are reusable across /ile, /seance, /maitre surfaces
+
+**Dependencies:** F-404 (schema spec lives in PEDAGOGY.md).
+**Branch:** main (or feature branch if scope grows; merge before F-406).
+
+**Dispatch note:** This ticket is typically split across multiple Claude Code sessions (one mold at a time) per the tracer-bullet pattern. Tracer-bullet order: Dialogue first (paired with F-406 to ship first end-to-end slice), then Chunks, ActeDeParole, Regle, Phonetique, Activite, Tache.
+
+---
+
+## F-406: /ile/[theme] real page (syllabus view)
+
+**Status:** Queued
+**Phase:** Phase 2
+**Priority:** P0
+
+Replace the /ile/[id] bientôt scaffold with the real syllabus view. Dynamic route reads user's current_level from BE, imports the MDX content for (theme, level), renders the mold components in sequence.
+
+**Scope:**
+- app/(app)/ile/[theme]/page.tsx (dynamic route)
+- MDX import resolution: /content/iles/[theme]/[level].mdx based on user.current_level
+- Renders Le Maître intro audio at the top
+- Renders the 7 mold sections in syllabus order
+- Completion state per section (calls BE user_progress endpoint)
+- La Tâche section locked until rest is complete
+- Le Maître close audio at the bottom (revealed when all complete)
+
+**Acceptance:**
+- /ile/[one of the launch themes] renders the full B1 île
+- All 7 mold sections render with their sample data
+- Progress state persists via BE (F-423 + F-424 must be live)
+- Tâche lock state respected
+
+**Dependencies:** F-404, F-405, F-423 (islands + user_progress schema), F-424 (target_profile).
+**Branch:** main.
+
+---
+
+## F-407: /ile/[theme]/activites + /ile/[theme]/tache real pages
+
+**Status:** Queued
+**Phase:** Phase 2
+**Priority:** P0
+
+Replace the bientôt scaffolds at /ile/[id]/activites and /ile/[id]/tache with real surfaces.
+
+**Scope:**
+- /ile/[theme]/activites renders the four activity sub-types as a focused list (alternative entry to L'Activité molds without the full syllabus)
+- /ile/[theme]/tache renders La Tâche in dedicated full-screen mode (consigne + image + input + Le Maître scoring after submit)
+- Both pages read from the same MDX as /ile/[theme]
+- Tache page routes to oral or writing variant based on the île's skill assignment
+
+**Acceptance:**
+- Both pages render correctly for any populated île
+- Activities page can be used independently of syllabus flow
+- Tache page captures input (audio or text) and submits to scoring endpoint (F-425)
+
+**Dependencies:** F-404, F-405, F-406, F-425 (Tâche scoring), F-426 (activity scoring).
+**Branch:** main.
+
+---
+
+## F-408: /seance daily session real
+
+**Status:** Queued
+**Phase:** Phase 2
+**Priority:** P0
+
+Replace the /seance bientôt scaffold with the real daily brain-game.
+
+**Scope:**
+- Daily session algorithm: queue 5 to 7 mold instances targeting approximately 20 minutes
+- Algorithm weights weak couches (per latest signal from F-425 and F-426 scoring)
+- Mixed across îles and molds (a session may pull a Réflexe from famille, a Chunk from repas, a Compréhension from travail)
+- Streak indicator (current consecutive days)
+- Skip / next mechanics
+- End-of-session summary
+
+**Acceptance:**
+- /seance renders the daily queue
+- Algorithm respects user's current_level (only pulls from level-matched MDX)
+- Session completion updates user_progress and streak
+- Streak resets correctly after a missed day
+
+**Dependencies:** F-405 (mold components), F-423 (user_progress + streak fields), F-425 + F-426 (scoring signals).
+**Branch:** main.
+
+---
+
+## F-409: /maitre conversation hub + active conversation UI
+
+**Status:** Queued
+**Phase:** Phase 2
+**Priority:** P1
+
+Replace the /maitre bientôt scaffold with the conversation hub plus active conversation UI.
+
+**Scope:**
+- /maitre hub: lists Le Maître's contexts (diagnostic, conversation practice, exam prep)
+- /maitre/conversation/[scenario]: active conversation UI (4 to 5 turn loop, voice or text input per session toggle, light per-turn signal, end-of-conversation summary)
+- Le Maître voice via ElevenLabs (per V1 voice strategy)
+- Conversation state persisted via BE F-427
+
+**Acceptance:**
+- /maitre renders the hub
+- Starting a conversation scenario launches the active UI
+- Voice or text toggle respected per session
+- Conversation completes and persists transcript + signal
+
+**Dependencies:** F-404, F-405 (Activite conversation sub-type), F-427 (Le Maître orchestration).
+**Branch:** main.
+
+---
+
+## F-410: /carte persona-adaptive primary CTA
+
+**Status:** Queued
+**Phase:** Phase 2
+**Priority:** P1
+
+Update /carte (the dashboard) to surface a persona-adaptive primary CTA.
+
+**Scope:**
+- Read user's persona from Target Profile (F-424)
+- Visa-urgent: primary CTA = "Reprendre votre île" (deep links to /ile/[current_theme])
+- Habit-builder: primary CTA = "Démarrer la séance du jour" (deep links to /seance)
+- Secondary CTAs remain available for the non-primary view
+
+**Acceptance:**
+- /carte shows persona-appropriate primary CTA
+- Switching personas in /parametres updates /carte immediately
+- Both views remain accessible regardless of persona
+
+**Dependencies:** F-424 (Target Profile persistence).
+**Branch:** main.
+
+---
+
+## F-411: Le Maître intensity setting in /parametres
+
+**Status:** Queued
+**Phase:** Phase 2
+**Priority:** P1
+
+Add Le Maître intensity setting (soft / balanced / strict) to /parametres.
+
+**Scope:**
+- Toggle group in /parametres for Maitre intensity
+- Stored on user record (BE F-424 holds it on Target Profile)
+- Setting consumed by Le Maître audio playback (intensity affects which transitions and feedback moments play)
+- Default: balanced (if user did not select at /bienvenue)
+
+**Acceptance:**
+- Setting persists across sessions
+- Changing setting in /parametres takes effect on next île visit
+- Audio playback respects intensity (soft = intro + close only; balanced = + transitions; strict = + mid-activity feedback)
+
+**Dependencies:** F-424.
+**Branch:** main.

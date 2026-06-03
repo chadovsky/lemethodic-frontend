@@ -596,3 +596,28 @@ after the site is complete. Streaming paths stay on AssemblyAI.
 **May 31, M5.5 inserted.** BE pre-monetization hardening between M5 and
 M6. P-105, F-401, F-402, F-403. Documented in section 11 above. Shipped
 June 2026.
+
+## Content Layer
+
+Le Méthodic uses MDX for île content in Phase 2. Content files live at /content/iles/[theme]/[level].mdx and ship with the FE bundle. Pages import MDX directly via Next.js MDX support.
+
+The BE does not read île content. The BE only tracks state (user_progress, scoring, conversations, recordings). This architectural simplification removes the need for a content loader endpoint and keeps content edits in the git/deploy workflow.
+
+The seven mold components (Dialogue, ActeDeParole, Chunks, Regle, Phonetique, Activite, Tache) live in /components/iles/molds/ and are imported into MDX files. Each mold has a fixed prop contract per PEDAGOGY.md.
+
+Shared assets (images, audio) live at /public/iles/[theme]/ and are theme-keyed (not level-keyed; images shared across A2, B1, and C1 of the same theme).
+
+The feat/payload-cms branch remains scaffolded for Phase 5 migration if content help joins. MDX-to-Payload migration is a planned future move, not a Phase 2 concern.
+
+## Image Pipeline
+
+Image generation uses Nano Banana Pro with the protocol locked in PEDAGOGY.md:
+
+- Aesthetic: linocut-inspired French editorial style with watercolor wash, more illustrative than photographic.
+- 4 to 6 style anchor references locked at Phase 2 start.
+- Style plus content reference split prompting per generation.
+- Variable-token prompting and trait locking for consistency.
+- Required prompt vocabulary and required negative prompt baked into the master template.
+- Storage: /public/iles/[theme]/ in FE repo for Phase 2; migrate to DigitalOcean Spaces with CDN at Phase 5.
+
+Per-île image density: 6 to 8 images (5 essential plus 2 to 3 supplementary). Phase 2 (3 îles) totals approximately 18 to 24 images.

@@ -76,33 +76,36 @@ Every surface present, navigation reads as fully running, bientôt state system 
 
 ---
 
-### Phase 2: Core loop (first exam, end to end)
+## Phase 2: Core Loop + Product UX
 
-The exam-agnostic spine is lit for the first exam (TCF Canada). A user completes a full session from Target Profile through progression.
+**Goal:** Ship the full learning experience for one skill pair (oral + writing), with B1 content across 3 themes, on the locked spine design.
 
-**Scope:**
-- Bienvenue (Target Profile): exam choice, threshold, deadline, persona
-- /carte (Atlas hub): île navigation, CLB map, progression state
-- La séance: lesson entry point, Le Maître narration
-- The île with oral and listening: Tâche flow with Le Maître tutor and examiner voice separation
-- Le Maître conversation and the five-couche gate: Le Propos, Le Plan, La Construction, Les Pièges Anglais, La Musique all scored and gated
-- Progression and CLB: user advances through CLB bands, state persists
-- F-373: Mic permission and test flow (first-time mic access UX before first Tâche)
-- F-374: Recording management (user-facing recording list at /profil with replay, download, delete; GDPR-aligned)
-- F-375: Transcript correction UX (confirm or correct AssemblyAI transcript before scoring)
-- F-376: Mock exam mode wired (/examen/[checkpoint] fully timed, four sections, scoring, removes bientôt)
-- F-377: Empty states batch (all in-product surfaces have designed empty states)
-- F-378: First-time user tour (30-second guided tour after /bienvenue, skippable, once only)
-- F-379: Score prediction surfaced (/carte or /progression shows predicted exam score)
-- F-380: Score dispute / appeal flow (request human review on any Tâche result, 5 business day SLA)
+**Spine design:** See PEDAGOGY.md for the canonical pedagogy doc. It captures the 7 molds, two-view pattern, Le Maître behavior, cross-level adaptation, image pipeline, and content schema.
 
-**Acceptance:**
-- A user can complete the full loop from onboarding through a scored Tâche and back to /carte
-- Le Maître (ElevenLabs Chadi-clone) plays in lesson narration. OpenAI TTS-1-HD plays in Tâches only. Voices do not cross.
-- CLB progression updates after a completed session
-- Mic permission flow invoked once per user before first Tâche
-- Every in-product surface has a designed empty state; no blank or unhandled states
-- F-225 Playwright captures for all loop surfaces
+**Dispatch sequence (tracer-bullet pattern):**
+
+1. **Foundation:** F-404 (PEDAGOGY.md doc), F-423 (islands + user_progress schema), F-424 (target_profile persistence).
+2. **Vertical slice 1:** F-405 (Dialogue mold built first) + F-406 (/ile/[theme] rendering Dialogue end-to-end). Working île with just dialogue, progress tracked.
+3. **Vertical slices 2 through 7:** F-405 continues, adding each remaining mold one at a time (Chunks, ActeDeParole, Regle, Phonetique, Activite, Tache).
+4. **Surfaces expand:** F-407 (/activites + /tache), F-408 (/seance), F-409 (/maitre).
+5. **State and scoring:** F-425 (5-couche level-weighted), F-426 (activity scoring), F-427 (Le Maître orchestration), F-428 (level advancement gate stub).
+6. **Persona and settings:** F-410 (/carte adaptive CTA), F-411 (/parametres intensity).
+
+**Founder authoring track (parallel to Claude Code work):**
+
+- A1: 4 to 6 style reference images locked.
+- A2: approximately 18 to 24 image batch for 3 îles.
+- A3: 3 B1 îles authored as MDX.
+- A4: Le Maître audio intros and closes (6 audio files).
+
+**Production-readiness tickets F-373 to F-380 (filed in the 6/2 dispatch) remain in Phase 2 scope:** mic permission and test, recording management GDPR, transcript correction UX, mock exam wiring, empty states batch, first-time tour, score prediction surfaced, score dispute SLA.
+
+**Phase 2 ships when:**
+- All 8 FE spine tickets (F-404 to F-411) shipped
+- All 6 BE spine tickets (F-423 to F-428) shipped (F-428 in stub mode)
+- 3 B1 îles authored and published
+- Production-readiness Phase 2 tickets F-373 to F-380 shipped
+- 5-couche scoring validated against real Tâche submissions (calibration pass)
 
 ---
 
