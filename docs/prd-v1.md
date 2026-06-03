@@ -2590,6 +2590,32 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 ---
 
+### F-405 — Dialogue mold component
+
+**Status:** Partial (Dialogue only; 6 remaining molds are Round 2+)
+**Commit:** feat(iles): Dialogue mold + /ile tracer bullet (sample data, MDX wired)
+**Effort:** 1 session
+
+**Scope:** `'use client'` Dialogue component at `components/iles/molds/Dialogue.tsx`. Props: `audio` (string), `transcript` (Turn[]), `comprehensionChecks` (ComprehensionCheck[]). Renders: styled HTML5 audio player, collapsible transcript, instant per-question feedback in local React state. DESIGN.md v2 tokens throughout (no sharp corners, no italic, no em-dash, Atelier Francais palette). MDX configured via `@next/mdx` in `next.config.mjs`; `mdx-components.tsx` at repo root per Next.js App Router spec; `@mdx-js/loader` + `@mdx-js/react` installed as peer deps.
+
+**Remaining molds (Round 2+):** L'Acte de Parole, Le Chunk, La Regle, Le Son, L'Activite (4 sub-types), La Tache.
+
+---
+
+### F-406 — /ile/[id] page rendering MDX (local state, BE wiring deferred)
+
+**Status:** Partial (local state; progress/level BE wiring deferred to Round 2, F-417/F-410)
+**Commit:** feat(iles): Dialogue mold + /ile tracer bullet (sample data, MDX wired)
+**Effort:** 1 session (combined with F-405)
+
+**Scope:** Updated `app/(app)/ile/[id]/page.tsx` to replace the bientot stub. Dynamic import of MDX by theme slug (level hardcoded to `b1` with BE seam comment for F-410). Le Maitre intro/close placeholders rendered at top/bottom (audio deferred to F-417). Sample island at `content/iles/_sample/b1.mdx` (famille theme, B1, 8-turn Dialogue, 2 comprehension checks). Dev demo route at `/dev/molds` rendering Dialogue in isolation (note: `/_dev/molds` is not routable in Next.js App Router; `_` prefix creates a private folder excluded from routing).
+
+**BE seams committed in code:**
+- `CURRENT_LEVEL = 'b1'` hardcoded in page.tsx (resolve from target_profile F-410 in Round 2)
+- Le Maitre close placeholder always visible (gate behind user_progress F-417 in Round 2)
+
+---
+
 ## Section 4 — Content Pipeline (CON-001 to CON-014)
 
 **Goal:** real content lives behind the surfaces. F-321 vocab review (1,684 Phase 1 chunks awaiting Chadi triage) lands here. L'École 27 lessons get methodology-visible content. Le Diagnostic Tâche library expands to 50 scenarios (F-061.2 Livraison 2/2).

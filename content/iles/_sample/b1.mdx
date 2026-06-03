@@ -1,0 +1,49 @@
+import Dialogue from '@/components/iles/molds/Dialogue'
+
+export const meta = {
+  theme: '_sample',
+  level: 'b1',
+  display_title: 'La famille',
+  prerequisites: [],
+  estimated_minutes: 22,
+  persona_priority: ['visa-urgent', 'habit-builder'],
+  image_set: '/iles/_sample',
+  maitre_audio: {
+    intro: '/iles/_sample/audio/b1/intro.mp3',
+    close: '/iles/_sample/audio/b1/close.mp3',
+  },
+  actes_de_parole: ['se-presenter', 'decrire-relations', 'exprimer-affection'],
+}
+
+<Dialogue
+  audio="/iles/_sample/audio/b1/dialogue.mp3"
+  transcript={[
+    { speaker: "Leila", text: "Bonjour Theo. Tu veux voir des photos de ma famille?" },
+    { speaker: "Theo", text: "Avec plaisir! Tu as des freres et soeurs?" },
+    { speaker: "Leila", text: "Oui, j'ai deux grands freres et une petite soeur. Et toi, tu viens d'une grande famille?" },
+    { speaker: "Theo", text: "Non, je suis enfant unique. Mais mes parents ont beaucoup de neveux et de nieces." },
+    { speaker: "Leila", text: "Ca doit etre tranquille chez toi. Chez nous, c'est toujours anime. Ma soeur joue du violon." },
+    { speaker: "Theo", text: "Et tes parents, qu'est-ce qu'ils font dans la vie?" },
+    { speaker: "Leila", text: "Mon pere est medecin et ma mere enseigne les mathematiques au lycee. Et tes parents?" },
+    { speaker: "Theo", text: "Mon pere est architecte et ma mere travaille dans la finance. On se voit souvent le week-end." },
+  ]}
+  comprehensionChecks={[
+    {
+      type: 'mcq',
+      question: "Quelle est la composition de la fratrie de Leila?",
+      options: [
+        "Un frere et une soeur",
+        "Deux freres et une soeur",
+        "Trois soeurs",
+        "Elle est enfant unique"
+      ],
+      correctIndex: 1,
+    },
+    {
+      type: 'vrai-faux',
+      question: "Le pere de Leila est professeur de mathematiques.",
+      options: ["Vrai", "Faux"],
+      correctIndex: 1,
+    },
+  ]}
+/>
