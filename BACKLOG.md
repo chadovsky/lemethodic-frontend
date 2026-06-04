@@ -6502,9 +6502,17 @@ stale hrefs (/dashboard, /la-bibliotheque, /l-examen, /cours/methode-tcf-canada)
 
 ## F-439 — FE: wire /ile + seance to F-438 progress endpoint (replace F-431 localStorage interim)
 
-**Status:** In Progress
+**Status:** Shipped (9f261ec)
 
 **Scope:** `lib/types.ts` UserProgress type + `lib/api.ts` getProgress()/patchProgress() + IleShell.tsx + SeancePlayer.tsx token-guard wiring + auth-e2e.ts mock + unit tests (16).
 
 **Acceptance:** F-431 localStorage interim gone for authenticated users; public visitors default b1 with no 401; unit green + e2e 0 fails + build green.
+
+## F-440 — Wire dashboard widgets to /progress endpoint (fast-follow)
+
+**Status:** Shipped (8068d03)
+
+**Scope:** Dashboard.tsx single-fetch pattern; StreakWidget wired to `streak_days`; DailyTargetWidget wired to `daily_target_minutes` + inline PATCH edit control. CalendarWidget stays on recordings.list() — flagged for dedicated activity-calendar endpoint. Unit +33 tests (StreakWidget.test.tsx, DailyTargetWidget.test.tsx, Dashboard.test.tsx updates). E2e dashboard.spec.ts: progress mock + edit-button test.
+
+**Acceptance:** build green · unit 466/466 · e2e 113 passed, 0 failed.
 

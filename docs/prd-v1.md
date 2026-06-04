@@ -2680,7 +2680,31 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 **Public-visitor guarantee:** `/la-methode` and any route that renders IleShell or SeancePlayer without a token defaults to `b1` with zero API requests fired. No 401 possible on public surfaces.
 
-**Dashboard widgets:** `StreakWidget` computes streak from `api.recordings.list()` (unchanged — no localStorage). `DailyTargetWidget` is a static placeholder with no localStorage reads. Neither consumes the F-431 interim; both are fast-follow candidates for wiring to `GET /progress` fields (streak_days, daily_target_minutes) in a future entry.
+**Dashboard widgets:** `StreakWidget` and `DailyTargetWidget` wired to `/progress` fields in F-440 (fast-follow, shipped 8068d03).
+
+---
+
+### F-440 — Wire dashboard widgets to /progress endpoint
+
+**Status:** Shipped (8068d03)
+**Branch:** `main` (executed inline per brief)
+**Effort:** 1 session
+
+**Context:** Fast-follow after F-439. Dashboard fetches `GET /api/users/me/progress` once at the container level and distributes to widgets. Eliminates the recordings-derived streak computation and the hardcoded daily-target placeholder.
+
+**Scope:**
+- `components/dashboard/Dashboard.tsx`: converted to `'use client'`; fetches `api.users.getProgress()` once in a `useEffect`; passes `progress` + `progressError` props to StreakWidget and DailyTargetWidget; exposes `handlePatchTarget` callback.
+- `components/dashboard/StreakWidget.tsx`: removed `api.recordings.list()` + client-side streak computation; now reads `progress.streakDays` from props. Loading skeleton and error fallback preserved.
+- `components/dashboard/DailyTargetWidget.tsx`: removed hardcoded `1` placeholder; reads `progress.dailyTargetMinutes`; adds inline "Modifier" edit control that PATCHes `{ daily_target_minutes }` via `api.users.patchProgress`. No "today vs target" bar (production_minutes_total is cumulative; today-minutes awaits activity-calendar endpoint).
+- **Stubbed + flagged:** `CalendarWidget` remains on `api.recordings.list()` — flagged for dedicated BE `/api/users/me/activity-calendar` endpoint (next follow-up). Recommendations widget is a separate entry.
+- `tests/unit/dashboard/Dashboard.test.tsx`: added `api.users` mock; updated daily-target assertion to expect `30` (from mocked `daily_target_minutes`).
+- `tests/unit/dashboard/StreakWidget.test.tsx`: new — 7 cases covering loading/error/ok states and plural labels.
+- `tests/unit/dashboard/DailyTargetWidget.test.tsx`: new — 9 cases covering loading/error/ok, edit mode open/close/save, cancel without patch, and sub-minimum guard.
+- `tests/e2e/dashboard.spec.ts`: added explicit progress mock to `setupDashboardRoutes`; updated daily-target assertion to `'30'`; added edit-button e2e test.
+
+**Acceptance:** build green · unit 466/466 · e2e 113 passed, 3 skipped, 0 failed.
+
+**Non-visual change note:** widget data source change only; layout and styling are identical.
 
 ---
 
