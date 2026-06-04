@@ -6485,7 +6485,7 @@ stale hrefs (/dashboard, /la-bibliotheque, /l-examen, /cours/methode-tcf-canada)
 
 ## F-437 — Route cleanup: /method doublon (7), diagnostic home (8), forbidden font (9)
 
-**Status:** In progress
+**Status:** Shipped (10a7d6e)
 
 **Items:**
 - (7) /method → /la-methode 308 redirect; Hero.tsx + MethodologyPreview.tsx CTAs updated to /la-methode; app/(app)/la-methode/page.tsx moved to app/la-methode/page.tsx (public, no ProtectedRoute — leçon cards render pre-login; lesson detail stays gated via (app) group). TopNav maitre entry removed.

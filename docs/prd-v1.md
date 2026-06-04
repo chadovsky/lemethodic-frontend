@@ -2621,8 +2621,8 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 ### F-437 — Route cleanup: /method doublon (7), diagnostic home (8), Cabinet Grotesk (9)
 
-**Status:** In progress
-**Commit:** TBD (post-squash)
+**Status:** Shipped (10a7d6e)
+**Commit:** 10a7d6e (3 commits: eab2c65, 09ff301, 10a7d6e)
 **Effort:** 1 session
 
 **Scope:**
