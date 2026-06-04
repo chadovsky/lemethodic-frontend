@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { injectAuthToken } from '../helpers/auth-e2e'
 
-// Shared API mocks: intercept recordings + lessons so widgets resolve
+// Shared API mocks: intercept recordings + lessons + progress so widgets resolve
 // without a live BE, and inject an exam date so the countdown renders.
 async function setupDashboardRoutes(page: Parameters<typeof page.route>[0]) {
   const futureDate = new Date(Date.now() + 45 * 86400000).toISOString().slice(0, 10)
@@ -67,6 +67,25 @@ async function setupDashboardRoutes(page: Parameters<typeof page.route>[0]) {
       }),
     })
   })
+
+  // F-440: progress endpoint feeds StreakWidget and DailyTargetWidget
+  await page.route('**/api/users/me/progress', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        current_level: 'b1',
+        maitre_intensity: 1,
+        streak_days: 0,
+        longest_streak_days: 0,
+        streak_last_active_date: null,
+        production_minutes_total: 0,
+        daily_target_minutes: 30,
+        tache_attempts: 0,
+        last_couche_signals: {},
+      }),
+    })
+  })
 }
 
 test.describe('Dashboard — desktop (1280×800)', () => {
@@ -100,12 +119,12 @@ test.describe('Dashboard — desktop (1280×800)', () => {
     expect(Number(text?.trim())).toBeGreaterThan(0)
   })
 
-  test('daily target widget shows static value of 1', async ({ page }) => {
+  test('daily target widget shows daily_target_minutes from progress (30)', async ({ page }) => {
     await page.goto('/dashboard')
-    await expect(page.getByTestId('daily-target-value')).toHaveText('1')
+    await expect(page.getByTestId('daily-target-value')).toHaveText('30')
   })
 
-  test('streak widget resolves (0 for empty recordings)', async ({ page }) => {
+  test('streak widget resolves (0 for progress streak_days=0)', async ({ page }) => {
     await page.goto('/dashboard')
     await expect(page.getByTestId('streak-count')).toBeVisible()
     await expect(page.getByTestId('streak-count')).toHaveText('0')
@@ -130,6 +149,15 @@ test.describe('Dashboard — desktop (1280×800)', () => {
     await expect(page.getByTestId('dashboard-widget-daily-target')).toHaveClass(/ed-card-lift/)
     await expect(page.getByTestId('dashboard-widget-prochaine-lecon')).toHaveClass(/ed-card-lift/)
     await expect(page.getByTestId('dashboard-widget-calendar')).toHaveClass(/ed-card-lift/)
+  })
+
+  test('daily target edit button opens input; cancel restores the value', async ({ page }) => {
+    await page.goto('/dashboard')
+    await page.getByTestId('daily-target-edit-btn').click()
+    await expect(page.getByTestId('daily-target-input')).toBeVisible()
+    await expect(page.getByTestId('daily-target-value')).not.toBeVisible()
+    await page.getByTestId('daily-target-cancel-btn').click()
+    await expect(page.getByTestId('daily-target-value')).toHaveText('30')
   })
 })
 

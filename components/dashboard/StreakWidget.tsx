@@ -1,55 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { api } from '@/lib/api'
-import type { RecordingSummary } from '@/lib/types'
+import type { UserProgress } from '@/lib/types'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 
-// Derives streak from recording dates. Covers only recording sessions (Tâches),
-// not lesson-only study days.
-// TODO(BE): replace with /api/users/me/streak when a dedicated endpoint lands.
-function computeStreak(recordings: RecordingSummary[]): number {
-  if (!recordings.length) return 0
-  const days = new Set(recordings.map((r) => r.createdAt.slice(0, 10)))
-  const sorted = Array.from(days).sort().reverse()
-
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const todayStr = today.toISOString().slice(0, 10)
-  const yesterday = new Date(today.getTime() - 86400000)
-  const yesterdayStr = yesterday.toISOString().slice(0, 10)
-
-  if (sorted[0] !== todayStr && sorted[0] !== yesterdayStr) return 0
-
-  let streak = 0
-  let cursor = sorted[0] === todayStr ? today : yesterday
-
-  for (const day of sorted) {
-    if (day === cursor.toISOString().slice(0, 10)) {
-      streak++
-      cursor = new Date(cursor.getTime() - 86400000)
-    } else {
-      break
-    }
-  }
-  return streak
+interface Props {
+  progress: UserProgress | null
+  progressError: boolean
 }
 
-type Status = 'loading' | 'ok' | 'error'
-
-export default function StreakWidget() {
-  const [streak, setStreak] = useState(0)
-  const [status, setStatus] = useState<Status>('loading')
-
-  useEffect(() => {
-    api.recordings
-      .list()
-      .then((recs) => {
-        setStreak(computeStreak(recs))
-        setStatus('ok')
-      })
-      .catch(() => setStatus('error'))
-  }, [])
+export default function StreakWidget({ progress, progressError }: Props) {
+  const status = progressError ? 'error' : progress === null ? 'loading' : 'ok'
+  const streak = progress?.streakDays ?? 0
 
   return (
     <section

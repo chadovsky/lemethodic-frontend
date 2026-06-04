@@ -17,7 +17,8 @@ vi.mock('@/lib/auth', () => ({
     selector({ user: { examDate: FUTURE_DATE }, hydrated: true }),
 }))
 
-// Stub api: recordings returns empty list; lessons returns one unlocked lesson
+// Stub api: recordings returns empty list; lessons returns one unlocked lesson;
+// users.getProgress returns a progress object with streak_days=0, daily_target_minutes=30
 vi.mock('@/lib/api', () => ({
   api: {
     recordings: {
@@ -39,6 +40,20 @@ vi.mock('@/lib/api', () => ({
           sublineEn: null,
         },
       ]),
+    },
+    users: {
+      getProgress: vi.fn().mockResolvedValue({
+        currentLevel: 'b1',
+        maitreIntensity: 1,
+        streakDays: 0,
+        longestStreakDays: 0,
+        streakLastActiveDate: null,
+        productionMinutesTotal: 0,
+        dailyTargetMinutes: 30,
+        tacheAttempts: 0,
+        lastCoucheSignals: {},
+      }),
+      patchProgress: vi.fn(),
     },
   },
 }))
@@ -86,12 +101,14 @@ describe('Dashboard', () => {
     expect(Number(days.textContent)).toBeGreaterThan(0)
   })
 
-  it('daily target widget shows static value of 1', () => {
+  it('daily target widget shows daily_target_minutes from progress (30)', async () => {
     render(<Dashboard />)
-    expect(screen.getByTestId('daily-target-value')).toHaveTextContent('1')
+    await waitFor(() => {
+      expect(screen.getByTestId('daily-target-value')).toHaveTextContent('30')
+    })
   })
 
-  it('streak widget resolves to 0 for a new user with no recordings', async () => {
+  it('streak widget resolves to 0 for progress with streakDays=0', async () => {
     render(<Dashboard />)
     await waitFor(() => {
       expect(screen.getByTestId('streak-count')).toHaveTextContent('0')
