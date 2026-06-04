@@ -9,22 +9,14 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  async rewrites() {
-    return {
-      // Serve /l-examen/diagnostic/* from app/(app)/maitre/diagnostic pages.
-      // URL stays as /l-examen/diagnostic/... — no redirect to the browser.
-      // beforeFiles runs before file-based routing so it wins over [checkpoint].
-      beforeFiles: [
-        { source: '/l-examen/diagnostic', destination: '/maitre/diagnostic' },
-        { source: '/l-examen/diagnostic/:path*', destination: '/maitre/diagnostic/:path*' },
-      ],
-    }
-  },
-
   async redirects() {
     return [
       // F-367: canonical route migrations (308 permanent).
       // Specific rules must precede the catch-all for the same prefix.
+
+      // F-437: /method doublon retired — canonical is /la-methode.
+      { source: '/method', destination: '/la-methode', permanent: true },
+      { source: '/method/:path*', destination: '/la-methode/:path*', permanent: true },
 
       // Legacy /l-examen shorthand → canonical /l-examen/diagnostic paths.
       { source: '/l-examen/results', destination: '/l-examen/diagnostic/results', permanent: true },

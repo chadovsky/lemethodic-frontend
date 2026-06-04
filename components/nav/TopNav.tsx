@@ -62,7 +62,7 @@ function shouldHideOn(pathname: string): boolean {
 
 const COPY = {
   en: {
-    nav: { seance: 'Séance', ecole: 'Méthode', speaking: 'Oral', writing: 'Écrit', progress: 'Progrès', maitre: 'Maître' },
+    nav: { seance: 'Séance', ecole: 'Méthode', speaking: 'Oral', writing: 'Écrit', progress: 'Progrès' },
     menu: {
       profile: 'Profile',
       settings: 'Settings',
@@ -73,7 +73,7 @@ const COPY = {
     skipToContent: 'Skip to content',
   },
   fr: {
-    nav: { seance: 'Séance', ecole: 'Méthode', speaking: 'Oral', writing: 'Écrit', progress: 'Progrès', maitre: 'Maître' },
+    nav: { seance: 'Séance', ecole: 'Méthode', speaking: 'Oral', writing: 'Écrit', progress: 'Progrès' },
     menu: {
       profile: 'Profil',
       settings: 'Paramètres',
@@ -91,7 +91,6 @@ const NAV_LINKS = [
   { key: 'speaking' as const, href: '/l-examen/expression-orale', match: ['/l-examen/expression-orale'] },
   { key: 'writing' as const, href: '/l-examen/expression-ecrite', match: ['/l-examen/expression-ecrite'] },
   { key: 'progress' as const, href: '/progression', match: ['/progression', '/l-examen'] },
-  { key: 'maitre' as const, href: '/maitre', match: ['/maitre'] },
 ] as const
 
 function isLinkActive(href: string, match: readonly string[], pathname: string): boolean {

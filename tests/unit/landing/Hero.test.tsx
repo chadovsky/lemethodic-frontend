@@ -25,10 +25,10 @@ describe('Hero', () => {
     expect(screen.getByTestId('hero-subheadline')).toBeInTheDocument()
   })
 
-  it('primary CTA links to /method', () => {
+  it('primary CTA links to /la-methode', () => {
     render(<Hero />)
     const cta = screen.getByRole('link', { name: /see how it works/i })
-    expect(cta).toHaveAttribute('href', '/method')
+    expect(cta).toHaveAttribute('href', '/la-methode')
   })
 
   it('secondary CTA links to /placement', () => {

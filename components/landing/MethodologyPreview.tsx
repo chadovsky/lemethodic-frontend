@@ -118,7 +118,7 @@ export default function MethodologyPreview() {
         }}
       >
         <Link
-          href="/method"
+          href="/la-methode"
           className="ed-btn-press"
           style={{
             display: 'inline-flex',

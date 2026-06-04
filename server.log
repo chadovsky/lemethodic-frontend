@@ -1,0 +1,38 @@
+
+> my-project@0.1.0 start C:\Users\pc\Downloads\fluentpath-frontend
+> next start
+
+▲ Next.js 16.2.0
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.7:3000
+✓ Ready in 296ms
+Error: Internal: NoFallbackError
+    at n (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0f4dqwc.js:2:1240)
+    at responseGenerator (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0f4dqwc.js:2:3584)
+Error: Internal: NoFallbackError
+    at n (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:1240)
+    at responseGenerator (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:3584)
+Error: Internal: NoFallbackError
+    at n (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:1240)
+    at responseGenerator (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:3584)
+Error: Internal: NoFallbackError
+    at n (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0f4dqwc.js:2:1240)
+    at responseGenerator (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0f4dqwc.js:2:3584)
+Error: Internal: NoFallbackError
+    at n (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:1240)
+    at responseGenerator (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:3584)
+Error: Internal: NoFallbackError
+    at n (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:1240)
+    at responseGenerator (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:3584)
+Error: Internal: NoFallbackError
+    at n (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:1240)
+    at responseGenerator (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:3584)
+Error: Internal: NoFallbackError
+    at n (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:1240)
+    at responseGenerator (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:3584)
+Error: Internal: NoFallbackError
+    at n (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:1240)
+    at responseGenerator (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:3584)
+Error: Internal: NoFallbackError
+    at n (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:1240)
+    at responseGenerator (C:\Users\pc\Downloads\fluentpath-frontend\.next\server\chunks\ssr\0nb5_next_dist_esm_build_templates_app-page_0bz11up.js:2:3584)

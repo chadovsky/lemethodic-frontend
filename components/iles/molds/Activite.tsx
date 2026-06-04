@@ -416,7 +416,7 @@ function ConversationBranch({ scenario, openingPrompt }: ConversationProps) {
           {openingPrompt}
         </p>
       </div>
-      {/* BE SEAM: live conversation wires in /maitre (F-409) */}
+      {/* BE SEAM: Le Maître live conversation wires in F-409 */}
       <div
         style={{
           display: 'flex',
@@ -456,7 +456,7 @@ function ConversationBranch({ scenario, openingPrompt }: ConversationProps) {
             margin: 0,
           }}
         >
-          La conversation guidee avec Le Maitre est disponible dans /maitre.
+          La conversation guidée avec Le Maître arrive bientôt.
         </p>
       </div>
     </div>

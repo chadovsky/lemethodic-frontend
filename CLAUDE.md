@@ -103,9 +103,11 @@ There is a **duplicate** `styles/globals.css` that is not imported anywhere: `ap
 
 ### Fonts
 
-Geist/Geist Mono are loaded via `next/font/google` in `app/layout.tsx` but the returned font variables are intentionally not applied (prefixed `_geist`). The display font is **Cabinet Grotesk**, loaded from `fonts.cdnfonts.com` via a plain `<link>` in `<head>` and referenced through the `DISPLAY_FONT` constant in inline styles.
+`app/layout.tsx` loads five fonts via `next/font/google`: **Instrument Serif** (`--font-instrument-serif`), **Crimson Pro** (`--font-crimson-pro`), **Instrument Sans** (`--font-instrument-sans`), **Inter** (`--font-inter`), **DM Mono** (`--font-dm-mono`). These map to the M2 t11 CSS aliases `--f-display`, `--f-body`, `--f-ui`, `--f-en`, `--f-mono` in `app/globals.css`. Geist/Geist Mono are loaded but intentionally not applied (prefixed `_geist`).
 
-The editorial system (F-200+) introduces a second font pairing via `lib/typography.ts`: **Geist** as `SANS_FONT`, **Source Serif 4** as `SERIF_FONT`. Both are used by the editorial primitives below.
+Cabinet Grotesk (formerly the display font, loaded from `fonts.cdnfonts.com`) was removed in F-437. No CDN font links exist in the codebase. `lib/typography.ts:DISPLAY_FONT` resolves to `var(--f-display)` → Instrument Serif.
+
+The `DISPLAY_FONT` constant in `lib/typography.ts` is the canonical reference. Some older components define a local `const DISPLAY_FONT = 'var(--font-geist), ...'` — this resolves to system-ui (Geist is not applied) and is acceptable until those components are migrated.
 
 ### Other routes
 

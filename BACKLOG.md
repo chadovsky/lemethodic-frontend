@@ -6483,3 +6483,14 @@ stale hrefs (/dashboard, /la-bibliotheque, /l-examen, /cours/methode-tcf-canada)
 - [Shipped] E2E-STABILIZE-R2: CI worker config (50% workers, 25min cap) + full local suite green. 38 failures → 19 (all R3). Fixes: (1) Timer — Date.now()-based elapsed with synchronous startTimeRef set in onClick (fake-clock compatible); (2) RecordingPlaceholder/diagnostic-results — injectAuthToken added to manual-context reduced-motion tests; (3) ecole-detail ArrowKey — waitFor(lesson-breadcrumb) before keypress; (4) m2-font-audit/touch-targets networkidle→load; (5) vocabulaire-browse chunk-load race — wait for 60-count before filter; (6) landing-methodology CTA — scoped to methodology section to avoid hero duplicate; (7) Hero href /methode→/method; (8) Paywall toggle 28→44px (min-height wrapper); (9) Footer + Wordmark touch targets (minHeight+minWidth 44); (10) landing-persona animation-race fixed with waitForFunction opacity=1. Round 3 deferred: landing-hero copy (13), invalid-ID 404s (6). Local run: 19 failed, 696 passed (3.6m).
 - [Shipped] E2E-STABILIZE-R3 (FINAL): Unit + e2e both green. 3 fixes: (1) matchMedia unit regression — window.matchMedia stub added to tests/setup.ts (jsdom gap); clears 24 unit fails; (2) landing-hero copy — spec updated to assert actual editorial hero (H1 "There's a method to French", CTA "See how it works" → /method, subheadline testid replaces missing kicker testid); (3) invalid-ID 404 — dynamicParams=false added to tache/[n] page (generateStaticParams already present for n=1-3); generateStaticParams(lecon-1..lecon-27) + dynamicParams=false added to la-methode/[id] page; routing-level 404 replaces notFound() which was returning HTTP 200. Unit: 433/433. E2E: 0 failures.
 
+## F-437 — Route cleanup: /method doublon (7), diagnostic home (8), forbidden font (9)
+
+**Status:** In progress
+
+**Items:**
+- (7) /method → /la-methode 308 redirect; Hero.tsx + MethodologyPreview.tsx CTAs updated to /la-methode; app/(app)/la-methode/page.tsx moved to app/la-methode/page.tsx (public, no ProtectedRoute — leçon cards render pre-login; lesson detail stays gated via (app) group). TopNav maitre entry removed.
+- (8) Diagnostic pages moved from app/(app)/maitre/diagnostic/* to app/(app)/l-examen/diagnostic/* (results + tache/[n] created; page.tsx was already present as R1 stub, now live). beforeFiles rewrite deleted. app/(app)/maitre/ directory deleted. /maitre/diagnostic → /l-examen/diagnostic redirect preserved.
+- (9) Cabinet Grotesk was already absent from all code files (removed pre-F-437). CLAUDE.md Fonts section updated to reflect current M2 t11 stack.
+
+**Acceptance:** /method 308 to /la-methode; /maitre gone; no forbidden fonts; unit 433/433 + e2e 0 fails + build green.
+

@@ -10,11 +10,11 @@ test.describe('Landing hero — desktop (1280×800)', () => {
     await expect(hero.getByRole('link', { name: /see how it works/i })).toBeVisible()
   })
 
-  test('CTA navigates to /method', async ({ page }) => {
+  test('CTA navigates to /la-methode', async ({ page }) => {
     await page.goto('/')
     const hero = page.getByRole('region', { name: /hero/i })
     await hero.getByRole('link', { name: /see how it works/i }).click()
-    await expect(page).toHaveURL(/\/method/, { timeout: 15_000 })
+    await expect(page).toHaveURL(/\/la-methode/, { timeout: 15_000 })
   })
 
   // Hero subheadline — editorial description visible above the fold
