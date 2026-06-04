@@ -37,6 +37,26 @@ export async function injectAuthToken(page: Page): Promise<void> {
       body: JSON.stringify(FAKE_USER),
     })
   })
+  // F-439: progress endpoint returns correct shape (catch-all returns [],
+  // wrong shape — components would fall back to b1 but test assertions on
+  // level-dependent UI would silently pass on the fallback value).
+  await page.route('**/api/users/me/progress', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        current_level: 'b1',
+        maitre_intensity: 1,
+        streak_days: 0,
+        longest_streak_days: 0,
+        streak_last_active_date: null,
+        production_minutes_total: 0,
+        daily_target_minutes: 30,
+        tache_attempts: 0,
+        last_couche_signals: {},
+      }),
+    })
+  })
 }
 
 /**

@@ -49,6 +49,22 @@ export interface User {
   emailVerified?: boolean
 }
 
+// ── User Progress (F-439) ─────────────────────────────────────────────────
+// GET /api/users/me/progress shape (camelCase FE view).
+// streak_days / longest_streak_days / tache_attempts are server-managed;
+// daily_target_minutes + last_couche_signals are writable via PATCH.
+export interface UserProgress {
+  currentLevel: string
+  maitreIntensity: number
+  streakDays: number
+  longestStreakDays: number
+  streakLastActiveDate: string | null
+  productionMinutesTotal: number
+  dailyTargetMinutes: number
+  tacheAttempts: number
+  lastCoucheSignals: Record<string, unknown>
+}
+
 // ── Lessons (L'École) ───────────────────────────────────────────────────
 
 export type LessonStatus = 'locked' | 'unlocked' | 'in_progress' | 'completed'

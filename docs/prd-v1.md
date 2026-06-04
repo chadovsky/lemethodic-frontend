@@ -2651,6 +2651,38 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 ---
 
+### F-439 — Progress endpoint FE wiring (replaces F-431 localStorage interim)
+
+**Status:** In Progress
+**Branch:** `main` (executed inline per brief)
+**Effort:** 1 session
+
+**Context:** BE F-438 shipped `GET /api/users/me/progress` and `PATCH /api/users/me/progress`. This entry wires the FE half: replaces the F-431 localStorage interim (`current_level` key + per-île completion writes) with real DB calls, with a public-visitor fallback (no token → default `b1`, no request fired).
+
+**Scope:**
+- `lib/types.ts`: `UserProgress` interface (camelCase FE view of the progress shape).
+- `lib/api.ts`: `RawUserProgress` raw interface + `mapUserProgress` mapper + `api.users.getProgress()` + `api.users.patchProgress(body)`.
+- `components/iles/IleShell.tsx`: token guard → `api.users.getProgress()` replaces `localStorage.getItem('current_level')`. Unauthenticated visitors default to `b1` with no request.
+- `components/seance/SeancePlayer.tsx`: same token-guard pattern for `current_level`. On séance completion: authenticated → `api.users.patchProgress({ last_couche_signals: { [ile]: { level, completed_at } } })` (fire-and-forget); unauthenticated → localStorage fallback preserved.
+- `tests/helpers/auth-e2e.ts`: specific mock for `/api/users/me/progress` registered after the catch-all (Playwright last-registered-wins). Returns correct shape so level-dependent UI assertions don't silently pass on fallback.
+- `tests/unit/users/UserProgressApiClient.test.ts`: 16 unit tests covering GET mapper fields + PATCH body + response mapping.
+
+**F-431 localStorage interim consumers removed for authenticated users:**
+1. `IleShell.tsx:38` — `localStorage.getItem('current_level')` → `api.users.getProgress()`
+2. `SeancePlayer.tsx:148` — `localStorage.getItem('current_level')` → `api.users.getProgress()`
+3. `SeancePlayer.tsx:193` — `localStorage.setItem('seance_completed_*')` → `api.users.patchProgress()`
+
+**Kept (not F-431 interim):**
+- `localStorage.getItem('current_ile')` in SeancePlayer — navigation hint, not progress data.
+- `localStorage.setItem('ile_started_*')` in IleShell — local start-timestamp UI hint.
+- `app/bienvenue/page.tsx` `lm.targetProfile.v1` key — pre-auth /bienvenue visitor stub, intentionally kept.
+
+**Public-visitor guarantee:** `/la-methode` and any route that renders IleShell or SeancePlayer without a token defaults to `b1` with zero API requests fired. No 401 possible on public surfaces.
+
+**Dashboard widgets:** `StreakWidget` computes streak from `api.recordings.list()` (unchanged — no localStorage). `DailyTargetWidget` is a static placeholder with no localStorage reads. Neither consumes the F-431 interim; both are fast-follow candidates for wiring to `GET /progress` fields (streak_days, daily_target_minutes) in a future entry.
+
+---
+
 ## Section 4 — Content Pipeline (CON-001 to CON-014)
 
 **Goal:** real content lives behind the surfaces. F-321 vocab review (1,684 Phase 1 chunks awaiting Chadi triage) lands here. L'École 27 lessons get methodology-visible content. Le Diagnostic Tâche library expands to 50 scenarios (F-061.2 Livraison 2/2).

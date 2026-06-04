@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import type { ComponentType } from 'react'
 import Image from 'next/image'
+import { api } from '@/lib/api'
+import { TOKEN_KEY } from '@/lib/storage-keys'
 
 interface IleMeta {
   theme: string
@@ -35,27 +37,37 @@ export default function IleShell({ theme }: Props) {
   const [started, setStarted] = useState(false)
 
   useEffect(() => {
-    const storedLevel = localStorage.getItem('current_level') ?? 'b1'
-    setLevel(storedLevel)
-
-    // Persist start timestamp once per (theme, level) pair
-    const startKey = `ile_started_${theme}_${storedLevel}`
-    if (!localStorage.getItem(startKey)) {
-      localStorage.setItem(startKey, new Date().toISOString())
+    function init(resolvedLevel: string) {
+      setLevel(resolvedLevel)
+      // Persist start timestamp once per (theme, level) pair
+      const startKey = `ile_started_${theme}_${resolvedLevel}`
+      if (!localStorage.getItem(startKey)) {
+        localStorage.setItem(startKey, new Date().toISOString())
+      }
+      setStarted(true)
+      // Dynamic MDX import — webpack bundles all content/iles/**/*.mdx
+      import(`@/content/iles/${theme}/${resolvedLevel}.mdx`)
+        .then((mod) => {
+          setContent(() => mod.default as ComponentType)
+          setMeta((mod.meta as IleMeta) ?? null)
+          setLoading(false)
+        })
+        .catch(() => {
+          setMissing(true)
+          setLoading(false)
+        })
     }
-    setStarted(true)
 
-    // Dynamic MDX import — webpack bundles all content/iles/**/*.mdx
-    import(`@/content/iles/${theme}/${storedLevel}.mdx`)
-      .then((mod) => {
-        setContent(() => mod.default as ComponentType)
-        setMeta((mod.meta as IleMeta) ?? null)
-        setLoading(false)
-      })
-      .catch(() => {
-        setMissing(true)
-        setLoading(false)
-      })
+    // F-439: authenticated users source level from BE progress endpoint.
+    // Public visitors (no token) default to b1 without making a request.
+    const token = localStorage.getItem(TOKEN_KEY)
+    if (token) {
+      api.users.getProgress()
+        .then((p) => init(p.currentLevel ?? 'b1'))
+        .catch(() => init('b1'))
+    } else {
+      init('b1')
+    }
   }, [theme])
 
   if (loading) {

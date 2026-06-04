@@ -37,6 +37,7 @@ import type {
   TodayActionResponse,
   UiLanguage,
   User,
+  UserProgress,
   UserClusterStateResponse,
   WritingJob,
   WritingPrompt,
@@ -354,6 +355,33 @@ function mapUser(raw: RawUser): User {
     currentLevel: raw.current_level ?? null,
     interfaceLanguage: raw.interface_language ?? null,
     emailVerified: raw.email_verified,
+  }
+}
+
+// F-439 — progress endpoint (GET/PATCH /api/users/me/progress)
+interface RawUserProgress {
+  current_level: string
+  maitre_intensity: number
+  streak_days: number
+  longest_streak_days: number
+  streak_last_active_date: string | null
+  production_minutes_total: number
+  daily_target_minutes: number
+  tache_attempts: number
+  last_couche_signals: Record<string, unknown>
+}
+
+function mapUserProgress(raw: RawUserProgress): UserProgress {
+  return {
+    currentLevel: raw.current_level,
+    maitreIntensity: raw.maitre_intensity,
+    streakDays: raw.streak_days,
+    longestStreakDays: raw.longest_streak_days,
+    streakLastActiveDate: raw.streak_last_active_date,
+    productionMinutesTotal: raw.production_minutes_total,
+    dailyTargetMinutes: raw.daily_target_minutes,
+    tacheAttempts: raw.tache_attempts,
+    lastCoucheSignals: raw.last_couche_signals,
   }
 }
 
@@ -968,6 +996,27 @@ export const api = {
     async getMe(): Promise<User> {
       const raw = await request<RawUser>('/api/auth/me')
       return mapUser(raw)
+    },
+
+    // F-439 — user progress. Auth-required (bearer token). Callers MUST
+    // guard with a token check before calling; public visitors default to b1
+    // without hitting this endpoint (no 401 for unauthenticated surfaces).
+    async getProgress(): Promise<UserProgress> {
+      const raw = await request<RawUserProgress>('/api/users/me/progress')
+      return mapUserProgress(raw)
+    },
+
+    // Writable fields only: daily_target_minutes and last_couche_signals.
+    // streak_days / tache_attempts / production_minutes_total are server-managed.
+    async patchProgress(body: {
+      daily_target_minutes?: number
+      last_couche_signals?: Record<string, unknown>
+    }): Promise<UserProgress> {
+      const raw = await request<RawUserProgress>('/api/users/me/progress', {
+        method: 'PATCH',
+        body,
+      })
+      return mapUserProgress(raw)
     },
 
     // P-220 — superseded by api.onboarding.submit. The legacy

@@ -6494,3 +6494,17 @@ stale hrefs (/dashboard, /la-bibliotheque, /l-examen, /cours/methode-tcf-canada)
 
 **Acceptance:** /method 308 to /la-methode; /maitre gone; no forbidden fonts; unit 433/433 + e2e 0 fails + build green.
 
+## F-438 — BE: progress endpoints (GET + PATCH /api/users/me/progress)
+
+**Status:** Shipped (BE repo, branch: master)
+
+**Scope:** FastAPI endpoints `GET /api/users/me/progress` and `PATCH /api/users/me/progress`. Returns `{ current_level, maitre_intensity, streak_days, longest_streak_days, streak_last_active_date, production_minutes_total, daily_target_minutes, tache_attempts, last_couche_signals }`. Writable fields: `daily_target_minutes`, `last_couche_signals`. Streak + attempts are server-managed. Auth-required (bearer token).
+
+## F-439 — FE: wire /ile + seance to F-438 progress endpoint (replace F-431 localStorage interim)
+
+**Status:** In Progress
+
+**Scope:** `lib/types.ts` UserProgress type + `lib/api.ts` getProgress()/patchProgress() + IleShell.tsx + SeancePlayer.tsx token-guard wiring + auth-e2e.ts mock + unit tests (16).
+
+**Acceptance:** F-431 localStorage interim gone for authenticated users; public visitors default b1 with no 401; unit green + e2e 0 fails + build green.
+

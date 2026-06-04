@@ -9,6 +9,8 @@ import Dialogue from '@/components/iles/molds/Dialogue'
 import ActeDeParole from '@/components/iles/molds/ActeDeParole'
 import Activite from '@/components/iles/molds/Activite'
 import Tache from '@/components/iles/molds/Tache'
+import { api } from '@/lib/api'
+import { TOKEN_KEY } from '@/lib/storage-keys'
 
 const LEVEL_LABELS: Record<string, string> = {
   a1_a2: 'A1–A2',
@@ -145,23 +147,33 @@ export default function SeancePlayer() {
   const [done, setDone] = useState(false)
 
   useEffect(() => {
-    const storedLevel = localStorage.getItem('current_level') ?? 'b1'
-
-    // Resolve current île: explicit override → first available île that has a session
-    let activeIle: string | null = localStorage.getItem('current_ile')
-    if (activeIle && !SESSIONS.some(s => s.ile === activeIle)) {
-      activeIle = null
+    function initPlayer(resolvedLevel: string) {
+      // Resolve current île: explicit override → first available île that has a session
+      let activeIle: string | null = localStorage.getItem('current_ile')
+      if (activeIle && !SESSIONS.some(s => s.ile === activeIle)) {
+        activeIle = null
+      }
+      if (!activeIle) {
+        const first = LECONS.find(
+          l => l.status === 'available' && l.themeSlug && SESSIONS.some(s => s.ile === l.themeSlug),
+        )
+        activeIle = first?.themeSlug ?? null
+      }
+      setLevel(resolvedLevel)
+      setIle(activeIle)
+      setMounted(true)
     }
-    if (!activeIle) {
-      const first = LECONS.find(
-        l => l.status === 'available' && l.themeSlug && SESSIONS.some(s => s.ile === l.themeSlug),
-      )
-      activeIle = first?.themeSlug ?? null
-    }
 
-    setLevel(storedLevel)
-    setIle(activeIle)
-    setMounted(true)
+    // F-439: authenticated users source level from BE progress endpoint.
+    // Public visitors (no token) default to b1 without making a request.
+    const token = localStorage.getItem(TOKEN_KEY)
+    if (token) {
+      api.users.getProgress()
+        .then((p) => initPlayer(p.currentLevel ?? 'b1'))
+        .catch(() => initPlayer('b1'))
+    } else {
+      initPlayer('b1')
+    }
   }, [])
 
   if (!mounted) return null
@@ -189,8 +201,18 @@ export default function SeancePlayer() {
   function handleContinuer() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
     if (isLast) {
-      // STREAK SEAM — persists completion timestamp; streak logic wires in F-407 (production scoring)
-      localStorage.setItem(`seance_completed_${ile}_${level}`, new Date().toISOString())
+      const token = localStorage.getItem(TOKEN_KEY)
+      if (token && ile) {
+        // F-439: persist île completion signals to BE (fire-and-forget)
+        api.users.patchProgress({
+          last_couche_signals: { [ile]: { level, completed_at: new Date().toISOString() } },
+        }).catch(() => {
+          // Completion UI is still shown even if the PATCH fails
+        })
+      } else {
+        // Unauthenticated fallback — STREAK SEAM (F-407)
+        localStorage.setItem(`seance_completed_${ile}_${level}`, new Date().toISOString())
+      }
       setDone(true)
     } else {
       setStepIdx(prev => prev + 1)
