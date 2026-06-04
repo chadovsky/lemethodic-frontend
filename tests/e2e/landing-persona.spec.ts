@@ -8,6 +8,16 @@ test.describe('PersonaMatch section — desktop (1280×800)', () => {
     const columns = page.getByTestId('persona-column')
     await columns.first().scrollIntoViewIfNeeded()
     await expect(columns).toHaveCount(3)
+    // Wait for all three RevealOnScroll animations to complete before measuring.
+    // Each wraps a motion.div with staggered delays (0/0.1/0.2s) + 700ms duration.
+    // Poll until all three parent wrappers reach opacity=1 (max ~900ms total).
+    await page.waitForFunction(() => {
+      const cols = document.querySelectorAll('[data-testid="persona-column"]')
+      return Array.from(cols).every(col => {
+        const parent = col.parentElement
+        return parent && parseFloat(window.getComputedStyle(parent).opacity) >= 0.99
+      })
+    }, { timeout: 3000 })
 
     const b0 = await columns.nth(0).boundingBox()
     const b1 = await columns.nth(1).boundingBox()

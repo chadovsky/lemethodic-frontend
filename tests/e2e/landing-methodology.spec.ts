@@ -80,7 +80,7 @@ test.describe('Landing methodology — desktop (1280×800)', () => {
 
   test('CTA navigates to /method', async ({ page }) => {
     await page.goto('/')
-    const cta = page.getByRole('link', { name: /see how it works/i })
+    const cta = page.getByLabel(/the 5-couche method/i).getByRole('link', { name: /see how it works/i })
     await cta.scrollIntoViewIfNeeded()
     await cta.click()
     await expect(page).toHaveURL(/\/method/, { timeout: 15_000 })

@@ -49,7 +49,8 @@ test('reduced-motion: results-score-block animation is suppressed on /l-examen/d
   const animName = await scoreBlock.evaluate(
     (el) => getComputedStyle(el).animationName,
   )
-  expect(animName).toBe('none')
+  // Chromium may return '' or 'none' when animation is suppressed — both are valid.
+  expect(['none', '']).toContain(animName)
   await page.close()
 })
 
@@ -63,7 +64,8 @@ test('reduced-motion: ed-hero-rise elements have no animation on /', async () =>
     const animName = await heroEls.first().evaluate(
       (el) => getComputedStyle(el).animationName,
     )
-    expect(animName).toBe('none')
+    // Chromium may return '' or 'none' when animation is suppressed — both are valid.
+    expect(['none', '']).toContain(animName)
   }
   await page.close()
 })

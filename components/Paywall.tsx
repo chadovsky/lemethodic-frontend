@@ -463,31 +463,45 @@ export default function Paywall() {
               aria-checked={trialOn}
               onClick={() => setTrialOn((v) => !v)}
               style={{
-                width: 48,
-                height: 28,
-                borderRadius: 14,
+                minWidth: 48,
+                minHeight: 44,
+                background: 'transparent',
                 border: 'none',
-                backgroundColor: trialOn ? INK : '#1A1A1A33',
                 cursor: 'pointer',
-                position: 'relative',
-                transition: 'background-color 0.2s',
                 flexShrink: 0,
                 outline: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 0,
               }}
             >
               <span
                 style={{
-                  position: 'absolute',
-                  top: 3,
-                  left: trialOn ? 23 : 3,
-                  width: 22,
-                  height: 22,
-                  borderRadius: '50%',
-                  backgroundColor: 'var(--paper)',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-                  transition: 'left 0.2s',
+                  display: 'block',
+                  width: 48,
+                  height: 28,
+                  borderRadius: 14,
+                  backgroundColor: trialOn ? INK : '#1A1A1A33',
+                  position: 'relative',
+                  transition: 'background-color 0.2s',
+                  flexShrink: 0,
                 }}
-              />
+              >
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: 3,
+                    left: trialOn ? 23 : 3,
+                    width: 22,
+                    height: 22,
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--paper)',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+                    transition: 'left 0.2s',
+                  }}
+                />
+              </span>
               <span className="sr-only">{trialOn ? 'Disable free trial' : 'Enable free trial'}</span>
             </button>
           </div>

@@ -115,18 +115,21 @@ test.describe("La Méthode lesson detail — desktop (1280×800)", () => {
 
   test('ArrowRight on /la-methode/lecon-3 navigates to /la-methode/lecon-4', async ({ page }) => {
     await page.goto('/la-methode/lecon-3')
+    await page.getByTestId('lesson-breadcrumb').waitFor()
     await page.keyboard.press('ArrowRight')
     await expect(page).toHaveURL(/\/la-methode\/lecon-4$/)
   })
 
   test('ArrowLeft on /la-methode/lecon-3 navigates to /la-methode/lecon-2', async ({ page }) => {
     await page.goto('/la-methode/lecon-3')
+    await page.getByTestId('lesson-breadcrumb').waitFor()
     await page.keyboard.press('ArrowLeft')
     await expect(page).toHaveURL(/\/la-methode\/lecon-2$/)
   })
 
   test('ArrowLeft on /la-methode/lecon-1 does not navigate away (boundary guard)', async ({ page }) => {
     await page.goto('/la-methode/lecon-1')
+    await page.getByTestId('lesson-breadcrumb').waitFor()
     await page.keyboard.press('ArrowLeft')
     await expect(page).toHaveURL(/\/la-methode\/lecon-1$/)
   })

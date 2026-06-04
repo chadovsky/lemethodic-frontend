@@ -103,6 +103,7 @@ test.describe('Le Diagnostic tâche shell — desktop (1280×800)', () => {
   test('ripple rings absent when prefers-reduced-motion is set', async ({ browser }) => {
     const context = await browser.newContext({ reducedMotion: 'reduce' })
     const page = await context.newPage()
+    await injectAuthToken(page)
     await page.goto('/l-examen/diagnostic/tache/1')
     await page.getByTestId('recording-mic-btn').click()
     await expect(page.getByTestId('recording-ripple')).toHaveCount(0)

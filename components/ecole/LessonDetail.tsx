@@ -1,34 +1,17 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
 import type { Lesson } from '@/lib/types'
 import Breadcrumb from '@/components/common/Breadcrumb'
 import AudioPlayerPlaceholder from './AudioPlayerPlaceholder'
 import LessonNav from './LessonNav'
 
-const TOTAL_LESSONS = 27
-
 function sectionLabel(phase: 1 | 2): string {
   return phase === 1 ? 'Fondations' : 'Approfondissement'
 }
 
 export default function LessonDetail({ lesson }: { lesson: Lesson }) {
-  const router = useRouter()
   const cefr = lesson.phase === 1 ? 'B1' : 'B2'
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' && lesson.lessonNumber < TOTAL_LESSONS) {
-        router.push(`/la-methode/lecon-${lesson.lessonNumber + 1}`)
-      } else if (e.key === 'ArrowLeft' && lesson.lessonNumber > 1) {
-        router.push(`/la-methode/lecon-${lesson.lessonNumber - 1}`)
-      }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [lesson.lessonNumber, router])
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 8 }}>

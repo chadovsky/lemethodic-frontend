@@ -115,6 +115,9 @@ export default function RecommendationsStub() {
               padding: '8px 16px',
               flexShrink: 0,
               whiteSpace: 'nowrap',
+              minHeight: 44,
+              display: 'inline-flex',
+              alignItems: 'center',
             }}
           >
             {row.cta.label}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useLayoutEffect } from 'react'
 import { SANS_FONT } from '@/lib/typography'
 import WaveformPlaceholder from './WaveformPlaceholder'
 
@@ -12,14 +12,17 @@ const STATUS: Record<RecordingState, string> = {
   stopped: 'Enregistrement terminé.',
 }
 
-function prefersReducedMotion(): boolean {
-  if (typeof window === 'undefined') return false
-  return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
-}
-
 export default function RecordingPlaceholder() {
   const [state, setState] = useState<RecordingState>('idle')
-  const reducedMotion = prefersReducedMotion()
+  const [reducedMotion, setReducedMotion] = useState(false)
+
+  useLayoutEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setReducedMotion(mq.matches)
+    const listener = (e: MediaQueryListEvent) => setReducedMotion(e.matches)
+    mq.addEventListener('change', listener)
+    return () => mq.removeEventListener('change', listener)
+  }, [])
 
   const handleMicClick = () => {
     if (state === 'idle') setState('recording')

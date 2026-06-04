@@ -56,8 +56,8 @@ export default function AppShell({ children }: AppShellProps) {
           aria-controls="app-shell-sidebar"
           onClick={() => setDrawerOpen(true)}
           style={{
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
             background: 'transparent',
             border: 'none',
             cursor: 'pointer',

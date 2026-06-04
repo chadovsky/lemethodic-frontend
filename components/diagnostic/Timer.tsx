@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
 import { SANS_FONT } from '@/lib/typography'
 
 function fmt(s: number): string {
@@ -10,37 +10,52 @@ function fmt(s: number): string {
 }
 
 export default function Timer({ initialSeconds }: { initialSeconds: number }) {
-  const [secondsLeft, setSecondsLeft] = useState(initialSeconds)
+  // startTimeRef: wall time (fake-clock-compatible) when current run started.
+  // Set synchronously in the click handler BEFORE React commits the state
+  // update, so page.clock.fastForward() in tests finds it immediately.
+  const startTimeRef = useRef<number | null>(null)
+  // pausedAtRef: seconds remaining when paused / not yet started.
+  const pausedAtRef = useRef<number>(initialSeconds)
+
   const [running, setRunning] = useState(false)
+  // tick increments on each interval fire to trigger a re-render and recompute
+  // secondsLeft from Date.now() (which the fake clock controls in tests).
+  const [tick, setTick] = useState(0)
+
+  const secondsLeft: number = startTimeRef.current === null
+    ? pausedAtRef.current
+    : Math.max(0, pausedAtRef.current - Math.floor((Date.now() - startTimeRef.current) / 1000))
+
   const elapsed = secondsLeft === 0
   const urgency = secondsLeft > 0 && secondsLeft < 60 && running
 
-  useEffect(() => {
-    if (!running) return
-    const id = setInterval(() => {
-      setSecondsLeft((prev) => Math.max(0, prev - 1))
-    }, 1000)
+  // Single interval, always registered on mount (empty deps) so the fake clock
+  // always finds an existing timer when fastForward() fires.
+  useLayoutEffect(() => {
+    const id = setInterval(() => setTick((c) => c + 1), 1000)
     return () => clearInterval(id)
-  }, [running])
+  }, [])
 
+  // Auto-stop when seconds reach zero.
   useEffect(() => {
-    if (secondsLeft === 0) setRunning(false)
-  }, [secondsLeft])
+    if (secondsLeft === 0 && running) {
+      pausedAtRef.current = 0
+      startTimeRef.current = null
+      setRunning(false)
+    }
+  }, [secondsLeft, running])
 
   const handleReset = useCallback(() => {
+    startTimeRef.current = null
+    pausedAtRef.current = initialSeconds
     setRunning(false)
-    setSecondsLeft(initialSeconds)
+    setTick(0)
   }, [initialSeconds])
 
   return (
     <div
       data-testid="timer"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        flexWrap: 'wrap',
-      }}
+      style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}
     >
       <span
         data-testid="timer-display"
@@ -77,7 +92,19 @@ export default function Timer({ initialSeconds }: { initialSeconds: number }) {
 
       <button
         data-testid="timer-toggle"
-        onClick={() => { if (!elapsed) setRunning((r) => !r) }}
+        onClick={() => {
+          if (elapsed) return
+          if (!running) {
+            // Set startTimeRef synchronously — visible to interval callbacks
+            // before React commits running=true (critical for fake-clock tests).
+            startTimeRef.current = Date.now()
+            setRunning(true)
+          } else {
+            pausedAtRef.current = secondsLeft
+            startTimeRef.current = null
+            setRunning(false)
+          }
+        }}
         disabled={elapsed}
         className="ed-btn-press"
         style={{
@@ -88,6 +115,7 @@ export default function Timer({ initialSeconds }: { initialSeconds: number }) {
           backgroundColor: running ? 'transparent' : 'var(--cta-utility)',
           border: '1px solid var(--cta-utility)',
           borderRadius: 4,
+          minHeight: 44,
           padding: '6px 14px',
           cursor: elapsed ? 'default' : 'pointer',
           opacity: elapsed ? 0.5 : 1,
@@ -106,6 +134,7 @@ export default function Timer({ initialSeconds }: { initialSeconds: number }) {
           color: 'var(--text-muted)',
           background: 'none',
           border: 'none',
+          minHeight: 44,
           padding: '6px 0',
           cursor: 'pointer',
           textDecoration: 'underline',

@@ -56,6 +56,9 @@ export default function PracticeDeck() {
             color: 'var(--text-muted)',
             textDecoration: 'none',
             alignSelf: 'flex-start',
+            display: 'inline-flex',
+            alignItems: 'center',
+            minHeight: 44,
           }}
         >
           ← Retour à la liste

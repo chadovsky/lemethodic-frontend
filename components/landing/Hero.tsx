@@ -55,7 +55,7 @@ export default function Hero() {
             style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}
           >
             <Link
-              href="/methode"
+              href="/method"
               className="ed-btn-press"
               style={{
                 display: 'inline-flex',

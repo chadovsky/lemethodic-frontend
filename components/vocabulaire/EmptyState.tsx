@@ -42,6 +42,7 @@ export default function EmptyState({ onReset }: { onReset: () => void }) {
           color: 'var(--bg-elevated)',
           backgroundColor: 'var(--cta-utility)',
           border: 'none',
+          minHeight: 44,
           padding: '10px 18px',
           borderRadius: 4,
           cursor: 'pointer',

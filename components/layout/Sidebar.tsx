@@ -158,20 +158,21 @@ export default function Sidebar({
               href="/tableau-de-bord"
               data-testid="sidebar-wordmark"
               onClick={onLinkClick}
-              style={{ textDecoration: 'none', display: 'inline-block' }}
+              style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}
             >
               <Wordmark size="nav" />
             </Link>
             {onClose && (
               <button
                 type="button"
+                data-testid="sidebar-close"
                 aria-label="Close navigation"
                 className="lg:hidden inline-flex items-center justify-center"
                 onClick={onClose}
                 style={{
                   marginLeft: 'auto',
-                  width: 32,
-                  height: 32,
+                  width: 44,
+                  height: 44,
                   background: 'transparent',
                   border: 'none',
                   cursor: 'pointer',
@@ -228,8 +229,8 @@ export default function Sidebar({
               onClick={onSignOut}
               aria-label="Se déconnecter"
               style={{
-                width: 32,
-                height: 32,
+                width: 44,
+                height: 44,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -250,7 +251,7 @@ export default function Sidebar({
               onClick={onSignOut}
               style={{
                 width: '100%',
-                height: 40,
+                height: 44,
                 background: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
@@ -286,8 +287,8 @@ export default function Sidebar({
           aria-expanded={!collapsed}
           onClick={handleToggle}
           style={{
-            width: 32,
-            height: 32,
+            width: 44,
+            height: 44,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

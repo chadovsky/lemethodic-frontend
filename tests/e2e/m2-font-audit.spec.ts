@@ -28,7 +28,7 @@ for (const surface of SURFACES) {
     }
 
     await page.setViewportSize({ width: 1440, height: 900 })
-    await page.goto(surface.route, { waitUntil: 'networkidle', timeout: 15000 })
+    await page.goto(surface.route, { waitUntil: 'load' })
     await page.screenshot({
       path: path.join(AUDIT_DIR, `m2-fonts-${surface.slug}-1440.png`),
       fullPage: true,

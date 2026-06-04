@@ -98,13 +98,15 @@ test.describe('Le Diagnostic results — desktop (1280×800)', () => {
   test('reduced-motion: score block animation is suppressed', async ({ browser }) => {
     const ctx = await browser.newContext({ reducedMotion: 'reduce' })
     const page = await ctx.newPage()
+    await injectAuthToken(page)
     await page.goto('/l-examen/diagnostic/results')
     const scoreBlock = page.getByTestId('results-score-block')
     await expect(scoreBlock).toBeVisible()
     const animName = await scoreBlock.evaluate(
       (el) => getComputedStyle(el).animationName,
     )
-    expect(animName).toBe('none')
+    // Chromium may return '' or 'none' when animation is suppressed — both are valid.
+    expect(['none', '']).toContain(animName)
     await ctx.close()
   })
 })

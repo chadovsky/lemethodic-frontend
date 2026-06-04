@@ -264,7 +264,7 @@ export default function Wordmark({
 
   if (href) {
     return (
-      <Link href={href} style={{ textDecoration: 'none', display: 'inline-block' }}>
+      <Link href={href} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>
         {content}
       </Link>
     )

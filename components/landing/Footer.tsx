@@ -61,7 +61,9 @@ export default function Footer() {
                 letterSpacing: '-0.02em',
                 color: 'rgba(248, 244, 237, 0.9)',
                 textDecoration: 'none',
-                display: 'inline-block',
+                display: 'inline-flex',
+                alignItems: 'center',
+                minHeight: 44,
                 marginBottom: 12,
               }}
             >
@@ -109,6 +111,10 @@ export default function Footer() {
                         fontSize: '0.875rem',
                         color: 'rgba(248, 244, 237, 0.7)',
                         textDecoration: 'none',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        minHeight: 44,
+                        minWidth: 44,
                       }}
                     >
                       {link.label}
@@ -153,6 +159,10 @@ export default function Footer() {
                 fontSize: '0.8125rem',
                 color: 'rgba(248, 244, 237, 0.45)',
                 textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                minHeight: 44,
+                minWidth: 44,
               }}
             >
               GitHub
@@ -166,6 +176,10 @@ export default function Footer() {
                 fontSize: '0.8125rem',
                 color: 'rgba(248, 244, 237, 0.45)',
                 textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                minHeight: 44,
+                minWidth: 44,
               }}
             >
               Twitter / X

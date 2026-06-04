@@ -160,14 +160,15 @@ export default function StickyHeader() {
           {/* Mobile: hamburger / close toggle */}
           <button
             type="button"
+            data-testid="sticky-header-hamburger"
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
             aria-controls="sticky-header-mobile-nav"
             className="md:hidden inline-flex items-center justify-center"
             onClick={() => setMenuOpen((v) => !v)}
             style={{
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',

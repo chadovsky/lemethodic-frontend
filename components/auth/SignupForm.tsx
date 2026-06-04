@@ -66,7 +66,9 @@ export default function SignupForm({ tier }: SignupFormProps) {
       )
       useAuthStore.getState().setAuth(token, user)
       router.push('/onboarding')
+      // spinner stays visible while navigation is in flight; component unmounts on arrival
     } catch (err) {
+      setLoading(false)
       captchaRef.current?.resetCaptcha()
       setCaptchaToken(null)
       if (err instanceof ApiError) {
@@ -78,8 +80,6 @@ export default function SignupForm({ tier }: SignupFormProps) {
       } else {
         setServerError("Can't reach the server. Check your connection.")
       }
-    } finally {
-      setLoading(false)
     }
   }
 

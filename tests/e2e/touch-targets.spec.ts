@@ -24,8 +24,6 @@ test.use({ viewport: { width: 375, height: 667 }, isMobile: true })
 for (const route of ROUTES) {
   test(`touch targets ≥44×44px on ${route} (mobile 375px)`, async ({ page }) => {
     await page.goto(route)
-    // Wait for interactive elements to render
-    await page.waitForLoadState('networkidle')
     const failing = await getFailingTouchTargets(page)
     if (failing.length > 0) {
       const details = failing

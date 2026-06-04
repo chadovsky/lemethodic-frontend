@@ -84,7 +84,7 @@ test.describe('t5 dark mode gallery', () => {
       test(`[light] ${route} @ ${label}px`, async ({ page }) => {
         await page.setViewportSize({ width, height })
         if (auth) await injectAuthToken(page)
-        await page.goto(route, { waitUntil: 'networkidle' })
+        await page.goto(route, { waitUntil: 'load' })
         await page.screenshot({
           path: path.join(GALLERY_DIR, `${routeSlug}-light-${label}.png`),
           fullPage: true,
@@ -95,7 +95,7 @@ test.describe('t5 dark mode gallery', () => {
         await page.setViewportSize({ width, height })
         await page.emulateMedia({ colorScheme: 'dark' })
         if (auth) await injectAuthToken(page)
-        await page.goto(route, { waitUntil: 'networkidle' })
+        await page.goto(route, { waitUntil: 'load' })
         // Wait for next-themes to apply .dark class before screenshotting.
         await page.waitForSelector('html.dark', { timeout: 5000 }).catch(() => {
           // Some routes (marketing, unauthenticated) may not render the

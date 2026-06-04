@@ -102,6 +102,7 @@ test.describe('Le Vocabulaire browse — desktop (1280×800)', () => {
 
   test('selecting source "Média" filters to Média rows only', async ({ page }) => {
     await page.goto('/la-bibliotheque')
+    await expect(page.getByTestId('chunk-row')).toHaveCount(60)
     await page.getByTestId('source-select').selectOption('Média')
     const rows = await page.getByTestId('chunk-row').all()
     expect(rows.length).toBeGreaterThan(0)
@@ -114,6 +115,7 @@ test.describe('Le Vocabulaire browse — desktop (1280×800)', () => {
     page,
   }) => {
     await page.goto('/la-bibliotheque')
+    await expect(page.getByTestId('chunk-row')).toHaveCount(60)
     await page.getByTestId('search-input').fill('tomber')
     const rows = page.getByTestId('chunk-row')
     const count = await rows.count()
