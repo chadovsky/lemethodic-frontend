@@ -9,6 +9,12 @@ type Params = Promise<{ id: string }>
 
 const TOTAL_LESSONS = 27
 
+export function generateStaticParams() {
+  return Array.from({ length: TOTAL_LESSONS }, (_, i) => ({ id: `lecon-${i + 1}` }))
+}
+
+export const dynamicParams = false
+
 export default async function LessonDetailPage({ params }: { params: Params }) {
   const { id } = await params
   const m = /^lecon-(\d+)$/.exec(id) ?? /^(\d+)$/.exec(id)

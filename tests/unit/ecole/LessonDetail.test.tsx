@@ -13,9 +13,15 @@ vi.mock('next/link', () => ({
 const mockPush = vi.hoisted(() => vi.fn())
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
+  notFound: vi.fn(),
+}))
+
+vi.mock('@/lib/api/lessons', () => ({
+  fetchLesson: () => new Promise(() => {}),
 }))
 
 import LessonDetail from '@/components/ecole/LessonDetail'
+import LessonDetailContainer from '@/components/ecole/LessonDetailContainer'
 import type { Lesson } from '@/lib/types'
 
 const LESSON_1: Lesson = {
@@ -153,14 +159,14 @@ describe('LessonDetail', () => {
     expect(badge).toHaveTextContent('B2')
   })
 
-  it('ArrowRight on lesson 5 pushes to /ecole/6', () => {
-    render(<LessonDetail lesson={LESSON_5} />)
+  it('ArrowRight on lesson 5 pushes to /la-methode/lecon-6', () => {
+    render(<LessonDetailContainer id={5} />)
     fireEvent.keyDown(window, { key: 'ArrowRight' })
     expect(mockPush).toHaveBeenCalledWith('/la-methode/lecon-6')
   })
 
-  it('ArrowLeft on lesson 5 pushes to /ecole/4', () => {
-    render(<LessonDetail lesson={LESSON_5} />)
+  it('ArrowLeft on lesson 5 pushes to /la-methode/lecon-4', () => {
+    render(<LessonDetailContainer id={5} />)
     fireEvent.keyDown(window, { key: 'ArrowLeft' })
     expect(mockPush).toHaveBeenCalledWith('/la-methode/lecon-4')
   })

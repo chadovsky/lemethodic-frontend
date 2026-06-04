@@ -5,25 +5,25 @@ test.describe('Landing hero — desktop (1280×800)', () => {
 
   test('headline and CTA are above the fold', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Pass TCF Canada')
-    await expect(page.getByRole('link', { name: /start your prep/i })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1 })).toContainText("There's a method to French")
+    const hero = page.getByRole('region', { name: /hero/i })
+    await expect(hero.getByRole('link', { name: /see how it works/i })).toBeVisible()
   })
 
-  test('CTA navigates to /signup', async ({ page }) => {
+  test('CTA navigates to /method', async ({ page }) => {
     await page.goto('/')
-    await page.getByRole('link', { name: /start your prep/i }).click()
-    // 15 s budget: first request to /signup triggers dev-server compilation
-    await expect(page).toHaveURL(/\/signup/, { timeout: 15_000 })
+    const hero = page.getByRole('region', { name: /hero/i })
+    await hero.getByRole('link', { name: /see how it works/i }).click()
+    await expect(page).toHaveURL(/\/method/, { timeout: 15_000 })
   })
 
-  // MOCK-001 — RotatingKicker
-  test('kicker element is visible and contains an exam name', async ({ page }) => {
+  // Hero subheadline — editorial description visible above the fold
+  test('hero subheadline is visible', async ({ page }) => {
     await page.goto('/')
-    const kicker = page.getByTestId('hero-kicker')
-    await expect(kicker).toBeVisible()
-    const text = await kicker.textContent()
-    const EXAM_NAMES = ['TCF', 'TEF', 'DELF', 'DALF']
-    expect(EXAM_NAMES.some((name) => text?.includes(name))).toBe(true)
+    const sub = page.getByTestId('hero-subheadline')
+    await expect(sub).toBeVisible()
+    const text = await sub.textContent()
+    expect(text).toContain('French')
   })
 
   // MOCK-001 — Sticky header scroll state
@@ -53,20 +53,22 @@ test.describe('Landing hero — mobile (375×667)', () => {
   test('headline and CTA visible', async ({ page }) => {
     await page.goto('/')
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-    await expect(page.getByRole('link', { name: /start your prep/i })).toBeVisible()
+    const hero = page.getByRole('region', { name: /hero/i })
+    await expect(hero.getByRole('link', { name: /see how it works/i })).toBeVisible()
   })
 
   test('CTA tap target is at least 44px tall', async ({ page }) => {
     await page.goto('/')
-    const cta = page.getByRole('link', { name: /start your prep/i })
+    const hero = page.getByRole('region', { name: /hero/i })
+    const cta = hero.getByRole('link', { name: /see how it works/i })
     const box = await cta.boundingBox()
     expect(box).toBeTruthy()
     expect(box!.height).toBeGreaterThanOrEqual(44)
   })
 
-  // MOCK-001 — kicker visible on mobile
-  test('kicker element is visible on mobile', async ({ page }) => {
+  // Hero subheadline visible on mobile
+  test('hero subheadline is visible on mobile', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByTestId('hero-kicker')).toBeVisible()
+    await expect(page.getByTestId('hero-subheadline')).toBeVisible()
   })
 })

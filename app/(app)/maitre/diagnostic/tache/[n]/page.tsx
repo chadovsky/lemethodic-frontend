@@ -8,6 +8,8 @@ export function generateStaticParams() {
   return [{ n: '1' }, { n: '2' }, { n: '3' }]
 }
 
+export const dynamicParams = false
+
 export async function generateMetadata({ params }: { params: Params }) {
   const { n } = await params
   const tache = await fetchTache(Number(n))
