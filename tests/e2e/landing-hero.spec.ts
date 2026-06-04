@@ -32,11 +32,13 @@ test.describe('Landing hero — desktop (1280×800)', () => {
     const header = page.getByTestId('sticky-header')
     // At top — should not have scrolled class
     await expect(header).not.toHaveClass(/sticky-header--scrolled/)
-    // Scroll down
-    await page.evaluate(() => window.scrollTo(0, 80))
-    // Wait for scroll event to propagate and React to re-render
-    await page.waitForTimeout(100)
-    await expect(header).toHaveClass(/sticky-header--scrolled/)
+    // Ensure page has enough height to scroll, then scroll past threshold (>60px)
+    await page.evaluate(() => {
+      document.documentElement.style.minHeight = '2000px'
+      window.scrollTo(0, 80)
+    })
+    // toHaveClass auto-retries up to 5 s — no explicit sleep needed
+    await expect(header).toHaveClass(/sticky-header--scrolled/, { timeout: 5000 })
   })
 })
 
