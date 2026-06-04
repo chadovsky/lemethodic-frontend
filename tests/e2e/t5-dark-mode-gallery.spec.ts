@@ -51,7 +51,7 @@ const PUBLIC_ROUTES = [
   '/login',
   '/paywall',
   '/onboarding',
-  '/method',
+  '/la-methode',
   '/mentions-legales',
   '/confidentialite',
   '/cgv',

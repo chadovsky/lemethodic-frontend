@@ -33,7 +33,7 @@ const STATIC_ROUTES: RouteSpec[] = [
   { path: '/', slug: 'home', isDynamic: false },
   { path: '/library', slug: 'library', isDynamic: false },
   { path: '/login', slug: 'login', isDynamic: false },
-  { path: '/method', slug: 'method', isDynamic: false },
+  { path: '/la-methode', slug: 'la-methode', isDynamic: false },
   { path: '/more', slug: 'more', isDynamic: false },
   { path: '/password-reset', slug: 'password-reset', isDynamic: false },
   { path: '/paywall', slug: 'paywall', isDynamic: false },
