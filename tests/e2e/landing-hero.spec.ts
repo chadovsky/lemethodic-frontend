@@ -30,14 +30,17 @@ test.describe('Landing hero — desktop (1280×800)', () => {
   test('header gains solid background after scrolling 80px', async ({ page }) => {
     await page.goto('/')
     const header = page.getByTestId('sticky-header')
-    // At top — should not have scrolled class
     await expect(header).not.toHaveClass(/sticky-header--scrolled/)
-    // Ensure page has enough height to scroll, then scroll past threshold (>60px)
+    // Ensure page is tall enough, then scroll past the >60px threshold
     await page.evaluate(() => {
       document.documentElement.style.minHeight = '2000px'
       window.scrollTo(0, 80)
     })
-    // toHaveClass auto-retries up to 5 s — no explicit sleep needed
+    // Wait for the browser to commit the scroll position before dispatching the event.
+    // This avoids the race where scrollTo fires before React's useEffect listener is registered.
+    await page.waitForFunction(() => window.scrollY >= 60, { timeout: 3000 })
+    // Re-dispatch so the React listener (now guaranteed registered) picks it up
+    await page.evaluate(() => window.dispatchEvent(new Event('scroll')))
     await expect(header).toHaveClass(/sticky-header--scrolled/, { timeout: 5000 })
   })
 })
