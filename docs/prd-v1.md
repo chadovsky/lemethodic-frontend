@@ -2653,7 +2653,8 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 ### F-439 — Progress endpoint FE wiring (replaces F-431 localStorage interim)
 
-**Status:** In Progress
+**Status:** Shipped (9f261ec)
+**Commits:** 472eb83, 9f261ec
 **Branch:** `main` (executed inline per brief)
 **Effort:** 1 session
 
