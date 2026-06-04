@@ -2619,6 +2619,38 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 ---
 
+### F-437 — Route cleanup: /method doublon (7), diagnostic home (8), Cabinet Grotesk (9)
+
+**Status:** In progress
+**Commit:** TBD (post-squash)
+**Effort:** 1 session
+
+**Scope:**
+
+**(7) /method doublon retired.**
+- `/method` → `/la-methode` 308 redirect added to `next.config.mjs`.
+- `Hero.tsx` + `MethodologyPreview.tsx` CTA `href` updated to `/la-methode`.
+- `app/(app)/la-methode/page.tsx` moved to `app/la-methode/page.tsx` (public, no ProtectedRoute). Leçon cards render pre-login; `/la-methode/[id]` lesson detail stays gated via the `(app)` group layout. `app/method/page.tsx` stub deleted.
+- TopNav `/maitre` nav entry removed (Le Maître has no URL per locked decision).
+
+**(8) Diagnostic consolidated at /l-examen/diagnostic.**
+- `app/(app)/l-examen/diagnostic/results/page.tsx` and `tache/[n]/page.tsx` created (moved from `app/(app)/maitre/diagnostic/`).
+- `app/(app)/l-examen/diagnostic/page.tsx` (R1 band-aid, now live) promoted to real route.
+- `beforeFiles` rewrite (`/l-examen/diagnostic/* → /maitre/diagnostic/*`) deleted from `next.config.mjs`.
+- `app/(app)/maitre/` directory deleted entirely.
+- `/maitre/diagnostic → /l-examen/diagnostic` backward-compat redirect preserved.
+- `Activite.tsx` bientôt copy updated to remove stale `/maitre` URL.
+
+**(9) Cabinet Grotesk reference removed.**
+- Cabinet Grotesk was already absent from all code files before this entry.
+- `CLAUDE.md` Fonts section updated to document the M2 t11 stack accurately.
+
+**Tests:** Unit 433/433 + e2e 0 fails (pending confirm). `landing-hero.spec.ts`, `landing-methodology.spec.ts`, `Hero.test.tsx`, `MethodologyPreview.test.tsx` updated to assert `/la-methode`.
+
+**Non-visual change note:** Diagnostic route move is backend-side file routing only; existing e2e diagnostic specs already asserted `/l-examen/diagnostic` paths through the former rewrite.
+
+---
+
 ## Section 4 — Content Pipeline (CON-001 to CON-014)
 
 **Goal:** real content lives behind the surfaces. F-321 vocab review (1,684 Phase 1 chunks awaiting Chadi triage) lands here. L'École 27 lessons get methodology-visible content. Le Diagnostic Tâche library expands to 50 scenarios (F-061.2 Livraison 2/2).

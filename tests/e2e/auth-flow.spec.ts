@@ -7,9 +7,9 @@ test.describe('Auth flow — redirect gate', () => {
     await expect(page).toHaveURL('/')
   })
 
-  test('unauthenticated visitor on /la-methode is redirected to /', async ({ page }) => {
+  test('unauthenticated visitor on /la-methode sees the lesson list (not redirected)', async ({ page }) => {
     await page.goto('/la-methode')
-    await expect(page).toHaveURL('/')
+    await expect(page).toHaveURL('/la-methode')
   })
 
   test('unauthenticated visitor on /la-bibliotheque is redirected to /', async ({ page }) => {

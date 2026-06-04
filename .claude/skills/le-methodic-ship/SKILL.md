@@ -40,7 +40,7 @@ Grep the diff (against the merge base, or against `main` for working changes) fo
 | `Fraunces` | Not in the approved font stack. |
 | `Figtree` | Not in the approved font stack. |
 
-Approved fonts: Cabinet Grotesk, Geist, Source Serif 4. If a new font is genuinely required, that is a Chadi-level decision — surface it explicitly, do not silently permit.
+Approved fonts (M2 t11 stack): Instrument Serif, Crimson Pro, Instrument Sans, Inter, DM Mono. Cabinet Grotesk, Geist, and Source Serif 4 are removed — do not reintroduce. If a new font is genuinely required, that is a Chadi-level decision — surface it explicitly, do not silently permit.
 
 ### 6. Build green
 
