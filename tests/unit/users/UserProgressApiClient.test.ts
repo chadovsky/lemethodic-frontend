@@ -59,7 +59,7 @@ describe('api.users.getProgress() — F-439', () => {
     const [url, init] = mockFetch.mock.calls[0] as [string, RequestInit]
     expect(url).toContain('/api/users/me/progress')
     expect(init.credentials).toBe('include')
-    expect(init.method).toBeUndefined() // GET inferred (no body)
+    expect(init.method).toBe('GET')
   })
 
   it('maps current_level → currentLevel', async () => {
