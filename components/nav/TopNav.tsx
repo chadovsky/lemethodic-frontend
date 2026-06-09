@@ -1,9 +1,9 @@
 'use client'
 
-// V-013c — desktop top nav. Apple-style sticky bar with backdrop-blur on
-// scroll, peach-deep underline for active link, profile dropdown.
-// Mounted globally in app/layout.tsx; returns null on marketing /
-// conversion paths and below md (768px) so BottomNav owns mobile.
+// F-441 -- TopNav rebuilt to locked IA. English benefit labels, Exams
+// dropdown with TCF/DELF/French for Business, bientôt chips for Real French +
+// AI Tutor. Right side is auth-conditional: unauthenticated sees
+// Pricing/Log in/Start Free; authenticated sees ThemeToggle + avatar dropdown.
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
@@ -43,8 +43,6 @@ const EXCLUDED_PREFIXES = [
   '/librairie',
 ] as const
 
-// V-016g — /library + /fr/library stubs are also marketing surfaces.
-// /exam-prep -> /tcf-canada (F-332); /fr/exam-prep -> /fr (F-340).
 const EXCLUDED_EXACT: ReadonlySet<string> = new Set([
   '/',
   '/fr',
@@ -60,49 +58,120 @@ function shouldHideOn(pathname: string): boolean {
   return false
 }
 
-const COPY = {
-  en: {
-    nav: { seance: 'Séance', ecole: 'Méthode', speaking: 'Oral', writing: 'Écrit', progress: 'Progrès' },
-    menu: {
-      profile: 'Profile',
-      settings: 'Settings',
-      account: 'Account',
-      about: 'About',
-      logout: 'Sign out',
-    },
-    skipToContent: 'Skip to content',
-  },
-  fr: {
-    nav: { seance: 'Séance', ecole: 'Méthode', speaking: 'Oral', writing: 'Écrit', progress: 'Progrès' },
-    menu: {
-      profile: 'Profil',
-      settings: 'Paramètres',
-      account: 'Abonnement',
-      about: 'À propos',
-      logout: 'Se déconnecter',
-    },
-    skipToContent: 'Aller au contenu',
-  },
-} as const
-
-const NAV_LINKS = [
-  { key: 'seance' as const, href: '/seance', match: ['/seance'] },
-  { key: 'ecole' as const, href: '/la-methode', match: ['/la-methode', '/cluster', '/learn'] },
-  { key: 'speaking' as const, href: '/l-examen/expression-orale', match: ['/l-examen/expression-orale'] },
-  { key: 'writing' as const, href: '/l-examen/expression-ecrite', match: ['/l-examen/expression-ecrite'] },
-  { key: 'progress' as const, href: '/progression', match: ['/progression', '/l-examen'] },
+// Exams dropdown children. TCF is live; DELF + French for Business are bientôt.
+const EXAM_CHILDREN = [
+  { label: 'TCF', href: '/l-examen', bientot: false },
+  { label: 'DELF', href: null, bientot: true },
+  { label: 'French for Business', href: null, bientot: true },
 ] as const
 
-function isLinkActive(href: string, match: readonly string[], pathname: string): boolean {
+// F-441 nav IA -- English benefit labels.
+const NAV_ITEMS = [
+  {
+    key: 'vocabulary',
+    label: 'Vocabulary',
+    href: '/la-methode',
+    match: ['/la-methode', '/cluster', '/learn'],
+    dropdown: false,
+    bientot: false,
+  },
+  {
+    key: 'exams',
+    label: 'Exams',
+    href: '/l-examen',
+    match: ['/l-examen'],
+    dropdown: true,
+    bientot: false,
+  },
+  {
+    key: 'library',
+    label: 'Library',
+    href: '/la-bibliotheque',
+    match: ['/la-bibliotheque'],
+    dropdown: false,
+    bientot: false,
+  },
+  {
+    key: 'real-french',
+    label: 'Real French',
+    href: null as string | null,
+    match: [] as string[],
+    dropdown: false,
+    bientot: true,
+  },
+  {
+    key: 'ai-tutor',
+    label: 'AI Tutor',
+    href: null as string | null,
+    match: [] as string[],
+    dropdown: false,
+    bientot: true,
+  },
+  {
+    key: 'coaching',
+    label: 'Coaching',
+    href: '/coaching',
+    match: ['/coaching'],
+    dropdown: false,
+    bientot: false,
+  },
+] as const
+
+function isLinkActive(href: string | null, match: readonly string[], pathname: string): boolean {
+  if (!href) return false
   if (pathname === href) return true
   return match.some((m) => pathname === m || pathname.startsWith(m + '/'))
 }
+
+// Inline bientôt chip for nav items.
+function BientotChip() {
+  return (
+    <span
+      aria-label="coming soon"
+      style={{
+        display: 'inline-block',
+        marginLeft: 6,
+        padding: '1px 6px',
+        borderRadius: 99,
+        backgroundColor: 'var(--lm-warm-peach)',
+        color: 'var(--lm-warm-espresso)',
+        fontFamily: SANS,
+        fontWeight: 600,
+        fontSize: 10,
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+        lineHeight: '16px',
+        verticalAlign: 'middle',
+        userSelect: 'none',
+      }}
+    >
+      bientôt
+    </span>
+  )
+}
+
+const MENU_COPY = {
+  en: {
+    profile: 'Profile',
+    settings: 'Settings',
+    account: 'Account',
+    about: 'About',
+    logout: 'Sign out',
+  },
+  fr: {
+    profile: 'Profil',
+    settings: 'Paramètres',
+    account: 'Abonnement',
+    about: 'À propos',
+    logout: 'Se déconnecter',
+  },
+} as const
 
 export default function TopNav() {
   const pathname = usePathname() ?? '/'
   const router = useRouter()
   const language = useInterfaceLanguage()
-  const copy = COPY[language]
+  const menuCopy = MENU_COPY[language]
   const user = useAuthStore((s) => s.user)
   const setAuth = useAuthStore((s) => s.setAuth)
   const clearAuth = useAuthStore((s) => s.clearAuth)
@@ -111,9 +180,17 @@ export default function TopNav() {
 
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [examsOpen, setExamsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement | null>(null)
+  const examsRef = useRef<HTMLLIElement | null>(null)
 
-  // Track scroll past 8px for the backdrop-blur + border activation.
+  // Kick off auth store rehydration on mount. Idempotent -- safe when
+  // ProtectedRoute has already called it on (app) group routes.
+  useEffect(() => {
+    useAuthStore.getState().hydrate()
+  }, [])
+
+  // Backdrop-blur activation past 8px.
   useEffect(() => {
     if (typeof window === 'undefined') return
     const onScroll = () => setScrolled(window.scrollY > 8)
@@ -122,7 +199,7 @@ export default function TopNav() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Click-outside dismissal for the profile dropdown.
+  // Click-outside: profile dropdown.
   useEffect(() => {
     if (!menuOpen) return
     const onClick = (e: MouseEvent) => {
@@ -133,17 +210,22 @@ export default function TopNav() {
     return () => document.removeEventListener('mousedown', onClick)
   }, [menuOpen])
 
+  // Click-outside: exams dropdown.
+  useEffect(() => {
+    if (!examsOpen) return
+    const onClick = (e: MouseEvent) => {
+      if (!examsRef.current) return
+      if (!examsRef.current.contains(e.target as Node)) setExamsOpen(false)
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
+  }, [examsOpen])
+
   if (shouldHideOn(pathname)) return null
-  // Wait for hydration before rendering — avoids flash of nav on
-  // unauthenticated marketing redirects.
-  if (!hydrated || !token) return null
+  // Wait for auth store hydration to avoid a flash of wrong right-side state.
+  if (!hydrated) return null
 
   const avatarInitial = (user?.fullName?.trim().charAt(0) || user?.email?.charAt(0) || 'L').toUpperCase()
-
-  function handleLanguageToggle(next: InterfaceLanguage) {
-    if (!user || !token || next === language) return
-    setAuth(token, { ...user, interfaceLanguage: next })
-  }
 
   async function handleLogout() {
     setMenuOpen(false)
@@ -159,15 +241,12 @@ export default function TopNav() {
   return (
     <nav
       aria-label="Primary"
-      // Mobile gets BottomNav instead — hide TopNav below md.
       className="hidden md:flex"
       style={{
         position: 'sticky',
         top: 0,
         zIndex: 50,
         height: 64,
-        // V-013c — backdrop-blur(12px) when scrolled past 8px. Solid bg
-        // baseline so the nav still has a fill when scroll is at top.
         backgroundColor: scrolled ? 'var(--lm-bg-blur)' : ED_BG,
         backdropFilter: scrolled ? 'blur(12px)' : 'none',
         WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
@@ -190,10 +269,10 @@ export default function TopNav() {
           height: '100%',
         }}
       >
-        {/* LEFT — wordmark */}
+        {/* LEFT -- wordmark */}
         <Wordmark size="nav" href="/la-methode" />
 
-        {/* CENTER — nav links */}
+        {/* CENTER -- nav links */}
         <ul
           style={{
             listStyle: 'none',
@@ -201,15 +280,171 @@ export default function TopNav() {
             padding: 0,
             display: 'flex',
             justifyContent: 'center',
-            gap: 'clamp(20px, 3vw, 36px)',
+            gap: 'clamp(16px, 2.5vw, 30px)',
+            alignItems: 'center',
           }}
         >
-          {NAV_LINKS.map(({ key, href, match }) => {
-            const active = isLinkActive(href, match, pathname)
+          {NAV_ITEMS.map((item) => {
+            const active = isLinkActive(item.href, item.match, pathname)
+
+            // Bientôt items -- non-interactive, chip only.
+            if (item.bientot) {
+              return (
+                <li key={item.key}>
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '6px 4px',
+                      fontFamily: SANS,
+                      fontWeight: 500,
+                      fontSize: 14,
+                      letterSpacing: '0.01em',
+                      color: ED_FG_SOFT,
+                      cursor: 'default',
+                      opacity: 0.7,
+                    }}
+                  >
+                    {item.label}
+                    <BientotChip />
+                  </span>
+                </li>
+              )
+            }
+
+            // Exams dropdown.
+            if (item.dropdown) {
+              return (
+                <li key={item.key} ref={examsRef} style={{ position: 'relative' }}>
+                  <button
+                    type="button"
+                    aria-haspopup="true"
+                    aria-expanded={examsOpen}
+                    onClick={() => setExamsOpen((v) => !v)}
+                    style={{
+                      position: 'relative',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      padding: '6px 4px',
+                      fontFamily: SANS,
+                      fontWeight: active ? 600 : 500,
+                      fontSize: 14,
+                      letterSpacing: '0.01em',
+                      color: active ? ED_FG : ED_FG_SOFT,
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      transition: 'color var(--lm-duration-hover) var(--lm-ease-spring)',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = ED_FG }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = active ? ED_FG : ED_FG_SOFT }}
+                  >
+                    {item.label}
+                    {/* Chevron */}
+                    <svg
+                      width="10"
+                      height="6"
+                      viewBox="0 0 10 6"
+                      fill="none"
+                      aria-hidden="true"
+                      style={{
+                        transform: examsOpen ? 'rotate(180deg)' : 'none',
+                        transition: 'transform var(--lm-duration-hover) var(--lm-ease-spring)',
+                      }}
+                    >
+                      <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {active && (
+                      <span
+                        aria-hidden="true"
+                        style={{
+                          position: 'absolute',
+                          left: 4,
+                          right: 4,
+                          bottom: -6,
+                          height: 2,
+                          backgroundColor: 'var(--lm-warm-peach-deep)',
+                          borderRadius: 2,
+                        }}
+                      />
+                    )}
+                  </button>
+
+                  {examsOpen && (
+                    <div
+                      role="menu"
+                      style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 10px)',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        minWidth: 200,
+                        backgroundColor: 'var(--lm-bg-surface)',
+                        border: `1px solid ${ED_RULE}`,
+                        borderRadius: 4,
+                        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04)',
+                        padding: 4,
+                        zIndex: 51,
+                      }}
+                    >
+                      {EXAM_CHILDREN.map((child) => {
+                        if (child.bientot) {
+                          return (
+                            <div
+                              key={child.label}
+                              role="menuitem"
+                              aria-disabled="true"
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '10px 14px',
+                                fontFamily: SANS,
+                                fontWeight: 500,
+                                fontSize: 13,
+                                color: ED_FG_SOFT,
+                                opacity: 0.6,
+                                cursor: 'default',
+                              }}
+                            >
+                              {child.label}
+                              <BientotChip />
+                            </div>
+                          )
+                        }
+                        return (
+                          <Link
+                            key={child.label}
+                            href={child.href}
+                            role="menuitem"
+                            onClick={() => setExamsOpen(false)}
+                            style={{
+                              display: 'block',
+                              padding: '10px 14px',
+                              fontFamily: SANS,
+                              fontWeight: 500,
+                              fontSize: 13,
+                              color: ED_FG,
+                              textDecoration: 'none',
+                              borderRadius: 2,
+                            }}
+                          >
+                            {child.label}
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  )}
+                </li>
+              )
+            }
+
+            // Standard nav link.
             return (
-              <li key={key}>
+              <li key={item.key}>
                 <Link
-                  href={href}
+                  href={item.href!}
                   aria-current={active ? 'page' : undefined}
                   style={{
                     position: 'relative',
@@ -223,15 +458,10 @@ export default function TopNav() {
                     textDecoration: 'none',
                     transition: 'color var(--lm-duration-hover) var(--lm-ease-spring)',
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = ED_FG
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = active ? ED_FG : ED_FG_SOFT
-                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = ED_FG }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = active ? ED_FG : ED_FG_SOFT }}
                 >
-                  {copy.nav[key]}
-                  {/* Active underline — 2px peach-deep, 4px below the link */}
+                  {item.label}
                   {active && (
                     <span
                       aria-hidden="true"
@@ -252,148 +482,171 @@ export default function TopNav() {
           })}
         </ul>
 
-        {/* RIGHT — language toggle + theme toggle + profile */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <ThemeToggle />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            {(['en', 'fr'] as const).map((l, i) => {
-              const active = l === language
-              return (
-                <span key={l} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <button
-                    type="button"
-                    onClick={() => handleLanguageToggle(l)}
-                    aria-pressed={active}
-                    style={{
-                      padding: '4px 6px',
-                      background: 'transparent',
-                      border: 'none',
-                      cursor: 'pointer',
-                      outline: 'none',
-                      color: active ? ED_FG : ED_FG_SOFT,
-                      fontFamily: SANS,
-                      fontWeight: active ? 600 : 500,
-                      fontSize: 12,
-                      letterSpacing: '0.06em',
-                      textTransform: 'uppercase',
-                      transition: 'color var(--lm-duration-hover) var(--lm-ease-spring)',
-                    }}
-                  >
-                    {l}
-                  </button>
-                  {i === 0 && (
-                    <span aria-hidden="true" style={{ color: ED_RULE, fontSize: 11 }}>
-                      /
-                    </span>
-                  )}
-                </span>
-              )
-            })}
-          </div>
-
-          <div style={{ position: 'relative' }} ref={menuRef}>
-            <button
-              type="button"
-              onClick={() => setMenuOpen((v) => !v)}
-              aria-haspopup="menu"
-              aria-expanded={menuOpen}
-              className="ed-btn-press"
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: '50%',
-                backgroundColor: 'var(--lm-warm-peach)',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 0,
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: SERIF,
-                  fontWeight: 400,
-                  fontSize: 14,
-                  color: 'var(--lm-warm-espresso)',
-                  lineHeight: 1,
-                }}
-              >
-                {avatarInitial}
-              </span>
-            </button>
-            {menuOpen && (
-              <div
-                role="menu"
-                style={{
-                  position: 'absolute',
-                  top: 'calc(100% + 8px)',
-                  right: 0,
-                  minWidth: 200,
-                  backgroundColor: 'var(--lm-bg-surface)',
-                  border: `1px solid ${ED_RULE}`,
-                  borderRadius: 4,
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04)',
-                  padding: 4,
-                  zIndex: 51,
-                }}
-              >
-                {/* V-014c — dropdown expanded to all 4 /more sections via
-                    anchor links so Settings / Account / About are
-                    reachable from desktop without intermediate /more
-                    navigation. /more sections carry matching id
-                    attributes for native anchor scroll. */}
-                {(['profile', 'settings', 'account', 'about'] as const).map((section) => (
-                  <Link
-                    key={section}
-                    href={
-                      section === 'profile' ? '/profil' :
-                      section === 'settings' ? '/parametres' :
-                      section === 'account' ? '/abonnement' :
-                      '/a-propos'
-                    }
-                    role="menuitem"
-                    onClick={() => setMenuOpen(false)}
-                    style={{
-                      display: 'block',
-                      padding: '10px 14px',
-                      fontFamily: SANS,
-                      fontWeight: 500,
-                      fontSize: 13,
-                      color: ED_FG,
-                      textDecoration: 'none',
-                      borderRadius: 2,
-                    }}
-                  >
-                    {copy.menu[section]}
-                  </Link>
-                ))}
-                <hr style={{ margin: '4px 0', border: 'none', borderTop: `1px solid ${ED_RULE}` }} />
+        {/* RIGHT -- auth-conditional */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {token ? (
+            // Authenticated: ThemeToggle + avatar dropdown.
+            <>
+              <ThemeToggle />
+              <div style={{ position: 'relative' }} ref={menuRef}>
                 <button
                   type="button"
-                  role="menuitem"
-                  onClick={handleLogout}
+                  data-testid="topnav-avatar"
+                  onClick={() => setMenuOpen((v) => !v)}
+                  aria-haspopup="menu"
+                  aria-expanded={menuOpen}
+                  className="ed-btn-press"
                   style={{
-                    display: 'block',
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '10px 14px',
-                    fontFamily: SANS,
-                    fontWeight: 500,
-                    fontSize: 13,
-                    color: 'var(--lm-error)',
-                    backgroundColor: 'transparent',
+                    width: 32,
+                    height: 32,
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--lm-warm-peach)',
                     border: 'none',
                     cursor: 'pointer',
-                    borderRadius: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 0,
                   }}
                 >
-                  {copy.menu.logout}
+                  <span
+                    style={{
+                      fontFamily: SERIF,
+                      fontWeight: 400,
+                      fontSize: 14,
+                      color: 'var(--lm-warm-espresso)',
+                      lineHeight: 1,
+                    }}
+                  >
+                    {avatarInitial}
+                  </span>
                 </button>
+                {menuOpen && (
+                  <div
+                    role="menu"
+                    style={{
+                      position: 'absolute',
+                      top: 'calc(100% + 8px)',
+                      right: 0,
+                      minWidth: 200,
+                      backgroundColor: 'var(--lm-bg-surface)',
+                      border: `1px solid ${ED_RULE}`,
+                      borderRadius: 4,
+                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04)',
+                      padding: 4,
+                      zIndex: 51,
+                    }}
+                  >
+                    {(['profile', 'settings', 'account', 'about'] as const).map((section) => (
+                      <Link
+                        key={section}
+                        href={
+                          section === 'profile' ? '/profil' :
+                          section === 'settings' ? '/parametres' :
+                          section === 'account' ? '/abonnement' :
+                          '/a-propos'
+                        }
+                        role="menuitem"
+                        onClick={() => setMenuOpen(false)}
+                        style={{
+                          display: 'block',
+                          padding: '10px 14px',
+                          fontFamily: SANS,
+                          fontWeight: 500,
+                          fontSize: 13,
+                          color: ED_FG,
+                          textDecoration: 'none',
+                          borderRadius: 2,
+                        }}
+                      >
+                        {menuCopy[section]}
+                      </Link>
+                    ))}
+                    <hr style={{ margin: '4px 0', border: 'none', borderTop: `1px solid ${ED_RULE}` }} />
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={handleLogout}
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '10px 14px',
+                        fontFamily: SANS,
+                        fontWeight: 500,
+                        fontSize: 13,
+                        color: 'var(--lm-error)',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        borderRadius: 2,
+                      }}
+                    >
+                      {menuCopy.logout}
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          ) : (
+            // Unauthenticated: Pricing | Log in | Start Free.
+            <>
+              <Link
+                href="/tarifs"
+                style={{
+                  fontFamily: SANS,
+                  fontWeight: 500,
+                  fontSize: 14,
+                  color: ED_FG_SOFT,
+                  textDecoration: 'none',
+                  padding: '6px 4px',
+                  transition: 'color var(--lm-duration-hover) var(--lm-ease-spring)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = ED_FG }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = ED_FG_SOFT }}
+              >
+                Pricing
+              </Link>
+              <Link
+                href="/connexion"
+                style={{
+                  fontFamily: SANS,
+                  fontWeight: 500,
+                  fontSize: 14,
+                  color: ED_FG_SOFT,
+                  textDecoration: 'none',
+                  padding: '6px 4px',
+                  transition: 'color var(--lm-duration-hover) var(--lm-ease-spring)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = ED_FG }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = ED_FG_SOFT }}
+              >
+                Log in
+              </Link>
+              <Link
+                href="/inscription"
+                className="ed-btn-press"
+                style={{
+                  display: 'inline-block',
+                  padding: '7px 16px',
+                  backgroundColor: ED_FG,
+                  color: 'var(--lm-bg-base)',
+                  fontFamily: SANS,
+                  fontWeight: 600,
+                  fontSize: 13,
+                  letterSpacing: '0.01em',
+                  textDecoration: 'none',
+                  borderRadius: 4,
+                  transition: 'opacity var(--lm-duration-hover) var(--lm-ease-spring)',
+                  whiteSpace: 'nowrap',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85' }}
+                onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}
+              >
+                Start Free
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>

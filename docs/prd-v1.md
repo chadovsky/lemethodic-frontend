@@ -2708,6 +2708,24 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 ---
 
+### F-441 -- TopNav + SITEMAP rebuild to locked IA
+
+**Status:** Shipped (9dca1bf)
+**Branch:** `feat/f-441-topnav-sitemap-ia`
+**Effort:** 1 session
+
+**Context:** The TopNav had French/internal labels (Séance, Méthode, Oral, Écrit, Progrès) and only rendered for authenticated users. F-441 rebuilds it to the locked product IA with English benefit labels visible to all visitors on product routes.
+
+**Scope:**
+- `components/nav/TopNav.tsx`: rebuilt to locked IA. Nav items: Vocabulary (/la-methode), Exams (dropdown: TCF live, DELF bientôt, French for Business bientôt), Library (/la-bibliotheque), Real French (bientôt chip), AI Tutor (bientôt chip), Coaching (/coaching). Right side: unauthenticated shows Pricing/Log in/Start Free; authenticated keeps ThemeToggle + avatar dropdown. Language toggle removed from nav. Added `hydrate()` call on mount so nav renders on (shell) routes (e.g. /la-methode) that don't pass through ProtectedRoute.
+- `SITEMAP.md`: rebuilt at FE root to match F-441 IA. Previous content was stale (wrong route names, old architecture). New doc reflects actual live routes, TopNav IA table, auth-conditional right side, and bientôt surfaces.
+- `BACKLOG.md`: F-441 entry added.
+- `tests/e2e/f-441.spec.ts`: 28 cases covering nav labels, Exams dropdown (open, children, bientôt chips, close), bientôt chips, auth-conditional right side, mobile hidden behavior.
+- `tests/screenshots/f-441-la-methode-{1440,375}.png`: F-225 captures.
+- `tests/traces/f-441.zip`: Playwright trace for desktop nav test.
+
+**Acceptance:** build green · unit 466/466 · e2e 735 passed (with retries), 1 pre-existing flake (landing-hero mobile scroll), 0 F-441 failures.
+
 ## Section 4 — Content Pipeline (CON-001 to CON-014)
 
 **Goal:** real content lives behind the surfaces. F-321 vocab review (1,684 Phase 1 chunks awaiting Chadi triage) lands here. L'École 27 lessons get methodology-visible content. Le Diagnostic Tâche library expands to 50 scenarios (F-061.2 Livraison 2/2).

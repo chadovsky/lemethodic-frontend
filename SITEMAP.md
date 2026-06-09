@@ -1,230 +1,161 @@
-# Le Méthodic, Site Architecture (SITEMAP)
+# SITEMAP -- Le Méthodic FE
 
-**Status:** Canonical  
-**Last updated:** 2026-06-02  
-**Related artifacts:** PRODUCT.md, DESIGN.md, BACKLOG.md  
+**Status:** Canonical
+**Last updated:** F-441, 2026-06-09
+**Related artifacts:** DESIGN.md, BACKLOG.md, docs/prd-v1.md
 
 ## Overview
 
-Le Méthodic is one complete website. Every surface is present from launch. Unbuilt surfaces display a polished coming-soon state (bientôt); lighting one up is a content drop plus a feature flag, never a new version or a new tier. The spine is exam-agnostic. A Target Profile (exam, threshold, deadline, persona) overlays it at onboarding. All four skills (oral comprehension, written comprehension, oral expression, written expression) are present from the start. TCF is the first exam lit.
-
-Roughly 40 templates across four zones: Public, Auth, Onboarding, La Méthode (authenticated), Account.
-
-The product routes in French. Public SEO surfaces serve English and French via hreflang. No Next.js i18n framework; hreflang is applied at the page level.
+Le Méthodic is one complete website. Every surface is present from launch.
+Unbuilt surfaces display a bientôt state -- lighting one up is content plus a
+feature flag, never a new version. The spine is exam-agnostic. TCF is the
+first exam lit. All four skills are present from the start.
 
 ## Status legend
 
-- `live`, route in production, content rendered
-- `bientôt`, navigable and polished, coming-soon state, never broken
-
-## Bientôt presentation pattern
-
-Every bientôt surface is a first-class page. It renders its route, shows its position in the navigation, displays its purpose, and presents a clear coming-soon signal. It offers a relevant next action (return to /carte, continue a live sibling surface, or join a notification list). No 404. No locked-icon overlays. No paywall messaging. The page should feel like a place the product will inhabit, not an empty shell.
+- `live` -- route in production, content rendered
+- `bientôt` -- navigable, shows bientôt state, never a 404
+- `tbd` -- not yet created
 
 ---
 
-## Public zone
+## TopNav IA (F-441)
 
-### Accueil
+TopNav is mounted globally. It is hidden on marketing, auth, and conversion
+surfaces (see `EXCLUDED_PREFIXES` and `EXCLUDED_EXACT` in
+`components/nav/TopNav.tsx`). It shows on all other routes.
 
-| Path | Purpose | Status |
+**Left/center -- in order:**
+
+| Label | Route | Notes |
 |---|---|---|
-| `/` | Brand-led hub. Builds desire for French itself. Exam conversion is handled by /examens. | live |
+| Vocabulary | `/la-methode` | Active on /la-methode/*, /cluster/*, /learn/* |
+| Exams | `/l-examen` | Parent link. Dropdown: TCF (live), DELF (bientôt), French for Business (bientôt) |
+| Library | `/la-bibliotheque` | Active on /la-bibliotheque/* |
+| Real French | -- | Bientôt chip. Phase 3 surface. No route yet. |
+| AI Tutor | -- | Bientôt chip. Le Maître. No route yet. |
+| Coaching | `/coaching` | Route TBD |
 
-### À propos
+**Right -- auth-conditional:**
 
-| Path | Purpose | Status |
-|---|---|---|
-| `/a-propos` | Founder, methodology, and credentials. Coaching enquiries link out to Preply. No internal booking surface. | live |
-
-### Examens
-
-Exam landings share one template. TCF is the first exam lit. All others render bientôt.
-
-| Path | Purpose | Status |
-|---|---|---|
-| `/examens` | Exam hub. All supported exams listed with their live or bientôt state. | bientôt |
-| `/examens/tcf` | TCF exam landing. Primary SEO target. Covers TCF Canada, Québec, DAP, and Naturalisation variants. | live |
-| `/examens/tef` | TEF exam landing. | bientôt |
-| `/examens/dalf` | DALF exam landing (C1 and C2). | bientôt |
-| `/examens/delf` | DELF exam landing (A1 through B2). | bientôt |
-| `/examens/general` | General French proficiency, non-exam intent. | bientôt |
-
-### Les Pièges Anglais (SEO library)
-
-The growth engine. Each page targets a specific anglicism, false cognate, or structural interference pattern. Programmatic generation; each article also links into /ile for practice.
-
-| Path | Purpose | Status |
-|---|---|---|
-| `/pieges` | Pièges index. Browse by category, search by interference pattern. | bientôt |
-| `/pieges/[slug]` | Individual pièges article. SEO-targeted, contextual link to the corresponding île activity. | live |
-
-### Blog
-
-| Path | Purpose | Status |
-|---|---|---|
-| `/blog` | Blog index. Authored and programmatic content. | live |
-| `/blog/[slug]` | Individual post. | live |
-
-### Resources
-
-| Path | Purpose | Status |
-|---|---|---|
-| `/faq` | Frequently asked questions. | live |
-| `/tarifs` | Pricing. Single plan, no tier ladder. | live |
-| `/contact` | Contact form. Submits to founder inbox via Postmark (or mailto fallback until Phase 4 wires Postmark). Public. | live |
-| `/aide` | Help center hub. MDX-backed, distinct from /faq (faq = short answers, aide = depth). Public. Nav: StickyHeader. | live |
-| `/aide/[slug]` | Individual help article. Sections: getting started, method explainer, exam coverage, technical setup, account and billing. Public. | live |
-
-### Outils (public tools, no auth)
-
-| Path | Purpose | Status |
-|---|---|---|
-| `/outils/clb` | Free CLB/TCF score calculator. Lead magnet. User enters section scores, gets CLB equivalents, optional email capture. SEO-optimized. No auth required. Nav: StickyHeader. | live |
-
-### La Librairie
-
-The public digital book store. Sells the Book-Lab French catalog (books, audio, downloads, and free resources) through LemonSqueezy. Digital products only. Note: /librairie (the public store) is distinct from /la-bibliotheque (the in-app vocabulary product for authenticated learners). These are two separate surfaces with separate purposes.
-
-| Path | Purpose | Status |
-|---|---|---|
-| `/librairie` | Book store hub. Four categories: Livres, Audio, Téléchargements, Ressources gratuites. LemonSqueezy-backed. | bientôt |
-| `/librairie/livres` | Books from the Book-Lab French catalog. | bientôt |
-| `/librairie/audio` | Audio packs from the Book-Lab French catalog. | bientôt |
-| `/librairie/telechargements` | Digital downloads from the Book-Lab French catalog. | bientôt |
-| `/librairie/ressources-gratuites` | Free resources, email-gated lead magnets. | bientôt |
-| `/librairie/[item-slug]` | Individual product page. | bientôt |
-
-### Search
-
-| Path | Purpose | Status |
-|---|---|---|
-| `/recherche` | Search results page. Full-text search across pièges, îles, blog posts, and bibliothèque entries. Authenticated. Nav: TopNav. | live |
-
-### Programmatic SEO
-
-| Path | Purpose | Status |
-|---|---|---|
-| `/[seo]` | Programmatic landing pages. CLB calculator, exam-prep intent clusters, keyword-targeted entry points. Served in French and English via hreflang. | live |
-
-### Legal
-
-| Path | Purpose | Status |
-|---|---|---|
-| `/mentions-legales` | Legal notices. | live |
-| `/confidentialite` | Privacy policy. | live |
-| `/cgv` | General terms of sale. | live |
+| State | Items |
+|---|---|
+| Unauthenticated | Pricing → `/tarifs`, Log in → `/connexion`, Start Free → `/inscription` |
+| Authenticated | ThemeToggle, avatar dropdown (Profile, Settings, Account, About, Sign out) |
 
 ---
 
-## Auth
+## Public / Marketing (TopNav hidden)
 
-| Path | Purpose | Status |
+| Route | Surface | Status |
 |---|---|---|
-| `/inscription` | Account creation. hCaptcha gated. | live |
-| `/connexion` | Sign in. | live |
+| `/` | TCF Canada landing | live |
+| `/fr` | French-language landing | live |
+| `/tarifs` | Pricing | live |
+| `/a-propos` | About | live |
+| `/faq` | FAQ | live |
+| `/blog` | Blog index | live |
+| `/blog/:slug` | Blog post | live |
+| `/examens` | Exams hub | live |
+| `/librairie` | Public book store (LemonSqueezy) | live |
+| `/library` | Library stub | live |
+| `/pieges` | Les Pièges Anglais index | live |
+| `/pieges/:slug` | Individual Pièges article | live |
+| `/mentions-legales` | Legal notices | live |
+| `/confidentialite` | Privacy policy | live |
+| `/cgv` | Terms of sale | live |
+| `/refund` | Refund policy | live |
 
 ---
 
-## Onboarding
+## Auth / Conversion (TopNav hidden)
 
-Post-signup setup sequence. Establishes the Target Profile (exam, threshold, deadline, persona) that overlays the exam-agnostic spine. Feeds all /carte widgets.
-
-| Path | Purpose | Status |
+| Route | Surface | Status |
 |---|---|---|
-| `/bienvenue` | Target Profile setup. Exam selection, CEFR self-assessment, exam date, daily target. | live |
-| `/maitre/diagnostic` | Initial diagnostic with Le Maître. Establishes a baseline across all four skills before the first séance. | live |
+| `/connexion` | Log in | live |
+| `/inscription` | Sign up (hCaptcha gated) | live |
+| `/onboarding` | Onboarding flow (6 steps) | live |
+| `/paywall` | Paywall | live |
+| `/password-reset` | Password reset | live |
+| `/bienvenue` | Welcome / post-onboarding | live |
 
 ---
 
-## La Méthode (authenticated)
+## Product surfaces (TopNav visible)
 
-The core learning loop. All surfaces are present. Unbuilt surfaces render bientôt per the pattern above.
+### Vocabulary -- /la-methode
 
-### La Carte (hub home)
-
-| Path | Purpose | Status |
+| Route | Surface | Status |
 |---|---|---|
-| `/carte` | The Atlas. Hub home. Exam countdown, streak, next séance, entrance to every surface. | live |
+| `/la-methode` | Lesson list (public, no auth gate) | live |
+| `/la-methode/:id` | Lesson detail (auth gated) | live |
+| `/cluster/:id` | Cluster view | live |
+| `/learn/:id` | Learn session | live |
 
-### La Séance
+### Exams -- /l-examen
 
-| Path | Purpose | Status |
+| Route | Surface | Exam | Status |
+|---|---|---|---|
+| `/l-examen` | L'Examen hub | TCF | live |
+| `/l-examen/diagnostic` | Diagnostic landing | TCF | live |
+| `/l-examen/diagnostic/tache/:n` | Diagnostic tâche | TCF | live |
+| `/l-examen/expression-orale` | Oral expression hub | TCF | live |
+| `/l-examen/expression-orale/tache1/:topic` | Oral tâche 1 | TCF | live |
+| `/l-examen/expression-orale/tache2/:scenario` | Oral tâche 2 | TCF | live |
+| `/l-examen/expression-orale/tache3/:topic` | Oral tâche 3 | TCF | live |
+| `/l-examen/expression-orale/feedback/:session` | Oral feedback | TCF | live |
+| `/l-examen/expression-ecrite` | Written expression hub | TCF | live |
+| `/l-examen/expression-ecrite/:id` | Written prompt | TCF | live |
+| `/l-examen/expression-ecrite/history` | Written history | TCF | live |
+| `/l-examen/comprehension-orale` | Oral comprehension | TCF | live |
+| `/l-examen/comprehension-ecrite` | Written comprehension | TCF | live |
+| `/l-examen/mock` | Mock exam | TCF | live |
+
+### Library -- /la-bibliotheque
+
+| Route | Surface | Status |
 |---|---|---|
-| `/seance` | Daily séance launcher. Surfaces the next recommended activity based on Target Profile and progression state. | bientôt |
+| `/la-bibliotheque` | Vocabulary library index | live |
+| `/la-bibliotheque/:slug` | Library resource / practice | live |
 
-### Les Îles (learning islands)
+### Real French (bientôt)
 
-An île is a self-contained unit anchored to one segment of the 5-couche spine: Le Propos, Le Plan, La Construction, Les Pièges Anglais, La Musique. Each île contains activities and a scored tâche. The tâche surfaces are live from the start; île navigation and activity lists are bientôt.
+Phase 3 surface. Route TBD.
 
-| Path | Purpose | Status |
+### AI Tutor (bientôt)
+
+Le Maître (ElevenLabs Chadi-clone). Route TBD.
+
+### Coaching
+
+| Route | Surface | Status |
 |---|---|---|
-| `/ile/[id]` | Île home. Overview of its couche, activity list, and current progression. | bientôt |
-| `/ile/[id]/activites` | Activity list for this île. Vocabulary, listening, and reading practice anchored to the couche. | bientôt |
-| `/ile/[id]/tache` | Oral or written tâche for this île. Scored by Le Maître. | live |
-
-### Le Maître (AI tutor)
-
-Le Maître is the unified tutor persona (ElevenLabs voice). It scores tâches, conducts the diagnostic, and leads conversation practice. AI-led vocabulary drilling is absorbed here rather than split across surfaces.
-
-| Path | Purpose | Status |
-|---|---|---|
-| `/maitre` | Le Maître hub. Conversation entry, session history, pronunciation work. | bientôt |
-
-### La Bibliothèque
-
-| Path | Purpose | Status |
-|---|---|---|
-| `/bibliotheque` | Vocabulary chunk library. Browse, practice, and test modes. | live |
-| `/bibliotheque/[id]` | Individual chunk or topic page. | bientôt |
-
-### L'Examen
-
-Unified exam-format practice hub across all four skills. Oral expression and written expression are accessible via /ile/[id]/tache. Oral and written comprehension practice render bientôt until content is uploaded.
-
-| Path | Purpose | Status |
-|---|---|---|
-| `/examen` | Exam-format practice hub. All four skills listed with live or bientôt state. | live |
-| `/examen/[checkpoint]` | Checkpoint session: a timed, scored sequence across one or more skills. Full timed TCF mock (four sections, total timer, section timers, submit, aggregated scoring) when F-376 ships. | bientôt (live with F-376) |
-
-### L'École (bientôt)
-
-Structured courses anchored to the 5-couche spine. The spine exists; course content uploads complete the surface.
-
-| Path | Purpose | Status |
-|---|---|---|
-| `/ecole` | Course catalog. | bientôt |
-| `/ecole/[id]` | Individual course: lessons, glossary, audio, notes. | bientôt |
-
-### La Progression
-
-| Path | Purpose | Status |
-|---|---|---|
-| `/progression` | Progress dashboard. CEFR level, CLB mapping, per-skill breakdown, streak, history. | bientôt |
+| `/coaching` | Coaching hub | tbd |
 
 ---
 
-## Account
+## Product surfaces (app shell, no TopNav)
 
-| Path | Purpose | Status |
+These routes are wrapped by the (app) route group with its sidebar shell. They
+do not show the TopNav.
+
+| Route | Surface | Status |
 |---|---|---|
-| `/profil` | Account overview and personal information. Includes recording management (replay, download, delete per F-374). | live |
-| `/parametres` | Display, audio, and notification preferences. | bientôt |
-| `/abonnement` | Subscription management. | bientôt |
-| `/notifications` | In-app notifications list. Full page view; mark-as-read; types: dispute response, payment receipt, content updates, milestones. Authenticated. Nav: TopNav. | live |
-
-## Internal
-
-Internal surfaces not in the public navigation. Accessed only by the founder.
-
-| Path | Purpose | Status |
-|---|---|---|
-| `/admin` | Admin dashboard (founder-only, gated to founder email). Surfaces: users list (filter, search, impersonate), revenue (LemonSqueezy data), content health, dispute queue, support inbox, telemetry summary. No StickyHeader or TopNav; its own minimal chrome. | live |
+| `/tableau-de-bord` | Dashboard (streak, daily target, progress widgets) | live |
+| `/seance` | Séance player | live |
+| `/ile` | Learning island | live |
+| `/carte` | Atlas hub | live |
+| `/cours/:id` | Cours detail | live |
+| `/progression` | Progress overview | live |
+| `/profil` | Profile and account info | live |
+| `/parametres` | Settings | live |
+| `/abonnement` | Subscription management | live |
+| `/progres` | Progress detail | live |
 
 ---
 
-## Cross-references
+## Dev / Internal
 
-- **PRODUCT.md**, vision, positioning, audience, product systems, 5-couche, pricing
-- **DESIGN.md v2**, Atelier Français visual system, color tokens, typography, wordmark spec
-- **BACKLOG.md** (per repo), tickets including deviation-driven actions
+| Route | Surface | Notes |
+|---|---|---|
+| `/dev` | Dev utilities | Dev only |

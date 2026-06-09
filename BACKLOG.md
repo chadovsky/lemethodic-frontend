@@ -6516,3 +6516,11 @@ stale hrefs (/dashboard, /la-bibliotheque, /l-examen, /cours/methode-tcf-canada)
 
 **Acceptance:** build green · unit 466/466 · e2e 113 passed, 0 failed.
 
+## F-441 -- FE: TopNav + SITEMAP rebuild to locked IA
+
+**Status:** Shipped (9dca1bf)
+
+**Scope:** TopNav.tsx rebuilt to locked F-441 IA. English benefit labels. Nav items in order: Vocabulary (/la-methode), Exams (dropdown: TCF live, DELF bientôt, French for Business bientôt) (/l-examen), Library (/la-bibliotheque), Real French (bientôt chip), AI Tutor (bientôt chip), Coaching (/coaching). Right side: unauthenticated shows Pricing/Log in/Start Free; authenticated shows ThemeToggle + avatar dropdown (unchanged). Language toggle removed from nav. Nav now renders for unauthenticated visitors on product routes (was token-gated; hydrate() moved to TopNav to work on (shell) routes). SITEMAP.md rebuilt at FE root to match IA. Les Pièges removed from nav. E2e: f-441.spec.ts (1440 + 375 screenshots, Exams dropdown interaction, bientôt chips).
+
+**Acceptance:** build green · unit 466/466 · e2e 735 passed, 1 pre-existing flake (landing-hero mobile), 0 F-441 failures.
+
