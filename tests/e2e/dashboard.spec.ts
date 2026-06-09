@@ -86,6 +86,24 @@ async function setupDashboardRoutes(page: Parameters<typeof page.route>[0]) {
       }),
     })
   })
+
+  // F-444: activity calendar endpoint feeds CalendarWidget
+  await page.route('**/api/users/me/activity-calendar*', (route) => {
+    const today = new Date().toISOString().slice(0, 10)
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        current_streak: 3,
+        longest_streak: 7,
+        today_count: 15,
+        today_target: 30,
+        days: [
+          { date: today, count: 15, target_met: false },
+        ],
+      }),
+    })
+  })
 }
 
 test.describe('Dashboard — desktop (1280×800)', () => {

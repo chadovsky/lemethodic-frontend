@@ -39,7 +39,9 @@ export default function Dashboard() {
           onPatchTarget={handlePatchTarget}
         />
         <NextLessonWidget />
-        <CalendarWidget />
+        <div className="fp-dashboard-calendar">
+          <CalendarWidget />
+        </div>
       </div>
     </div>
   )

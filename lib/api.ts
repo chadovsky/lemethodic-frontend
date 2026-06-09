@@ -38,6 +38,7 @@ import type {
   UiLanguage,
   User,
   UserProgress,
+  ActivityCalendar,
   UserClusterStateResponse,
   WritingJob,
   WritingPrompt,
@@ -382,6 +383,35 @@ function mapUserProgress(raw: RawUserProgress): UserProgress {
     dailyTargetMinutes: raw.daily_target_minutes,
     tacheAttempts: raw.tache_attempts,
     lastCoucheSignals: raw.last_couche_signals,
+  }
+}
+
+// F-444 — activity calendar raw shape (snake_case → camelCase via mapper below)
+interface RawActivityCalendarDay {
+  date: string
+  count: number
+  target_met: boolean
+}
+
+interface RawActivityCalendar {
+  current_streak: number
+  longest_streak: number
+  today_count: number
+  today_target: number
+  days: RawActivityCalendarDay[]
+}
+
+function mapActivityCalendar(raw: RawActivityCalendar): ActivityCalendar {
+  return {
+    currentStreak: raw.current_streak,
+    longestStreak: raw.longest_streak,
+    todayCount: raw.today_count,
+    todayTarget: raw.today_target,
+    days: raw.days.map((d) => ({
+      date: d.date,
+      count: d.count,
+      targetMet: d.target_met,
+    })),
   }
 }
 
@@ -1017,6 +1047,14 @@ export const api = {
         body,
       })
       return mapUserProgress(raw)
+    },
+
+    // F-444 — 90-day activity calendar. Auth-required.
+    async getActivityCalendar(days = 90): Promise<ActivityCalendar> {
+      const raw = await request<RawActivityCalendar>(
+        `/api/users/me/activity-calendar?days=${days}`,
+      )
+      return mapActivityCalendar(raw)
     },
 
     // P-220 — superseded by api.onboarding.submit. The legacy

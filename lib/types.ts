@@ -65,6 +65,23 @@ export interface UserProgress {
   lastCoucheSignals: Record<string, unknown>
 }
 
+// ── Activity Calendar (F-444) ────────────────────────────────────────────
+// GET /api/users/me/activity-calendar?days=90
+
+export interface ActivityCalendarDay {
+  date: string
+  count: number
+  targetMet: boolean
+}
+
+export interface ActivityCalendar {
+  currentStreak: number
+  longestStreak: number
+  todayCount: number
+  todayTarget: number
+  days: ActivityCalendarDay[]
+}
+
 // ── Lessons (L'École) ───────────────────────────────────────────────────
 
 export type LessonStatus = 'locked' | 'unlocked' | 'in_progress' | 'completed'

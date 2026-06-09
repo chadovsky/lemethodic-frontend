@@ -1147,6 +1147,10 @@
 @media (min-width: 1440px) {
   .dashboard-grid { grid-template-columns: repeat(4, 1fr); }
 }
+/* F-444 — CalendarWidget spans full width at ≥640px so the heatmap has room */
+@media (min-width: 640px) {
+  .fp-dashboard-calendar { grid-column: 1 / -1; }
+}
 /* MOCK-007 — mobile bottom separator between stacked widgets */
 @media (max-width: 639px) {
   .dashboard-grid > * {
