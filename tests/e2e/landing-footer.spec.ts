@@ -30,7 +30,7 @@ test.describe('Landing footer — desktop (1280×800)', () => {
   test('sticky header is visible after scrolling to bottom', async ({ page }) => {
     await page.goto('/')
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
-    await expect(page.getByTestId('sticky-header')).toBeVisible()
+    await expect(page.getByTestId('topnav-desktop')).toBeVisible()
   })
 })
 
@@ -46,6 +46,6 @@ test.describe('Landing footer — mobile (375×667)', () => {
 
   test('sticky header is visible on load', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByTestId('sticky-header')).toBeVisible()
+    await expect(page.getByTestId('topnav-mobile')).toBeVisible()
   })
 })

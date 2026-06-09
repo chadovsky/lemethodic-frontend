@@ -248,7 +248,8 @@ export default function TopNav() {
     <>
     <nav
       aria-label="Primary"
-      className="hidden md:flex"
+      data-testid="topnav-desktop"
+      className={`hidden md:flex${scrolled ? ' sticky-header--scrolled' : ''}`}
       style={{
         position: 'sticky',
         top: 0,

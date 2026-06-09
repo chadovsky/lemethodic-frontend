@@ -79,7 +79,8 @@ test.describe('F-445 -- Landing nav (unauthenticated, desktop 1440)', () => {
 
   test('framed wordmark is present in the nav', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByTestId('wordmark')).toBeVisible()
+    const nav = page.getByRole('navigation', { name: 'Primary' })
+    await expect(nav.getByTestId('wordmark')).toBeVisible()
   })
 
   test('StickyHeader does not render on landing page', async ({ page }) => {

@@ -29,7 +29,7 @@ test.describe('Landing hero — desktop (1280×800)', () => {
   // MOCK-001 — Sticky header scroll state
   test('header gains solid background after scrolling 80px', async ({ page }) => {
     await page.goto('/')
-    const header = page.getByTestId('sticky-header')
+    const header = page.getByTestId('topnav-desktop')
     await expect(header).not.toHaveClass(/sticky-header--scrolled/)
     // Ensure page is tall enough, then scroll past the >60px threshold
     await page.evaluate(() => {
