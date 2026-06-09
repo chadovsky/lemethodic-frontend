@@ -50,3 +50,7 @@ t5-dark-mode-gallery/
 # M0 audit auth state — contains JWT, never commit
 audit-auth.json
 audit-auth-verified.json
+
+# Auto-generated audit artifacts -- re-written every dispatch, never commit
+docs/audit-screenshots/
+e2e-results.txt

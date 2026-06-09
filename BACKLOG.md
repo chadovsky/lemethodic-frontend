@@ -6524,3 +6524,11 @@ stale hrefs (/dashboard, /la-bibliotheque, /l-examen, /cours/methode-tcf-canada)
 
 **Acceptance:** build green · unit 466/466 · e2e 735 passed, 1 pre-existing flake (landing-hero mobile), 0 F-441 failures.
 
+## F-442 -- chore: untrack auto-generated audit artifacts
+
+**Status:** Shipped
+
+**Scope:** `git rm --cached` all PNGs under `docs/audit-screenshots/` (587 files) and `e2e-results.txt`. Both paths added to `.gitignore`. These are re-written by the m0-audit Playwright spec and the e2e runner on every dispatch and had no business being tracked. `tests/screenshots/` and `tests/traces/` (F-225 deliberate artifacts) are untouched.
+
+**Non-visual change:** no source code changed.
+
