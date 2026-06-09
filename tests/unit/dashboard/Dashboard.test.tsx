@@ -54,6 +54,14 @@ vi.mock('@/lib/api', () => ({
         lastCoucheSignals: {},
       }),
       patchProgress: vi.fn(),
+      // F-444 — activity calendar mock
+      getActivityCalendar: vi.fn().mockResolvedValue({
+        currentStreak: 3,
+        longestStreak: 7,
+        todayCount: 15,
+        todayTarget: 30,
+        days: [],
+      }),
     },
   },
 }))
@@ -92,6 +100,9 @@ describe('Dashboard', () => {
     ).toBeInTheDocument()
     expect(
       screen.getByRole('heading', { level: 2, name: /prochaine leçon/i }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 2, name: /activité/i }),
     ).toBeInTheDocument()
   })
 
