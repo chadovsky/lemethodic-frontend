@@ -44,8 +44,6 @@ const EXCLUDED_PREFIXES = [
 ] as const
 
 const EXCLUDED_EXACT: ReadonlySet<string> = new Set([
-  '/',
-  '/fr',
   '/library',
   '/fr/library',
 ])
@@ -181,6 +179,7 @@ export default function TopNav() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [examsOpen, setExamsOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement | null>(null)
   const examsRef = useRef<HTMLLIElement | null>(null)
 
@@ -221,6 +220,9 @@ export default function TopNav() {
     return () => document.removeEventListener('mousedown', onClick)
   }, [examsOpen])
 
+  // Close mobile menu on route change.
+  useEffect(() => { setMobileOpen(false) }, [pathname])
+
   if (shouldHideOn(pathname)) return null
   // Wait for auth store hydration to avoid a flash of wrong right-side state.
   if (!hydrated) return null
@@ -238,7 +240,12 @@ export default function TopNav() {
     router.push('/')
   }
 
+  // Landing page (/ and /fr): show a mobile header since there is no AppShell topbar
+  // or BottomNav on public marketing routes.
+  const isLanding = pathname === '/' || pathname === '/fr'
+
   return (
+    <>
     <nav
       aria-label="Primary"
       className="hidden md:flex"
@@ -650,5 +657,215 @@ export default function TopNav() {
         </div>
       </div>
     </nav>
+
+    {/* Mobile header — landing page only. Product routes have AppShell topbar + BottomNav. */}
+    {isLanding && (
+      <>
+        <header
+          data-testid="topnav-mobile"
+          className="flex md:hidden"
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 50,
+            height: 64,
+            backgroundColor: scrolled ? 'var(--lm-bg-blur)' : ED_BG,
+            backdropFilter: scrolled ? 'blur(12px)' : 'none',
+            WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
+            borderBottom: scrolled ? `1px solid ${ED_RULE}` : '1px solid transparent',
+            transition: 'background-color var(--lm-duration-hover) var(--lm-ease-spring), border-color var(--lm-duration-hover) var(--lm-ease-spring)',
+            alignItems: 'center',
+            width: '100%',
+          }}
+        >
+          <div
+            style={{
+              width: '100%',
+              padding: '0 clamp(20px, 5vw, 40px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              height: '100%',
+            }}
+          >
+            <Wordmark size="nav" href="/la-methode" />
+            <button
+              type="button"
+              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileOpen}
+              aria-controls="topnav-mobile-nav"
+              onClick={() => setMobileOpen((v) => !v)}
+              style={{
+                width: 44,
+                height: 44,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                color: ED_FG,
+                borderRadius: 4,
+                padding: 0,
+              }}
+            >
+              {mobileOpen ? (
+                <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+                  <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" d="M2 2l14 14M16 2L2 16" fill="none" />
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                  <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" d="M3 6h14M3 10h14M3 14h14" fill="none" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </header>
+
+        {mobileOpen && (
+          <nav
+            id="topnav-mobile-nav"
+            aria-label="Primary mobile"
+            className="md:hidden"
+            style={{
+              position: 'fixed',
+              top: 64,
+              left: 0,
+              right: 0,
+              zIndex: 49,
+              backgroundColor: 'var(--lm-bg-surface)',
+              borderBottom: `1px solid ${ED_RULE}`,
+              padding: '8px 0 20px',
+              fontFamily: SANS,
+            }}
+          >
+            {NAV_ITEMS.map((item) => {
+              if (item.bientot) {
+                return (
+                  <div
+                    key={item.key}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '12px clamp(20px, 5vw, 40px)',
+                      fontSize: 16,
+                      fontWeight: 500,
+                      color: ED_FG_SOFT,
+                      opacity: 0.65,
+                    }}
+                  >
+                    {item.label}
+                    <BientotChip />
+                  </div>
+                )
+              }
+              // Exams: flat link to /l-examen on mobile (no nested dropdown).
+              return (
+                <a
+                  key={item.key}
+                  href={item.href ?? '/l-examen'}
+                  onClick={() => setMobileOpen(false)}
+                  style={{
+                    display: 'block',
+                    padding: '12px clamp(20px, 5vw, 40px)',
+                    fontSize: 16,
+                    fontWeight: 500,
+                    color: ED_FG,
+                    textDecoration: 'none',
+                    letterSpacing: '0.01em',
+                  }}
+                >
+                  {item.label}
+                </a>
+              )
+            })}
+            <hr style={{ margin: '12px clamp(20px, 5vw, 40px)', border: 'none', borderTop: `1px solid ${ED_RULE}` }} />
+            {token ? (
+              <>
+                {(['profile', 'settings', 'account', 'about'] as const).map((section) => (
+                  <a
+                    key={section}
+                    href={
+                      section === 'profile' ? '/profil' :
+                      section === 'settings' ? '/parametres' :
+                      section === 'account' ? '/abonnement' :
+                      '/a-propos'
+                    }
+                    onClick={() => setMobileOpen(false)}
+                    style={{
+                      display: 'block',
+                      padding: '12px clamp(20px, 5vw, 40px)',
+                      fontSize: 16,
+                      fontWeight: 500,
+                      color: ED_FG,
+                      textDecoration: 'none',
+                    }}
+                  >
+                    {menuCopy[section]}
+                  </a>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => { setMobileOpen(false); handleLogout() }}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    textAlign: 'left',
+                    padding: '12px clamp(20px, 5vw, 40px)',
+                    fontSize: 16,
+                    fontWeight: 500,
+                    color: 'var(--lm-error)',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontFamily: SANS,
+                  }}
+                >
+                  {menuCopy.logout}
+                </button>
+              </>
+            ) : (
+              <>
+                <a
+                  href="/tarifs"
+                  onClick={() => setMobileOpen(false)}
+                  style={{ display: 'block', padding: '12px clamp(20px, 5vw, 40px)', fontSize: 16, fontWeight: 500, color: ED_FG, textDecoration: 'none' }}
+                >
+                  Pricing
+                </a>
+                <a
+                  href="/connexion"
+                  onClick={() => setMobileOpen(false)}
+                  style={{ display: 'block', padding: '12px clamp(20px, 5vw, 40px)', fontSize: 16, fontWeight: 500, color: ED_FG, textDecoration: 'none' }}
+                >
+                  Log in
+                </a>
+                <div style={{ padding: '8px clamp(20px, 5vw, 40px) 4px' }}>
+                  <a
+                    href="/inscription"
+                    onClick={() => setMobileOpen(false)}
+                    style={{
+                      display: 'block',
+                      padding: '12px 20px',
+                      backgroundColor: ED_FG,
+                      color: 'var(--lm-bg-base)',
+                      fontFamily: SANS,
+                      fontWeight: 600,
+                      fontSize: 15,
+                      textDecoration: 'none',
+                      borderRadius: 4,
+                      textAlign: 'center',
+                    }}
+                  >
+                    Start Free
+                  </a>
+                </div>
+              </>
+            )}
+          </nav>
+        )}
+      </>
+    )}
+    </>
   )
 }
