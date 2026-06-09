@@ -6526,7 +6526,7 @@ stale hrefs (/dashboard, /la-bibliotheque, /l-examen, /cours/methode-tcf-canada)
 
 ## F-444 — CalendarWidget + today-vs-target bar (FE)
 
-**Status:** In Progress
+**Status:** Shipped (141464a — pre-squash, feature branch feat/f-444-calendar-widget)
 
 **Scope:** Wire `GET /api/users/me/activity-calendar?days=90` into the `/dashboard` (`/tableau-de-bord`) page. Three new UI pieces all inside `CalendarWidget.tsx`:
 1. **Contribution-graph heatmap** — 90-day rolling window, 7 rows × ~13 week-columns, navy-ink intensity levels (5 steps: 0 = ink-trace, 1-4 = dominant at 18/38/62/100% opacity), target-met cells ringed in vermillion (`--accent`), today cell outlined in dominant.
@@ -6536,6 +6536,8 @@ stale hrefs (/dashboard, /la-bibliotheque, /l-examen, /cours/methode-tcf-canada)
 API layer: `ActivityCalendar` / `ActivityCalendarDay` types added to `lib/types.ts`; `RawActivityCalendar` raw shape + `mapActivityCalendar` mapper + `api.users.getActivityCalendar(days)` method added to `lib/api.ts`. `CalendarWidget` still self-fetches (keeps `Dashboard.tsx` clean). `fp-dashboard-calendar` CSS class spans full width at ≥640px so the heatmap has room. `localDateStr` helper avoids UTC/local-midnight timezone bugs in grid construction.
 
 Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, current streak, longest streak, today count label, heatmap grid, today-cell marker, error state, zero-activity new-user). `Dashboard.test.tsx` updated with `getActivityCalendar` mock + "Activité" heading assertion. E2e: `f-444.spec.ts` (desktop 1440 + mobile 375: grid render, streak values, today bar, zero-activity, graceful error, no overflow, F-225 screenshots).
+
+**Acceptance:** build green · unit 475/475 · e2e f-444.spec.ts 14/14 passed.
 
 ## F-442 -- chore: untrack auto-generated audit artifacts
 
