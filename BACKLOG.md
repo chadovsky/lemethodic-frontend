@@ -6553,7 +6553,9 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 **Start Free destination:** `/inscription` (existing signup route -- no new route invented).
 
-**Acceptance:** build green · unit TBD · e2e f-445.spec.ts TBD.
+**Fix (b35902f):** `data-testid="topnav-desktop"` + `sticky-header--scrolled` class added to the desktop nav; tests repointed from removed `sticky-header` testid to `topnav-desktop`/`topnav-mobile`; wordmark assertion scoped within `nav[aria-label=Primary]` to avoid strict-mode double-match.
+
+**Acceptance:** build green · unit 490/490 · e2e f-445.spec.ts 36/36 passed (confirmed locally; awaiting CI green before squash-merge).
 
 ---
 
