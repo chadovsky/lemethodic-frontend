@@ -24,7 +24,7 @@ describe('StickyHeader', () => {
   })
 
   it('renders on marketing paths', () => {
-    mockUsePathname.mockReturnValue('/')
+    mockUsePathname.mockReturnValue('/tarifs')
     render(<StickyHeader />)
     expect(screen.getByTestId('sticky-header')).toBeInTheDocument()
   })
@@ -36,7 +36,7 @@ describe('StickyHeader', () => {
   })
 
   it('renders logo link and Sign in link', () => {
-    mockUsePathname.mockReturnValue('/')
+    mockUsePathname.mockReturnValue('/tarifs')
     render(<StickyHeader />)
     expect(screen.getByTestId('wordmark')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /sign in/i })).toBeInTheDocument()
@@ -44,13 +44,13 @@ describe('StickyHeader', () => {
 
   // MOCK-001 — scroll-state class
   it('does not have scrolled class at scrollY=0', () => {
-    mockUsePathname.mockReturnValue('/')
+    mockUsePathname.mockReturnValue('/tarifs')
     render(<StickyHeader />)
     expect(screen.getByTestId('sticky-header')).not.toHaveClass('sticky-header--scrolled')
   })
 
   it('gains sticky-header--scrolled class when scrollY > 60', async () => {
-    mockUsePathname.mockReturnValue('/')
+    mockUsePathname.mockReturnValue('/tarifs')
     render(<StickyHeader />)
     await act(async () => {
       Object.defineProperty(window, 'scrollY', { value: 80, configurable: true })
@@ -60,7 +60,7 @@ describe('StickyHeader', () => {
   })
 
   it('loses scrolled class when scrollY returns to 0', async () => {
-    mockUsePathname.mockReturnValue('/')
+    mockUsePathname.mockReturnValue('/tarifs')
     render(<StickyHeader />)
     await act(async () => {
       Object.defineProperty(window, 'scrollY', { value: 80, configurable: true })
@@ -74,7 +74,7 @@ describe('StickyHeader', () => {
   })
 
   it('does not gain scrolled class at exactly scrollY=60', async () => {
-    mockUsePathname.mockReturnValue('/')
+    mockUsePathname.mockReturnValue('/tarifs')
     render(<StickyHeader />)
     await act(async () => {
       Object.defineProperty(window, 'scrollY', { value: 60, configurable: true })

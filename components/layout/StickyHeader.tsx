@@ -6,12 +6,10 @@ import Link from 'next/link'
 import { SANS_FONT } from '@/lib/typography'
 import Wordmark from '@/components/Wordmark'
 
-// Mirror the TopNav exclusion list — StickyHeader shows exactly where
-// the in-product TopNav hides. These sets should stay in sync as new
-// marketing / legal surfaces are added.
+// StickyHeader shows on marketing / legal paths that are NOT the landing page.
+// '/' and '/fr' are handled by TopNav (F-445: landing nav IA migration).
+// Keep in sync with TopNav EXCLUDED_PREFIXES when adding new marketing surfaces.
 const MARKETING_EXACT: ReadonlySet<string> = new Set([
-  '/',
-  '/fr',
   '/library',
   '/fr/library',
 ])

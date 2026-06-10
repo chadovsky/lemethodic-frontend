@@ -6539,6 +6539,26 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 **Acceptance:** build green · unit 475/475 · e2e f-444.spec.ts 14/14 passed.
 
+## F-445 -- FE: Landing/marketing header migration to locked IA
+
+**Status:** In progress (feat/f-445-landing-nav-ia)
+
+**Scope:** Converge the logged-out landing page header with the shared TopNav (F-441 locked IA).
+
+- `components/nav/TopNav.tsx`: removed `'/'` and `'/fr'` from `EXCLUDED_EXACT` so TopNav renders on the landing page. Added mobile section (`isLanding` guard: `pathname === '/' || pathname === '/fr'`) -- a `<header data-testid="topnav-mobile">` + collapsible `<nav aria-label="Primary mobile">` drawer that mirrors the locked IA nav items (Vocabulary/Exams/Library/Real French bientôt/AI Tutor bientôt/Coaching) + Pricing/Log in/Start Free when unauthenticated. Exams is a flat link to /l-examen on mobile (no nested dropdown).
+- `components/layout/StickyHeader.tsx`: removed `'/'` and `'/fr'` from `MARKETING_EXACT` -- StickyHeader no longer renders on the landing page; TopNav owns it.
+- `tests/unit/layout/StickyHeader.test.tsx` + `tests/unit/landing/StickyHeader.test.tsx`: updated path from `'/'` to `'/tarifs'` (still a valid marketing path).
+- `tests/unit/nav/TopNav.test.tsx` (new): 16 unit tests covering unauthenticated nav items, auth-conditional right side, excluded routes, mobile header guard (landing vs product routes), hydration gate.
+- `tests/e2e/f-445.spec.ts` (new): desktop 1440 + mobile 375 -- full-IA nav visible, Start Free /inscription, Pricing /tarifs, Log in /connexion, Les Pièges absent, wordmark present, StickyHeader absent, Exams dropdown, no overflow. F-225 screenshots: `f-445-landing-1440.png` + `f-445-landing-375.png`.
+
+**Start Free destination:** `/inscription` (existing signup route -- no new route invented).
+
+**Fix (b35902f):** `data-testid="topnav-desktop"` + `sticky-header--scrolled` class added to the desktop nav; tests repointed from removed `sticky-header` testid to `topnav-desktop`/`topnav-mobile`; wordmark assertion scoped within `nav[aria-label=Primary]` to avoid strict-mode double-match.
+
+**Acceptance:** build green · unit 490/490 · e2e f-445.spec.ts 36/36 passed (confirmed locally; awaiting CI green before squash-merge).
+
+---
+
 ## F-442 -- chore: untrack auto-generated audit artifacts
 
 **Status:** Shipped
