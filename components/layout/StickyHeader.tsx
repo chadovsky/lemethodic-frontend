@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { SANS_FONT } from '@/lib/typography'
 import Wordmark from '@/components/Wordmark'
+import CartButton from '@/components/store/CartButton'
 
 // StickyHeader shows on marketing / legal paths that are NOT the landing page.
 // '/' and '/fr' are handled by TopNav (F-445: landing nav IA migration).
@@ -68,6 +69,12 @@ export default function StickyHeader() {
   useEffect(() => { setMenuOpen(false) }, [pathname])
 
   if (!isMarketingPath(pathname)) return null
+
+  // F-448 — the store has no TopNav/sidebar chrome (TopNav excludes
+  // /librairie; the route is outside the authed shell group). StickyHeader
+  // renders on /librairie for both auth states, so it carries the cart while
+  // shopping. Scoped to /librairie so other marketing surfaces are untouched.
+  const isStore = pathname === '/librairie' || pathname.startsWith('/librairie/')
 
   return (
     <>
@@ -153,9 +160,15 @@ export default function StickyHeader() {
             >
               Sign in
             </Link>
+            {isStore && <CartButton variant="icon" testId="store-cart-button" />}
           </div>
 
-          {/* Mobile: hamburger / close toggle */}
+          {/* Mobile: cart (store only) + hamburger / close toggle */}
+          {isStore && (
+            <div className="md:hidden" style={{ marginLeft: 'auto', marginRight: 4 }}>
+              <CartButton variant="icon" testId="store-cart-button-mobile" />
+            </div>
+          )}
           <button
             type="button"
             data-testid="sticky-header-hamburger"

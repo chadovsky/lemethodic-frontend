@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuthStore } from '@/lib/auth'
 import Wordmark from '@/components/Wordmark'
+import CartButton from '@/components/store/CartButton'
 
 const ED_BG = 'var(--lm-bg-base)'
 const ED_FG = 'var(--lm-text-primary)'
@@ -439,8 +440,9 @@ export default function TopNav() {
           })}
         </ul>
 
-        {/* RIGHT -- unauthenticated: Pricing | Log in | Start Free */}
+        {/* RIGHT -- unauthenticated: Cart | Pricing | Log in | Start Free */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <CartButton variant="icon" testId="topnav-cart-button" />
           <Link
             href="/tarifs"
             style={{
@@ -530,6 +532,8 @@ export default function TopNav() {
             }}
           >
             <Wordmark size="nav" href="/la-methode" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <CartButton variant="icon" testId="topnav-cart-button-mobile" />
             <button
               type="button"
               aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
@@ -560,6 +564,7 @@ export default function TopNav() {
                 </svg>
               )}
             </button>
+            </div>
           </div>
         </header>
 

@@ -6592,3 +6592,22 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 **Acceptance:** TopNav: Library gone; Store -> /librairie; Log in != Start Free href. Sidebar: Library gone; Store + Pricing + Coaching present (revenue section). No routes broken. E2e green. Build green.
 
+## F-448 -- FE: Store mold at /librairie (UI only, checkout stubbed)
+
+**Status:** In Progress (feat/f-448-store-mold)
+
+**Scope:** Build the real bookstore MOLD at `/librairie`: full shopping experience UI, no payment wiring. Replaces the four bientôt category cards.
+
+- **Placeholder data (`lib/store/books.ts`):** 11 placeholder books across the four canonical categories (Livres, Audio, Téléchargements, Ressources gratuites). Fields mirror the LemonSqueezy product API shape (`id`, `slug`, `title<-name`, `description`, `priceCents<-price`, `currency`, `coverUrl<-large_thumb_url`, `category`, `author`) with a field-by-field LS mapping comment, so the later swap (option A: books live in LS as products) is config in `lib/api/store.ts`, not rework. No LS API calls, no API keys touched. `formatPrice` mirrors `price_formatted` (0 -> "Gratuit"). Free resources priced at 0.
+- **Catalog (`app/librairie/page.tsx` + `components/store/StoreCatalog.tsx`):** editorial selling header (Instrument Serif), responsive 2/3/4-col book grid, the four categories preserved as client filter chips plus "Tout". `BookCard` + `BookCover` render a styled ink-frame placeholder cover (vermillion spine), never a gray box.
+- **Detail (`app/librairie/[slug]/page.tsx`):** new nested SSG route (11 prerendered paths). Replaces the old `[item-slug]` notFound stub. Large cover, category, title, author, vermillion price, description, Add to cart. `generateStaticParams` + `generateMetadata`.
+- **Cart (`lib/store/cart.ts` + `components/store/CartDrawer.tsx` + `CartButton.tsx` + `AddToCartButton.tsx`):** client-side zustand store persisted to `localStorage` (`lemethodic_cart`), mirroring the `lib/auth.ts` hydrate pattern (SSR-safe). Add / remove / qty steppers, live total. Right-slide drawer mounted once globally in `app/layout.tsx`; any CartButton toggles it.
+- **Cart-badge visibility choice:** the cart icon is ALWAYS present in each shell; the numeric count badge appears only when the cart is non-empty. Wired into BOTH shells -- logged-out `TopNav` (right cluster, desktop + mobile) and logged-in `Sidebar` (revenue section row) -- plus `StickyHeader` scoped to `/librairie` (the store has no TopNav/sidebar chrome of its own: TopNav excludes `/librairie` and the route sits outside the authed shell group, so StickyHeader carries the cart while shopping for both auth states).
+- **Checkout stub:** prominent "Passer la commande" button in the drawer wrapped in the existing `<Bientot level="section">` pattern. No LemonSqueezy, no payment, no order records.
+
+**Cascade audit (F-445/446/447 lesson):** grepped `tests/` for `/librairie`. `tests/e2e/f-447.spec.ts` had two `heading {name:/la librairie/i}` checks that the rebuild changes (the page H1 is now an editorial headline); both updated in this branch to assert the `catalog-grid` testid renders (route-accessible signal). No other specs referenced the old category-card content. The four category subpages (`/librairie/{livres,audio,telechargements,ressources-gratuites}`) are left as-is (out of scope; static segments take priority over `[slug]`, no route conflict) but are no longer linked from the new catalog.
+
+**Tests:** `tests/e2e/f-448.spec.ts` -- catalog render (11 cards), category filter, detail navigation, add-to-cart + drawer, qty increment + total, remove, reload persistence, checkout bientôt-stub, badge in both shells. F-225 screenshots: `f-448-catalog-1440.png`, `f-448-catalog-375.png`, `f-448-detail-375.png`, `f-448-cart-1440.png`. Unit: 492/492 unaffected (CartButton is a `<button>`, not a `sidebar-link-*`, so the locked-order count test is untouched).
+
+**Acceptance:** Catalog renders + filter works; detail per book; add/remove/qty/total correct + persists; badge updates in both shells; checkout bientôt-stubbed. Build green. CI all green.
+
