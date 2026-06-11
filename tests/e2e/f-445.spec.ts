@@ -24,12 +24,12 @@ test.describe('F-445 -- Landing nav (unauthenticated, desktop 1440)', () => {
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-445-landing-1440.png'), fullPage: false })
   })
 
-  test('center nav shows Vocabulary, Exams, Library', async ({ page }) => {
+  test('center nav shows Vocabulary, Exams, Store (F-447: Library replaced by Store)', async ({ page }) => {
     await page.goto('/')
     const nav = page.getByRole('navigation', { name: 'Primary' })
     await expect(nav.getByText('Vocabulary')).toBeVisible()
     await expect(nav.getByText('Exams')).toBeVisible()
-    await expect(nav.getByText('Library')).toBeVisible()
+    await expect(nav.getByText('Store')).toBeVisible()
   })
 
   test('bientôt chips visible for Real French and AI Tutor', async ({ page }) => {

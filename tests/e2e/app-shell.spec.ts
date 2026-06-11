@@ -30,15 +30,19 @@ test.describe('App shell — desktop (1280×800)', () => {
     await expect(page.getByTestId('sidebar-link-tableau-de-bord')).not.toHaveAttribute('aria-current', /.+/)
   })
 
-  test('shell renders on /tableau-de-bord with sidebar and 6 nav links', async ({ page }) => {
+  test('shell renders on /tableau-de-bord with sidebar: 5 core links + revenue section (F-447)', async ({ page }) => {
     await page.goto('/tableau-de-bord')
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
+    // Core nav (5 links — La Bibliothèque removed in F-447)
     await expect(page.getByTestId('sidebar-link-seance')).toBeVisible()
     await expect(page.getByTestId('sidebar-link-tableau-de-bord')).toBeVisible()
     await expect(page.getByTestId('sidebar-link-la-methode')).toBeVisible()
-    await expect(page.getByTestId('sidebar-link-la-bibliotheque')).toBeVisible()
     await expect(page.getByTestId('sidebar-link-l-examen')).toBeVisible()
     await expect(page.getByTestId('sidebar-link-profil')).toBeVisible()
+    // Revenue section (F-447)
+    await expect(page.getByTestId('sidebar-link-librairie')).toBeVisible()
+    await expect(page.getByTestId('sidebar-link-tarifs')).toBeVisible()
+    await expect(page.getByTestId('sidebar-link-coaching')).toBeVisible()
   })
 
   test('hamburger button is hidden on desktop', async ({ page }) => {
@@ -97,7 +101,7 @@ test.describe('App shell — mobile (375×667)', () => {
     expect(await page.getByTestId('app-shell-backdrop').count()).toBe(0)
   })
 
-  test('hamburger click opens drawer with 6 nav links and backdrop', async ({ page }) => {
+  test('hamburger click opens drawer with core links, revenue section, and backdrop (F-447)', async ({ page }) => {
     await page.goto('/tableau-de-bord')
     await page.getByTestId('app-shell-hamburger').click()
     await expect(page.getByTestId('app-shell-sidebar')).toHaveAttribute(
@@ -105,12 +109,16 @@ test.describe('App shell — mobile (375×667)', () => {
       'true',
     )
     await expect(page.getByTestId('app-shell-backdrop')).toBeVisible()
+    // Core nav (5 links — La Bibliothèque removed in F-447)
     await expect(page.getByTestId('sidebar-link-seance')).toBeVisible()
     await expect(page.getByTestId('sidebar-link-tableau-de-bord')).toBeVisible()
     await expect(page.getByTestId('sidebar-link-la-methode')).toBeVisible()
-    await expect(page.getByTestId('sidebar-link-la-bibliotheque')).toBeVisible()
     await expect(page.getByTestId('sidebar-link-l-examen')).toBeVisible()
     await expect(page.getByTestId('sidebar-link-profil')).toBeVisible()
+    // Revenue section (F-447)
+    await expect(page.getByTestId('sidebar-link-librairie')).toBeVisible()
+    await expect(page.getByTestId('sidebar-link-tarifs')).toBeVisible()
+    await expect(page.getByTestId('sidebar-link-coaching')).toBeVisible()
   })
 
   test('backdrop click closes the drawer', async ({ page }) => {
