@@ -25,12 +25,9 @@ test.describe('Le Vocabulaire test — desktop (1280×800)', () => {
     await expect(page.getByTestId('quiz-submit')).toBeDisabled()
   })
 
-  test('shows La Bibliothèque as active in the sidebar from /la-bibliotheque/test', async ({ page }) => {
+  test('renders inside (app) shell at /la-bibliotheque/test (route un-nav\'d in F-447 but still exists)', async ({ page }) => {
     await page.goto('/la-bibliotheque/test')
-    await expect(page.getByTestId('sidebar-link-la-bibliotheque')).toHaveAttribute(
-      'aria-current',
-      'page',
-    )
+    await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
   })
 
   test('selecting a choice enables Submit; clicking Submit reveals feedback and Question suivante', async ({

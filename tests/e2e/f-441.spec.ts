@@ -16,14 +16,14 @@ function ensureDir(dir: string) {
 test.describe('F-441 -- TopNav IA (unauthenticated)', () => {
   test.use({ viewport: { width: 1440, height: 900 } })
 
-  test('nav shows Vocabulary, Exams, Library on desktop (1440)', async ({ page }) => {
+  test('nav shows Vocabulary, Exams, Store on desktop (1440) (F-447: Library replaced by Store)', async ({ page }) => {
     ensureDir(SCREENSHOT_DIR)
     await page.goto(ROUTE)
     const nav = page.getByRole('navigation', { name: 'Primary' })
     await expect(nav).toBeVisible()
     await expect(nav.getByText('Vocabulary')).toBeVisible()
     await expect(nav.getByText('Exams')).toBeVisible()
-    await expect(nav.getByText('Library')).toBeVisible()
+    await expect(nav.getByText('Store')).toBeVisible()
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-441-la-methode-1440.png'), fullPage: false })
   })
 
@@ -107,10 +107,10 @@ test.describe('F-441 -- TopNav IA (unauthenticated)', () => {
     await expect(nav.getByRole('link', { name: 'Vocabulary' })).toHaveAttribute('href', '/la-methode')
   })
 
-  test('Library link points to /la-bibliotheque', async ({ page }) => {
+  test('Store link points to /librairie (F-447: Library replaced by Store)', async ({ page }) => {
     await page.goto(ROUTE)
     const nav = page.getByRole('navigation', { name: 'Primary' })
-    await expect(nav.getByRole('link', { name: 'Library' })).toHaveAttribute('href', '/la-bibliotheque')
+    await expect(nav.getByRole('link', { name: 'Store' })).toHaveAttribute('href', '/librairie')
   })
 })
 

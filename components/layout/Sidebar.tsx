@@ -8,10 +8,12 @@ import Wordmark from '@/components/Wordmark'
 import {
   Home,
   GraduationCap,
-  BookOpen,
   FileText,
   User,
   PlayCircle,
+  ShoppingBag,
+  Tag,
+  Users,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -30,9 +32,14 @@ const NAV_ITEMS = [
   { href: '/seance', label: 'La Séance', icon: <PlayCircle size={20} strokeWidth={1.5} /> },
   { href: '/tableau-de-bord', label: 'Tableau de bord', icon: <Home size={20} strokeWidth={1.5} /> },
   { href: '/la-methode', label: 'La Méthode', icon: <GraduationCap size={20} strokeWidth={1.5} /> },
-  { href: '/la-bibliotheque', label: 'La Bibliothèque', icon: <BookOpen size={20} strokeWidth={1.5} /> },
   { href: '/l-examen', label: "L'Examen", icon: <FileText size={20} strokeWidth={1.5} /> },
   { href: '/profil', label: 'Compte', icon: <User size={20} strokeWidth={1.5} /> },
+]
+
+const REVENUE_ITEMS = [
+  { href: '/librairie', label: 'Store', icon: <ShoppingBag size={20} strokeWidth={1.5} /> },
+  { href: '/tarifs', label: 'Pricing', icon: <Tag size={20} strokeWidth={1.5} /> },
+  { href: '/coaching', label: 'Coaching', icon: <Users size={20} strokeWidth={1.5} /> },
 ]
 
 interface SidebarProps {
@@ -212,6 +219,46 @@ export default function Sidebar({
             </li>
           ))}
         </ul>
+
+        {/* Revenue paths: Store / Pricing / Coaching */}
+        <div
+          data-testid="sidebar-revenue-section"
+          style={{
+            borderTop: '1px solid var(--rule-default)',
+            marginTop: 4,
+            paddingTop: 4,
+          }}
+        >
+          {!collapsed && (
+            <p
+              style={{
+                fontFamily: SANS_FONT,
+                fontWeight: 600,
+                fontSize: '0.6875rem',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: 'var(--text-muted)',
+                padding: '8px 20px 4px',
+                margin: 0,
+              }}
+            >
+              More
+            </p>
+          )}
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+            {REVENUE_ITEMS.map((item) => (
+              <li key={item.href}>
+                <SidebarLink
+                  href={item.href}
+                  label={item.label}
+                  icon={item.icon}
+                  isCollapsed={collapsed}
+                  onClick={onLinkClick}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
       </nav>
 
       {/* F-446: ThemeToggle relocated from TopNav's authenticated branch.

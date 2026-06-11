@@ -77,12 +77,9 @@ test.describe('Le Vocabulaire browse — desktop (1280×800)', () => {
     await expect(page.getByTestId('chunk-row')).toHaveCount(60)
   })
 
-  test('shows La Bibliothèque as active in the sidebar', async ({ page }) => {
+  test('renders inside the (app) shell at /la-bibliotheque (route un-nav\'d in F-447 but still exists)', async ({ page }) => {
     await page.goto('/la-bibliotheque')
-    await expect(page.getByTestId('sidebar-link-la-bibliotheque')).toHaveAttribute(
-      'aria-current',
-      'page',
-    )
+    await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
   })
 
   test('count badge shows "60 chunks"', async ({ page }) => {

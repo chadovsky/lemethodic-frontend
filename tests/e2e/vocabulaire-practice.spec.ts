@@ -25,14 +25,11 @@ test.describe('Le Vocabulaire practice — desktop (1280×800)', () => {
     await expect(page.getByTestId('practice-prev')).toBeDisabled()
   })
 
-  test('shows La Bibliothèque as active in the sidebar from /la-bibliotheque/practice', async ({
+  test('renders inside (app) shell at /la-bibliotheque/practice (route un-nav\'d in F-447 but still exists)', async ({
     page,
   }) => {
     await page.goto('/la-bibliotheque/practice')
-    await expect(page.getByTestId('sidebar-link-la-bibliotheque')).toHaveAttribute(
-      'aria-current',
-      'page',
-    )
+    await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
   })
 
   test('clicking the card flips it; clicking again flips it back', async ({ page }) => {

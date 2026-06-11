@@ -39,25 +39,34 @@ describe('Sidebar', () => {
     expect(screen.getByRole('navigation', { name: /app sections/i })).toBeInTheDocument()
   })
 
-  it('renders 6 nav links in the locked order with correct hrefs', () => {
+  it('renders 8 nav links (5 core + 3 revenue) in the locked order with correct hrefs (F-447)', () => {
     render(<Sidebar drawerOpen={false} />)
     const links = screen
       .getAllByRole('link')
       .filter((l) => l.getAttribute('data-testid')?.startsWith('sidebar-link-'))
 
-    expect(links).toHaveLength(6)
+    // Core nav: La Séance, Tableau de bord, La Méthode, L'Examen, Compte
+    // Revenue section: Store, Pricing, Coaching
+    expect(links).toHaveLength(8)
     expect(links[0]).toHaveTextContent('La Séance')
     expect(links[0]).toHaveAttribute('href', '/seance')
     expect(links[1]).toHaveTextContent('Tableau de bord')
     expect(links[1]).toHaveAttribute('href', '/tableau-de-bord')
     expect(links[2]).toHaveTextContent('La Méthode')
     expect(links[2]).toHaveAttribute('href', '/la-methode')
-    expect(links[3]).toHaveTextContent('La Bibliothèque')
-    expect(links[3]).toHaveAttribute('href', '/la-bibliotheque')
-    expect(links[4]).toHaveTextContent("L'Examen")
-    expect(links[4]).toHaveAttribute('href', '/l-examen')
-    expect(links[5]).toHaveTextContent('Compte')
-    expect(links[5]).toHaveAttribute('href', '/profil')
+    expect(links[3]).toHaveTextContent("L'Examen")
+    expect(links[3]).toHaveAttribute('href', '/l-examen')
+    expect(links[4]).toHaveTextContent('Compte')
+    expect(links[4]).toHaveAttribute('href', '/profil')
+    // Revenue section
+    expect(links[5]).toHaveTextContent('Store')
+    expect(links[5]).toHaveAttribute('href', '/librairie')
+    expect(links[6]).toHaveTextContent('Pricing')
+    expect(links[6]).toHaveAttribute('href', '/tarifs')
+    expect(links[7]).toHaveTextContent('Coaching')
+    expect(links[7]).toHaveAttribute('href', '/coaching')
+    // La Bibliothèque removed from nav (F-447)
+    expect(links.some((l) => l.getAttribute('href') === '/la-bibliotheque')).toBe(false)
   })
 
   it('marks the link matching the exact current pathname as active', () => {

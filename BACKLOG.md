@@ -6579,3 +6579,16 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 **Non-visual change:** no source code changed.
 
+## F-447 -- FE: nav IA content pass on the new shell
+
+**Status:** In Progress (feat/f-447-nav-ia-content)
+
+**Scope:**
+- `components/nav/TopNav.tsx`: `library` item removed from `NAV_ITEMS`; replaced with `store` (label "Store", href `/librairie`) in the same slot. Log in (`/connexion`) and Start Free (`/inscription`) were already distinct routes -- verified, no change needed.
+- `components/layout/Sidebar.tsx`: `La Bibliotheque` (`/la-bibliotheque`) removed from `NAV_ITEMS`. `BookOpen` icon import removed. `ShoppingBag`, `Tag`, `Users` icons added. New `REVENUE_ITEMS` array (Store `/librairie`, Pricing `/tarifs`, Coaching `/coaching`) rendered as a distinct section below the main nav, separated by a border-top and a collapsed-aware "More" label (`data-testid="sidebar-revenue-section"`).
+- `tests/e2e/f-447.spec.ts`: 12 tests across 4 describe blocks (TopNav desktop 1440, TopNav mobile 375, Sidebar desktop 1440, Sidebar mobile 375). Covers: Store present + href, Library absent, Log in != Start Free href, Store click navigation, Pricing/Coaching present + hrefs, revenue section visible. F-225 screenshots: `f-447-topnav-1440.png`, `f-447-topnav-375.png`, `f-447-sidebar-1440.png`, `f-447-sidebar-375.png`.
+
+**VERIFY -- /librairie purchase flow:** `/librairie` renders a catalog page (La Librairie) listing Livres, Audio, Telechargements, Ressources gratuites. All four category cards are wrapped in `<Bientot level="section">` components. Click-to-buy is NOT wired -- no LemonSqueezy integration exists. Store links to the catalog only. Purchase flow is deferred.
+
+**Acceptance:** TopNav: Library gone; Store -> /librairie; Log in != Start Free href. Sidebar: Library gone; Store + Pricing + Coaching present (revenue section). No routes broken. E2e green. Build green.
+
