@@ -126,21 +126,20 @@ test.describe('F-441 -- TopNav IA mobile (375)', () => {
   })
 })
 
-test.describe('F-441 -- TopNav IA (authenticated)', () => {
+test.describe('F-441 / F-446 -- TopNav IA (authenticated)', () => {
   test.use({ viewport: { width: 1440, height: 900 } })
 
   test.beforeEach(async ({ page }) => {
     await injectAuthToken(page)
   })
 
-  test('authenticated right side shows avatar, not Log in or Start Free', async ({ page }) => {
+  // F-446 shell split: TopNav returns null when authenticated. The sidebar
+  // (AppShell) is the app shell for logged-in users. TopNav must not render.
+  test('TopNav is absent when authenticated (shell split)', async ({ page }) => {
     await page.goto(ROUTE)
-    const nav = page.getByRole('navigation', { name: 'Primary' })
-    await expect(nav).toBeVisible()
-    // Log in and Start Free should NOT be present for authenticated users.
-    await expect(nav.getByRole('link', { name: 'Log in' })).not.toBeVisible()
-    await expect(nav.getByRole('link', { name: 'Start Free' })).not.toBeVisible()
-    // Avatar button (profile dropdown trigger) should be visible.
-    await expect(page.getByTestId('topnav-avatar')).toBeVisible()
+    // TopNav's Primary nav must not be visible — sidebar owns the shell.
+    await expect(page.getByTestId('topnav-desktop')).not.toBeVisible()
+    // No avatar button in TopNav (it was removed from TopNav in F-446).
+    expect(await page.getByTestId('topnav-avatar').count()).toBe(0)
   })
 })

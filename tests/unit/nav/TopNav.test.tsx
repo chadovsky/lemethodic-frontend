@@ -1,14 +1,14 @@
-// F-445 -- TopNav unit tests: both auth states on landing + product routes.
+// F-445 -- TopNav unit tests: unauthenticated renders, mobile header, hydration gate.
+// F-446 -- Updated authenticated describe: TopNav returns null (shell split).
 
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 const mockPathname = vi.fn<() => string>()
-const mockPush = vi.fn()
 
 vi.mock('next/navigation', () => ({
   usePathname: () => mockPathname(),
-  useRouter: () => ({ push: mockPush }),
+  useRouter: () => ({ push: vi.fn() }),
 }))
 
 vi.mock('next/link', () => ({
@@ -20,55 +20,25 @@ vi.mock('next/link', () => ({
   ),
 }))
 
-vi.mock('@/lib/api', () => ({
-  api: { auth: { logout: vi.fn() } },
-}))
-
-vi.mock('@/lib/onboarding', () => ({
-  useOnboardingStore: () => ({ reset: vi.fn() }),
-}))
-
-vi.mock('@/lib/submitResponse', () => ({
-  useSubmitResponseStore: () => ({ clear: vi.fn() }),
-}))
-
-vi.mock('@/lib/hooks/useInterfaceLanguage', () => ({
-  useInterfaceLanguage: () => 'en',
-}))
-
-vi.mock('@/components/ui/ThemeToggle', () => ({
-  ThemeToggle: () => <button data-testid="theme-toggle" />,
-}))
-
 vi.mock('@/components/Wordmark', () => ({
   default: ({ href }: { href?: string }) => (
     <a href={href ?? '/'} data-testid="wordmark">Le Méthodic</a>
   ),
 }))
 
-// Shared auth store mock — swap token/hydrated per test.
-// Variables are captured by reference inside functions so they read current
-// values at call-time (after beforeEach runs), not at hoisting time.
+// Auth store mock — swap token/hydrated per test.
 let mockToken: string | null = null
-let mockUser: { fullName: string; email: string } | null = null
 const mockHydrated = { value: true }
 const mockHydrate = vi.fn()
-const mockClearAuth = vi.fn()
-const mockSetAuth = vi.fn()
 
 vi.mock('@/lib/auth', () => {
-  const hydrateStub = vi.fn()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const store = (selector: (s: any) => unknown) =>
     selector({
       get token() { return mockToken },
-      get user() { return mockUser },
       get hydrated() { return mockHydrated.value },
-      setAuth: mockSetAuth,
-      clearAuth: mockClearAuth,
-      hydrate: hydrateStub,
     })
-  store.getState = () => ({ hydrate: hydrateStub })
+  store.getState = () => ({ hydrate: mockHydrate })
   return { useAuthStore: store }
 })
 
@@ -77,7 +47,6 @@ import TopNav from '@/components/nav/TopNav'
 describe('TopNav — unauthenticated', () => {
   beforeEach(() => {
     mockToken = null
-    mockUser = null
     mockHydrated.value = true
     mockPathname.mockReturnValue('/la-methode')
   })
@@ -134,36 +103,35 @@ describe('TopNav — unauthenticated', () => {
   })
 })
 
-describe('TopNav — authenticated', () => {
+// F-446 shell split: TopNav returns null when token is present.
+// The authenticated app shell is the left sidebar (AppShell).
+describe('TopNav — authenticated (shell split)', () => {
   beforeEach(() => {
     mockToken = 'test-token'
-    mockUser = { fullName: 'Chadi Bakhay', email: 'c@test.com' }
     mockHydrated.value = true
     mockPathname.mockReturnValue('/la-methode')
   })
 
-  it('shows avatar button when authenticated', () => {
-    render(<TopNav />)
-    expect(screen.getByTestId('topnav-avatar')).toBeInTheDocument()
+  it('returns null when authenticated on a product route', () => {
+    const { container } = render(<TopNav />)
+    expect(container.firstChild).toBeNull()
   })
 
-  it('does not show Log in or Start Free when authenticated', () => {
-    render(<TopNav />)
-    const nav = screen.getByRole('navigation', { name: 'Primary' })
-    expect(nav.querySelector('a[href="/connexion"]')).toBeNull()
-    expect(nav.querySelector('a[href="/inscription"]')).toBeNull()
+  it('returns null when authenticated on the landing page (/)', () => {
+    mockPathname.mockReturnValue('/')
+    const { container } = render(<TopNav />)
+    expect(container.firstChild).toBeNull()
   })
 
-  it('shows ThemeToggle when authenticated', () => {
+  it('does not render the Primary nav when authenticated', () => {
     render(<TopNav />)
-    expect(screen.getByTestId('theme-toggle')).toBeInTheDocument()
+    expect(screen.queryByRole('navigation', { name: 'Primary' })).toBeNull()
   })
 })
 
 describe('TopNav — landing page mobile section', () => {
   beforeEach(() => {
     mockToken = null
-    mockUser = null
     mockHydrated.value = true
   })
 
@@ -179,14 +147,11 @@ describe('TopNav — landing page mobile section', () => {
     expect(screen.queryByTestId('topnav-mobile')).toBeNull()
   })
 
-  it('Start Free link in mobile drawer points to /inscription', () => {
+  it('mobile header is present with hamburger on landing', () => {
     mockPathname.mockReturnValue('/')
     render(<TopNav />)
-    // The mobile nav is rendered (but collapsed); the header itself shows.
-    // Check the mobile header is present with correct aria attributes.
     const mobileHeader = screen.getByTestId('topnav-mobile')
     expect(mobileHeader).toBeInTheDocument()
-    // The hamburger button should be present.
     expect(screen.getByRole('button', { name: /open menu/i })).toBeInTheDocument()
   })
 })

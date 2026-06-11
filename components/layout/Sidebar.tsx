@@ -16,6 +16,7 @@ import {
   ChevronRight,
   LogOut,
 } from 'lucide-react'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
 // Same cookie name as S2 (components/ui/sidebar.tsx) for future S2 deprecation parity.
 // S2 stores open state: cookie value "true" = expanded, "false" = collapsed.
@@ -212,6 +213,20 @@ export default function Sidebar({
           ))}
         </ul>
       </nav>
+
+      {/* F-446: ThemeToggle relocated from TopNav's authenticated branch.
+          Always present in the app shell so authenticated users retain dark/light control. */}
+      <div
+        data-testid="sidebar-theme-toggle"
+        style={{
+          padding: collapsed ? '8px 0' : '8px 16px',
+          borderTop: '1px solid var(--rule-default)',
+          display: 'flex',
+          justifyContent: collapsed ? 'center' : 'flex-start',
+        }}
+      >
+        <ThemeToggle />
+      </div>
 
       {onSignOut && (
         <div
