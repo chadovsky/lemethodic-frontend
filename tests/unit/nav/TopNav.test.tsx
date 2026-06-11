@@ -56,12 +56,13 @@ describe('TopNav — unauthenticated', () => {
     expect(screen.getByRole('navigation', { name: 'Primary' })).toBeInTheDocument()
   })
 
-  it('shows Vocabulary, Exams, Library in the desktop nav', () => {
+  it('shows Vocabulary, Exams, Store in the desktop nav (F-447: Library replaced by Store)', () => {
     render(<TopNav />)
     const nav = screen.getByRole('navigation', { name: 'Primary' })
     expect(nav).toHaveTextContent('Vocabulary')
     expect(nav).toHaveTextContent('Exams')
-    expect(nav).toHaveTextContent('Library')
+    expect(nav).toHaveTextContent('Store')
+    expect(nav).not.toHaveTextContent('Library')
   })
 
   it('shows bientôt chips for Real French and AI Tutor', () => {
