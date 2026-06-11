@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import TopNav from '@/components/nav/TopNav'
 import StickyHeader from '@/components/layout/StickyHeader'
+import CartDrawer from '@/components/store/CartDrawer'
 import QueryProvider from '@/components/QueryProvider'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { PlausibleAnalytics } from '@/components/analytics/Plausible'
@@ -117,6 +118,9 @@ export default function RootLayout({
             {/* V-013c — desktop-only top nav. Returns null on marketing /
                 conversion / legal paths and below md breakpoint. */}
             <TopNav />
+            {/* F-448 — global cart drawer; opened by any CartButton (TopNav,
+                sidebar, store header). Renders null until opened. */}
+            <CartDrawer />
             {children}
             {process.env.NODE_ENV === 'production' && <Analytics />}
             <PlausibleAnalytics />

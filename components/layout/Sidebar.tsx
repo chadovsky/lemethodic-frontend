@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { SANS_FONT } from '@/lib/typography'
 import SidebarLink from './SidebarLink'
 import Wordmark from '@/components/Wordmark'
+import CartButton from '@/components/store/CartButton'
 import {
   Home,
   GraduationCap,
@@ -257,6 +258,11 @@ export default function Sidebar({
                 />
               </li>
             ))}
+            {/* F-448 — cart affordance in the logged-in shell. Opens the
+                global drawer; badge shows count only when non-empty. */}
+            <li>
+              <CartButton variant="row" testId="sidebar-cart-button" isCollapsed={collapsed} />
+            </li>
           </ul>
         </div>
       </nav>

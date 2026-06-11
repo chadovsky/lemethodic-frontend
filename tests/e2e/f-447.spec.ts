@@ -53,8 +53,10 @@ test.describe('F-447 -- TopNav content (desktop 1440)', () => {
   })
 
   test('/librairie catalog page renders (Store destination is accessible)', async ({ page }) => {
+    // F-448: /librairie rebuilt into the store catalog. The Store destination
+    // is accessible when the catalog grid renders.
     await page.goto('/librairie')
-    await expect(page.getByRole('heading', { name: /la librairie/i })).toBeVisible()
+    await expect(page.getByTestId('catalog-grid')).toBeVisible()
   })
 })
 
@@ -120,8 +122,9 @@ test.describe('F-447 -- Sidebar content (desktop 1440)', () => {
   })
 
   test('/librairie accessible when authenticated (sidebar Store destination)', async ({ page }) => {
+    // F-448: catalog grid is the accessible-destination signal post-rebuild.
     await page.goto('/librairie')
-    await expect(page.getByRole('heading', { name: /la librairie/i })).toBeVisible()
+    await expect(page.getByTestId('catalog-grid')).toBeVisible()
   })
 })
 
