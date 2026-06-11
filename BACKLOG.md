@@ -6559,6 +6559,18 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 ---
 
+## F-446 -- FE: auth-state nav shell split
+
+**Status:** In Progress (feat/f-446-auth-nav-shell)
+
+**Scope:** TopNav = logged-out shell only. Sidebar = logged-in shell. When `token` is truthy, TopNav returns null. ThemeToggle relocated from TopNav's authenticated branch into the sidebar footer. Authenticated branch (avatar dropdown + ThemeToggle) removed from TopNav. Authenticated user on `/` is already redirected to `/tableau-de-bord` via `AuthRedirect` (pre-existing). No content/IA changes to nav items.
+
+**Shell split decision:** redirect approach for `/` (AuthRedirect already handles it — no new code needed). TopNav returning null on authenticated routes means public routes like `/la-methode` have no nav when authed; that is acceptable for this scope -- F-447 will address the IA content changes.
+
+**Tests:** `tests/unit/nav/TopNav.test.tsx` (updated -- F-445 auth tests replaced with shell-split assertions: authenticated returns null, unauthenticated renders preserved); `tests/unit/layout/Sidebar.test.tsx` (updated -- ThemeToggle present); `tests/e2e/f-441.spec.ts` (updated -- authenticated block now asserts TopNav absent); `tests/e2e/f-446.spec.ts` (new -- logged-out TopNav present/sidebar absent, logged-in sidebar present/TopNav absent, ThemeToggle in sidebar, F-225 screenshots).
+
+**Acceptance:** build green · unit suite green · e2e f-446.spec.ts 0 failures · no double nav in any auth state.
+
 ## F-442 -- chore: untrack auto-generated audit artifacts
 
 **Status:** Shipped

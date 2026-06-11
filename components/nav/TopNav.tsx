@@ -2,18 +2,14 @@
 
 // F-441 -- TopNav rebuilt to locked IA. English benefit labels, Exams
 // dropdown with TCF/DELF/French for Business, bientôt chips for Real French +
-// AI Tutor. Right side is auth-conditional: unauthenticated sees
-// Pricing/Log in/Start Free; authenticated sees ThemeToggle + avatar dropdown.
+// AI Tutor. Right side: unauthenticated only (Pricing / Log in / Start Free).
+// F-446 -- Shell split: TopNav = logged-out shell. Returns null when
+// authenticated. Authenticated app shell is the left sidebar (AppShell).
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { api } from '@/lib/api'
+import { usePathname } from 'next/navigation'
 import { useAuthStore } from '@/lib/auth'
-import { useOnboardingStore } from '@/lib/onboarding'
-import { useSubmitResponseStore } from '@/lib/submitResponse'
-import { useInterfaceLanguage, type InterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import Wordmark from '@/components/Wordmark'
 
 const ED_BG = 'var(--lm-bg-base)'
@@ -21,7 +17,6 @@ const ED_FG = 'var(--lm-text-primary)'
 const ED_FG_SOFT = 'var(--lm-text-secondary)'
 const ED_RULE = 'var(--lm-border-subtle)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
-const SERIF = 'var(--font-source-serif), Georgia, serif'
 
 // Routes that should NOT render the in-product top nav. Marketing,
 // conversion funnel, legal, and auth surfaces have their own chrome.
@@ -148,39 +143,14 @@ function BientotChip() {
   )
 }
 
-const MENU_COPY = {
-  en: {
-    profile: 'Profile',
-    settings: 'Settings',
-    account: 'Account',
-    about: 'About',
-    logout: 'Sign out',
-  },
-  fr: {
-    profile: 'Profil',
-    settings: 'Paramètres',
-    account: 'Abonnement',
-    about: 'À propos',
-    logout: 'Se déconnecter',
-  },
-} as const
-
 export default function TopNav() {
   const pathname = usePathname() ?? '/'
-  const router = useRouter()
-  const language = useInterfaceLanguage()
-  const menuCopy = MENU_COPY[language]
-  const user = useAuthStore((s) => s.user)
-  const setAuth = useAuthStore((s) => s.setAuth)
-  const clearAuth = useAuthStore((s) => s.clearAuth)
   const token = useAuthStore((s) => s.token)
   const hydrated = useAuthStore((s) => s.hydrated)
 
   const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
   const [examsOpen, setExamsOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement | null>(null)
   const examsRef = useRef<HTMLLIElement | null>(null)
 
   // Kick off auth store rehydration on mount. Idempotent -- safe when
@@ -198,17 +168,6 @@ export default function TopNav() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Click-outside: profile dropdown.
-  useEffect(() => {
-    if (!menuOpen) return
-    const onClick = (e: MouseEvent) => {
-      if (!menuRef.current) return
-      if (!menuRef.current.contains(e.target as Node)) setMenuOpen(false)
-    }
-    document.addEventListener('mousedown', onClick)
-    return () => document.removeEventListener('mousedown', onClick)
-  }, [menuOpen])
-
   // Click-outside: exams dropdown.
   useEffect(() => {
     if (!examsOpen) return
@@ -224,21 +183,11 @@ export default function TopNav() {
   useEffect(() => { setMobileOpen(false) }, [pathname])
 
   if (shouldHideOn(pathname)) return null
-  // Wait for auth store hydration to avoid a flash of wrong right-side state.
+  // Wait for auth store hydration to avoid a flash of wrong state.
   if (!hydrated) return null
-
-  const avatarInitial = (user?.fullName?.trim().charAt(0) || user?.email?.charAt(0) || 'L').toUpperCase()
-
-  async function handleLogout() {
-    setMenuOpen(false)
-    try {
-      await api.auth.logout()
-    } catch {}
-    clearAuth()
-    useOnboardingStore.getState().reset()
-    useSubmitResponseStore.getState().clear()
-    router.push('/')
-  }
+  // F-446: TopNav is the logged-out shell only. Authenticated users get the
+  // left sidebar (AppShell) as their nav; TopNav must not render alongside it.
+  if (token) return null
 
   // Landing page (/ and /fr): show a mobile header since there is no AppShell topbar
   // or BottomNav on public marketing routes.
@@ -490,171 +439,62 @@ export default function TopNav() {
           })}
         </ul>
 
-        {/* RIGHT -- auth-conditional */}
+        {/* RIGHT -- unauthenticated: Pricing | Log in | Start Free */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {token ? (
-            // Authenticated: ThemeToggle + avatar dropdown.
-            <>
-              <ThemeToggle />
-              <div style={{ position: 'relative' }} ref={menuRef}>
-                <button
-                  type="button"
-                  data-testid="topnav-avatar"
-                  onClick={() => setMenuOpen((v) => !v)}
-                  aria-haspopup="menu"
-                  aria-expanded={menuOpen}
-                  className="ed-btn-press"
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--lm-warm-peach)',
-                    border: 'none',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: 0,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: SERIF,
-                      fontWeight: 400,
-                      fontSize: 14,
-                      color: 'var(--lm-warm-espresso)',
-                      lineHeight: 1,
-                    }}
-                  >
-                    {avatarInitial}
-                  </span>
-                </button>
-                {menuOpen && (
-                  <div
-                    role="menu"
-                    style={{
-                      position: 'absolute',
-                      top: 'calc(100% + 8px)',
-                      right: 0,
-                      minWidth: 200,
-                      backgroundColor: 'var(--lm-bg-surface)',
-                      border: `1px solid ${ED_RULE}`,
-                      borderRadius: 4,
-                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04)',
-                      padding: 4,
-                      zIndex: 51,
-                    }}
-                  >
-                    {(['profile', 'settings', 'account', 'about'] as const).map((section) => (
-                      <Link
-                        key={section}
-                        href={
-                          section === 'profile' ? '/profil' :
-                          section === 'settings' ? '/parametres' :
-                          section === 'account' ? '/abonnement' :
-                          '/a-propos'
-                        }
-                        role="menuitem"
-                        onClick={() => setMenuOpen(false)}
-                        style={{
-                          display: 'block',
-                          padding: '10px 14px',
-                          fontFamily: SANS,
-                          fontWeight: 500,
-                          fontSize: 13,
-                          color: ED_FG,
-                          textDecoration: 'none',
-                          borderRadius: 2,
-                        }}
-                      >
-                        {menuCopy[section]}
-                      </Link>
-                    ))}
-                    <hr style={{ margin: '4px 0', border: 'none', borderTop: `1px solid ${ED_RULE}` }} />
-                    <button
-                      type="button"
-                      role="menuitem"
-                      onClick={handleLogout}
-                      style={{
-                        display: 'block',
-                        width: '100%',
-                        textAlign: 'left',
-                        padding: '10px 14px',
-                        fontFamily: SANS,
-                        fontWeight: 500,
-                        fontSize: 13,
-                        color: 'var(--lm-error)',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        borderRadius: 2,
-                      }}
-                    >
-                      {menuCopy.logout}
-                    </button>
-                  </div>
-                )}
-              </div>
-            </>
-          ) : (
-            // Unauthenticated: Pricing | Log in | Start Free.
-            <>
-              <Link
-                href="/tarifs"
-                style={{
-                  fontFamily: SANS,
-                  fontWeight: 500,
-                  fontSize: 14,
-                  color: ED_FG_SOFT,
-                  textDecoration: 'none',
-                  padding: '6px 4px',
-                  transition: 'color var(--lm-duration-hover) var(--lm-ease-spring)',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = ED_FG }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = ED_FG_SOFT }}
-              >
-                Pricing
-              </Link>
-              <Link
-                href="/connexion"
-                style={{
-                  fontFamily: SANS,
-                  fontWeight: 500,
-                  fontSize: 14,
-                  color: ED_FG_SOFT,
-                  textDecoration: 'none',
-                  padding: '6px 4px',
-                  transition: 'color var(--lm-duration-hover) var(--lm-ease-spring)',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = ED_FG }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = ED_FG_SOFT }}
-              >
-                Log in
-              </Link>
-              <Link
-                href="/inscription"
-                className="ed-btn-press"
-                style={{
-                  display: 'inline-block',
-                  padding: '7px 16px',
-                  backgroundColor: ED_FG,
-                  color: 'var(--lm-bg-base)',
-                  fontFamily: SANS,
-                  fontWeight: 600,
-                  fontSize: 13,
-                  letterSpacing: '0.01em',
-                  textDecoration: 'none',
-                  borderRadius: 4,
-                  transition: 'opacity var(--lm-duration-hover) var(--lm-ease-spring)',
-                  whiteSpace: 'nowrap',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85' }}
-                onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}
-              >
-                Start Free
-              </Link>
-            </>
-          )}
+          <Link
+            href="/tarifs"
+            style={{
+              fontFamily: SANS,
+              fontWeight: 500,
+              fontSize: 14,
+              color: ED_FG_SOFT,
+              textDecoration: 'none',
+              padding: '6px 4px',
+              transition: 'color var(--lm-duration-hover) var(--lm-ease-spring)',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = ED_FG }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = ED_FG_SOFT }}
+          >
+            Pricing
+          </Link>
+          <Link
+            href="/connexion"
+            style={{
+              fontFamily: SANS,
+              fontWeight: 500,
+              fontSize: 14,
+              color: ED_FG_SOFT,
+              textDecoration: 'none',
+              padding: '6px 4px',
+              transition: 'color var(--lm-duration-hover) var(--lm-ease-spring)',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = ED_FG }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = ED_FG_SOFT }}
+          >
+            Log in
+          </Link>
+          <Link
+            href="/inscription"
+            className="ed-btn-press"
+            style={{
+              display: 'inline-block',
+              padding: '7px 16px',
+              backgroundColor: ED_FG,
+              color: 'var(--lm-bg-base)',
+              fontFamily: SANS,
+              fontWeight: 600,
+              fontSize: 13,
+              letterSpacing: '0.01em',
+              textDecoration: 'none',
+              borderRadius: 4,
+              transition: 'opacity var(--lm-duration-hover) var(--lm-ease-spring)',
+              whiteSpace: 'nowrap',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85' }}
+            onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}
+          >
+            Start Free
+          </Link>
         </div>
       </div>
     </nav>
@@ -781,88 +621,40 @@ export default function TopNav() {
               )
             })}
             <hr style={{ margin: '12px clamp(20px, 5vw, 40px)', border: 'none', borderTop: `1px solid ${ED_RULE}` }} />
-            {token ? (
-              <>
-                {(['profile', 'settings', 'account', 'about'] as const).map((section) => (
-                  <a
-                    key={section}
-                    href={
-                      section === 'profile' ? '/profil' :
-                      section === 'settings' ? '/parametres' :
-                      section === 'account' ? '/abonnement' :
-                      '/a-propos'
-                    }
-                    onClick={() => setMobileOpen(false)}
-                    style={{
-                      display: 'block',
-                      padding: '12px clamp(20px, 5vw, 40px)',
-                      fontSize: 16,
-                      fontWeight: 500,
-                      color: ED_FG,
-                      textDecoration: 'none',
-                    }}
-                  >
-                    {menuCopy[section]}
-                  </a>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => { setMobileOpen(false); handleLogout() }}
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '12px clamp(20px, 5vw, 40px)',
-                    fontSize: 16,
-                    fontWeight: 500,
-                    color: 'var(--lm-error)',
-                    backgroundColor: 'transparent',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontFamily: SANS,
-                  }}
-                >
-                  {menuCopy.logout}
-                </button>
-              </>
-            ) : (
-              <>
-                <a
-                  href="/tarifs"
-                  onClick={() => setMobileOpen(false)}
-                  style={{ display: 'block', padding: '12px clamp(20px, 5vw, 40px)', fontSize: 16, fontWeight: 500, color: ED_FG, textDecoration: 'none' }}
-                >
-                  Pricing
-                </a>
-                <a
-                  href="/connexion"
-                  onClick={() => setMobileOpen(false)}
-                  style={{ display: 'block', padding: '12px clamp(20px, 5vw, 40px)', fontSize: 16, fontWeight: 500, color: ED_FG, textDecoration: 'none' }}
-                >
-                  Log in
-                </a>
-                <div style={{ padding: '8px clamp(20px, 5vw, 40px) 4px' }}>
-                  <a
-                    href="/inscription"
-                    onClick={() => setMobileOpen(false)}
-                    style={{
-                      display: 'block',
-                      padding: '12px 20px',
-                      backgroundColor: ED_FG,
-                      color: 'var(--lm-bg-base)',
-                      fontFamily: SANS,
-                      fontWeight: 600,
-                      fontSize: 15,
-                      textDecoration: 'none',
-                      borderRadius: 4,
-                      textAlign: 'center',
-                    }}
-                  >
-                    Start Free
-                  </a>
-                </div>
-              </>
-            )}
+            <a
+              href="/tarifs"
+              onClick={() => setMobileOpen(false)}
+              style={{ display: 'block', padding: '12px clamp(20px, 5vw, 40px)', fontSize: 16, fontWeight: 500, color: ED_FG, textDecoration: 'none' }}
+            >
+              Pricing
+            </a>
+            <a
+              href="/connexion"
+              onClick={() => setMobileOpen(false)}
+              style={{ display: 'block', padding: '12px clamp(20px, 5vw, 40px)', fontSize: 16, fontWeight: 500, color: ED_FG, textDecoration: 'none' }}
+            >
+              Log in
+            </a>
+            <div style={{ padding: '8px clamp(20px, 5vw, 40px) 4px' }}>
+              <a
+                href="/inscription"
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  display: 'block',
+                  padding: '12px 20px',
+                  backgroundColor: ED_FG,
+                  color: 'var(--lm-bg-base)',
+                  fontFamily: SANS,
+                  fontWeight: 600,
+                  fontSize: 15,
+                  textDecoration: 'none',
+                  borderRadius: 4,
+                  textAlign: 'center',
+                }}
+              >
+                Start Free
+              </a>
+            </div>
           </nav>
         )}
       </>

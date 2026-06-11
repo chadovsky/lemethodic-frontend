@@ -146,12 +146,11 @@ test.describe('F-445 -- Landing nav (authenticated, desktop 1440)', () => {
     await injectAuthToken(page)
   })
 
-  test('authenticated landing shows avatar, not Log in or Start Free', async ({ page }) => {
+  // F-446 shell split: TopNav returns null when authenticated.
+  // Authenticated users get the sidebar (AppShell), not TopNav.
+  test('TopNav is absent when authenticated (shell split)', async ({ page }) => {
     await page.goto('/tableau-de-bord')
-    const nav = page.getByRole('navigation', { name: 'Primary' })
-    await expect(nav).toBeVisible()
-    await expect(page.getByTestId('topnav-avatar')).toBeVisible()
-    await expect(nav.getByRole('link', { name: 'Log in' })).not.toBeVisible()
-    await expect(nav.getByRole('link', { name: 'Start Free' })).not.toBeVisible()
+    await expect(page.getByTestId('topnav-desktop')).not.toBeVisible()
+    expect(await page.getByTestId('topnav-avatar').count()).toBe(0)
   })
 })
