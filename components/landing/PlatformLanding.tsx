@@ -46,7 +46,7 @@ const PLATFORM_COPY = {
         subtitle: 'TCF · TEF · DELF · DALF',
         body: 'Diagnostic-driven path. AI examiner feedback under exam pressure. Built specifically for English speakers hitting the B1 wall.',
         cta: 'Explore exam prep',
-        href: '/tcf-canada',
+        href: '/examens/tcf',
       },
       library: {
         title: 'Library',
@@ -68,7 +68,7 @@ const PLATFORM_COPY = {
       sub: 'Five layers compose your French. We diagnose the one holding you back.',
       attribution: 'Built on 7,000+ hours of French tutoring with English speakers.',
       seeMore: 'See full methodology',
-      seeMoreHref: '/tcf-canada',
+      seeMoreHref: '/examens/tcf',
     },
     finalCta: {
       h2: "Stop guessing what's blocking your French.",

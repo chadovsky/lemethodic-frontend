@@ -2726,6 +2726,28 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 **Acceptance:** build green · unit 466/466 · e2e 735 passed (with retries), 1 pre-existing flake (landing-hero mobile scroll), 0 F-441 failures.
 
+### F-450 — Hotfix: broken nav targets (live 404s)
+
+**Status:** Committed (local, pending push) — commit 1 `c47e880`, commit 2 (this entry)
+**Branch:** `main` (hotfix, direct)
+**Effort:** 1 session (2 commits)
+
+**Context:** Stage-0 orphan audit (`docs/audits/ORPHAN_AUDIT.md`, Table 3) surfaced four hard-broken nav targets resolving to live 404s on prod. Same bug class: links/redirects pointing at routes that were never built. Bundled under one ticket, fixed before a single Vercel deploy.
+
+**Scope (commit 1, `c47e880`):**
+- `next.config.mjs`: `/exam-prep` redirect repointed `/tcf-canada` (never built; MS-1) → `/examens/tcf` (the real, built TCF Canada landing). `:path*` variant collapsed to the bare target (no sub-routes under `/examens/tcf`).
+- `app/coaching/page.tsx`: bientôt placeholder (existing `<Bientot>` pattern, F-359) so TopNav + Sidebar `/coaching` links resolve. Real Cal.com embed is a separate scoped build.
+- `app/placement/page.tsx`: bientôt placeholder for the Hero CTA target. Hero CTA left intact.
+
+**Scope (commit 2):**
+- `components/landing/PlatformLanding.tsx` (×2: `href`, `seeMoreHref`) + `components/landing/LandingFooter.tsx` (EN branch of locale ternary): three direct `/tcf-canada` hrefs repointed to `/examens/tcf`. FR branches unchanged (`/fr`, pending `/fr/tcf-canada` at MS-1).
+- `docs/prd-v1.md`: this entry.
+- `tests/screenshots/f-450-{coaching,placement}-{1440,375}.png`: F-225 captures for the two new visible surfaces.
+
+**Verification:** `pnpm build` exit 0 (both runs). Tree-wide grep confirms zero remaining live `/tcf-canada` references — only comments (MS-1 `/fr/tcf-canada` deferral notes) remain.
+
+**Deferred (out of scope):** building `/tcf-canada` proper and the `/fr/tcf-canada` French landing (both MS-1). `/exam-prep` and the landing links now route to the canonical `/examens/tcf` until MS-1 reinstates a dedicated marketing page.
+
 ## Section 4 — Content Pipeline (CON-001 to CON-014)
 
 **Goal:** real content lives behind the surfaces. F-321 vocab review (1,684 Phase 1 chunks awaiting Chadi triage) lands here. L'École 27 lessons get methodology-visible content. Le Diagnostic Tâche library expands to 50 scenarios (F-061.2 Livraison 2/2).
