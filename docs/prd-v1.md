@@ -2770,6 +2770,34 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 **Deferred (out of scope):** BE persistence of the Target Profile (`lm.targetProfile.v1` → server-side `target_profiles`, F-366). `/onboarding` tour content unchanged.
 
+### F-452 — Dead-route cleanup (final Stage-0 item)
+
+**Status:** Committed (local, pending push) — commit (this entry)
+**Branch:** `main` (Stage-0, direct)
+**Effort:** 1 session
+
+**Context:** Final Stage-0 orphan-audit item (`docs/audits/ORPHAN_AUDIT.md`). Four superseded route families removed without breaking inbound equity: every removal either already sat behind a 308 or got one added first.
+
+**Verify-first table (confirmed before any removal):**
+
+| Route | 308 existed? | Inbound | Sitemap | Path taken |
+| --- | --- | --- | --- | --- |
+| `/cours/methode-tcf-canada` + `/[id]` | Yes (`next.config.mjs:63-64`, `:path*` covers `[id]`) | none (shadowed dead code) | no | Removed page files only; redirect preserved |
+| `/la-methode/lesson/[id]` + `/quiz` | No | self cross-links only; 0 live nav links (live scheme is `/la-methode/lecon-N`) | no | No 1:1 id map + zero inbound → **removed cleanly**, no redirect |
+| `/legal/privacy` | No | none (empty `<main />` stub) | no | Added 308 → `/confidentialite`, then removed |
+| `/legal/tos` | No | none (empty `<main />` stub) | no | Added 308 → `/cgv`, then removed |
+
+**`/legal/tos` target choice:** both legal stubs were empty (`<main />`), so no content distinguished them. ToS (Terms of Service = the service-contract terms) maps to **CGV**, not Mentions légales (publisher-identity disclosure). The pre-existing `/terms`→`/mentions-legales` redirect (`next.config.mjs:76`) was left untouched (out of scope).
+
+**Scope:**
+- `next.config.mjs`: +2 308 rules (`/legal/tos`→`/cgv`, `/legal/privacy`→`/confidentialite`).
+- Removed: `app/(app)/cours/` (methode-tcf-canada + `[id]`), `app/la-methode/lesson/` (`[id]` + `quiz`, incl. `LessonDetailClient`/`QuizClient`), `app/legal/` (privacy + tos). 8 files.
+- `docs/prd-v1.md`: this entry.
+
+**Verification:** full unit suite (vitest) — see gate report. `pnpm build` exit 0. **F-225 captures: skipped — non-visual change** (dead-route removals add no visible surface; the two new redirects resolve to already-shipped `/cgv` and `/confidentialite`).
+
+**Deferred (out of scope):** descriptive references to the removed routes in dated audit docs (`docs/m0-fe-audit-*.md`, `docs/audits/ORPHAN_AUDIT.md`) and the `tests/e2e/m0-audit.spec.ts` route list (a point-in-time descriptive audit, no hard per-route assertion — left as historical snapshot). `Sidebar.test.tsx:92` keeps its `/la-methode/lesson/3` mock (tests prefix-match string logic; passes regardless of route existence).
+
 ## Section 4 — Content Pipeline (CON-001 to CON-014)
 
 **Goal:** real content lives behind the surfaces. F-321 vocab review (1,684 Phase 1 chunks awaiting Chadi triage) lands here. L'École 27 lessons get methodology-visible content. Le Diagnostic Tâche library expands to 50 scenarios (F-061.2 Livraison 2/2).

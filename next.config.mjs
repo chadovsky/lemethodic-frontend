@@ -78,6 +78,12 @@ const nextConfig = {
       { source: '/privacy', destination: '/confidentialite', permanent: true },
       { source: '/privacy/:path*', destination: '/confidentialite/:path*', permanent: true },
 
+      // F-452: legacy /legal/* stub routes retired (dead-route cleanup).
+      // /legal/tos -> /cgv (ToS = service-contract terms = CGV; mentions-legales
+      // is publisher-identity disclosure, not terms). /legal/privacy -> /confidentialite.
+      { source: '/legal/tos', destination: '/cgv', permanent: true },
+      { source: '/legal/privacy', destination: '/confidentialite', permanent: true },
+
       // /vocabulaire -> /la-bibliotheque (direct to canonical)
       { source: '/vocabulaire', destination: '/la-bibliotheque', permanent: true },
       { source: '/vocabulaire/:path*', destination: '/la-bibliotheque/:path*', permanent: true },
