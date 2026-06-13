@@ -65,7 +65,10 @@ export default function SignupForm({ tier }: SignupFormProps) {
         captchaToken,
       )
       useAuthStore.getState().setAuth(token, user)
-      router.push('/onboarding')
+      router.push('/bienvenue')
+      // F-451: route signup into the real Target Profile capture (/bienvenue),
+      // not the dismissible product tour (/onboarding). /bienvenue lands on
+      // /tableau-de-bord after the four intent questions.
       // spinner stays visible while navigation is in flight; component unmounts on arrival
     } catch (err) {
       setLoading(false)

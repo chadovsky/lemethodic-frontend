@@ -2748,6 +2748,28 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 **Deferred (out of scope):** building `/tcf-canada` proper and the `/fr/tcf-canada` French landing (both MS-1). `/exam-prep` and the landing links now route to the canonical `/examens/tcf` until MS-1 reinstates a dedicated marketing page.
 
+### F-451 — Signup reroute: make the real intent capture reachable
+
+**Status:** Committed (local, pending push) — commit `8916bb0`
+**Branch:** `main` (hotfix, direct)
+**Effort:** 1 session
+
+**Context:** Post-signup `SignupForm` redirected to `/onboarding` — the dismissible product tour (the `OnboardingFlow` state machine → `/paywall`). The real learner-intent capture lives at `/bienvenue` (F-365: the four-question Target Profile — exam, threshold, deadline, persona — persisted to `lm.targetProfile.v1`). New users were never routed through intent capture; the signal that personalises the parcours was being silently skipped.
+
+**Verify findings (both routes read before change):**
+- `/bienvenue` (`app/bienvenue/page.tsx`): the Target Profile capture. Four questions across three steps. Post-capture pushes `/tableau-de-bord` (already correctly wired — no dead-end). Guarded by `ProtectedRoute` (authed; redirects unauth to `/inscription`).
+- `/onboarding` (`app/onboarding/page.tsx` → `OnboardingFlow`): the optional product tour. Left intact, only decoupled from the signup redirect.
+
+**Scope:**
+- `components/auth/SignupForm.tsx`: post-submit redirect `/onboarding` → `/bienvenue`.
+- `tests/unit/signup/SignupForm.test.tsx`: redirect assertion + test name updated to `/bienvenue`.
+- `tests/e2e/signup-flow.spec.ts` (×2): both URL assertions updated to `/bienvenue`.
+- `docs/prd-v1.md`: this entry.
+
+**Verification:** `pnpm build` exit 0. `SignupForm.test.tsx` 16/16 pass. `/onboarding` left in place as the optional tour. **F-225 captures: skipped — no visible surface changed** (signup form, `/bienvenue`, and `/onboarding` are all visually unchanged; the change is a redirect target, behaviourally covered by the updated e2e URL assertions).
+
+**Deferred (out of scope):** BE persistence of the Target Profile (`lm.targetProfile.v1` → server-side `target_profiles`, F-366). `/onboarding` tour content unchanged.
+
 ## Section 4 — Content Pipeline (CON-001 to CON-014)
 
 **Goal:** real content lives behind the surfaces. F-321 vocab review (1,684 Phase 1 chunks awaiting Chadi triage) lands here. L'École 27 lessons get methodology-visible content. Le Diagnostic Tâche library expands to 50 scenarios (F-061.2 Livraison 2/2).

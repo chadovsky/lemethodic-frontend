@@ -137,7 +137,7 @@ describe('SignupForm', () => {
     expect(screen.getByText(/signing up for: pro/i)).toBeInTheDocument()
   })
 
-  it('navigates to /onboarding after valid submit', async () => {
+  it('navigates to /bienvenue after valid submit', async () => {
     mockRegister.mockResolvedValueOnce({
       token: 'tok',
       user: { id: 1, email: 'test@example.com', fullName: '' },
@@ -150,7 +150,7 @@ describe('SignupForm', () => {
       fireEvent.click(screen.getByRole('button', { name: /create account/i }))
     })
 
-    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/onboarding'))
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/bienvenue'))
   })
 
   // MOCK-005 — ed-field, PasswordStrength, spinner

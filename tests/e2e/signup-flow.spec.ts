@@ -52,7 +52,7 @@ test.describe('Signup form — desktop (1280×800)', () => {
     await expect(page.getByText(/signing up for: daily bundle/i)).toBeVisible()
   })
 
-  test('valid form submission navigates to /onboarding', async ({ page }) => {
+  test('valid form submission navigates to /bienvenue', async ({ page }) => {
     await bypassCaptcha(page)
     await mockRegisterEndpoint(page)
     await page.goto('/inscription')
@@ -60,7 +60,7 @@ test.describe('Signup form — desktop (1280×800)', () => {
     await page.getByLabel('Password', { exact: true }).fill('password123')
     await page.getByLabel('Confirm password').fill('password123')
     await page.getByRole('button', { name: /create account/i }).click()
-    await expect(page).toHaveURL(/\/onboarding/, { timeout: 15_000 })
+    await expect(page).toHaveURL(/\/bienvenue/, { timeout: 15_000 })
   })
 
   // MOCK-005 — password strength segments and spinner
@@ -78,7 +78,7 @@ test.describe('Signup form — desktop (1280×800)', () => {
     await expect(page.locator('[data-testid="strength-segment"][data-filled="true"]')).toHaveCount(3)
   })
 
-  test('submit shows spinner then navigates to /onboarding', async ({ page }) => {
+  test('submit shows spinner then navigates to /bienvenue', async ({ page }) => {
     await bypassCaptcha(page)
     await mockRegisterEndpoint(page)
     await page.goto('/inscription')
@@ -87,7 +87,7 @@ test.describe('Signup form — desktop (1280×800)', () => {
     await page.getByLabel('Confirm password').fill('password123')
     await page.getByRole('button', { name: /create account/i }).click()
     await expect(page.getByTestId('signup-spinner')).toBeVisible()
-    await expect(page).toHaveURL(/\/onboarding/, { timeout: 15_000 })
+    await expect(page).toHaveURL(/\/bienvenue/, { timeout: 15_000 })
   })
 })
 
