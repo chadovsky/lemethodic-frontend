@@ -63,9 +63,10 @@ const nextConfig = {
       { source: '/cours/methode-tcf-canada', destination: '/la-methode', permanent: true },
       { source: '/cours/methode-tcf-canada/:path*', destination: '/la-methode/:path*', permanent: true },
 
-      // /exam-prep -> /tcf-canada (MS-1 owns the destination page)
-      { source: '/exam-prep', destination: '/tcf-canada', permanent: true },
-      { source: '/exam-prep/:path*', destination: '/tcf-canada/:path*', permanent: true },
+      // /exam-prep -> /examens/tcf (F-450: /tcf-canada destination never built;
+      // /examens/tcf is the real TCF Canada landing page). MS-1 may reinstate /tcf-canada later.
+      { source: '/exam-prep', destination: '/examens/tcf', permanent: true },
+      { source: '/exam-prep/:path*', destination: '/examens/tcf', permanent: true },
 
       // /fr/exam-prep -> /fr (F-340: English /exam-prep deleted by F-332)
       { source: '/fr/exam-prep', destination: '/fr', permanent: true },
