@@ -6611,3 +6611,25 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 **Acceptance:** Catalog renders + filter works; detail per book; add/remove/qty/total correct + persists; badge updates in both shells; checkout bientôt-stubbed. Build green. CI all green.
 
+## F-449 -- DESIGN.md v3 adoption (Apple-lean) + surface re-execution
+
+**Status:** Queued (doc adoption shipped; surface re-execution tickets to follow)
+
+**Context:** DESIGN.md v3 (Apple-lean modern) was locked 2026-06-11 and committed to main, superseding v2 (Atelier Français). v3 direction: near-monochrome base + one accent (`#E5301C` light / `#FF453A` dark), sans-led (Inter system face + DM Mono for data, serifs retired), generous whitespace, soft layered shadows + frosted glass, rounded everywhere, calm motion, and the glossy 3D islands voyage as the single expressive signature. Full true-dark mode.
+
+**Doc adoption (done in the v3-adoption commit, doc-only):**
+- `DESIGN.md` (FE root) replaced with the locked v3 spec.
+- v2 archived to `docs/archive/DESIGN-v2.md`; `LEMETHODIC-DESIGN.md` archived to `docs/archive/LEMETHODIC-DESIGN-archived.md`. Both carry supersession banners.
+- Stale design-language references corrected to v3 / banner-flagged: `CLAUDE.md` (fonts), `ARCHITECTURE.md` (image pipeline aesthetic), `PEDAGOGY.md` (image pipeline section bannered), `PRODUCT.md` (companion pointer, type stack, visual-signal + per-couche tables), `le-methodic-ship` skill (font guard), `docs/m2-visual-audit-v2-2026-06-01.md` (historical note).
+
+**Surface re-execution (NOT done -- separate tickets, code work):**
+- Token layer: replace v2 tokens (`--paper`/`--ink`/`--dominant`/`--accent`/couche tokens) with the v3 light + true-dark palettes in `app/globals.css`.
+- Typography: migrate code off Instrument Serif + Crimson Pro to Inter-led; retire italic-on-serif display patterns; remove the serif faces from `app/layout.tsx` + `lib/typography.ts` once surfaces are migrated. (Until then the serif faces are tolerated by the ship gate.)
+- Wordmark: retire typewriter + breathing-M; ship the modern Inter logotype. Optional mark/glyph exploration queued.
+- Shape/elevation/motion: apply the v3 radius scale, three shadow levels, frosted-glass nav, and v3 motion tokens.
+- Islands system: glossy 3D assets (Nano Banana 2, locked prompt C+) for homepage hero, dashboard voyage map, île detail. Motion via Fable 5 (pending verification that Claude Code can run Fable 5).
+- Couche color: re-spec under the "one accent only" rule (was warm per-couche in v1, ink-blue + vermillion-Pièges in v2).
+- Image pipeline re-authoring: PEDAGOGY.md image-pipeline prompts (aesthetic, reference anchors, prompt vocabulary, negative prompts) need a full rewrite to the glossy-3D direction; the current negative prompt bans "glossy, 3D render," the inverse of v3.
+
+**Sequencing note:** surface re-execution is UI work and follows the FE-first protocol; individual tickets to be filed when dispatched. This entry is the umbrella.
+

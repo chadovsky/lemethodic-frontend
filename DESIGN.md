@@ -1,234 +1,178 @@
-# DESIGN.md — Le Méthodic
+# DESIGN v3
 
-**Version:** v2 (Atelier Français)
-**Locked:** 2026-05-27
-**Supersedes:** DESIGN.md v1 (commit 9081610, warm mustard/ochre direction — now obsolete)
+**Le Méthodic visual system. Apple-lean modern.**
+Supersedes v2 (Atelier Français). v2 is retired: watercolor, ink washes, typewriter wordmark, serif type, and handmade-imperfection texture all read archaic and are removed. This document is the source of truth every surface executes against.
 
-This document is the source of truth for Le Méthodic's visual system. All new surfaces are built against it. Where the codebase still reflects v1 (mustard palette, Cabinet Grotesk, per-couche surface colors), it is migrated to this spec.
+Status: LOCKED 2026-06-11. Decisions resolved (see bottom).
 
----
-
-## 1. Movement: Atelier Français
-
-The aesthetic is **French artisan workshop precision** — academic, sophisticated, modern. The reference points are NRF Gallimard, Le Monde, Clairefontaine, Cassandre, and French academic press, not vintage paper or manuscript pastiche. The feeling is editorial and exact: ink on white, generous whitespace, a single confident accent.
-
-Rejected: warm mustard/ochre palette (v1), vintage-paper texture, decorative ornament for its own sake.
+> Archived predecessors: `docs/archive/DESIGN-v2.md` (Atelier Français) and `docs/archive/LEMETHODIC-DESIGN-archived.md` (pastel "disciplined warmth"). Retained for audit only.
 
 ---
 
-## 2. Palette A — French ink blue
+## 1. Direction
 
-Cool, not warm. One dominant, one accent, paper white, and a near-black ink for text.
+Premium, minimal, calm, modern tech product. The feel of a high-end app, not a literary journal. Content-first, restraint over decoration, generous whitespace, soft depth instead of ornament. Confidence through space and typography, not flourish.
 
-```css
-:root {
-  /* Dominant — French ink blue */
-  --dominant: #14213D;
-  --dominant-soft: #2C3E5E;
-  --dominant-deep: #0B1729;
+The signature that keeps it from being generic clean-SaaS: **the islands voyage**, rendered as glossy, dimensional, rim-lit 3D objects. The aesthetic is restrained everywhere so the islands carry the brand.
 
-  /* Accent — vermillion */
-  --accent: #C8102E;
-  --accent-soft: #E84A5F;
-
-  /* Paper / backgrounds */
-  --paper: #FFFFFF;
-  --paper-tint: #FAFAFA;
-  --paper-edge: #F4F4F5;
-
-  /* Ink / text */
-  --ink: #0F1419;
-  --ink-soft: rgba(15, 20, 25, 0.62);
-  --ink-faint: rgba(15, 20, 25, 0.38);
-  --ink-trace: rgba(15, 20, 25, 0.16);
-
-  /* Rules / borders */
-  --rule: rgba(15, 20, 25, 0.08);
-  --rule-strong: rgba(15, 20, 25, 0.16);
-}
-```
-
-**Usage rules**
-- Body text: `--ink`. Secondary text: `--ink-soft`. Metadata/labels: `--ink-faint`.
-- CTAs and primary interactive surfaces: `--dominant` (NOT near-black). Hover deepens to `--dominant-deep`.
-- `--accent` (vermillion) is reserved for emphasis, attention/bottleneck states, the master's accent line, and the wordmark animation. It is the single bold note — used sparingly so it stays loud.
-- Backgrounds: `--paper` (pure white) is the base. `--paper-tint` for raised cards/cells. The beige `#FAF7F0` from v1 is banned.
-
-**Couche colors (LOCKED).** Four couches render in `--dominant` (ink blue): Le Propos, Le Plan, La Construction, La Musique. **Les Pièges Anglais** — the differentiator — renders in `--accent` (vermillion). It is the only couche with a distinct color, spending the palette's single bold note where it matters most.
-
-Bottleneck/attention is communicated by the "Bottleneck" tag pill (with its breathing animation), NOT by recoloring a bar to vermillion. That color is reserved for Les Pièges Anglais's identity, so any couche can be flagged as a bottleneck via the tag with no color conflict.
-
-**Dark mode (LOCKED) — "night paper."** The dark background is a deep version of the ink blue, not a neutral charcoal, so dark mode still reads as Le Méthodic. Cool, not warm. The dominant shifts to a mid-blue so it stays visible against the dark background while white button text still passes contrast; hover lightens rather than darkens. Vermillion brightens slightly so it pops instead of going muddy.
-
-```css
-.dark {
-  /* Night paper — deep ink blue, cool */
-  --paper: #0E1626;
-  --paper-tint: #16203A;
-  --paper-edge: #1E2A47;
-
-  /* Cool off-white ink */
-  --ink: #E5E9F0;
-  --ink-soft: rgba(229, 233, 240, 0.64);
-  --ink-faint: rgba(229, 233, 240, 0.40);
-  --ink-trace: rgba(229, 233, 240, 0.18);
-
-  /* Rules / borders */
-  --rule: rgba(229, 233, 240, 0.10);
-  --rule-strong: rgba(229, 233, 240, 0.20);
-
-  /* Dominant — mid blue: visible on night paper, white text still passes contrast */
-  --dominant: #38598F;
-  --dominant-soft: #2E4A7A;
-  --dominant-deep: #4A6BA3;   /* hover LIGHTENS in dark mode */
-
-  /* Accent — vermillion brightened for dark backgrounds */
-  --accent: #E23A54;
-  --accent-soft: #F06B7E;
-}
-```
-
-Toggle via the `.dark` class on a wrapper (next-themes ThemeProvider is already wired). The codebase's legacy `--lm-*` dark tokens must be mapped to these values during migration (see §10).
+Principles:
+1. Whitespace is a feature. Let surfaces breathe.
+2. One accent color, used sparingly, for moments that matter (price, primary CTA, progress).
+3. Soft depth, never ornament. Subtle shadow and blur, no texture, no grain, no vintage.
+4. Sans-led, upright, modern. No serifs.
+5. The islands are the only place that gets to be expressive.
 
 ---
 
-## 3. Type A — Editorial Atelier
+## 2. Color
 
-```css
-:root {
-  --f-display: 'Instrument Serif', Georgia, serif;   /* headlines, hero, large display */
-  --f-body:    'Crimson Pro', Georgia, serif;         /* lesson body, long-form reading */
-  --f-ui:      'Instrument Sans', system-ui, sans-serif; /* French UI: nav, labels, buttons */
-  --f-en:      'Inter', system-ui, sans-serif;        /* English UI text */
-  --f-mono:    'DM Mono', 'Courier New', monospace;   /* metadata, eyebrows, folios, accents */
-}
-```
+Near-monochrome base plus one confident accent. Light mode primary; full dark mode (Apple-style true dark).
 
-**Language-aware UI font**
+### Light
+| token | hex | use |
+|---|---|---|
+| `--bg` | `#FFFFFF` | base background |
+| `--surface` | `#F5F5F7` | subtle panels, sections |
+| `--surface-elevated` | `#FFFFFF` | cards (with shadow) |
+| `--hairline` | `#E8E8ED` | borders, dividers |
+| `--ink` | `#1D1D1F` | primary text |
+| `--ink-secondary` | `#6E6E73` | secondary text |
+| `--ink-tertiary` | `#86868B` | captions, disabled |
+| `--accent` | `#E5301C` | brand accent (modern vermillion) |
 
-French UI text uses Instrument Sans. English UI text uses Inter. Apply via the `lang` attribute:
+### Dark (true dark)
+| token | hex | use |
+|---|---|---|
+| `--bg` | `#000000` | base background |
+| `--surface` | `#1C1C1E` | panels |
+| `--surface-elevated` | `#2C2C2E` | cards |
+| `--hairline` | `#38383A` | borders |
+| `--ink` | `#F5F5F7` | primary text |
+| `--ink-secondary` | `#98989D` | secondary text |
+| `--accent` | `#FF453A` | accent on dark |
 
-```css
-[lang="en"] { font-family: var(--f-en); }
-```
-
-Set `lang="fr"` as the document default; mark English fragments/pages with `lang="en"`.
-
-**Mapping**
-- Display / hero / section headings → `--f-display` (Instrument Serif)
-- Lesson body, reading content → `--f-body` (Crimson Pro)
-- Nav, buttons, form labels, in-product chrome (French) → `--f-ui` (Instrument Sans)
-- Same chrome in English → `--f-en` (Inter)
-- Eyebrows, folios, timestamps, monospace metadata → `--f-mono` (DM Mono)
-
-Cabinet Grotesk, Geist, Source Serif 4, Fraunces, Figtree are all obsolete for this direction.
+Accent is rare. Most of the UI is ink-on-paper. The red appears on the primary CTA, prices, active progress, and the occasional brand moment. Nowhere else.
 
 ---
 
-## 4. Shape & radius
+## 3. Typography
 
-No sharp corners anywhere (Apple-feel). Soft shadows preferred over hard borders for elevation.
+Sans-led system. Serifs are out (the serif was the archaic signal). `Inter` is the system face: clean, modern, Apple-adjacent, already in the stack.
 
-```css
-:root {
-  --r-xs: 6px;    /* small chips, dots */
-  --r-sm: 10px;   /* dropdown items, inputs */
-  --r-md: 16px;   /* dropdowns, mid containers */
-  --r-lg: 22px;   /* cards, cells */
-  --r-xl: 28px;   /* large shells, panels */
-  --r-pill: 999px;/* CTAs, pills, tags */
-}
-```
+| role | face | size (desktop) | weight |
+|---|---|---|---|
+| Display | Inter (tight tracking) | 56–72px | 700 |
+| H1 | Inter | 40px | 700 |
+| H2 | Inter | 28px | 600 |
+| H3 | Inter | 20px | 600 |
+| Body | Inter | 17px | 400 |
+| Body-emphasis | Inter | 17px | 500 |
+| Small | Inter | 14px | 400 |
+| Mono | DM Mono | 13px | 400 |
 
----
-
-## 5. Motion
-
-```css
-:root {
-  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);       /* default — most transitions */
-  --ease-snap: cubic-bezier(0.4, 0, 0.2, 1.4);  /* playful overshoot — dots, hover pops */
-}
-```
-
-**Principles**
-- Reveals: fade + 24px translate-up, IntersectionObserver-triggered as content scrolls in.
-- Hover lifts: cards rise 3px; CTAs rise 2px with a soft shadow.
-- Number tickers: count up on scroll-into-view with cubic ease-out.
-- Always honor `prefers-reduced-motion: reduce` — disable transforms/animations, show final state.
+- Headings: tight letter-spacing (-0.02em on display), generous line-height on body (1.5–1.6).
+- Mono (DM Mono) survives for data: streak counts, scores, timers.
+- **Removed:** Instrument Serif, Crimson Pro.
+- Display = Inter for now. A distinctive display face is a deferred revisit, once surfaces exist.
 
 ---
 
-## 6. Wordmark signature (LOCKED)
+## 4. Space & layout
 
-The wordmark is **"LE MÉTHODIC"** and its animation is the brand's signature gesture. It is used in two places with identical mechanics: as a showcase (e.g. brand panels) and as the in-product brand mark in the top nav (smaller padding).
-
-**Sequence**
-1. **Typewriter** — letters stamp in one by one. Implemented with the Web Animations API (WAAPI), triggered by IntersectionObserver when the wordmark scrolls into view (NOT on page load — that's why earlier versions appeared to "not fire"). Stagger ~70ms per character; each letter does a small scale+drop entrance.
-2. **Caret** — a vermillion (`--accent`) caret blinks at the end of the word after the last letter lands.
-3. **Frame** — a black/ink (`--ink`) frame draws in around the word: two symmetric SVG paths, both starting at top-center, one tracing clockwise (right side), one counterclockwise (left side), meeting at bottom-center. Duration ~800ms. The frame **stays** (no retract). It appears after the caret, slower than the caret's first blink.
-
-**The M** breathes continuously and independently: scale 1.0 → 1.06 + color shift toward vermillion, 3.6s loop, infinite. This is the only persistent motion after the sequence settles.
-
-**Implementation notes (so it survives re-execution)**
-- Frame centering: measure the wordmark width **excluding the caret** (caret width + its 3px margin). Including the caret pushes the frame off-center to the left.
-- Frame padding is parameterized per context via data attributes: `data-frame-pad-x`, `data-frame-pad-y`, `data-frame-margin`. Showcase uses generous padding; nav uses tight (`pad-x≈11`, `pad-y≈5`, `margin≈2`).
-- Frame SVG `stroke-width` ~1.4px, `stroke-linejoin: miter` for crisp corners.
-- The frame is enabled per-element via a `data-frame="1"` attribute on the wordmark; the typewriter is enabled via `data-typewriter`.
-- The wordmark element MUST set `white-space: nowrap`. The typewriter wraps each letter in an inline-block span, which can wrap to a second line in a constrained container; if it does, the frame measures a broken tall/narrow box.
-- The frame stroke, caret, and M-breath colors MUST read from theme tokens (`var(--ink)` for the frame, `var(--accent)` for caret and the M's color shift), not hardcoded hex, so they flip correctly between light and dark mode. Read the computed token values in JS at setup time.
-
-**Do not** attempt to anchor animated lines to the M's stroke positions — that approach (earlier iterations) is abandoned because per-glyph stroke alignment can't be made reliable across fonts/sizes/render engines. The frame is independent of the M.
+- Base unit 8px. Scale: 4, 8, 12, 16, 24, 32, 48, 64, 96, 128.
+- Section padding desktop: 96–128px vertical. Apple-grade breathing room.
+- Content max-width ~1120px; hero sections can go full-bleed.
+- Mobile: 16–24px gutters, sections 48–64px vertical.
+- Strong baseline grid, lots of negative space, never crowded.
 
 ---
 
-## 7. Component patterns
+## 5. Shape & elevation
 
-**Top nav**
-- Brand mark = framed wordmark (§6), no icon/seal beside it.
-- Nav links: pill-shaped, `--ink-soft` default, `--paper-tint` on hover, `--dominant` background + white text when active.
-- Dropdowns open on hover with a fade + 6px translate.
-
-**Dropdown items**
-- On hover: item scales up slightly (≈1.025, left origin) and a vermillion dot fades/pops in from the left (`--ease-snap`). This grow-plus-dot is the canonical dropdown hover pattern.
-
-**CTAs**
-- Pill (`--r-pill`), `--dominant` background, white text. Hover: deepen to `--dominant-deep`, rise 2px, soft shadow. A trailing arrow slides right on hover.
-
-**Cards / cells**
-- `--paper-tint` background, `--r-lg`/`--r-xl` radius. Hover: rise 3px + soft shadow. No hard borders.
-
-**Progress / couche bars**
-- Track in faint ink. Fill in the couche's identity color: `--dominant` for four couches, `--accent` (vermillion) for Les Pièges Anglais. Bottleneck/attention shown via the "Bottleneck" tag pill, not by recoloring the fill. Fills animate width on scroll-into-view.
-
-**Editorial (lesson) elements**
-- Drop cap (Instrument Serif, vermillion) on opening paragraph.
-- Marginalia: monospace side note, small, `--ink-faint`, with a vermillion left rule on narrow viewports.
-- Pull quote: Instrument Serif with a vermillion left bar.
-- Folio: centered monospace, e.g. `— III —`.
-
-**Master's seal** (optional accent mark)
-- Small SVG seal with a slowly rotating outer ring and an "M" monogram, in vermillion. Used beside scores/grades as a "visa du maître" mark. Decorative-but-branded; use sparingly.
+- **Rounded everywhere. No sharp corners** (carries from v2, and it is core to the Apple-lean feel).
+- Radius scale: `8` (inputs/small), `12` (buttons), `16` (cards), `20–24` (large cards/sections), `999` (pills, avatars).
+- **Soft, layered shadows only.** Three levels:
+  - `e1`: `0 1px 2px rgba(0,0,0,0.04)` (resting cards)
+  - `e2`: `0 4px 16px rgba(0,0,0,0.06)` (raised cards, dropdowns)
+  - `e3`: `0 12px 40px rgba(0,0,0,0.10)` (modals, hero objects)
+- **Frosted glass** (backdrop-blur, ~20px, translucent surface) for the sticky top nav and overlays. A clear Apple signal.
 
 ---
 
-## 8. Copy & language rules
+## 6. Components
 
-- **No em-dashes** (—) anywhere in product copy. Use commas, colons, or restructure.
-- **No italic** in display type.
-- French is the primary product language; copy uses canonical names: La Méthode, La Bibliothèque, L'Examen, and the 5 couches Le Propos / Le Plan / La Construction / Les Pièges Anglais / La Musique.
-- English UI text switches to Inter (§3).
-
----
-
-## 9. Open items (decisions pending)
-
-1. **Hero treatment.** "Bonjour, [name]." in Instrument Serif with a vermillion hand-drawn accent line under the name is locked as Hero A. Full hero/dashboard layout still iterating.
+- **Buttons.** Primary = filled `--accent`, radius 12, weight 500, comfortable padding, large tap target. Secondary = subtle grey fill or ghost (hairline border). Tertiary = text + accent. One primary per view.
+- **Cards.** `--surface-elevated`, radius 16, shadow `e1`/`e2`, generous internal padding. Hover lifts shadow gently.
+- **Inputs.** Radius 8–12, hairline border, focus ring in accent, large hit area.
+- **Nav.** Sticky top nav (logged-out) frosted-glass; left sidebar (logged-in) clean, hairline divider, soft active state.
+- **Pills / chips.** Radius 999, subtle fill, for filters and bientôt tags.
 
 ---
 
-## 10. Migration status
+## 7. Motion
 
-- **t1–t9** (token/component work) predate this direction and need re-execution against this spec.
-- **M-RENAME** routes (/la-methode, /la-bibliotheque, /l-examen and nested) are not yet built; canonical FR routes still 404.
-- The codebase still uses legacy product/couche names; M-RENAME Phase A.3 handles that migration.
+Calm, smooth, purposeful. The Apple feel lives here.
+- Easing: ease-out / custom cubic-bezier(0.4, 0, 0.2, 1). Durations 200–400ms.
+- Scroll-reveal: content fades + rises slightly on entry.
+- Hero island: subtle float / parallax, soft rotation, reactive to scroll.
+- Interactive: gentle spring on press, smooth state transitions.
+- Restraint: motion supports, never distracts.
+- **Execution:** this is where Fable 5 (motion code) + Nano Banana 2 (the glossy 3D assets) combine. Pending verification that Claude Code can run Fable 5.
+
+---
+
+## 8. The Islands system (the signature)
+
+Glossy 3D rendered islands. Smooth rounded forms, shiny rim-lit beveled edges, soft studio lighting, subtle reflections and gloss, gentle depth. Generated in Nano Banana 2 (locked prompt C+). Light background, soft shadows, one accent marker.
+
+Where they appear:
+- **Homepage hero:** one large glossy island, soft float motion, the centerpiece.
+- **Dashboard voyage map:** a clean dotted path connecting islands; accent markers show progress along the journey.
+- **Île detail:** the island as the surface's hero, calm and dimensional.
+
+The islands are the ONLY expressive element. Everything around them stays restrained so they read as premium, not busy.
+
+---
+
+## 9. Logotype
+
+Retire the typewriter "LE MÉTHODIC" + red caret + breathing M. New: a clean modern logotype in Inter (tight tracking), upright, confident. Optional minimal mark (a small glossy island dot, or a single geometric glyph) for favicon / collapsed nav.
+- `white-space: nowrap` on the wordmark element (carries from v2).
+- Logotype reads `--ink`; optional mark uses `--accent`.
+- Mark: a short exploration pass is queued (glossy island dot / single geometric glyph). The modern Inter wordmark ships first.
+
+---
+
+## 10. Iconography & imagery
+
+- **Icons:** `lucide` (in-stack), clean line, consistent 1.5–2px stroke, rounded joins. Modern and quiet. No illustrated or hand-drawn icons.
+- **Spot illustration:** glossy 3D renders only, reserved for brand moments (islands, key objects). Not on every surface.
+- **Imagery:** clean, modern, dimensional. No watercolor, no grain, no paper texture, no vintage anything.
+
+---
+
+## 11. Hard rules
+
+Carry forward:
+- **Never an em-dash** in any output. Use commas, colons, parens, sentence breaks.
+- **No sharp corners.** Everything rounded.
+
+New in v3:
+- **One accent color only.** No second brand color.
+- **Sans only.** No serif type anywhere.
+- **No texture.** No watercolor, grain, paper, or handmade imperfection.
+- **Restraint.** Whitespace and soft depth over decoration.
+
+Relaxed from v2:
+- Italics allowed sparingly for genuine emphasis (v2 banned them; not needed in a modern sans system, but no longer forbidden).
+
+Retired from v2:
+- Atelier Français direction, watercolor washes, typewriter wordmark, breathing-M animation, ink/handmade texture, Instrument Serif, Crimson Pro, mustard (already gone in v2).
+
+---
+
+## Locked decisions (2026-06-11)
+
+1. **Accent color:** `#E5301C` (modern vermillion) light, `#FF453A` dark. One accent only.
+2. **Display typeface:** Inter system. A distinctive display face is deferred, revisited once surfaces exist.
+3. **Logotype mark:** modern Inter wordmark ships first; a short mark/glyph exploration (glossy island dot / single geometric glyph) is queued as a follow-on.

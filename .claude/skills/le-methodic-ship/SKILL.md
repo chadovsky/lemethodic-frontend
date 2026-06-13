@@ -40,7 +40,7 @@ Grep the diff (against the merge base, or against `main` for working changes) fo
 | `Fraunces` | Not in the approved font stack. |
 | `Figtree` | Not in the approved font stack. |
 
-Approved fonts (M2 t11 stack): Instrument Serif, Crimson Pro, Instrument Sans, Inter, DM Mono. Cabinet Grotesk, Geist, and Source Serif 4 are removed — do not reintroduce. If a new font is genuinely required, that is a Chadi-level decision — surface it explicitly, do not silently permit.
+Font stack (DESIGN.md v3, Apple-lean): the target stack is **Inter** (system face) + **DM Mono** (data). Instrument Serif and Crimson Pro are retired in the v3 spec but still loaded in code; they are TOLERATED during surface re-execution (BACKLOG F-449), so do not block a ship merely for using them yet. Do NOT introduce them in net-new surfaces. Cabinet Grotesk, Geist, Source Serif 4, Fraunces, Figtree remain forbidden — do not reintroduce. Any net-new font is a Chadi-level decision — surface it explicitly, do not silently permit.
 
 ### 6. Build green
 

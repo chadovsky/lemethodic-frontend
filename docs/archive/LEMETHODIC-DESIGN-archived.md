@@ -1,3 +1,10 @@
+> **ARCHIVED — superseded by DESIGN.md v3 (Apple-lean modern), locked 2026-06-11.**
+> This older design doc (pastel "disciplined warmth" direction) is retained for audit only. Do not build against its visual direction.
+> The current visual constitution is repo-root `DESIGN.md` (v3).
+> Note: this file also carries product/brand positioning (audience, brand stance, owner identity, REVIEW decision markers) that is not purely a design spec and is not covered by DESIGN.md v3. Treat that context as historical.
+
+---
+
 # LEMETHODIC-DESIGN.md
 
 **Project:** LeMethodic — TCF/TEF speaking practice for serious adult learners.

@@ -117,11 +117,13 @@ Level advancement is gated by Le Maître's 5-couche pass rate over the current l
 
 ## Image Pipeline
 
+> **Superseded by DESIGN.md v3 (Apple-lean), locked 2026-06-11.** The watercolor/linocut direction described in this whole section is retired. v3 imagery is glossy, dimensional, rim-lit 3D renders (the islands signature), generated in Nano Banana 2. Note the contradiction: the "required negative prompt" below bans "glossy, 3D render," which is the exact opposite of v3. This entire pipeline (aesthetic, reference anchors, prompt vocabulary, negative prompts) needs re-authoring to v3 as a dedicated content ticket (see BACKLOG F-449). The mechanics below are retained for reference until then; do not generate new assets against them.
+
 ### Aesthetic
 
-Linocut-inspired French editorial style with watercolor wash, more illustrative direction (less photographic). The Atelier Français palette (paper white, ink #14213D, vermillion #C8102E) reads naturally with this medium.
+(Retired, see banner above.) Prior direction: linocut-inspired French editorial style with watercolor wash, more illustrative than photographic, on the Atelier Français palette (paper white, ink #14213D, vermillion #C8102E). v3 replaces this with glossy 3D renders per DESIGN.md §8/§10.
 
-Reference anchor: the Hermès 2026 homepage redesign commissioned hand-drawn linocut and lithograph illustrations from French illustrator Linda Merad. The 2026 illustration trend rewards visible craft over polished AI output; this aesthetic positions Le Méthodic as a serious French product, not a stack of stock visuals.
+Prior reference anchor (retired): the Hermès 2026 homepage redesign commissioned hand-drawn linocut and lithograph illustrations from French illustrator Linda Merad.
 
 ### Density per île
 

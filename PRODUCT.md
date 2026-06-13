@@ -2,7 +2,7 @@
 
 > **Document type:** anchoring brief for AI coding assistants and human collaborators making design, copy, or product decisions inside this repo.
 > **Audience:** any AI agent or human working in this repository.
-> **Companion:** DESIGN.md is the visual constitution (warm palette, per-couche colors, motion direction, type system). Do not touch DESIGN.md. See it for all visual language decisions.
+> **Companion:** DESIGN.md is the visual constitution (v3 Apple-lean: near-monochrome base, one accent, sans type, soft depth, the glossy 3D islands signature). Do not touch DESIGN.md. See it for all visual language decisions.
 > **Copy rule:** never use em-dash in any output, including prose, file contents, code comments, diagram labels, or conversational responses. Use commas, colons, parentheses, or sentence breaks instead. This applies to every surface, every agent, every response.
 > **Decisions locked:** 2026-05-24 through 2026-06-02 sessions. Iterate only when product reality changes.
 
@@ -295,11 +295,10 @@ Both voices are **brand-critical and non-negotiable.** No cost-reduction migrati
 
 ### Approved type stack
 
-- **Cabinet Grotesk:** primary display and hero typography
-- **Geist:** UI, body, interface text
-- **Source Serif 4:** editorial body copy where serif is pedagogically right (lesson content, long-form reading)
+- **Inter:** the system face for display, headings, UI, and body (sans-led, per DESIGN.md v3)
+- **DM Mono:** data only (streak counts, scores, timers)
 
-No other typefaces enter the stack without an explicit decision logged in DESIGN.md.
+Serif type is retired in v3 (Instrument Serif and Crimson Pro removed). A distinctive display face is a deferred revisit. No other typefaces enter the stack without an explicit decision logged in DESIGN.md.
 
 ### Voice anti-patterns
 
@@ -326,10 +325,12 @@ The product's visual language must communicate:
 | **French linguistic identity** | French chrome (date formats, accents, typographic conventions: espace fine insécable in numerals, French quote marks « » where pedagogically right) |
 | **Editorial confidence on brand surfaces** | Generous type scale, serif accents, long-form rhythm, room for argument |
 | **Utility-first on product surfaces** | Tight spacing, fast feedback, no decorative chrome |
-| **Warm, not cold** | Warm palette anchors the system. Direction is warm, never the cool-blue SaaS-template default. Specifics in DESIGN.md. |
+| **Calm, premium restraint** | Near-monochrome ink-on-paper base with one confident accent, generous whitespace, soft depth over decoration. The glossy 3D islands are the single expressive signal. Specifics in DESIGN.md v3. |
 | **Motion present, never decorative** | Motion is welcomed where it serves comprehension or delight at the right moment. Reduced-motion preferences respected. No autoplay loops, no scroll-jacking, no parallax-as-decoration. |
 
 ### Per-couche color direction
+
+> **Superseded.** The warm per-couche palette below is v1 direction. DESIGN.md v3 uses one accent only (no second brand color, no per-couche warm hues). The couche color decision under v3 is a re-spec item (see BACKLOG F-449). Table retained for historical context.
 
 | Couche | Color direction |
 |---|---|

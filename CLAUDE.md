@@ -103,6 +103,8 @@ There is a **duplicate** `styles/globals.css` that is not imported anywhere: `ap
 
 ### Fonts
 
+> **Design direction is DESIGN.md v3 (Apple-lean, locked 2026-06-11): sans-led, Inter as the system face, DM Mono for data; serifs retired (Instrument Serif and Crimson Pro removed in the spec).** The font loading described below is the *current code state* and is still accurate; v3 surface re-execution (which removes the serif faces) is a separate set of tickets (see BACKLOG F-449), not yet applied. Treat Inter + DM Mono as the forward intent.
+
 `app/layout.tsx` loads five fonts via `next/font/google`: **Instrument Serif** (`--font-instrument-serif`), **Crimson Pro** (`--font-crimson-pro`), **Instrument Sans** (`--font-instrument-sans`), **Inter** (`--font-inter`), **DM Mono** (`--font-dm-mono`). These map to the M2 t11 CSS aliases `--f-display`, `--f-body`, `--f-ui`, `--f-en`, `--f-mono` in `app/globals.css`. Geist/Geist Mono are loaded but intentionally not applied (prefixed `_geist`).
 
 Cabinet Grotesk (formerly the display font, loaded from `fonts.cdnfonts.com`) was removed in F-437. No CDN font links exist in the codebase. `lib/typography.ts:DISPLAY_FONT` resolves to `var(--f-display)` → Instrument Serif.

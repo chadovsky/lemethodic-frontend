@@ -7,6 +7,8 @@
 **t11 Type A font loading:** 7c6042a (M2 t11 shipped)
 **Supersedes:** docs/m2-visual-audit-2026-05-25.md (v1 direction, now obsolete)
 
+> **Historical.** This audit measures surfaces against DESIGN.md v2 (Atelier Français), which was superseded by DESIGN.md v3 (Apple-lean) on 2026-06-11. Retained as a record of the v2 audit; its findings (Instrument Serif, vermillion accent lines, no-italic, pastel chip rules) no longer reflect the current design direction.
+
 ---
 
 ## Audit baseline: what t10/t11 delivered

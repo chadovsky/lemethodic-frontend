@@ -613,7 +613,7 @@ The feat/payload-cms branch remains scaffolded for Phase 5 migration if content 
 
 Image generation uses Nano Banana Pro with the protocol locked in PEDAGOGY.md:
 
-- Aesthetic: linocut-inspired French editorial style with watercolor wash, more illustrative than photographic.
+- Aesthetic: glossy, dimensional, rim-lit 3D renders per DESIGN.md v3 (the islands signature). The prior linocut/watercolor direction is retired; the PEDAGOGY.md image-pipeline prompts are pending re-authoring to v3 (see BACKLOG F-449).
 - 4 to 6 style anchor references locked at Phase 2 start.
 - Style plus content reference split prompting per generation.
 - Variable-token prompting and trait locking for consistency.
