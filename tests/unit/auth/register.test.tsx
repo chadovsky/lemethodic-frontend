@@ -105,7 +105,7 @@ describe('SignupForm — register wiring', () => {
     )
   })
 
-  it('navigates to /onboarding on success', async () => {
+  it('navigates to /bienvenue on success', async () => {
     mockRegister.mockResolvedValueOnce({
       token: 'tok',
       user: { id: 1, email: 'user@example.com', fullName: '' },
@@ -116,7 +116,7 @@ describe('SignupForm — register wiring', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /create account/i }))
     })
-    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/onboarding'))
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/bienvenue'))
   })
 
   it('shows "Email already registered." on 409', async () => {
