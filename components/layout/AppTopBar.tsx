@@ -120,8 +120,10 @@ export default function AppTopBar({
         Le Méthodic
       </span>
 
-      {/* Desktop-only: page title, left, ink. */}
-      <h1
+      {/* Desktop-only: page title, left, ink. Chrome, not the page heading —
+          a plain <div> (not <h1>) so each page keeps a single content <h1>
+          and the heading landmark stays unambiguous (F-455 CI fix). */}
+      <div
         className="hidden lg:block"
         data-testid="app-topbar-title"
         style={{
@@ -135,7 +137,7 @@ export default function AppTopBar({
         }}
       >
         {title}
-      </h1>
+      </div>
 
       {/* Desktop-only: inert search field. No fake interactivity. */}
       <div className="app-topbar-search hidden lg:flex" data-testid="app-topbar-search">
