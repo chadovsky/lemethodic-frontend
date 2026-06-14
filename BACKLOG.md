@@ -6634,6 +6634,36 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 **Sequencing note:** surface re-execution is UI work and follows the FE-first protocol; individual tickets to be filed when dispatched. This entry is the umbrella.
 
 
+## F-450 -- FE: resolve broken nav targets (live 404s)
+**Status:** Shipped (c47e880 + f3c0f76)
+
+**Scope:** Fixed live 404s from broken nav targets. `/exam-prep` redirect repointed off `/tcf-canada` (never built) to `/examens/tcf` (the real TCF Canada landing); `/coaching` + `/placement` given bientot placeholders (F-359 pattern) so TopNav / Sidebar / Hero CTA links resolve. Second commit folded in `PlatformLanding.tsx` (href, seeMoreHref) + `LandingFooter.tsx` (EN branch) `/tcf-canada` hrefs -> `/examens/tcf`; tree-wide grep confirms zero live `/tcf-canada` refs (comments only). The `/tcf-canada` page itself was not built (MS-1, out of scope). e2e `f-450` 4/4 + F-225 captures; build green.
+
+## F-451 -- FE: reroute signup into Target Profile capture (/bienvenue)
+**Status:** Shipped (37d5341 + ed3581e)
+
+**Scope:** `SignupForm` post-submit redirected to `/onboarding` (the dismissible product tour) instead of `/bienvenue` (the real four-question intent capture), so new users never hit intent capture. Repointed `/onboarding` -> `/bienvenue`; the tour is left intact, only decoupled from the signup redirect. `/bienvenue` already lands on `/tableau-de-bord` post-capture. Follow-up commit fixed a missed signup-redirect assertion in `register.test.tsx` (the earlier single-file run had masked it, turning CI red). Full unit suite 492/492, build green.
+
+## F-452 -- FE: dead-route cleanup (remove 4 superseded route families)
+**Status:** Shipped (d5ebba5)
+
+**Scope:** Removed dead route families: `/cours/methode-tcf-canada` + `[id]` (already 308 -> `/la-methode`), `/la-methode/lesson/[id]` + quiz (superseded by `/la-methode/lecon-N`, zero inbound). Added 308 redirects `/legal/privacy` -> `/confidentialite` and `/legal/tos` -> `/cgv` (ToS = service terms = CGV), removed the stubs. 8 files removed, +2 redirects. Unit 492/492, build green.
+
+## F-453 -- FE: v3 logged-in shell plumbing (app top bar + dashboard rewire)
+**Status:** Shipped (1cc936c)
+
+**Scope:** App top bar (`components/layout/AppTopBar.tsx`): content-column bar with an inert search field, an inert notifications bell (desktop), the relocated still-functional `ThemeToggle` (moved out of the sidebar), and a functional user dropdown (`components/layout/UserMenu.tsx`) that de-orphans `/parametres` + `/abonnement`. Dashboard: removed the heatmap `CalendarWidget` from the surface (component + unit test parked; the F-443 BE endpoint untouched) and added a gated `Commencer la seance` primary CTA via the F-359 bientot pattern. Shell: sidebar reservation dropped (now full-height), `.app-shell-main` top padding moved to CSS to clear the fixed top bar. Plumbing baseline only on v3 tokens; frosted / elevation / motion deferred to F-454. Full unit suite 506/506, build green.
+
+## F-454 -- FE: v3 palette foundation (token repoint + F-349 hex sweep) + rgba/hsl ext
+**Status:** Shipped (900ced4 + 16c2d4f)
+
+**Scope:** Repointed every canonical color token in `app/globals.css` to the DESIGN.md v3 palette across `:root` (light) + `.dark`, added a distinct `--canvas` surface tier, collapsed the in-product nav-blue + vermillion onto the single v3 coral accent, moved slate to chart-line only. Finished the F-349 hex sweep by routing the deferred chrome hexes (correct-green, error reds, status greens/amber, corals, flame, hover) through v3 tokens; banned v2 literals now zero. Ext commit swept v2 colors written in `rgba()` / `hsl()` form (semantic consts -> role tokens; themed tints -> `color-mix` of the role token at matching alpha) across the iles molds, seance, and the CalendarWidget ramp; final all-form grep (hex + rgba + dead-hsl) confirms zero dead-palette colors remain. Full suite 506/506, build green.
+
+## F-455 -- FE: v3 shell chrome paint (frosted sidebar + top bar)
+**Status:** Shipped (1077b6c + 950edd0 + 2b52ccc)
+
+**Scope:** Chrome-only v3 frosted paint; our IA, French labels, and the LE METHODIC wordmark preserved (not the mock's nav). Sidebar: frosted floating panel (blur, rounded, soft shadow, 12px inset inside its 240/64 footprint), active row is an opaque white pill + coral icon/label, legacy MOCK-006 left-tab retired, logout row removed (logout lives solely in the user dropdown). Top bar: frosted + scroll shadow, route-locked French page title, inert search, inert EN/FR toggle (functional switch is F-357), inert bell, theme toggle, user dropdown (coral avatar per the one-accent doctrine, fade+scale open motion, reduced-motion guarded). New shell tokens (light + dark). Two follow-up fixes: top-bar title changed `<h1>` -> `<div>` (it is chrome, not the page heading; the duplicate h1 caused a Playwright strict-mode violation on 3 pages); desktop hamburger hidden via plain CSS rather than `lg:hidden` (an inline `display` beat the no-`!important` Tailwind class, rendering the button at 1440 and reddening CI prod). Verified against a CI-mode prod build: e2e 888 passed / 3 skipped / 0 failures, unit 509/509, build green.
+
 ## F-456 -- FE: Journey data model + static fixture
 
 **Status:** Shipped (direct to main)
