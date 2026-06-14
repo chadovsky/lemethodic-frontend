@@ -25,20 +25,13 @@ export default function SidebarLink({ href, label, onClick, icon, isCollapsed = 
   return (
     <div
       className={active ? 'sidebar-active-row' : ''}
-      style={{ display: 'flex', alignItems: 'stretch' }}
+      style={{
+        display: 'flex',
+        alignItems: 'stretch',
+        // F-455 — inset the pill from the panel edges so it floats.
+        padding: isCollapsed ? '2px 8px' : '2px 10px',
+      }}
     >
-      {active && (
-        <span
-          data-testid="sidebar-active-tab"
-          aria-hidden="true"
-          style={{
-            width: 4,
-            flexShrink: 0,
-            backgroundColor: 'var(--cta-utility)',
-            borderRadius: '0 2px 2px 0',
-          }}
-        />
-      )}
       <Link
         href={href}
         onClick={onClick}
@@ -49,18 +42,24 @@ export default function SidebarLink({ href, label, onClick, icon, isCollapsed = 
           display: 'flex',
           alignItems: 'center',
           justifyContent: isCollapsed ? 'center' : 'flex-start',
-          height: 44,
+          height: 42,
           flex: 1,
-          paddingLeft: isCollapsed ? 0 : (active ? 13 : 17),
-          paddingRight: isCollapsed ? 0 : 20,
+          paddingLeft: isCollapsed ? 0 : 12,
+          paddingRight: isCollapsed ? 0 : 14,
           gap: isCollapsed ? 0 : 10,
           fontFamily: SANS_FONT,
           fontWeight: active ? 600 : 500,
           fontSize: '0.9375rem',
           letterSpacing: '0.005em',
-          color: active ? 'var(--text-primary)' : 'var(--text-muted)',
+          // F-455 — active = opaque white pill + coral icon/label; inactive =
+          // secondary-text slate, no pill. Smooth fade on selection.
+          borderRadius: 10,
+          backgroundColor: active ? 'var(--shell-pill)' : 'transparent',
+          boxShadow: active ? 'var(--shell-pill-shadow)' : 'none',
+          color: active ? 'var(--accent)' : 'var(--text-secondary)',
           textDecoration: 'none',
-          transition: 'color var(--lm-duration-hover) ease',
+          transition:
+            'background-color var(--lm-duration-hover) var(--lm-ease), color var(--lm-duration-hover) ease, box-shadow var(--lm-duration-hover) ease',
         }}
       >
         {icon && (

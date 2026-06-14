@@ -11,19 +11,6 @@ interface UserMenuProps {
   onSignOut?: () => void
 }
 
-// Deterministic avatar palette — zero backend. A name always maps to the same
-// hue, so the colored circle is stable across sessions without storing anything.
-const AVATAR_COLORS = [
-  '#E05C42', // v3 accent coral
-  '#1F6FEB',
-  '#2DA44E',
-  '#8957E5',
-  '#BF8700',
-  '#0969DA',
-  '#1A7F37',
-  '#9A3412',
-]
-
 function firstNameOf(fullName?: string | null, email?: string | null): string {
   if (fullName?.trim()) return fullName.trim().split(/\s+/)[0]
   if (email?.trim()) return email.split('@')[0]
@@ -34,22 +21,15 @@ function initialOf(name: string): string {
   return name.slice(0, 1).toUpperCase()
 }
 
-// Simple deterministic string hash → palette index.
-function avatarColor(seed: string): string {
-  let h = 0
-  for (let i = 0; i < seed.length; i++) {
-    h = (h * 31 + seed.charCodeAt(i)) >>> 0
-  }
-  return AVATAR_COLORS[h % AVATAR_COLORS.length]
-}
-
 export default function UserMenu({ fullName, email, onSignOut }: UserMenuProps) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
 
   const firstName = firstNameOf(fullName, email)
   const initial = initialOf(firstName)
-  const color = avatarColor(firstName)
+  // F-455 — coral initials circle. The v3 one-accent doctrine retires the
+  // per-name palette; the avatar always carries the brand coral.
+  const color = 'var(--accent)'
 
   const close = useCallback(() => setOpen(false), [])
 
@@ -133,6 +113,7 @@ export default function UserMenu({ fullName, email, onSignOut }: UserMenuProps) 
           data-testid="user-menu-dropdown"
           role="menu"
           aria-label="Compte"
+          className="shell-menu-pop"
           style={{
             position: 'absolute',
             top: 'calc(100% + 8px)',
@@ -144,6 +125,7 @@ export default function UserMenu({ fullName, email, onSignOut }: UserMenuProps) 
             padding: 6,
             zIndex: 70,
             fontFamily: SANS_FONT,
+            boxShadow: 'var(--shell-shadow)',
           }}
         >
           {/* Header: first name + email */}

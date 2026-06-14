@@ -17,7 +17,6 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
-  LogOut,
 } from 'lucide-react'
 
 // Same cookie name as S2 (components/ui/sidebar.tsx) for future S2 deprecation parity.
@@ -27,6 +26,10 @@ const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b'
 const EXPANDED_WIDTH = 240
 const COLLAPSED_WIDTH = 64
+// F-455 — float the frosted panel inside its 240/64 footprint so the canvas
+// shows around it. The right edge stays at EXPANDED/COLLAPSED width, so the
+// top-bar (left: 240) and main (margin-left: 240) offsets are untouched.
+const PANEL_INSET = 12
 
 const NAV_ITEMS = [
   { href: '/seance', label: 'La Séance', icon: <PlayCircle size={20} strokeWidth={1.5} /> },
@@ -46,7 +49,6 @@ interface SidebarProps {
   drawerOpen: boolean
   onLinkClick?: () => void
   onClose?: () => void
-  onSignOut?: () => void
   initials?: string
 }
 
@@ -54,7 +56,6 @@ export default function Sidebar({
   drawerOpen,
   onLinkClick,
   onClose,
-  onSignOut,
   initials = 'CH',
 }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -115,13 +116,17 @@ export default function Sidebar({
       className="app-shell-sidebar"
       style={{
         position: 'fixed',
-        top: 0,
-        bottom: 0,
-        left: 0,
+        top: PANEL_INSET,
+        bottom: PANEL_INSET,
+        left: PANEL_INSET,
         zIndex: 50,
-        width: sidebarWidth,
-        backgroundColor: 'var(--bg-elevated)',
-        borderRight: '1px solid var(--rule-default)',
+        width: sidebarWidth - PANEL_INSET,
+        backgroundColor: 'var(--shell-frost)',
+        backdropFilter: 'saturate(180%) blur(20px)',
+        WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+        border: '1px solid var(--rule-default)',
+        borderRadius: 'var(--shell-radius)',
+        boxShadow: 'var(--shell-shadow)',
         display: 'flex',
         flexDirection: 'column',
         transition: 'width 200ms ease, transform 300ms var(--lm-ease)',
@@ -267,63 +272,9 @@ export default function Sidebar({
       </nav>
 
       {/* F-453: ThemeToggle relocated to the app shell top bar (AppTopBar). */}
-
-      {onSignOut && (
-        <div
-          style={{
-            padding: collapsed ? '12px 0' : '12px 16px',
-            borderTop: '1px solid var(--rule-default)',
-            display: 'flex',
-            justifyContent: collapsed ? 'center' : 'flex-start',
-          }}
-        >
-          {collapsed ? (
-            <button
-              type="button"
-              data-testid="sidebar-signout"
-              onClick={onSignOut}
-              aria-label="Se déconnecter"
-              style={{
-                width: 44,
-                height: 44,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                color: 'var(--text-muted)',
-                borderRadius: 4,
-                padding: 0,
-              }}
-            >
-              <LogOut size={18} strokeWidth={1.5} />
-            </button>
-          ) : (
-            <button
-              type="button"
-              data-testid="sidebar-signout"
-              onClick={onSignOut}
-              style={{
-                width: '100%',
-                height: 44,
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                fontFamily: SANS_FONT,
-                fontWeight: 500,
-                fontSize: '0.875rem',
-                color: 'var(--text-muted)',
-                textAlign: 'left',
-                padding: '0 8px',
-                borderRadius: 4,
-              }}
-            >
-              Se déconnecter
-            </button>
-          )}
-        </div>
-      )}
+      {/* F-455: sidebar logout row removed — logout now lives solely in the
+          user dropdown (AppTopBar → UserMenu), deduping the second affordance
+          the F-453 note flagged. */}
 
       {/* Desktop-only collapse toggle */}
       <div

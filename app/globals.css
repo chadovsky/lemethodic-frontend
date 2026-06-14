@@ -102,6 +102,15 @@
   --dominant-soft: #4E5D70;
   --dominant-deep: #3E4B5C;   /* derived darker slate */
 
+  /* F-455 — v3 frosted shell chrome (sidebar + top bar). Translucent paper
+     over the recessed canvas, soft elevation, opaque pill for the active row. */
+  --shell-frost:      color-mix(in srgb, var(--paper) 76%, transparent);
+  --shell-shadow:     0 6px 28px -10px rgba(17, 24, 39, 0.16), 0 1px 3px rgba(17, 24, 39, 0.06);
+  --shell-shadow-bar: 0 4px 20px -12px rgba(17, 24, 39, 0.20), 0 1px 2px rgba(17, 24, 39, 0.05);
+  --shell-pill:       var(--paper);
+  --shell-pill-shadow: 0 1px 3px rgba(17, 24, 39, 0.10), 0 1px 1px rgba(17, 24, 39, 0.04);
+  --shell-radius:     18px;
+
   /* Accent — brand / CTA / selected / progress (v3 coral, single accent) */
   --accent: #E05C42;
   --accent-soft: #F87171;            /* data secondary coral */
@@ -253,6 +262,13 @@
   --accent: #DC5D4B;
   --accent-soft: #F27A6C;            /* data secondary coral (dark) */
   --accent-deep: hsl(9 60% 48%);     /* hover depth for dark-mode coral */
+
+  /* F-455 — frosted shell chrome (dark): deeper translucency + stronger shadow */
+  --shell-frost:      color-mix(in srgb, var(--paper) 66%, transparent);
+  --shell-shadow:     0 6px 30px -10px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.40);
+  --shell-shadow-bar: 0 4px 22px -12px rgba(0, 0, 0, 0.55), 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shell-pill:       color-mix(in srgb, var(--paper) 92%, #fff);
+  --shell-pill-shadow: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 1px rgba(0, 0, 0, 0.30);
 
   /* shadcn token overrides — v3 night */
   --background: var(--canvas);
@@ -1091,6 +1107,8 @@
    hamburger), shifted to the content column (right of the 240px sidebar) on
    desktop. z-index 30 keeps it below the mobile drawer (sidebar z-50) so the
    open drawer is never occluded. */
+/* F-455 — frosted top bar. Translucent paper + backdrop blur; the bottom rule
+   is dropped in favour of a soft shadow that fades in once content scrolls. */
 .app-topbar {
   position: fixed;
   top: 0;
@@ -1102,8 +1120,17 @@
   align-items: center;
   gap: 8px;
   padding: 0 12px;
-  background-color: var(--bg-elevated);
-  border-bottom: 1px solid var(--rule-default);
+  background-color: var(--shell-frost);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid transparent;
+  box-shadow: none;
+  transition: box-shadow var(--lm-duration-base) var(--lm-ease),
+              border-color var(--lm-duration-base) var(--lm-ease);
+}
+.app-topbar[data-scrolled="true"] {
+  box-shadow: var(--shell-shadow-bar);
+  border-bottom-color: var(--rule-default);
 }
 .app-topbar-search {
   align-items: center;
@@ -1113,7 +1140,7 @@
   padding: 0 14px;
   border: 1px solid var(--rule-default);
   border-radius: 999px;
-  background-color: var(--bg-canvas);
+  background-color: color-mix(in srgb, var(--bg-canvas) 70%, transparent);
 }
 .app-shell-main { margin-left: 0; padding-top: 72px; }
 .app-shell-sidebar {
@@ -1128,8 +1155,22 @@
   .app-shell-sidebar { transform: translateX(0); }
 }
 
-/* MOCK-006 — Sidebar active row full-bleed background */
-.sidebar-active-row { background-color: var(--bg-elevated, #fff); }
+/* F-455 — active row is now an opaque pill on the Link itself (see
+   SidebarLink); the wrapper no longer paints a full-bleed background. */
+.sidebar-active-row { background-color: transparent; }
+
+/* F-455 — user-menu dropdown open motion: fade + slight scale/rise. */
+@keyframes shell-menu-pop {
+  from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+.shell-menu-pop {
+  animation: shell-menu-pop var(--lm-duration-fast) var(--lm-ease) both;
+  transform-origin: top right;
+}
+@media (prefers-reduced-motion: reduce) {
+  .shell-menu-pop { animation: none; }
+}
 
 /* MOCK-006 — Backdrop fade-in animation */
 @keyframes backdrop-fade-in {

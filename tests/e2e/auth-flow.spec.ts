@@ -29,9 +29,13 @@ test.describe('Auth flow — redirect gate', () => {
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
   })
 
-  test('sidebar exposes a sign-out button', async ({ page }) => {
+  // F-455 — logout deduped out of the sidebar; it lives solely in the user
+  // dropdown (top bar). Sidebar must no longer carry a sign-out affordance.
+  test('logout lives in the user menu, not the sidebar', async ({ page }) => {
     await injectAuthToken(page)
     await page.goto('/dashboard')
-    await expect(page.getByTestId('sidebar-signout')).toBeVisible()
+    await expect(page.getByTestId('sidebar-signout')).toHaveCount(0)
+    await page.getByTestId('user-menu-trigger').click()
+    await expect(page.getByTestId('user-menu-signout')).toBeVisible()
   })
 })

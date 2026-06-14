@@ -2866,6 +2866,32 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 - **Final all-form grep** (hex + rgba + dead-hsl, excl. archived docs) → **ZERO dead-palette colors remain in any form.** Out-of-scope (untouched per brief): decorative palettes (`#6B4EAA`, category/avatar/pastel).
 - **Verification:** full suite **506/506**; `pnpm build` exit 0. F-225 recapture of the surfaces that shifted: `f-454ext-molds-{light,dark}-{1440,375}.png` (lesson molds: piège/chip/answer tints), `f-454ext-l-examen-{light,dark}-{1440,375}.png` (secondary text + hairlines); trace `tests/traces/f-454-ext.zip`. Spec `tests/e2e/f-454-ext.spec.ts` — all 4 green.
 
+### F-455 — v3 shell chrome paint (frosted sidebar + top bar)
+
+**Status:** Shipped — main at <POST_SQUASH_SHA>
+
+**Context:** Resolves the shell-polish punt F-453 tagged "to F-454" (F-454 was redesignated palette/token foundation, so the polish slipped to its own ticket — this one). Scope is **chrome only** (sidebar + top bar); dashboard content (island map, rings, charts, cards) is a separate ticket. Aesthetic source = the v3 dashboard mock (frosted glass, coral accent on gray/white, lucide icons, active coral pill) — the **look only**. Our locked IA, French labels, and brand are preserved; the mock's nav (Bibliothèque / Carte du Voyage / Mes Cours / Communauté, compass/PARLER EN VOYAGE wordmark) was **not** adopted.
+
+**Sidebar (`components/layout/Sidebar.tsx`, `SidebarLink.tsx`):**
+- Frosted translucent floating panel: `var(--shell-frost)` (color-mix of `--paper` over transparent) + `backdrop-filter: blur`, `--shell-radius` rounded, `--shell-shadow` soft elevation, inset 12px inside its 240/64 footprint so the canvas shows around it. Top-bar `left:240` / main `margin-left:240` offsets untouched (right edge stays at the footprint width).
+- IA preserved exactly — 5 core (La Séance, Tableau de bord, La Méthode, L'Examen, Compte) + revenue (Store, Pricing, Coaching) + Panier. No renames, no Communauté, Profile/Settings stay in the user dropdown.
+- Wordmark = our `Wordmark` (LE MÉTHODIC), unchanged.
+- lucide line icons per item (already in place), 20px / stroke 1.5: La Séance→PlayCircle, Tableau de bord→Home, La Méthode→GraduationCap, L'Examen→FileText, Compte→User, Store→ShoppingBag, Pricing→Tag, Coaching→Users.
+- Active = opaque white pill (`--shell-pill`) + coral (`--accent`) icon & label; inactive = `--text-secondary` slate, no pill; smooth fade on selection. Legacy MOCK-006 left-tab (`sidebar-active-tab`) retired.
+- **Logout row removed** — logout now lives solely in the user dropdown (dedupes the second affordance the F-453 note flagged).
+
+**Top bar (`components/layout/AppTopBar.tsx`):**
+- Frosted translucent (`--shell-frost` + backdrop blur) spanning the content column; bottom rule dropped for a soft shadow that fades in on content scroll (`data-scrolled` via window scroll listener).
+- Page title left, ink (resolved from the route via longest-prefix match on the locked French labels).
+- Existing inert search kept, restyled to v3 (translucent canvas fill).
+- Right cluster: **EN/FR toggle** (placed/visual only — FR active coral pill; inert per the bientôt pattern, functional switching ships with F-357), **notifications bell** (inert; coral unread-dot capability via `hasUnread`), theme toggle, **user dropdown** (coral initials circle + first name + chevron; menu = Paramètres / Abonnement / Se déconnecter per F-453).
+
+**User menu (`components/layout/UserMenu.tsx`):** avatar now always brand coral (`--accent`), retiring the per-name palette per the v3 one-accent doctrine; dropdown gets fade + scale open motion (`.shell-menu-pop`, reduced-motion-guarded) and `--shell-shadow`.
+
+**Tokens (`app/globals.css`):** new `--shell-frost` / `--shell-shadow` / `--shell-shadow-bar` / `--shell-pill` / `--shell-pill-shadow` / `--shell-radius` (light + dark). Rounded-only, restrained Apple-lean motion. i18n/relabel is out of scope (F-357).
+
+**Verification:** full unit suite (vitest) **509/509 passed** (53 files); `pnpm build` exit 0. F-225 captures (painted shell — sidebar + top bar + open dropdown, both modes, 1440 + 375): `f-455-tableau-de-bord-{1440,375}.png`, `f-455-tableau-de-bord-dark-{1440,375}.png`, `f-455-user-menu-{1440,375}.png`, `f-455-user-menu-dark-{1440,375}.png` (8 total); trace `tests/traces/f-455.zip`. Spec `tests/e2e/f-455.spec.ts` (4 describes, all green). Touched-surface regression specs re-run green: `app-shell`, `auth-flow`, `f-453`.
+
 ## Section 4 — Content Pipeline (CON-001 to CON-014)
 
 **Goal:** real content lives behind the surfaces. F-321 vocab review (1,684 Phase 1 chunks awaiting Chadi triage) lands here. L'École 27 lessons get methodology-visible content. Le Diagnostic Tâche library expands to 50 scenarios (F-061.2 Livraison 2/2).

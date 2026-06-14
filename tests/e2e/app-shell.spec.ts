@@ -15,10 +15,11 @@ test.describe('App shell — desktop (1280×800)', () => {
     await expect(page.getByTestId('sidebar-avatar')).toHaveText('CH')
   })
 
-  test('active link row has left-tab indicator visible', async ({ page }) => {
+  // F-455 — legacy left-tab replaced by the active pill on the link itself.
+  test('active link renders the active pill (no legacy left-tab)', async ({ page }) => {
     await page.goto('/tableau-de-bord')
-    const tab = page.getByTestId('sidebar-active-tab')
-    await expect(tab).toBeVisible()
+    await expect(page.getByTestId('sidebar-link-tableau-de-bord')).toHaveAttribute('data-active', 'true')
+    await expect(page.getByTestId('sidebar-active-tab')).toHaveCount(0)
   })
 
   test('navigating tableau-de-bord→la-methode shifts active state', async ({ page }) => {

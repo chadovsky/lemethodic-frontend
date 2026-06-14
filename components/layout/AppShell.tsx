@@ -65,7 +65,6 @@ export default function AppShell({ children }: AppShellProps) {
         drawerOpen={drawerOpen}
         onLinkClick={closeDrawer}
         onClose={closeDrawer}
-        onSignOut={() => signOut(router)}
         initials={initials}
       />
 

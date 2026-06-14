@@ -10,6 +10,11 @@ vi.mock('next/link', () => ({
   ),
 }))
 
+const mockUsePathname = vi.fn<() => string>(() => '/tableau-de-bord')
+vi.mock('next/navigation', () => ({
+  usePathname: () => mockUsePathname(),
+}))
+
 // Stub ThemeToggle so the bar test doesn't depend on next-themes internals.
 vi.mock('@/components/ui/ThemeToggle', () => ({
   ThemeToggle: () => <button data-testid="theme-toggle" aria-label="Switch to dark mode" />,
@@ -46,6 +51,28 @@ describe('AppTopBar', () => {
     const bell = screen.getByTestId('app-topbar-bell')
     expect(bell).toHaveAttribute('aria-disabled', 'true')
     expect(bell).toHaveAttribute('tabindex', '-1')
+  })
+
+  it('renders the page title resolved from the route', () => {
+    mockUsePathname.mockReturnValue('/la-methode/lesson/3')
+    render(<AppTopBar onHamburgerClick={vi.fn()} drawerOpen={false} />)
+    expect(screen.getByTestId('app-topbar-title')).toHaveTextContent('La Méthode')
+    mockUsePathname.mockReturnValue('/tableau-de-bord')
+  })
+
+  it('renders the placed EN/FR language toggle (inert, FR active)', () => {
+    render(<AppTopBar onHamburgerClick={vi.fn()} drawerOpen={false} />)
+    const lang = screen.getByTestId('app-topbar-lang')
+    expect(lang).toHaveAttribute('aria-disabled', 'true')
+    expect(screen.getByTestId('app-topbar-lang-fr')).toHaveAttribute('data-active', 'true')
+    expect(screen.getByTestId('app-topbar-lang-en')).toHaveAttribute('data-active', 'false')
+  })
+
+  it('renders the unread coral dot only when hasUnread is set', () => {
+    const { rerender } = render(<AppTopBar onHamburgerClick={vi.fn()} drawerOpen={false} />)
+    expect(screen.queryByTestId('app-topbar-bell-dot')).not.toBeInTheDocument()
+    rerender(<AppTopBar onHamburgerClick={vi.fn()} drawerOpen={false} hasUnread />)
+    expect(screen.getByTestId('app-topbar-bell-dot')).toBeInTheDocument()
   })
 
   it('hosts the theme toggle and the user menu', () => {
