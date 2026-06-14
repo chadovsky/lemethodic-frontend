@@ -7,11 +7,6 @@ vi.mock('next/navigation', () => ({
   usePathname: () => mockUsePathname(),
 }))
 
-// F-446: ThemeToggle is now part of the sidebar.
-vi.mock('@/components/ui/ThemeToggle', () => ({
-  ThemeToggle: () => <button data-testid="theme-toggle" aria-label="Switch to dark mode" />,
-}))
-
 vi.mock('next/link', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   default: ({ href, children, onClick, ...rest }: any) => (
@@ -145,16 +140,9 @@ describe('Sidebar', () => {
     expect(onSignOut).toHaveBeenCalledTimes(1)
   })
 
-  // F-446 -- ThemeToggle relocated from TopNav authenticated branch to sidebar.
-  it('renders ThemeToggle inside the sidebar', () => {
+  // F-453 -- ThemeToggle relocated out of the sidebar to the app top bar.
+  it('no longer renders the ThemeToggle inside the sidebar', () => {
     render(<Sidebar drawerOpen={false} />)
-    expect(screen.getByTestId('theme-toggle')).toBeInTheDocument()
-  })
-
-  it('ThemeToggle is inside the sidebar-theme-toggle container', () => {
-    render(<Sidebar drawerOpen={false} />)
-    const container = screen.getByTestId('sidebar-theme-toggle')
-    expect(container).toBeInTheDocument()
-    expect(container.querySelector('[data-testid="theme-toggle"]')).not.toBeNull()
+    expect(screen.queryByTestId('sidebar-theme-toggle')).not.toBeInTheDocument()
   })
 })

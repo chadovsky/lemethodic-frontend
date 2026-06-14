@@ -155,9 +155,11 @@ test.describe('Dashboard — desktop (1280×800)', () => {
     await expect(link).toHaveAttribute('href', '/la-methode/lecon-2')
   })
 
-  test('calendar widget renders the month grid', async ({ page }) => {
+  // F-453: heatmap CalendarWidget removed from the dashboard; the gated
+  // "Commencer la séance" CTA now leads the surface.
+  test('gated Commencer la séance CTA renders at the top', async ({ page }) => {
     await page.goto('/dashboard')
-    await expect(page.getByTestId('calendar-grid')).toBeVisible()
+    await expect(page.getByTestId('dashboard-commencer-seance')).toBeVisible()
   })
 
   test('widget cards carry ed-card-lift class', async ({ page }) => {
@@ -166,7 +168,6 @@ test.describe('Dashboard — desktop (1280×800)', () => {
     await expect(page.getByTestId('dashboard-widget-streak')).toHaveClass(/ed-card-lift/)
     await expect(page.getByTestId('dashboard-widget-daily-target')).toHaveClass(/ed-card-lift/)
     await expect(page.getByTestId('dashboard-widget-prochaine-lecon')).toHaveClass(/ed-card-lift/)
-    await expect(page.getByTestId('dashboard-widget-calendar')).toHaveClass(/ed-card-lift/)
   })
 
   test('daily target edit button opens input; cancel restores the value', async ({ page }) => {

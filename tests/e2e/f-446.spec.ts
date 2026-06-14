@@ -93,15 +93,13 @@ test.describe('F-446 -- logged-in shell (desktop 1440)', () => {
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
   })
 
-  test('ThemeToggle reachable in sidebar when logged in', async ({ page }) => {
+  // F-453: ThemeToggle relocated from the sidebar to the app top bar.
+  test('ThemeToggle reachable in the app top bar when logged in', async ({ page }) => {
     await page.goto(AUTHED_ROUTE)
-    const sidebar = page.getByTestId('app-shell-sidebar')
-    await expect(sidebar).toBeVisible()
-    const themeToggleContainer = page.getByTestId('sidebar-theme-toggle')
-    await expect(themeToggleContainer).toBeVisible()
-    // The toggle button itself is inside the container.
-    const toggleBtn = themeToggleContainer.getByTestId('theme-toggle')
-    await expect(toggleBtn).toBeVisible()
+    await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
+    const topbar = page.getByTestId('app-topbar')
+    await expect(topbar).toBeVisible()
+    await expect(topbar.getByTestId('theme-toggle')).toBeVisible()
   })
 
   test('ThemeToggle click does not throw (basic interaction)', async ({ page }) => {
@@ -121,11 +119,11 @@ test.describe('F-446 -- logged-in shell (mobile 375)', () => {
     await injectAuthToken(page)
   })
 
-  test('app-shell topbar renders on mobile when logged in, no TopNav', async ({ page }) => {
+  test('app top bar renders on mobile when logged in, no TopNav', async ({ page }) => {
     ensureDir(SCREENSHOT_DIR)
     await page.goto(AUTHED_ROUTE)
-    // AppShell renders a mobile topbar (app-shell-topbar) at <1024px.
-    await expect(page.locator('.app-shell-topbar')).toBeVisible()
+    // AppShell renders the app top bar (.app-topbar) carrying the hamburger.
+    await expect(page.locator('.app-topbar')).toBeVisible()
     // TopNav desktop nav is absent (hidden md:flex + token guard).
     await expect(page.getByTestId('topnav-desktop')).not.toBeVisible()
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-446-logged-in-375.png'), fullPage: false })
@@ -137,9 +135,10 @@ test.describe('F-446 -- logged-in shell (mobile 375)', () => {
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
   })
 
-  test('ThemeToggle visible inside sidebar drawer on mobile', async ({ page }) => {
+  // F-453: ThemeToggle lives in the app top bar (visible at all widths),
+  // no longer inside the sidebar drawer.
+  test('ThemeToggle visible in the app top bar on mobile', async ({ page }) => {
     await page.goto(AUTHED_ROUTE)
-    await page.getByTestId('app-shell-hamburger').click()
-    await expect(page.getByTestId('sidebar-theme-toggle')).toBeVisible()
+    await expect(page.getByTestId('app-topbar').getByTestId('theme-toggle')).toBeVisible()
   })
 })

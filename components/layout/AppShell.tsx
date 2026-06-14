@@ -2,9 +2,9 @@
 
 import { useState, type ReactNode } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { SERIF_FONT } from '@/lib/typography'
 import { useAuthStore, signOut } from '@/lib/auth'
 import Sidebar from './Sidebar'
+import AppTopBar from './AppTopBar'
 import EmailVerificationBanner from '@/components/app/EmailVerificationBanner'
 
 interface AppShellProps {
@@ -34,64 +34,16 @@ export default function AppShell({ children }: AppShellProps) {
         backgroundColor: 'var(--bg-canvas)',
       }}
     >
-      {/* Mobile top bar — hidden at ≥1024px via .app-shell-topbar */}
-      <header
-        className="app-shell-topbar"
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 30,
-          height: 56,
-          backgroundColor: 'var(--bg-elevated)',
-          borderBottom: '1px solid var(--rule-default)',
-          alignItems: 'center',
-          padding: '0 16px',
-        }}
-      >
-        <button
-          type="button"
-          data-testid="app-shell-hamburger"
-          aria-label="Open navigation menu"
-          aria-expanded={drawerOpen}
-          aria-controls="app-shell-sidebar"
-          onClick={() => setDrawerOpen(true)}
-          style={{
-            width: 44,
-            height: 44,
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 0,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'var(--text-primary)',
-            borderRadius: 4,
-          }}
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-            <path
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              d="M3 6h14M3 10h14M3 14h14"
-              fill="none"
-            />
-          </svg>
-        </button>
-        <span
-          style={{
-            marginLeft: 8,
-            fontFamily: SERIF_FONT,
-            fontWeight: 400,
-            fontSize: '1.125rem',
-            letterSpacing: '-0.01em',
-            color: 'var(--text-primary)',
-          }}
-        >
-          Le Méthodic
-        </span>
-      </header>
+      {/* F-453 — logged-in app shell top bar (search, notifications, theme,
+          user menu). Replaces the prior mobile-only header; carries the
+          hamburger on mobile and the content-column controls on desktop. */}
+      <AppTopBar
+        onHamburgerClick={() => setDrawerOpen(true)}
+        drawerOpen={drawerOpen}
+        fullName={user?.fullName}
+        email={user?.email}
+        onSignOut={() => signOut(router)}
+      />
 
       {/* Mobile backdrop — hidden at ≥1024px via .app-shell-backdrop */}
       {drawerOpen && (
@@ -124,7 +76,6 @@ export default function AppShell({ children }: AppShellProps) {
         data-pathname={pathname}
         className="app-shell-main ed-page-enter"
         style={{
-          paddingTop: 24,
           paddingBottom: 64,
           paddingLeft: 'clamp(16px, 3vw, 32px)',
           paddingRight: 'clamp(16px, 3vw, 32px)',

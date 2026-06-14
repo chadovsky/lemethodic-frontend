@@ -1086,17 +1086,44 @@
    instead of Tailwind utilities so the breakpoint and transform
    behavior is explicit and stable regardless of Tailwind class
    detection. Breakpoint locked to ≥1024px per PRD acceptance. */
-.app-shell-topbar { display: flex; }
-.app-shell-main { margin-left: 0; }
+/* F-453 — app shell top bar. Fixed; full-width on mobile (carries the
+   hamburger), shifted to the content column (right of the 240px sidebar) on
+   desktop. z-index 30 keeps it below the mobile drawer (sidebar z-50) so the
+   open drawer is never occluded. */
+.app-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  background-color: var(--bg-elevated);
+  border-bottom: 1px solid var(--rule-default);
+}
+.app-topbar-search {
+  align-items: center;
+  gap: 8px;
+  width: clamp(220px, 30vw, 380px);
+  height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--rule-default);
+  border-radius: 999px;
+  background-color: var(--bg-canvas);
+}
+.app-shell-main { margin-left: 0; padding-top: 72px; }
 .app-shell-sidebar {
   transform: translateX(-100%);
   transition: transform 300ms var(--lm-ease);
 }
 .app-shell-sidebar[data-drawer-open="true"] { transform: translateX(0); }
 @media (min-width: 1024px) {
-  .app-shell-topbar { display: none; }
+  .app-topbar { left: 240px; height: 64px; padding: 0 24px; }
   .app-shell-backdrop { display: none; }
-  .app-shell-main { margin-left: 240px; }
+  .app-shell-main { margin-left: 240px; padding-top: 88px; }
   .app-shell-sidebar { transform: translateX(0); }
 }
 

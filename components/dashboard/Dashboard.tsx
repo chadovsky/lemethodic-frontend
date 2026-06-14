@@ -7,8 +7,8 @@ import DashboardGreeting from './DashboardGreeting'
 import CountdownWidget from './CountdownWidget'
 import StreakWidget from './StreakWidget'
 import DailyTargetWidget from './DailyTargetWidget'
-import CalendarWidget from './CalendarWidget'
 import NextLessonWidget from './NextLessonWidget'
+import CommencerSeance from './CommencerSeance'
 
 export default function Dashboard() {
   const [progress, setProgress] = useState<UserProgress | null>(null)
@@ -30,6 +30,8 @@ export default function Dashboard() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 8 }}>
       <DashboardGreeting />
 
+      <CommencerSeance />
+
       <div className="dashboard-grid">
         <CountdownWidget />
         <StreakWidget progress={progress} progressError={progressError} />
@@ -39,9 +41,6 @@ export default function Dashboard() {
           onPatchTarget={handlePatchTarget}
         />
         <NextLessonWidget />
-        <div className="fp-dashboard-calendar">
-          <CalendarWidget />
-        </div>
       </div>
     </div>
   )

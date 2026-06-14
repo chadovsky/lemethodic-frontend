@@ -87,7 +87,8 @@ describe('Dashboard', () => {
     expect(screen.getByTestId('dashboard-today')).toHaveTextContent(expected)
   })
 
-  it('renders all 5 widget headings', () => {
+  // F-453 — heatmap CalendarWidget removed; 4 widget headings remain.
+  it('renders all 4 widget headings', () => {
     render(<Dashboard />)
     expect(
       screen.getByRole('heading', { level: 2, name: /compte à rebours/i }),
@@ -101,9 +102,23 @@ describe('Dashboard', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: /prochaine leçon/i }),
     ).toBeInTheDocument()
+  })
+
+  // F-453 — the heatmap activity widget is gone from the dashboard.
+  it('no longer renders the activity heatmap heading', () => {
+    render(<Dashboard />)
     expect(
-      screen.getByRole('heading', { level: 2, name: /activité/i }),
-    ).toBeInTheDocument()
+      screen.queryByRole('heading', { level: 2, name: /activité/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  // F-453 — gated primary CTA at the top, surfaced via the bientôt pattern.
+  it('renders the gated "Commencer la séance" CTA with a bientôt pill', () => {
+    render(<Dashboard />)
+    const cta = screen.getByTestId('dashboard-commencer-seance')
+    expect(cta).toBeInTheDocument()
+    expect(cta).toHaveTextContent(/commencer la séance/i)
+    expect(cta.querySelector('[data-testid="bientot-pill"]')).not.toBeNull()
   })
 
   it('countdown widget shows days remaining when examDate is set', () => {

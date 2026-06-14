@@ -2798,6 +2798,32 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 **Deferred (out of scope):** descriptive references to the removed routes in dated audit docs (`docs/m0-fe-audit-*.md`, `docs/audits/ORPHAN_AUDIT.md`) and the `tests/e2e/m0-audit.spec.ts` route list (a point-in-time descriptive audit, no hard per-route assertion — left as historical snapshot). `Sidebar.test.tsx:92` keeps its `/la-methode/lesson/3` mock (tests prefix-match string logic; passes regardless of route existence).
 
+### F-453 — v3 logged-in shell plumbing (app top bar + dashboard rewire)
+
+**Status:** Committed (local, pending push) — commit (this entry)
+**Branch:** `main`
+**Effort:** 1 session
+
+**Context:** First plumbing pass on the v3 logged-in shell. Structure, elements, and behavior only — frosted/blur, shadow elevation, and motion are deferred to **F-454**. Built on existing design tokens (`--accent`, `--bg-elevated`, `--bg-canvas`, `--rule-default`, `--text-*`), rounded corners, Inter (`SANS_FONT`); no new hex tokens introduced (token re-point to the v3 palette stays with the DESIGN.md v3 surface re-execution, F-449).
+
+**App top bar (`components/layout/AppTopBar.tsx`, new):** lives in the content column (full-width on mobile carrying the hamburger; shifted to `left:240px` right of the sidebar on desktop). Replaces the prior mobile-only `<header class="app-shell-topbar">` in `AppShell`.
+- **Search field** — left/center, rounded pill, `disabled`/inert, subtle placeholder. **Placed only.**
+- **Notifications bell** — right cluster, desktop-only, `aria-disabled` + `tabIndex -1`, no badge/dropdown. **Placed only.**
+- **Dark-mode toggle** — the existing `ThemeToggle` **moved** out of the sidebar into the top-bar right cluster; **functional**.
+- **User dropdown** (`components/layout/UserMenu.tsx`, new) — trigger = deterministic colored avatar (name-hashed hue + first initial) + first name; menu = header (first name + email), Paramètres → `/parametres`, Abonnement → `/abonnement`, divider, Se déconnecter. Outside-click + Escape close. **Functional/wired.** De-orphans `/parametres` and `/abonnement` (previously unreachable from nav).
+
+**Dashboard (`components/dashboard/Dashboard.tsx`):**
+- **Heatmap `CalendarWidget` removed** from the surface. Component file + its unit test kept **parked** (not deleted). The **F-443 BE endpoint is untouched** (deployed, parked). The obsolete `tests/e2e/f-444.spec.ts` (asserted the widget on `/dashboard`) was removed.
+- **`Commencer la séance`** (`components/dashboard/CommencerSeance.tsx`, new) — primary accent CTA at the top, **gated via the F-359 bientôt pattern** (`<Bientot level="surface">`): visible, accent-styled, honestly not-yet-active (dimmed, pointer-events off). **No fixture deep-link** (séance surface stays `bientot`).
+
+**Shell adjustments:** sidebar `lg:!top-16` reservation removed (sidebar now `top:0` full height; its wordmark/avatar header fills the top-left corner). `.app-shell-main` top padding moved to CSS (72px mobile / 88px desktop) to clear the now-fixed top bar.
+
+**Placed vs wired vs gated:** Placed/inert — search, notifications bell. Wired/functional — theme toggle, user dropdown (avatar, header, both nav targets, signout). Gated (bientôt) — Commencer la séance CTA.
+
+**Verification:** full unit suite (vitest) **506/506 passed** (53 files); `pnpm build` exit 0. **F-225 captures (visible surface change):** `f-453-tableau-de-bord-{1440,375}.png` (top bar + heatmap-free dashboard), `f-453-user-menu-{1440,375}.png` (dropdown open), `f-453-parametres-{1440,375}.png` (de-orphan proof); trace `tests/traces/f-453.zip`. Capture spec `tests/e2e/f-453.spec.ts` (green serially; two assertions flake under parallel dev-server on-demand compilation — CI runs a prod build). E2E repointed: `f-446.spec.ts` (theme toggle now in top bar; `.app-shell-topbar` → `.app-topbar`), `dashboard.spec.ts` (calendar grid assertion → gated CTA).
+
+**Deferred to F-454:** frosted/blur treatment, shadow elevation, motion/micro-interactions. The sidebar's own `Se déconnecter` row is left in place (second affordance) pending the F-454 polish pass.
+
 ## Section 4 — Content Pipeline (CON-001 to CON-014)
 
 **Goal:** real content lives behind the surfaces. F-321 vocab review (1,684 Phase 1 chunks awaiting Chadi triage) lands here. L'École 27 lessons get methodology-visible content. Le Diagnostic Tâche library expands to 50 scenarios (F-061.2 Livraison 2/2).
