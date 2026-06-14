@@ -6633,3 +6633,19 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 **Sequencing note:** surface re-execution is UI work and follows the FE-first protocol; individual tickets to be filed when dispatched. This entry is the umbrella.
 
+
+## F-456 -- FE: Journey data model + static fixture
+
+**Status:** Shipped (direct to main)
+
+**Scope:** One static journey data model + fixture in `lib/journey/journey.ts` -- the single source the carte (/carte), the ile page (/ile/[theme]), and the seance render from. Phase 2 is static; the types are shaped so the Phase 3 BE (island_activities + target_profiles) can populate the same structure later WITHOUT reshaping.
+
+- **Types:** `Level` (A1..C1), `ThemeId` + `Theme` (7 TCF themes, stable ids + FR labels, education first), `ActivityType` (5 practice kinds), `Beat` (learn|practice|check), `Status` (locked|current|completed|bientot), `GrammarTopic` ({id,label,level,interference}), `Activity`, `Mock`, `LearnBeat`, `CheckBeat`, `Ile` ({theme,level,learn,practice,check,status}), `Journey` ({level,grammarPhase,iles[7],finalMock}).
+- **Fixture:** one assembled sample journey at B1 -- the 7 iles each carry the 3-beat skeleton; practice activities present as placeholders (one per ActivityType, all status bientot); grammarPhase populated from the 13-cluster B1 grammar list (curriculum/clusters/*), interference flag set on the anglophone-difficult points. First ile (education) is current, the rest locked. Mini mocks + final mock bientot. `SAMPLE_JOURNEY = getJourney(B1)`.
+- **Assembler:** thin `getJourney(level)` returns the grammar phase + the 7 iles (education first) for that level. Only B1 is authored; other levels return an empty phase + 7 bientot iles, no reshape needed when their curriculum lands.
+- **Not a duplicate of `lib/seance/sessions.ts`:** that fixture holds realised seance STEP content for one ile; this model is the higher-level voyage structure (which iles exist, their beats, their status). They coexist; the journey model indexes, the seance fixture realises.
+- **No UI, no BE calls, no content authoring.** Skeleton + fixture only. Vocab seeds are real TCF B1 lemmas (no lorem).
+
+**Tests:** `tests/unit/journey/journey.test.ts` -- theme order/count, B1 grammar phase (13, interference flags), 7 iles education-first, status sequencing (current then locked), 3-beat skeleton on every ile, vocab+grammarPoints seeded and referencing the phase, practice all-bientot one-per-type, mocks bientot, other-level fallback. Full unit suite 522/522 green, full e2e green, `npm run build` green.
+
+**F-ID note:** next free after the F-450..F-455 FE commit run (BACKLOG topped at F-449; F-450..455 were committed but not back-filled here). Verified free across both repo git ceilings (BE tops at F-443).
