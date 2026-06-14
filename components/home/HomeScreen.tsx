@@ -327,7 +327,7 @@ export default function HomeScreen({
               Bonjour, {displayName}
             </h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF6B35" stroke="none" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--accent)" stroke="none" aria-hidden="true">
                 <path d="M12 2C12 2 6 7.5 6 13a6 6 0 0012 0c0-2.5-1.5-5-3-7l-1.5 3C12.5 10.5 12 11.8 12 13a2 2 0 01-4 0c0-3 3-6 4-11z" />
               </svg>
               <span

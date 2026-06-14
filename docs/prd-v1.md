@@ -2824,6 +2824,40 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 
 **Deferred to F-454:** frosted/blur treatment, shadow elevation, motion/micro-interactions. The sidebar's own `Se déconnecter` row is left in place (second affordance) pending the F-454 polish pass.
 
+### F-454 — v3 palette foundation (global token repoint, light + dark) + F-349 hex-sweep completion
+
+**Status:** Committed (local, pending push) — commit (this entry)
+**Branch:** `main`
+**Effort:** 1 session (foundation ticket, deliberately larger than recent micro-tickets)
+
+**Context:** Repoints every canonical color token in `app/globals.css` to the DESIGN.md v3 palette (both `:root` light and `.dark`), so the whole app renders v3 in both modes with zero v2 islands, then finishes the F-349 hex sweep by routing the deferred hardcoded component hexes through those tokens. No surface re-layout — colors only.
+
+**ID note (naming collision):** F-453 punted its frosted/blur, shadow-elevation, and motion shell polish "to F-454." That polish is **not** this entry — this F-454 is the palette/token foundation. The shell-polish slice is re-designated as a **follow-up ticket** (see flags below); it was not executed here.
+
+**Token variables repointed (app/globals.css):**
+- **Surfaces:** added new `--canvas` (#F3F4F6 / #0A0C0E) as a distinct recessed page bg; `--paper` (surface) #FFFFFF / #1C1F22; `--paper-tint` folds to surface; `--paper-edge` (muted/subtle chip) #F3F4F6 / #2A2D31. `--bg-canvas`, `--background`, `--lm-bg-base` repointed off `--paper` onto `--canvas`. New Tailwind util `--color-canvas`.
+- **Text:** `--ink` (primary) #4B5563 / #E0E3E8; `--ink-soft` (secondary/axes) #9CA3AF / #A0A5AC; `--ink-faint` folds to secondary (v3 interim); `--ink-trace` → hairline.
+- **Borders:** `--rule` #D1D5DB / #2A2D31; `--rule-strong` #9CA3AF / #3A3E44.
+- **Accent (single, one-accent rule):** `--accent` #E05C42 / #DC5D4B; `--accent-soft` (data-secondary coral) #F87171 / #F27A6C; `--accent-deep` derived hover. `--cta-utility`, `--primary` (shadcn), `--lm-brand`/`-deep`/`-glow` all collapsed onto the accent (in-product nav-blue retired as chrome).
+- **Chart slate:** `--dominant`/`-soft`/`-deep` repointed to slate #4E5D70 (same both modes) — now chart-line only.
+- **Status:** `--success` → #22C55E (both modes); `--lm-success`/`-25`/`-warning`/`-error` routed through `--success`/`--warning`/`--error`. `--warning`/`--error` retained (amber/muted-red, no v3 analog).
+- **Misc:** `--lm-bg-blur` dark → night canvas rgba; `.ed-field` focus ring navy → v3 coral.
+
+**Couche interim mapping:** `--couche-pieges` + `--lm-couche-pieges` → `--accent`; the other four couches (`--couche-default`, `--lm-couche-propos/plan/construction/musique`) → `--ink` (primary-text neutral interim). **FLAGGED for the couche-display surface paint** to refine to real per-couche identity.
+
+**Hex sweep (F-349 completion):** routed the chrome hexes through v3 tokens — `#44794F`×11 (Activite/Dialogue correct-answer green → `--success`), error reds (profil `#D94F4F`, CorrectedLine `#C0392B`, RecordButton `#EF4444`×2, ModuleExamples `#C84A3F`) → `--error`, greens (profil `#3A6B35`, ModuleExamples `#3F7A4A`, ClusterHeader `#2D8B55`) → `--success`, ClusterHeader `#D9A441` → `--warning`, Tache3 coral `#FF8B6B` → `--accent-soft`, HomeScreen flame `#FF6B35` → `--accent`, l-examen hover `#F0F0F2` → `--paper-edge`, UserMenu banned `#C8102E` → v3 `#E05C42`, layout `themeColor` → `--canvas`. **The ~110 white occurrences are button/badge text (universal-contrast, correctly kept).** Whites used as `const PAPER` are white *text* (not surface bg), so they stay.
+
+**Could-not-map (listed for follow-up, not forced):**
+- Dark-chrome-in-light: `Footer.tsx` + `ProductDemo.tsx` `#1C1A16` (dark panel bg — v3 has no dark-chrome-in-light-mode token).
+- `HomeScreen.tsx` `#6B4EAA` purple deadline label (no v3 purple).
+- Decorative palettes intentionally kept: per-category tint maps (`#C7DFEA`/`#E8E4D8` in DetectedModuleCard/SecondaryModulesList/LearnModulePage/RecurringModuleCard), the UserMenu deterministic avatar palette, the onboarding `--lm-pastel-*` chip layer, ProductDemo fake-browser traffic-light dot.
+- **rgba v2-navy/-green/-vermillion tints** (e.g. `rgba(20,33,61,…)` in CalendarWidget heatmap + l-examen `INK_SOFT`/`RULE`; `rgba(68,121,79,…)`/`rgba(200,16,46,…)` answer-card tints in Activite/Dialogue) are an **rgba island outside the hex-defined scope** — flagged, comment corrected in CalendarWidget, deferred to a follow-up rgba pass.
+- **Shell polish** (frosted/blur, shadow elevation, motion) that F-453 tagged "F-454" — separate follow-up.
+
+**Old-v2-literal grep:** `#14213D | #C8102E | #0F1419 | #F5F5F7 | #1D1D1F | #E5301C | #FF453A` across `*.ts/*.tsx/*.css` (excl. node_modules/.next/.claude/docs) → **ZERO remain.**
+
+**Verification:** full unit suite (vitest) **506/506 passed** (53 files); `pnpm build` exit 0. **F-225 captures (both modes, since the repoint repaints every surface):** `f-454-{dashboard,la-methode,user-menu}-{light,dark}-{1440,375}.png` (12 total); trace `tests/traces/f-454.zip`. Capture spec `tests/e2e/f-454.spec.ts` reads the computed `--canvas` per mode and asserts it equals the v3 value (rgb(243,244,246) light / rgb(10,12,14) dark), so a broken var() chain fails the suite — all 4 green. Visual check: light = gray canvas + white cards + coral CTA (white text, contrast holds) + hairline borders; dark = near-black canvas + dark surfaces + coral accent + light text.
+
 ## Section 4 — Content Pipeline (CON-001 to CON-014)
 
 **Goal:** real content lives behind the surfaces. F-321 vocab review (1,684 Phase 1 chunks awaiting Chadi triage) lands here. L'École 27 lessons get methodology-visible content. Le Diagnostic Tâche library expands to 50 scenarios (F-061.2 Livraison 2/2).

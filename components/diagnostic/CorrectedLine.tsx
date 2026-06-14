@@ -47,7 +47,7 @@ export default function CorrectedLine({ segments, coachingNote, showCoaching = f
                 <span
                   style={{
                     textDecoration: 'line-through',
-                    color: '#C0392B',
+                    color: 'var(--error)',
                     fontWeight: 600,
                   }}
                 >

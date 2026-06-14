@@ -225,8 +225,8 @@ export default function Dialogue({ audio, transcript, comprehensionChecks }: Dia
                       cursor = 'default'
                       if (isSelected && isCorrect) {
                         bg = 'rgba(68, 121, 79, 0.10)'
-                        borderColor = '#44794F'
-                        color = '#44794F'
+                        borderColor = 'var(--success)'
+                        color = 'var(--success)'
                       } else if (isSelected && !isCorrect) {
                         bg = 'rgba(200, 16, 46, 0.08)'
                         borderColor = 'var(--accent)'
@@ -234,7 +234,7 @@ export default function Dialogue({ audio, transcript, comprehensionChecks }: Dia
                       } else if (!isSelected && isThisCorrect) {
                         bg = 'rgba(68, 121, 79, 0.05)'
                         borderColor = 'rgba(68, 121, 79, 0.35)'
-                        color = '#44794F'
+                        color = 'var(--success)'
                       }
                     }
 
@@ -279,7 +279,7 @@ export default function Dialogue({ audio, transcript, comprehensionChecks }: Dia
                     style={{
                       fontFamily: 'var(--f-ui)',
                       fontSize: 13,
-                      color: '#44794F',
+                      color: 'var(--success)',
                       margin: '10px 0 0',
                     }}
                   >
@@ -292,7 +292,7 @@ export default function Dialogue({ audio, transcript, comprehensionChecks }: Dia
                     style={{
                       fontFamily: 'var(--f-ui)',
                       fontSize: 13,
-                      color: '#44794F',
+                      color: 'var(--success)',
                       margin: '10px 0 0',
                     }}
                   >

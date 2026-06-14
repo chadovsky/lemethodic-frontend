@@ -84,8 +84,8 @@ function ComprehensionBranch(props: ComprehensionProps) {
             cursor = 'default'
             if (isSelected && isCorrect) {
               bg = 'rgba(68, 121, 79, 0.10)'
-              borderColor = '#44794F'
-              color = '#44794F'
+              borderColor = 'var(--success)'
+              color = 'var(--success)'
             } else if (isSelected && !isCorrect) {
               bg = 'rgba(200, 16, 46, 0.08)'
               borderColor = 'var(--accent)'
@@ -93,7 +93,7 @@ function ComprehensionBranch(props: ComprehensionProps) {
             } else if (!isSelected && isThisCorrect) {
               bg = 'rgba(68, 121, 79, 0.05)'
               borderColor = 'rgba(68, 121, 79, 0.35)'
-              color = '#44794F'
+              color = 'var(--success)'
             }
           }
           return (
@@ -135,7 +135,7 @@ function ComprehensionBranch(props: ComprehensionProps) {
           style={{
             fontFamily: 'var(--f-ui)',
             fontSize: 13,
-            color: isCorrect ? '#44794F' : 'var(--accent)',
+            color: isCorrect ? 'var(--success)' : 'var(--accent)',
             margin: '12px 0 0',
           }}
         >
@@ -182,7 +182,7 @@ function ReflexeBranch({ items }: ReflexeProps) {
               style={{
                 fontFamily: 'var(--f-ui)',
                 fontSize: 14,
-                color: '#44794F',
+                color: 'var(--success)',
                 margin: 0,
                 borderTop: '1px solid var(--rule)',
                 paddingTop: 10,
@@ -302,7 +302,7 @@ function ReemploiBranch({ items }: ReemploiProps) {
                   fontFamily: 'var(--f-body)',
                   fontSize: '1rem',
                   lineHeight: 1.55,
-                  color: '#44794F',
+                  color: 'var(--success)',
                   margin: 0,
                 }}
               >

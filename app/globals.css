@@ -28,8 +28,8 @@
 
      ────────────────────────────────────────────────────────────────────── */
 
-  /* Surfaces */
-  --bg-canvas:       var(--paper);
+  /* Surfaces — v3 (F-454): canvas is a distinct recessed page bg, ≠ surface */
+  --bg-canvas:       var(--canvas);
   --bg-elevated:     var(--paper);
   --bg-subtle:       var(--paper-edge);
 
@@ -47,18 +47,19 @@
   /* CTA — primary = vermillion for marketing/conversion (hero, paywall, signup, onboarding) */
   --cta-primary:        var(--accent);
   --cta-primary-hover:  var(--accent-deep);
-  /* CTA — utility = ink blue for in-product action buttons */
-  --cta-utility:        var(--dominant);
-  --cta-utility-hover:  var(--dominant-deep);
+  /* CTA — utility folds into the single v3 accent (one-accent rule, F-454).
+     In-product buttons share the brand coral; slate is chart-only now. */
+  --cta-utility:        var(--accent);
+  --cta-utility-hover:  var(--accent-deep);
 
   /* Rules / borders */
   --rule-default:    var(--rule);
   /* --rule-strong duplicate removed — v2 canonical defined above was being overridden */
 
-  /* Status (semantic; distinct from --accent-primary per two-greens rule) */
-  --success:  hsl(140 30% 38%);   /* #44794F state-signal sage */
-  --warning:  hsl(35  60% 50%);   /* #C28A33 warm amber */
-  --error:    hsl(8   45% 55%);   /* #C57764 muted red */
+  /* Status (semantic; distinct from --accent per one-accent rule) */
+  --success:  #22C55E;            /* v3 success / status — both modes */
+  --warning:  hsl(35  60% 50%);   /* warm amber — retained (no v3 analog) */
+  --error:    hsl(8   45% 55%);   /* muted red — retained (no v3 analog) */
 
   /* Neutral scale (chrome only — Tailwind-compatible 50-950) */
   --neutral-50:  hsl(38 25% 97%);
@@ -83,35 +84,37 @@
   --f-en:      var(--font-inter);               /* Inter — English UI text */
   --f-mono:    var(--font-dm-mono);             /* DM Mono — metadata, eyebrows, folios */
 
-  /* ── DESIGN.md v2 — Atelier Français canonical palette (M2 t10, 2026-05-30) ── */
+  /* ── DESIGN.md v3 — canonical palette (M2 t12, F-454, 2026-06-14) ────────── */
 
-  /* Paper / backgrounds */
-  --paper: #FFFFFF;
-  --paper-tint: #FAFAFA;
-  --paper-edge: #F4F4F5;
+  /* Surface tiers */
+  --canvas: #F3F4F6;        /* canvas / app bg (recessed page) */
+  --paper: #FFFFFF;         /* surface / card */
+  --paper-tint: #FFFFFF;    /* raised tint folds into surface in v3 flat system */
+  --paper-edge: #F3F4F6;    /* subtle / muted chip = canvas tier */
 
   /* Ink / text */
-  --ink: #0F1419;
-  --ink-soft: rgba(15, 20, 25, 0.62);
-  --ink-faint: rgba(15, 20, 25, 0.38);
-  --ink-trace: rgba(15, 20, 25, 0.16);
+  --ink: #4B5563;           /* primary text / menu */
+  --ink-soft: #9CA3AF;      /* secondary text / grid / axes */
+  --ink-faint: #9CA3AF;     /* tertiary — folds to secondary (v3 interim) */
+  --ink-trace: #D1D5DB;     /* faint hairline */
 
   /* Rules / borders */
-  --rule: rgba(15, 20, 25, 0.08);
-  --rule-strong: rgba(15, 20, 25, 0.16);
+  --rule: #D1D5DB;          /* elevated / border / hairline */
+  --rule-strong: #9CA3AF;   /* stronger divider */
 
-  /* Dominant — French ink blue */
-  --dominant: #14213D;
-  --dominant-soft: #2C3E5E;
-  --dominant-deep: #0B1729;
+  /* Dominant — chart line (slate); v3 retires ink blue as chrome */
+  --dominant: #4E5D70;
+  --dominant-soft: #4E5D70;
+  --dominant-deep: #3E4B5C;   /* derived darker slate */
 
-  /* Accent — vermillion (wordmark caret + M-breath, Les Pièges Anglais, emphasis) */
-  --accent: #C8102E;
-  --accent-soft: #E84A5F;
-  --accent-deep: hsl(350 85% 30%);   /* hover depth — #8D0B21, ~12% darker than #C8102E */
+  /* Accent — brand / CTA / selected / progress (v3 coral, single accent) */
+  --accent: #E05C42;
+  --accent-soft: #F87171;            /* data secondary coral */
+  --accent-deep: hsl(9 65% 45%);     /* hover depth, ~12% darker than #E05C42 */
 
-  /* Couche identity tokens — 4 couches inherit dominant, Pièges Anglais gets accent */
-  --couche-default: var(--dominant);
+  /* Couche identity tokens — 4 couches map to primary-text (neutral interim,
+     FLAG for couche-display surface paint), Pièges Anglais gets accent */
+  --couche-default: var(--ink);
   --couche-pieges: var(--accent);
 
   /* Shape */
@@ -128,28 +131,29 @@
 
   /* ── DESIGN.md v1 — Le Méthodic canonical tokens (M2 t7, 2026-05-25) ──── */
 
-  /* Brand — v2 bridge (warm ochre retired; ⚠ M-RENAME: no v2 analog, mapped to nearest primary) */
-  --lm-brand: var(--dominant);
-  --lm-brand-deep: var(--dominant-deep);
+  /* Brand — v3: maps to the single accent (one-accent rule, F-454) */
+  --lm-brand: var(--accent);
+  --lm-brand-deep: var(--accent-deep);
   --lm-brand-tint: var(--paper-tint);
-  --lm-brand-glow: var(--dominant-soft);
+  --lm-brand-glow: var(--accent-soft);
 
-  /* Per-couche colors — v2: 4 couches = dominant blue, Pièges Anglais = vermillion */
-  --lm-couche-propos: var(--dominant);
-  --lm-couche-plan: var(--dominant);
-  --lm-couche-construction: var(--dominant);
+  /* Per-couche colors — v3: 4 couches = primary-text neutral interim,
+     Pièges Anglais = accent. FLAG for couche-display surface paint. */
+  --lm-couche-propos: var(--ink);
+  --lm-couche-plan: var(--ink);
+  --lm-couche-construction: var(--ink);
   --lm-couche-pieges: var(--accent);
-  --lm-couche-musique: var(--dominant);
+  --lm-couche-musique: var(--ink);
 
-  /* Functional */
-  --lm-success: #6B8E3B;
-  --lm-success-25: rgba(107, 142, 59, 0.25);
-  --lm-warning: #C8841B;
-  --lm-error: #A8341B;
+  /* Functional — route through v3 status tokens */
+  --lm-success: var(--success);
+  --lm-success-25: rgba(34, 197, 94, 0.25);
+  --lm-warning: var(--warning);
+  --lm-error: var(--error);
   --lm-info: #7B6A8B;
 
-  /* Background / text / border — v2 bridges */
-  --lm-bg-base: var(--paper);          /* ⚠ M-RENAME: was warm cream (banned in v2), now paper white */
+  /* Background / text / border — v3 bridges */
+  --lm-bg-base: var(--canvas);         /* page base = recessed canvas */
   --lm-bg-surface: var(--paper);
   --lm-bg-subtle: var(--paper-edge);
   --lm-text-primary: var(--ink);
@@ -201,19 +205,19 @@
   /* F-VISUAL-001 X.2 / v2 — shadcn token rewire to DESIGN.md v2 canonical tokens.
      components/ui/* sources unchanged; palette flips automatically.
      Reversible: revert this block to re-detach shadcn from the design system. */
-  --background: var(--paper);
+  --background: var(--canvas);
   --foreground: var(--ink);
   --card: var(--paper);
   --card-foreground: var(--ink);
   --popover: var(--paper);
   --popover-foreground: var(--ink);
-  --primary: var(--dominant);
+  --primary: var(--accent);
   --primary-foreground: hsl(0 0% 100%);
-  --secondary: var(--paper-tint);
+  --secondary: var(--paper-edge);
   --secondary-foreground: var(--ink);
   --muted: var(--paper-edge);
   --muted-foreground: var(--ink-faint);
-  /* --accent resolves to v2 vermillion (#C8102E) from token defined above */
+  /* --accent resolves to v3 coral from the token defined above */
   --accent-foreground: hsl(0 0% 100%);
   --destructive: var(--error);
   --destructive-foreground: hsl(0 0% 100%);
@@ -237,37 +241,38 @@
 }
 
 .dark {
-  /* ── DESIGN.md v2 night-paper tokens (M2 t10) ── */
-  --paper: #0E1626;
-  --paper-tint: #16203A;
-  --paper-edge: #1E2A47;
-  --ink: #E5E9F0;
-  --ink-soft: rgba(229, 233, 240, 0.64);
-  --ink-faint: rgba(229, 233, 240, 0.40);
-  --ink-trace: rgba(229, 233, 240, 0.18);
-  --rule: rgba(229, 233, 240, 0.10);
-  --rule-strong: rgba(229, 233, 240, 0.20);
-  --dominant: #38598F;
-  --dominant-soft: #2E4A7A;
-  --dominant-deep: #4A6BA3;
-  --accent: #E23A54;
-  --accent-soft: #F06B7E;
-  --accent-deep: hsl(351 74% 44%);   /* hover depth for dark-mode vermillion */
+  /* ── DESIGN.md v3 night tokens (M2 t12, F-454) ── */
+  --canvas: #0A0C0E;        /* canvas / app bg */
+  --paper: #1C1F22;         /* surface / card */
+  --paper-tint: #1C1F22;    /* raised tint folds into surface */
+  --paper-edge: #2A2D31;    /* elevated / muted chip */
+  --ink: #E0E3E8;           /* primary text / menu */
+  --ink-soft: #A0A5AC;      /* secondary text / grid / axes */
+  --ink-faint: #A0A5AC;     /* tertiary — folds to secondary */
+  --ink-trace: #2A2D31;     /* faint hairline */
+  --rule: #2A2D31;          /* elevated / border / hairline */
+  --rule-strong: #3A3E44;   /* stronger divider (derived) */
+  --dominant: #4E5D70;      /* chart line (slate) — same both modes */
+  --dominant-soft: #4E5D70;
+  --dominant-deep: #5E6E82;   /* derived lighter slate for dark hover */
+  --accent: #DC5D4B;
+  --accent-soft: #F27A6C;            /* data secondary coral (dark) */
+  --accent-deep: hsl(9 60% 48%);     /* hover depth for dark-mode coral */
 
-  /* shadcn token overrides — v2 night-paper */
-  --background: var(--paper);
+  /* shadcn token overrides — v3 night */
+  --background: var(--canvas);
   --foreground: var(--ink);
-  --card: var(--paper-tint);
+  --card: var(--paper);
   --card-foreground: var(--ink);
   --popover: var(--paper);
   --popover-foreground: var(--ink);
-  --primary: var(--dominant);
+  --primary: var(--accent);
   --primary-foreground: hsl(0 0% 100%);
   --secondary: var(--paper-edge);
   --secondary-foreground: var(--ink);
   --muted: var(--paper-edge);
   --muted-foreground: var(--ink-faint);
-  /* --accent resolves to v2 dark vermillion (#E23A54) from token above */
+  /* --accent resolves to v3 dark coral from the token above */
   --accent-foreground: hsl(0 0% 100%);
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
@@ -290,8 +295,8 @@
 
   /* t5 / v2 — intermediate token dark overrides. Chains: component → --bg-* /
      --text-* / --rule-* → --lm-* → v2 canonical → flips correctly. */
-  --bg-canvas:      var(--paper);
-  --bg-elevated:    var(--paper-tint);
+  --bg-canvas:      var(--canvas);
+  --bg-elevated:    var(--paper);
   --bg-subtle:      var(--paper-edge);
   --text-primary:   var(--ink);
   --text-secondary: var(--ink-soft);
@@ -299,10 +304,10 @@
   --text-disabled:  var(--ink-faint);
   --rule-default:   var(--rule);
   --cta-primary:    var(--accent);
-  --cta-utility:    var(--dominant);
+  --cta-utility:    var(--accent);
 
-  /* nav backdrop-blur bg for dark mode (v2 night-paper) */
-  --lm-bg-blur: rgba(14, 22, 38, 0.82);
+  /* nav backdrop-blur bg for dark mode (v3 night canvas) */
+  --lm-bg-blur: rgba(10, 12, 14, 0.82);
 
   /* warm editorial palette — v2 night-paper remaps */
   --lm-warm-peach:      var(--paper-edge);
@@ -311,22 +316,22 @@
   --lm-warm-cream:      var(--paper);
   --lm-warm-sand:       var(--paper-tint);
 
-  /* --lm-* dark aliases — v2 canonical values */
-  --lm-brand: var(--dominant);
-  --lm-brand-deep: var(--dominant-deep);
+  /* --lm-* dark aliases — v3 canonical values */
+  --lm-brand: var(--accent);
+  --lm-brand-deep: var(--accent-deep);
   --lm-brand-tint: var(--paper-tint);
-  --lm-brand-glow: var(--dominant-soft);
-  --lm-couche-propos: var(--dominant);
-  --lm-couche-plan: var(--dominant);
-  --lm-couche-construction: var(--dominant);
+  --lm-brand-glow: var(--accent-soft);
+  --lm-couche-propos: var(--ink);
+  --lm-couche-plan: var(--ink);
+  --lm-couche-construction: var(--ink);
   --lm-couche-pieges: var(--accent);
-  --lm-couche-musique: var(--dominant);
-  --lm-success: #8FB058;
-  --lm-success-25: rgba(143, 176, 88, 0.25);
-  --lm-warning: #E2A040;
-  --lm-error: #D45A3A;
+  --lm-couche-musique: var(--ink);
+  --lm-success: var(--success);
+  --lm-success-25: rgba(34, 197, 94, 0.25);
+  --lm-warning: var(--warning);
+  --lm-error: var(--error);
   --lm-info: #9B8AAB;
-  --lm-bg-base: var(--paper);
+  --lm-bg-base: var(--canvas);
   --lm-bg-surface: var(--paper-tint);
   --lm-bg-subtle: var(--paper-edge);
   --lm-text-primary: var(--ink);
@@ -347,7 +352,8 @@
   --font-sans:     var(--f-ui);        /* was v1 UI font; now Instrument Sans */
   --font-serif:    var(--f-body);      /* was --font-source-serif; now Crimson Pro */
 
-  /* DESIGN.md v2 — Atelier Français canonical Tailwind utilities */
+  /* DESIGN.md v3 — canonical Tailwind utilities */
+  --color-canvas: var(--canvas);
   --color-paper: var(--paper);
   --color-paper-tint: var(--paper-tint);
   --color-paper-edge: var(--paper-edge);
@@ -857,7 +863,7 @@
 .ed-field:focus-visible {
   outline: none;
   border-color: var(--cta-utility);
-  box-shadow: 0 0 0 3px rgba(31, 45, 74, 0.18); /* ed-accent at ~18% — deferred A-013 */
+  box-shadow: 0 0 0 3px rgba(224, 92, 66, 0.18); /* v3 accent coral at ~18% */
 }
 
 /* F-211 — skeleton shimmer. ed-rule on ed-paper, slow 1.5s sweep, no

@@ -24,8 +24,9 @@ function countToLevel(count: number): 0 | 1 | 2 | 3 | 4 {
   return 4
 }
 
-// Navy-based heatmap palette using CSS tokens where possible.
-// Dark-mode is handled automatically since --dominant re-points to #38598F.
+// Heatmap intensity ramp. NOTE (F-454): the rgba(20,33,61,…) steps below are
+// legacy v2-navy literals (an rgba island, outside the hex sweep) and do NOT
+// follow v3 tokens yet — flagged for a follow-up repoint to slate/accent.
 const HEATMAP_BG: Record<0 | 1 | 2 | 3 | 4, string> = {
   0: 'var(--ink-trace)',
   1: 'rgba(20, 33, 61, 0.18)',

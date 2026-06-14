@@ -74,7 +74,7 @@ function ListRow({
           fontFamily: DISPLAY_FONT,
           fontWeight: 600,
           fontSize: 15,
-          color: danger ? '#D94F4F' : INK,
+          color: danger ? 'var(--error)' : INK,
         }}
       >
         {label}
@@ -266,7 +266,7 @@ export default function ProfilPage() {
                     fontSize: 10,
                     letterSpacing: '0.10em',
                     textTransform: 'uppercase',
-                    color: '#3A6B35',
+                    color: 'var(--success)',
                     margin: 0,
                     marginBottom: 8,
                   }}

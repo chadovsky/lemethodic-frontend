@@ -14,7 +14,7 @@ interface UserMenuProps {
 // Deterministic avatar palette — zero backend. A name always maps to the same
 // hue, so the colored circle is stable across sessions without storing anything.
 const AVATAR_COLORS = [
-  '#C8102E', // accent vermillion
+  '#E05C42', // v3 accent coral
   '#1F6FEB',
   '#2DA44E',
   '#8957E5',

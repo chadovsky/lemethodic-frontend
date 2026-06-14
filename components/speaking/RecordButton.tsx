@@ -31,10 +31,10 @@ export default function RecordButton({
   const isProcessing = recordingState === 'processing'
 
   // Pulse ring color: red for tap-mode recording, colored ring for PTT
-  const ringColor = mode === 'tap' ? '#EF4444' : idleColor
+  const ringColor = mode === 'tap' ? 'var(--error)' : idleColor
 
   const buttonBg = isRecording
-    ? mode === 'tap' ? '#EF4444' : idleColor
+    ? mode === 'tap' ? 'var(--error)' : idleColor
     : idleColor
 
   function handleClick() {

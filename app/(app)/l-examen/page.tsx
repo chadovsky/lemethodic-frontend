@@ -182,7 +182,7 @@ export default function ExamenHubPage() {
                 transition: 'background-color 120ms ease',
                 cursor: 'pointer',
               }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = '#F0F0F2' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = 'var(--paper-edge)' }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = PAPER_TINT }}
             >
               <span

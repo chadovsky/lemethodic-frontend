@@ -10,8 +10,8 @@ import { useInterfaceLanguage } from '@/lib/hooks/useInterfaceLanguage'
 const INK          = 'var(--text-primary)'
 const INK_SOFT     = 'var(--text-secondary)'
 const INK_MUTED    = 'var(--text-muted)'
-const RED_SOFT     = '#C84A3F'
-const GREEN_SOFT   = '#3F7A4A'
+const RED_SOFT     = 'var(--error)'
+const GREEN_SOFT   = 'var(--success)'
 const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
 const COPY = {

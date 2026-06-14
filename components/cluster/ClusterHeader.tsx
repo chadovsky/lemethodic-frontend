@@ -72,12 +72,11 @@ const DETECTION_LABEL: Record<Detection, string> = {
   not_observed: 'Last: not observed',
 }
 
-// Detection dot color — green for clean, amber for wobble, red for fail,
-// muted for not_observed. Plain hex (not the FluentPath palette) since
-// detection signal needs traffic-light intuition.
+// Detection dot color — traffic-light intuition routed through v3 status
+// tokens so the signal adapts in both light and dark (F-454).
 const DETECTION_DOT: Record<Detection, string> = {
-  clean: '#2D8B55',
-  wobble: '#D9A441',
+  clean: 'var(--success)',
+  wobble: 'var(--warning)',
   fail: 'var(--error)',
   not_observed: INK_MUTED,
 }

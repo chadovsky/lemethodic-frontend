@@ -27,7 +27,7 @@ const DISPLAY_FONT = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, s
 const PREP_SECS      = 120 // 2 minutes
 const RECORD_SECS    = 180 // 3 minutes
 const RECORD_CAP_MS  = RECORD_SECS * 1000
-const CORAL          = '#FF8B6B'
+const CORAL          = 'var(--accent-soft)'
 
 // TODO(Phase 4): resolve the URL slug to a real topic_id via a backend
 // lookup endpoint, and fetch the prompt/difficulty/theme from that topic.
