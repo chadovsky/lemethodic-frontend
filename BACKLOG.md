@@ -6714,3 +6714,18 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 **Tests:** `tests/unit/iles/IleShell.test.tsx` (header theme/level/status, 3 beats present, 5 vocab, 2 grammar points both interference + 2 piege markers, Le Maitre slot bientot when no MDX, 5 activity shells + gated/disabled seance CTA, mini-mock bientot; unknown theme -> graceful stub; B2-via-profile renders structure with bientot status + empty learn). `tests/e2e/f-458.spec.ts` (carte CTA -> real 3-beat page, header attrs, 3 beats, vocab/grammar/piege counts, gated seance CTA, bientot mini-mock, unknown-theme stub no-404; light/dark/mobile receipts). `tests/e2e/f-457.spec.ts` reconciled: the ile-route landing assertion now expects the real `ile-page`, not the retired stub text. Full unit suite 545/545 green, `npm run build` green, full e2e green. Receipts (gitignored per F-442): `f-458-ile-education-1440.png`, `-375.png`, `-dark-1440.png`; trace `f-458.zip`.
 
 **F-ID note:** next free after F-457 (BACKLOG + FE git both topped at F-457; BE git tops at F-443).
+
+## F-459 -- FE: Le Diagnostic, deliberate level assignment
+
+**Status:** Shipped (direct to main)
+
+**Scope:** Phase 2 of Le Diagnostic -- a deterministic, content-free starting-level assignment (A1..C1) that personalizes the carte. NOT the adaptive grammar-surfacing diagnostic (Phase 3, deferred): no question bank, no scoring engine, no BE (localStorage now; target_profiles BE is Phase 3). The existing `/l-examen/diagnostic` (oral-tâche couches analysis) is a different feature and is untouched.
+
+- **Verify finding:** `/bienvenue` (F-365) already captures a `threshold` (niveau cible / **goal**, leading with a CEFR token) but no self-assessed **starting** level. `target-level.ts` (F-457) derived the carte level from that goal token. So Case A ("extend the capture") and Case B ("minimal level picker") converge: extend `/bienvenue`, do not duplicate.
+- **Capture extension** (`app/bienvenue/page.tsx`): a 4th step, "Votre niveau de départ" -- a confirm-and-adjust A1..C1 picker (CEFR band names only; standard, not authored content), seeded to **B1** (the only level with an authored journey). Progress dots 3 -> 4 across the flow. On completion the profile gains an explicit `level` field and the learner lands on **`/carte`** (was `/tableau-de-bord`; `/carte` is the documented Atlas-hub target + the ticket's diagnostic -> carte chain).
+- **Resolver seam closed** (`lib/journey/target-level.ts`): `levelFromTargetProfile` now reads the explicit `level` field first (the field this ticket writes), falling back to the legacy `threshold` token for pre-diagnostic profiles -- so CarteJourney + IleShell pick up the assigned level with no change, and old profiles still resolve. Extracted `levelFromThreshold` + `isLevel` (exported, tested).
+- Rounded-only (v3 `--r-*` radii via OnboardingScreen primitives), v3 tokens only, no em-dashes. No BE, no content authoring, no scoring.
+
+**Tests:** `tests/unit/journey/target-level.test.ts` (+ explicit-`level`-wins, invalid-level fallback to threshold, `levelFromThreshold`, `isLevel`); `tests/unit/bienvenue/BienvenueForm.test.tsx` (new -- 4-step walk, level step with 5 bands seeded to B1, writes confirmed B1 + adjusted A2, push to `/carte`). `tests/e2e/f-459.spec.ts` (new -- /bienvenue 4-step capture -> level step -> adjust to A2 -> lands `/carte` with `Niveau A2` header; light/dark/mobile receipts). Full unit suite 554/554 green, `npm run build` green, full e2e green. Receipts (gitignored per F-442): `f-459-bienvenue-level-1440.png`, `-375.png`, `-dark-1440.png`; trace `f-459.zip`.
+
+**F-ID note:** next free after F-458 (BACKLOG + FE git both topped at F-458; BE git tops at F-443).

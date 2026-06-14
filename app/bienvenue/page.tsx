@@ -1,14 +1,16 @@
 'use client'
 
 // F-365: /bienvenue - post-signup Target Profile capture.
-// All four questions across three steps. Persists to localStorage only.
-// BE follow-up required: persist target_profiles server-side (new table or
-// column on users). The localStorage key "lm.targetProfile.v1" is the
-// handoff contract between this FE stub and the future BE endpoint.
-// Unauthenticated redirect: ProtectedRoute -> / (onboarding/signup).
-// /inscription not yet a live route; this will align when F-inscription ships.
-// Submit redirect: /carte (Atlas hub). /maitre/diagnostic does not exist as a
-// live route; /carte is the correct target per PRODUCT.md Section 7.
+// F-459: Le Diagnostic (Phase 2) adds a deliberate starting-level step (step 4)
+// that writes an explicit `level` (A1..C1) onto the profile. That level is the
+// field target-level.ts reads first, so the carte renders the assigned map.
+// This is the deliberate level assignment; the adaptive grammar-surfacing
+// diagnostic is Phase 3 (BE target_profiles), explicitly deferred.
+// Persists to localStorage only. BE follow-up required: persist target_profiles
+// server-side. The localStorage key "lm.targetProfile.v1" is the handoff
+// contract between this FE stub and the future BE endpoint.
+// Unauthenticated redirect: ProtectedRoute -> /inscription.
+// Submit redirect: /carte (Atlas hub) with the assigned level applied.
 
 import { useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
@@ -19,6 +21,8 @@ import {
   CheckIcon,
 } from '@/components/onboarding/OnboardingScreen'
 import { SANS_FONT } from '@/lib/typography'
+import type { Level } from '@/lib/journey/journey'
+import { TARGET_PROFILE_KEY } from '@/lib/journey/target-level'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -30,6 +34,8 @@ interface TargetProfile {
   threshold: string
   deadline: string | null
   persona: Persona
+  // F-459: deliberate level assignment. The carte renders this level's map.
+  level: Level
   capturedAt: string
 }
 
@@ -84,6 +90,19 @@ const PERSONAS: { id: Persona; label: string; description: string }[] = [
   },
 ]
 
+// F-459: deliberate starting-level options. CEFR band names only (standard,
+// not authored content). B1 is the seeded default (the only level with an
+// authored journey); the learner confirms or adjusts.
+const LEVELS: { id: Level; label: string; hint: string }[] = [
+  { id: 'A1', label: 'A1', hint: 'Débutant' },
+  { id: 'A2', label: 'A2', hint: 'Élémentaire' },
+  { id: 'B1', label: 'B1', hint: 'Intermédiaire' },
+  { id: 'B2', label: 'B2', hint: 'Intermédiaire avancé' },
+  { id: 'C1', label: 'C1', hint: 'Avancé' },
+]
+
+const DEFAULT_LEVEL: Level = 'B1'
+
 // ── UI helpers ─────────────────────────────────────────────────────────────────
 
 function BientotChip() {
@@ -129,7 +148,7 @@ function SectionLabel({ children }: { children: ReactNode }) {
 
 // ── Form ───────────────────────────────────────────────────────────────────────
 
-function BienvenueForm() {
+export function BienvenueForm() {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [exam, setExam] = useState<Exam | null>(null)
@@ -137,6 +156,8 @@ function BienvenueForm() {
   const [noDeadline, setNoDeadline] = useState(true)
   const [deadline, setDeadline] = useState('')
   const [persona, setPersona] = useState<Persona | null>(null)
+  // F-459: seeded to the only authored level; confirm-and-adjust.
+  const [level, setLevel] = useState<Level>(DEFAULT_LEVEL)
 
   function selectExam(id: Exam) {
     setExam(id)
@@ -144,7 +165,7 @@ function BienvenueForm() {
   }
 
   function next() {
-    if (step < 3) {
+    if (step < 4) {
       setStep(step + 1)
     } else {
       submit()
@@ -158,12 +179,15 @@ function BienvenueForm() {
       threshold,
       deadline: noDeadline ? null : deadline || null,
       persona,
+      level,
       capturedAt: new Date().toISOString(),
     }
     // FE-only stub. BE follow-up (F-366): persist to target_profiles
     // server-side (new table or user.target_profile column).
-    localStorage.setItem('lm.targetProfile.v1', JSON.stringify(profile))
-    router.push('/tableau-de-bord')
+    localStorage.setItem(TARGET_PROFILE_KEY, JSON.stringify(profile))
+    // F-459: land on the carte with the assigned level applied (diagnostic ->
+    // carte chain). target-level.ts reads profile.level, so the map matches.
+    router.push('/carte')
   }
 
   // ── Step 1: Q1 exam ──────────────────────────────────────────────────────────
@@ -171,7 +195,7 @@ function BienvenueForm() {
   if (step === 1) {
     return (
       <OnboardingScreen
-        progressTotal={3}
+        progressTotal={4}
         progressFilledUpTo={1}
         progressCurrent={1}
         headline="Bienvenue"
@@ -225,7 +249,7 @@ function BienvenueForm() {
 
     return (
       <OnboardingScreen
-        progressTotal={3}
+        progressTotal={4}
         progressFilledUpTo={2}
         progressCurrent={2}
         headline="Quel niveau visez-vous?"
@@ -257,14 +281,15 @@ function BienvenueForm() {
   const today = new Date()
   const minMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`
 
-  return (
+  if (step === 3) {
+    return (
     <OnboardingScreen
-      progressTotal={3}
+      progressTotal={4}
       progressFilledUpTo={3}
       progressCurrent={3}
       headline="Votre situation"
-      descriptor="Deux dernières questions pour finaliser votre profil."
-      ctaLabel="Commencer mon parcours"
+      descriptor="Deux questions pour finaliser votre profil."
+      ctaLabel="Continuer"
       ctaEnabled={persona !== null}
       ctaHint="Sélectionnez votre situation pour continuer."
       onContinue={next}
@@ -332,6 +357,58 @@ function BienvenueForm() {
               </span>
             </div>
             <CheckIcon visible={persona === p.id} />
+          </OnboardingCard>
+        ))}
+      </div>
+    </OnboardingScreen>
+    )
+  }
+
+  // ── Step 4: Le Diagnostic - deliberate starting-level assignment (F-459) ─────
+  // Confirm-and-adjust. Seeded to B1 (the authored level); the learner accepts
+  // or changes it. The chosen level is written to the profile and drives the
+  // carte (target-level.ts reads profile.level). No question bank, no scoring.
+
+  return (
+    <OnboardingScreen
+      progressTotal={4}
+      progressFilledUpTo={4}
+      progressCurrent={4}
+      headline="Votre niveau de départ"
+      descriptor="Ce niveau personnalise votre carte. Confirmez-le ou ajustez-le."
+      ctaLabel="Commencer mon parcours"
+      ctaEnabled={true}
+      onContinue={next}
+      onBack={() => setStep(3)}
+    >
+      <div
+        data-testid="bienvenue-level-step"
+        style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+      >
+        {LEVELS.map((lvl) => (
+          <OnboardingCard
+            key={lvl.id}
+            isSelected={level === lvl.id}
+            onClick={() => setLevel(lvl.id)}
+          >
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+              <span
+                data-testid={`bienvenue-level-${lvl.id}`}
+                style={{ fontFamily: SANS_FONT, fontWeight: 600, fontSize: 16 }}
+              >
+                {lvl.label}
+              </span>
+              <span
+                style={{
+                  fontFamily: SANS_FONT,
+                  fontSize: 13,
+                  opacity: 0.72,
+                }}
+              >
+                {lvl.hint}
+              </span>
+            </div>
+            <CheckIcon visible={level === lvl.id} />
           </OnboardingCard>
         ))}
       </div>
