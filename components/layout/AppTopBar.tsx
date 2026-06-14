@@ -81,7 +81,7 @@ export default function AppTopBar({
         aria-expanded={drawerOpen}
         aria-controls="app-shell-sidebar"
         onClick={onHamburgerClick}
-        className="lg:hidden"
+        className="app-topbar-hamburger"
         style={{
           width: 44,
           height: 44,
@@ -89,7 +89,6 @@ export default function AppTopBar({
           border: 'none',
           cursor: 'pointer',
           padding: 0,
-          display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: 'var(--text-primary)',

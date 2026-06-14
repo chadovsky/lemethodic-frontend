@@ -1142,6 +1142,13 @@
   border-radius: 999px;
   background-color: color-mix(in srgb, var(--bg-canvas) 70%, transparent);
 }
+/* F-455 fix — hamburger visibility via plain CSS, not Tailwind `lg:hidden`.
+   The button carries an inline `display:inline-flex` (for its icon centering),
+   and an inline style beats the `.lg\:hidden { display:none }` utility (which
+   is not !important), so `lg:hidden` failed to hide it on desktop. Per the
+   UI-006 convention, the shell's responsive display is plain CSS. Base =
+   shown; ≥1024px (the desktop-sidebar breakpoint) = hidden. */
+.app-topbar-hamburger { display: inline-flex; }
 .app-shell-main { margin-left: 0; padding-top: 72px; }
 .app-shell-sidebar {
   transform: translateX(-100%);
@@ -1150,6 +1157,7 @@
 .app-shell-sidebar[data-drawer-open="true"] { transform: translateX(0); }
 @media (min-width: 1024px) {
   .app-topbar { left: 240px; height: 64px; padding: 0 24px; }
+  .app-topbar-hamburger { display: none; }
   .app-shell-backdrop { display: none; }
   .app-shell-main { margin-left: 240px; padding-top: 88px; }
   .app-shell-sidebar { transform: translateX(0); }
