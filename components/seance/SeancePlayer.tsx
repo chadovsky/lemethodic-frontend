@@ -228,7 +228,7 @@ export default function SeancePlayer() {
             <h1 style={{ fontFamily: 'var(--f-display)', fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 400, color: 'var(--ink)', margin: 0, letterSpacing: '-0.01em' }}>
               La Séance
             </h1>
-            <span style={{ fontFamily: 'var(--f-mono)', fontSize: 10, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--dominant)', background: 'rgba(20, 33, 61, 0.07)', borderRadius: 'var(--r-pill)', padding: '4px 12px', whiteSpace: 'nowrap' }}>
+            <span style={{ fontFamily: 'var(--f-mono)', fontSize: 10, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--dominant)', background: 'color-mix(in srgb, var(--dominant) 7%, transparent)', borderRadius: 'var(--r-pill)', padding: '4px 12px', whiteSpace: 'nowrap' }}>
               {session.displayTitle}
             </span>
             <span style={{ fontFamily: 'var(--f-mono)', fontSize: 10, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-faint)', background: 'var(--paper-edge)', borderRadius: 'var(--r-pill)', padding: '4px 12px' }}>

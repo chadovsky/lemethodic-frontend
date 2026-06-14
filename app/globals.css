@@ -5,26 +5,21 @@
 
 :root {
   /* ──────────────────────────────────────────────────────────────────────
-     F-VISUAL-001 — design system tokens (canonical from 2026-05-13).
-     Source of truth. Legacy --fp-* and --ed-* tokens below are kept as
-     aliases through X.1-X.5 to avoid surface churn; X.6 drops them
-     after F-225 Batch 3 verification passes.
-
-     Two-greens rule:
-       --accent-primary  #8FA279 sage — decoration only, NEVER body-text
-                          background. Used for icon fills, status pills
-                          with dark text, underline accents, divider
-                          tints. White text on --accent-primary fails
-                          WCAG AA (2.7:1); use --text-primary for all
-                          text on sage surfaces (~5.0:1, passes AA).
-       --success         #44794F deeper sage — state signal only (pass/
-                          done microcopy badges). NOT brand.
+     DESIGN.md v3 — design system tokens (canonical, F-454, 2026-06-14).
+     Source of truth. Legacy --fp-*, --ed-*, and --lm-* tokens below are kept
+     as aliases that resolve through the v3 canonical vars to avoid surface
+     churn; component-level migration off them is a later pass.
 
      One-accent rule:
-       Sage is the only accent in the system. No secondary brand color.
-       Visual variety comes from typography contrast + spacing rhythm
-       + editorial italic accents. Documented here to resist the
-       temptation of adding a second hue later.
+       --accent (coral) is the only brand accent — brand, CTA, selected,
+       progress all share it. The former in-product ink-blue is retired as
+       chrome; slate (--dominant) survives for chart lines/axes only. No
+       secondary brand hue. Visual variety comes from typography contrast +
+       spacing rhythm, not a second color.
+
+     Status, not brand:
+       --success (#22C55E) is a state signal (pass/done) only, never brand.
+       --warning / --error are functional signals with no v3 brand role.
 
      ────────────────────────────────────────────────────────────────────── */
 

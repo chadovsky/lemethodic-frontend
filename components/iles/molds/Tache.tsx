@@ -42,7 +42,9 @@ export default function Tache({ prompt, scenario, targetLength, type = 'oral' }:
             textTransform: 'uppercase',
             color: type === 'oral' ? 'var(--dominant)' : 'var(--accent)',
             background:
-              type === 'oral' ? 'rgba(20, 33, 61, 0.07)' : 'rgba(200, 16, 46, 0.07)',
+              type === 'oral'
+                ? 'color-mix(in srgb, var(--dominant) 7%, transparent)'
+                : 'color-mix(in srgb, var(--accent) 7%, transparent)',
             borderRadius: 'var(--r-pill)',
             padding: '3px 10px',
           }}

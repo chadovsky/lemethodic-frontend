@@ -31,9 +31,9 @@ const REGISTER_BADGE: Record<Register, CSSProperties> = {
     border: '1px solid var(--rule-strong)',
   },
   courant: {
-    background: 'rgba(20, 33, 61, 0.08)',
+    background: 'color-mix(in srgb, var(--dominant) 8%, transparent)',
     color: 'var(--dominant)',
-    border: '1px solid rgba(20, 33, 61, 0.18)',
+    border: '1px solid color-mix(in srgb, var(--dominant) 18%, transparent)',
   },
   soutenu: {
     background: 'var(--dominant)',

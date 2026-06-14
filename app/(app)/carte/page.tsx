@@ -1,9 +1,9 @@
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 
 const INK      = 'var(--dominant)'
-const INK_SOFT = 'rgba(20, 33, 61, 0.55)'
+const INK_SOFT = 'var(--text-secondary)'
 const PAPER    = 'var(--lm-bg-surface)'
-const RULE     = 'rgba(20, 33, 61, 0.10)'
+const RULE     = 'var(--rule-default)'
 
 export default function CartePage() {
   return (

@@ -224,16 +224,16 @@ export default function Dialogue({ audio, transcript, comprehensionChecks }: Dia
                     if (answered) {
                       cursor = 'default'
                       if (isSelected && isCorrect) {
-                        bg = 'rgba(68, 121, 79, 0.10)'
+                        bg = 'color-mix(in srgb, var(--success) 10%, transparent)'
                         borderColor = 'var(--success)'
                         color = 'var(--success)'
                       } else if (isSelected && !isCorrect) {
-                        bg = 'rgba(200, 16, 46, 0.08)'
+                        bg = 'color-mix(in srgb, var(--accent) 8%, transparent)'
                         borderColor = 'var(--accent)'
                         color = 'var(--accent)'
                       } else if (!isSelected && isThisCorrect) {
-                        bg = 'rgba(68, 121, 79, 0.05)'
-                        borderColor = 'rgba(68, 121, 79, 0.35)'
+                        bg = 'color-mix(in srgb, var(--success) 5%, transparent)'
+                        borderColor = 'color-mix(in srgb, var(--success) 35%, transparent)'
                         color = 'var(--success)'
                       }
                     }

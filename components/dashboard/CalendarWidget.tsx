@@ -24,14 +24,13 @@ function countToLevel(count: number): 0 | 1 | 2 | 3 | 4 {
   return 4
 }
 
-// Heatmap intensity ramp. NOTE (F-454): the rgba(20,33,61,…) steps below are
-// legacy v2-navy literals (an rgba island, outside the hex sweep) and do NOT
-// follow v3 tokens yet — flagged for a follow-up repoint to slate/accent.
+// Heatmap intensity ramp — graduated slate tints routed through --dominant via
+// color-mix (F-454 ext), so the ramp flows through v3 tokens in both modes.
 const HEATMAP_BG: Record<0 | 1 | 2 | 3 | 4, string> = {
   0: 'var(--ink-trace)',
-  1: 'rgba(20, 33, 61, 0.18)',
-  2: 'rgba(20, 33, 61, 0.38)',
-  3: 'rgba(20, 33, 61, 0.62)',
+  1: 'color-mix(in srgb, var(--dominant) 18%, transparent)',
+  2: 'color-mix(in srgb, var(--dominant) 38%, transparent)',
+  3: 'color-mix(in srgb, var(--dominant) 62%, transparent)',
   4: 'var(--dominant)',
 }
 

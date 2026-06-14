@@ -2851,12 +2851,20 @@ Supabase Auth remains the fallback if the Neon/Prisma Postgres layer in BE-002 p
 - Dark-chrome-in-light: `Footer.tsx` + `ProductDemo.tsx` `#1C1A16` (dark panel bg — v3 has no dark-chrome-in-light-mode token).
 - `HomeScreen.tsx` `#6B4EAA` purple deadline label (no v3 purple).
 - Decorative palettes intentionally kept: per-category tint maps (`#C7DFEA`/`#E8E4D8` in DetectedModuleCard/SecondaryModulesList/LearnModulePage/RecurringModuleCard), the UserMenu deterministic avatar palette, the onboarding `--lm-pastel-*` chip layer, ProductDemo fake-browser traffic-light dot.
-- **rgba v2-navy/-green/-vermillion tints** (e.g. `rgba(20,33,61,…)` in CalendarWidget heatmap + l-examen `INK_SOFT`/`RULE`; `rgba(68,121,79,…)`/`rgba(200,16,46,…)` answer-card tints in Activite/Dialogue) are an **rgba island outside the hex-defined scope** — flagged, comment corrected in CalendarWidget, deferred to a follow-up rgba pass.
+- ~~**rgba v2-navy/-green/-vermillion tints**~~ — **DONE in the extension commit** (see below).
 - **Shell polish** (frosted/blur, shadow elevation, motion) that F-453 tagged "F-454" — separate follow-up.
 
 **Old-v2-literal grep:** `#14213D | #C8102E | #0F1419 | #F5F5F7 | #1D1D1F | #E5301C | #FF453A` across `*.ts/*.tsx/*.css` (excl. node_modules/.next/.claude/docs) → **ZERO remain.**
 
 **Verification:** full unit suite (vitest) **506/506 passed** (53 files); `pnpm build` exit 0. **F-225 captures (both modes, since the repoint repaints every surface):** `f-454-{dashboard,la-methode,user-menu}-{light,dark}-{1440,375}.png` (12 total); trace `tests/traces/f-454.zip`. Capture spec `tests/e2e/f-454.spec.ts` reads the computed `--canvas` per mode and asserts it equals the v3 value (rgb(243,244,246) light / rgb(10,12,14) dark), so a broken var() chain fails the suite — all 4 green. Visual check: light = gray canvas + white cards + coral CTA (white text, contrast holds) + hairline borders; dark = near-black canvas + dark surfaces + coral accent + light text.
+
+**Extension (2nd commit under F-454) — rgba/hsl form sweep:** the hex grep missed v2 colors written in `rgba()`/`hsl()` notation. Swept them all:
+- **Semantic consts → tokens:** `INK_SOFT` (`rgba(20,33,61,.62/.55)` dead-navy secondary text) → `var(--text-secondary)`; `RULE` (`rgba(20,33,61,.10)` hairline) → `var(--rule-default)` across `/l-examen` + 4 comprehension/[exercise] pages, `/l-examen/mock`, `/carte`.
+- **Themed tints → `color-mix` of the role token at the same alpha:** dead-navy chip/section tints → `color-mix(var(--dominant) N%)` (IleShell, Activite, SeancePlayer, ActeDeParole, Tache oral, CalendarWidget heatmap ramp 18/38/62); v2-green answer/status tints → `color-mix(var(--success) N%)` (Activite/Dialogue/IleShell); v2-vermillion incorrect/piège tints → `color-mix(var(--accent) N%)` (Activite/Dialogue incorrect, Regle piège, Tache non-oral). Preserves alpha + dark-adapts via the token.
+- **Scrim:** CartDrawer backdrop `rgba(15,20,25,.45)` → neutral `rgba(0,0,0,.45)` (no v3 scrim token; black is the conventional role).
+- **globals.css doc-header** rewritten v2→v3 (the stale "two-greens rule" block referenced dead `#8FA279`/`#44794F`).
+- **Final all-form grep** (hex + rgba + dead-hsl, excl. archived docs) → **ZERO dead-palette colors remain in any form.** Out-of-scope (untouched per brief): decorative palettes (`#6B4EAA`, category/avatar/pastel).
+- **Verification:** full suite **506/506**; `pnpm build` exit 0. F-225 recapture of the surfaces that shifted: `f-454ext-molds-{light,dark}-{1440,375}.png` (lesson molds: piège/chip/answer tints), `f-454ext-l-examen-{light,dark}-{1440,375}.png` (secondary text + hairlines); trace `tests/traces/f-454-ext.zip`. Spec `tests/e2e/f-454-ext.spec.ts` — all 4 green.
 
 ## Section 4 — Content Pipeline (CON-001 to CON-014)
 

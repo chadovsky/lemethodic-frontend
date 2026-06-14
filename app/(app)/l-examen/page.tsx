@@ -7,8 +7,8 @@ const INK       = 'var(--dominant)'
 const VERMILLON = 'var(--accent)'
 const PAPER     = '#FFFFFF'
 const PAPER_TINT = 'var(--paper-tint)'
-const INK_SOFT  = 'rgba(20, 33, 61, 0.62)'
-const RULE      = 'rgba(20, 33, 61, 0.10)'
+const INK_SOFT  = 'var(--text-secondary)'
+const RULE      = 'var(--rule-default)'
 
 interface SectionCard {
   label: string

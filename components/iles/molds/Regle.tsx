@@ -152,8 +152,8 @@ export default function Regle({ regle, structure, exemples, piege }: RegleProps)
         <div
           style={{
             marginTop: 20,
-            background: 'rgba(200, 16, 46, 0.05)',
-            border: '1px solid rgba(200, 16, 46, 0.20)',
+            background: 'color-mix(in srgb, var(--accent) 5%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--accent) 20%, transparent)',
             borderRadius: 'var(--r-md)',
             padding: '14px 18px',
             display: 'flex',

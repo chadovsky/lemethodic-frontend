@@ -2,9 +2,9 @@ import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 
 const INK       = 'var(--dominant)'
 const VERMILLON = 'var(--accent)'
-const INK_SOFT  = 'rgba(20, 33, 61, 0.62)'
+const INK_SOFT  = 'var(--text-secondary)'
 const PAPER     = '#FFFFFF'
-const RULE      = 'rgba(20, 33, 61, 0.10)'
+const RULE      = 'var(--rule-default)'
 
 export const metadata = {
   title: "Mock examen complet | L'Examen | Le Méthodic",

@@ -246,7 +246,7 @@ export default function IleShell({ theme }: Props) {
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
               color: 'var(--dominant)',
-              background: 'rgba(20, 33, 61, 0.07)',
+              background: 'color-mix(in srgb, var(--dominant) 7%, transparent)',
               borderRadius: 'var(--r-pill)',
               padding: '4px 12px',
             }}
@@ -283,7 +283,7 @@ export default function IleShell({ theme }: Props) {
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
                 color: 'var(--success)',
-                background: 'rgba(68, 121, 79, 0.09)',
+                background: 'color-mix(in srgb, var(--success) 9%, transparent)',
                 borderRadius: 'var(--r-pill)',
                 padding: '4px 12px',
               }}

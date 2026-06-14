@@ -55,7 +55,7 @@ export default function CartDrawer() {
         style={{
           position: 'fixed',
           inset: 0,
-          backgroundColor: 'rgba(15, 20, 25, 0.45)',
+          backgroundColor: 'rgba(0, 0, 0, 0.45)',
           zIndex: 60,
         }}
       />
