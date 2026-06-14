@@ -1,115 +1,257 @@
 'use client'
 
+// F-458 — L'Île page: the 3-beat template (FE).
+//
+// Renders one ile from the F-456 journey model (lib/journey/journey.ts) at the
+// learner's target level (F-457 readTargetLevel). The ile resolves from
+// getJourney(level).iles by theme; the page lays out the 3 beats every ile
+// follows:
+//   Beat 1 Learn     -> vocab list + grammar points + Le Maitre video slot
+//                       (authored MDX rendered if present, else bientot).
+//   Beat 2 Practice  -> the 5 activity shells + one gated "Commencer la seance"
+//                       CTA (placed but bientot; the seance walk is a later
+//                       ticket — no interactivity here).
+//   Beat 3 Check     -> the mini-mock shell (bientot).
+// Les Pieges Anglais thread: grammar points flagged interference carry a Piege
+// marker. No BE, no diagnostic, no authored content. Rounded-only, v3 tokens
+// only, no em-dashes.
+
 import { useState, useEffect } from 'react'
 import type { ComponentType } from 'react'
-import Image from 'next/image'
-import { api } from '@/lib/api'
-import { TOKEN_KEY } from '@/lib/storage-keys'
-
-interface IleMeta {
-  theme: string
-  level: string
-  display_title: string
-  estimated_minutes?: number
-  image_set?: string
-  maitre_audio?: { intro: string; close: string }
-  actes_de_parole?: string[]
-}
+import {
+  Lock,
+  Check,
+  Dumbbell,
+  ClipboardCheck,
+  Video,
+  AlertTriangle,
+  PlayCircle,
+} from 'lucide-react'
+import {
+  getJourney,
+  THEMES,
+  type Level,
+  type Ile,
+  type Status,
+  type ThemeId,
+  type GrammarTopic,
+} from '@/lib/journey/journey'
+import { readTargetLevel } from '@/lib/journey/target-level'
+import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 
 interface Props {
   theme: string
 }
 
-const LEVEL_LABELS: Record<string, string> = {
-  a1_a2: 'A1–A2',
-  a2_b1: 'A2–B1',
-  b1: 'B1',
-  b2_plus: 'B2+',
+const THEME_LABELS: Record<ThemeId, string> = Object.fromEntries(
+  THEMES.map((theme) => [theme.id, theme.label]),
+) as Record<ThemeId, string>
+
+const THEME_IDS = new Set<string>(THEMES.map((t) => t.id))
+
+// ── Shared bits ──────────────────────────────────────────────────────────────
+
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      style={{
+        fontFamily: 'var(--f-mono)',
+        fontSize: 10,
+        fontWeight: 500,
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+        color: 'var(--ink-faint)',
+        margin: '0 0 6px',
+      }}
+    >
+      {children}
+    </p>
+  )
 }
 
+// Small "Bientot" tag, reused across the not-yet-live slots.
+function BientotTag() {
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        fontFamily: 'var(--f-mono)',
+        fontSize: 9,
+        fontWeight: 500,
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
+        color: 'var(--ink-faint)',
+        background: 'var(--paper-edge)',
+        border: '1px solid var(--rule)',
+        borderRadius: 'var(--r-pill)',
+        padding: '3px 10px',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      Bientôt
+    </span>
+  )
+}
+
+function StatusTag({ status }: { status: Status }) {
+  const map: Record<Status, { label: string; fg: string; bg: string }> = {
+    current: {
+      label: 'Vous êtes ici',
+      fg: 'var(--accent)',
+      bg: 'color-mix(in srgb, var(--accent) 12%, transparent)',
+    },
+    completed: {
+      label: 'Terminée',
+      fg: 'var(--success)',
+      bg: 'color-mix(in srgb, var(--success) 14%, transparent)',
+    },
+    locked: {
+      label: 'Verrouillée',
+      fg: 'var(--ink-faint)',
+      bg: 'var(--paper-edge)',
+    },
+    bientot: {
+      label: 'Bientôt',
+      fg: 'var(--ink-faint)',
+      bg: 'var(--paper-edge)',
+    },
+  }
+  const tag = map[status]
+  return (
+    <span
+      data-testid="ile-status"
+      data-status={status}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 5,
+        fontFamily: SANS_FONT,
+        fontSize: 11,
+        fontWeight: 600,
+        letterSpacing: '0.02em',
+        color: tag.fg,
+        background: tag.bg,
+        borderRadius: 'var(--r-pill)',
+        padding: '3px 11px',
+      }}
+    >
+      {status === 'locked' && <Lock size={11} strokeWidth={2} />}
+      {status === 'completed' && <Check size={12} strokeWidth={2.5} />}
+      {tag.label}
+    </span>
+  )
+}
+
+// One beat shell: numbered eyebrow + icon + title, then children.
+function Beat({
+  index,
+  icon,
+  title,
+  testId,
+  children,
+}: {
+  index: number
+  icon: React.ReactNode
+  title: string
+  testId: string
+  children: React.ReactNode
+}) {
+  return (
+    <section
+      data-testid={testId}
+      style={{
+        background: 'var(--paper)',
+        border: '1px solid var(--rule)',
+        borderRadius: 'var(--r-lg)',
+        padding: 'clamp(20px, 3vw, 28px)',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
+        <div
+          aria-hidden="true"
+          style={{
+            width: 40,
+            height: 40,
+            flexShrink: 0,
+            borderRadius: 'var(--r-md)',
+            background: 'color-mix(in srgb, var(--dominant) 9%, var(--paper))',
+            border: '1px solid var(--rule)',
+            color: 'var(--dominant)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {icon}
+        </div>
+        <div>
+          <Eyebrow>Étape {index}</Eyebrow>
+          <h2
+            style={{
+              fontFamily: SERIF_FONT,
+              fontWeight: 500,
+              fontSize: 'clamp(18px, 2.2vw, 22px)',
+              lineHeight: 1.2,
+              letterSpacing: '-0.01em',
+              color: 'var(--ink)',
+              margin: 0,
+            }}
+          >
+            {title}
+          </h2>
+        </div>
+      </div>
+      {children}
+    </section>
+  )
+}
+
+function SlotLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      style={{
+        fontFamily: 'var(--f-mono)',
+        fontSize: 9,
+        fontWeight: 500,
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
+        color: 'var(--ink-faint)',
+        margin: '0 0 10px',
+      }}
+    >
+      {children}
+    </p>
+  )
+}
+
+// ── Page ─────────────────────────────────────────────────────────────────────
+
 export default function IleShell({ theme }: Props) {
-  const [level, setLevel] = useState('b1')
+  // Level resolves client-side from the target profile (F-457); B1 keeps the
+  // first paint deterministic before localStorage is read.
+  const [level, setLevel] = useState<Level>('B1')
   const [Content, setContent] = useState<ComponentType | null>(null)
-  const [meta, setMeta] = useState<IleMeta | null>(null)
-  const [missing, setMissing] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [heroError, setHeroError] = useState(false)
-  const [started, setStarted] = useState(false)
 
   useEffect(() => {
-    function init(resolvedLevel: string) {
-      setLevel(resolvedLevel)
-      // Persist start timestamp once per (theme, level) pair
-      const startKey = `ile_started_${theme}_${resolvedLevel}`
-      if (!localStorage.getItem(startKey)) {
-        localStorage.setItem(startKey, new Date().toISOString())
-      }
-      setStarted(true)
-      // Dynamic MDX import — webpack bundles all content/iles/**/*.mdx
-      import(`@/content/iles/${theme}/${resolvedLevel}.mdx`)
-        .then((mod) => {
-          setContent(() => mod.default as ComponentType)
-          setMeta((mod.meta as IleMeta) ?? null)
-          setLoading(false)
-        })
-        .catch(() => {
-          setMissing(true)
-          setLoading(false)
-        })
-    }
-
-    // F-439: authenticated users source level from BE progress endpoint.
-    // Public visitors (no token) default to b1 without making a request.
-    const token = localStorage.getItem(TOKEN_KEY)
-    if (token) {
-      api.users.getProgress()
-        .then((p) => init(p.currentLevel ?? 'b1'))
-        .catch(() => init('b1'))
-    } else {
-      init('b1')
-    }
+    const resolved = readTargetLevel()
+    setLevel(resolved)
+    // Authored learn content seam: render the MDX mold sequence if a file
+    // exists for this (theme, level), else the Le Maitre slot stays bientot.
+    // The 7 journey themes have no MDX yet, so this resolves to bientot for
+    // them; the existing _sample / cafe MDX still renders.
+    import(`@/content/iles/${theme}/${resolved.toLowerCase()}.mdx`)
+      .then((mod) => setContent(() => mod.default as ComponentType))
+      .catch(() => setContent(null))
   }, [theme])
 
-  if (loading) {
-    return (
-      <main
-        lang="fr"
-        style={{
-          maxWidth: 820,
-          margin: '0 auto',
-          padding: 'clamp(32px, 5vw, 64px) clamp(20px, 4vw, 40px)',
-        }}
-      >
-        <div
-          style={{
-            height: 220,
-            background: 'var(--paper-edge)',
-            borderRadius: 'var(--r-lg)',
-            marginBottom: 32,
-          }}
-        />
-        <div
-          style={{
-            height: 28,
-            width: '52%',
-            background: 'var(--paper-edge)',
-            borderRadius: 'var(--r-sm)',
-            marginBottom: 12,
-          }}
-        />
-        <div
-          style={{
-            height: 14,
-            width: '22%',
-            background: 'var(--paper-edge)',
-            borderRadius: 'var(--r-sm)',
-          }}
-        />
-      </main>
-    )
-  }
+  const journey = getJourney(level)
+  const ile: Ile | undefined = THEME_IDS.has(theme)
+    ? journey.iles.find((candidate) => candidate.theme === theme)
+    : undefined
 
-  if (missing) {
+  // Unknown theme (or no ile at this level): graceful bientot stub, never a 404.
+  if (!ile) {
     return (
       <main
         lang="fr"
@@ -120,6 +262,7 @@ export default function IleShell({ theme }: Props) {
         }}
       >
         <div
+          data-testid="ile-not-found"
           style={{
             background: 'var(--paper-tint)',
             border: '1px solid var(--rule)',
@@ -128,22 +271,10 @@ export default function IleShell({ theme }: Props) {
             textAlign: 'center',
           }}
         >
-          <p
-            style={{
-              fontFamily: 'var(--f-mono)',
-              fontSize: 10,
-              fontWeight: 500,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: 'var(--ink-faint)',
-              margin: '0 0 16px',
-            }}
-          >
-            Bientôt
-          </p>
+          <Eyebrow>Bientôt</Eyebrow>
           <h1
             style={{
-              fontFamily: 'var(--f-display)',
+              fontFamily: SERIF_FONT,
               fontSize: 'clamp(1.5rem, 2.5vw, 2rem)',
               fontWeight: 400,
               color: 'var(--ink)',
@@ -153,14 +284,7 @@ export default function IleShell({ theme }: Props) {
           >
             Cette île arrive prochainement.
           </h1>
-          <p
-            style={{
-              fontFamily: 'var(--f-ui)',
-              fontSize: 14,
-              color: 'var(--ink-soft)',
-              margin: 0,
-            }}
-          >
+          <p style={{ fontFamily: SANS_FONT, fontSize: 14, color: 'var(--ink-soft)', margin: 0 }}>
             Le contenu pour ce thème et ce niveau est en préparation.
           </p>
         </div>
@@ -168,244 +292,342 @@ export default function IleShell({ theme }: Props) {
     )
   }
 
+  const label = THEME_LABELS[ile.theme]
+
+  // Resolve the ile's grammar-point ids against the journey grammar phase so we
+  // can surface labels + the Pieges Anglais (interference) marker.
+  const phaseById = new Map<string, GrammarTopic>(
+    journey.grammarPhase.map((topic) => [topic.id, topic]),
+  )
+  const grammarTopics: GrammarTopic[] = ile.learn.grammarPoints
+    .map((id) => phaseById.get(id))
+    .filter((topic): topic is GrammarTopic => Boolean(topic))
+
   return (
     <main
       lang="fr"
+      data-testid="ile-page"
       style={{
         maxWidth: 820,
         margin: '0 auto',
         padding: 'clamp(32px, 5vw, 64px) clamp(20px, 4vw, 40px)',
+        fontFamily: SANS_FONT,
       }}
     >
-      {/* Hero image — graceful placeholder if file is absent */}
-      <div
-        style={{
-          position: 'relative',
-          height: 220,
-          borderRadius: 'var(--r-lg)',
-          overflow: 'hidden',
-          marginBottom: 32,
-          background: 'var(--paper-edge)',
-        }}
+      {/* Header: theme display name + level + status */}
+      <header
+        data-testid="ile-header"
+        data-theme={ile.theme}
+        data-level={ile.level}
+        data-status={ile.status}
+        style={{ marginBottom: 32 }}
       >
-        {!heroError ? (
-          <Image
-            src={`/iles/${theme}/hero.png`}
-            alt={meta?.display_title ?? theme}
-            fill
-            style={{ objectFit: 'cover' }}
-            onError={() => setHeroError(true)}
-          />
-        ) : (
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: 'var(--f-display)',
-                fontSize: 80,
-                color: 'var(--ink-trace)',
-                lineHeight: 1,
-                userSelect: 'none',
-              }}
-            >
-              {(meta?.display_title ?? theme).charAt(0).toUpperCase()}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Île header: title + level badge + duration + progress */}
-      <div style={{ marginBottom: 40 }}>
-        <h1
+        <div
           style={{
-            fontFamily: 'var(--f-display)',
-            fontSize: 'clamp(1.75rem, 3vw, 2.5rem)',
-            fontWeight: 400,
-            color: 'var(--ink)',
-            margin: '0 0 12px',
-            letterSpacing: '-0.01em',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            flexWrap: 'wrap',
+            marginBottom: 12,
           }}
         >
-          {meta?.display_title ?? `Île ${theme}`}
-        </h1>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          {/* Level badge */}
           <span
+            data-testid="ile-level"
             style={{
               fontFamily: 'var(--f-mono)',
               fontSize: 10,
               fontWeight: 500,
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
-              color: 'var(--dominant)',
-              background: 'color-mix(in srgb, var(--dominant) 7%, transparent)',
+              color: 'var(--accent)',
+              background: 'color-mix(in srgb, var(--accent) 10%, transparent)',
               borderRadius: 'var(--r-pill)',
               padding: '4px 12px',
             }}
           >
-            {LEVEL_LABELS[level] ?? level.toUpperCase()}
+            Niveau {ile.level}
           </span>
-
-          {/* Duration chip */}
-          {meta?.estimated_minutes && (
-            <span
-              style={{
-                fontFamily: 'var(--f-mono)',
-                fontSize: 10,
-                fontWeight: 500,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                color: 'var(--ink-faint)',
-                background: 'var(--paper-edge)',
-                borderRadius: 'var(--r-pill)',
-                padding: '4px 12px',
-              }}
-            >
-              {meta.estimated_minutes} min
-            </span>
-          )}
-
-          {/* Progress indicator (localStorage-persisted) */}
-          {started && (
-            <span
-              style={{
-                fontFamily: 'var(--f-mono)',
-                fontSize: 10,
-                fontWeight: 500,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                color: 'var(--success)',
-                background: 'color-mix(in srgb, var(--success) 9%, transparent)',
-                borderRadius: 'var(--r-pill)',
-                padding: '4px 12px',
-              }}
-            >
-              En cours
-            </span>
-          )}
+          <StatusTag status={ile.status} />
         </div>
-      </div>
-
-      {/* Le Maître intro — disabled seam */}
-      {/* BE SEAM: replace with <MaitreAudio src={meta?.maitre_audio?.intro} /> in Round 2 (F-417) */}
-      <div
-        style={{
-          background: 'var(--paper-tint)',
-          border: '1px solid var(--rule)',
-          borderRadius: 'var(--r-lg)',
-          padding: '20px 24px',
-          marginBottom: 40,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 16,
-        }}
-      >
-        <div
+        <h1
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: 'var(--r-pill)',
-            background: 'var(--dominant)',
-            flexShrink: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            fontFamily: SERIF_FONT,
+            fontSize: 'clamp(2rem, 4vw, 2.75rem)',
+            fontWeight: 400,
+            color: 'var(--ink)',
+            margin: 0,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.1,
           }}
         >
-          <span
-            style={{
-              fontFamily: 'var(--f-display)',
-              fontSize: 18,
-              color: 'var(--paper)',
-              lineHeight: 1,
-            }}
-          >
-            M
-          </span>
-        </div>
-        <div>
-          <p
-            style={{
-              fontFamily: 'var(--f-ui)',
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'var(--dominant)',
-              margin: '0 0 2px',
-            }}
-          >
-            Le Maître
-          </p>
-          <p
-            style={{
-              fontFamily: 'var(--f-ui)',
-              fontSize: 13,
-              color: 'var(--ink-soft)',
-              margin: 0,
-            }}
-          >
-            Bienvenue sur cette île. Écoutez le dialogue, puis répondez aux questions.
-          </p>
-        </div>
-      </div>
+          {label}
+        </h1>
+      </header>
 
-      {/* MDX mold sequence in order */}
-      {Content && <Content />}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* ── Beat 1 — Learn ─────────────────────────────────────────────── */}
+        <Beat
+          index={1}
+          testId="ile-beat-learn"
+          title="Apprendre"
+          icon={<Video size={20} strokeWidth={1.75} />}
+        >
+          {/* Vocab */}
+          <div style={{ marginBottom: 24 }}>
+            <SlotLabel>Vocabulaire</SlotLabel>
+            {ile.learn.vocab.length > 0 ? (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {ile.learn.vocab.map((word) => (
+                  <span
+                    key={word}
+                    data-testid="ile-vocab-item"
+                    style={{
+                      fontFamily: SANS_FONT,
+                      fontSize: 13,
+                      color: 'var(--ink)',
+                      background: 'var(--paper-edge)',
+                      border: '1px solid var(--rule)',
+                      borderRadius: 'var(--r-pill)',
+                      padding: '5px 13px',
+                    }}
+                  >
+                    {word}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p style={{ fontFamily: SANS_FONT, fontSize: 13, color: 'var(--ink-faint)', margin: 0 }}>
+                Le vocabulaire de cette île arrive bientôt.
+              </p>
+            )}
+          </div>
 
-      {/* Le Maître close — disabled seam (same pattern as Tâche) */}
-      {/* BE SEAM: gate until all molds complete in user_progress (F-417, Round 2) */}
-      <div
-        style={{
-          background: 'var(--paper-tint)',
-          border: '1px solid var(--rule)',
-          borderRadius: 'var(--r-lg)',
-          padding: '20px 24px',
-          marginTop: 16,
-          opacity: 0.45,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div
+          {/* Grammar points + Pieges Anglais thread */}
+          <div style={{ marginBottom: 24 }}>
+            <SlotLabel>Points de grammaire</SlotLabel>
+            {grammarTopics.length > 0 ? (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {grammarTopics.map((topic) => (
+                  <span
+                    key={topic.id}
+                    data-testid="ile-grammar-point"
+                    data-interference={String(topic.interference)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 7,
+                      fontFamily: SANS_FONT,
+                      fontSize: 13,
+                      color: 'var(--ink)',
+                      background: 'var(--paper-edge)',
+                      border: '1px solid var(--rule)',
+                      borderRadius: 'var(--r-pill)',
+                      padding: '5px 13px',
+                    }}
+                  >
+                    {topic.label}
+                    {topic.interference && (
+                      <span
+                        data-testid="ile-piege"
+                        title="Piège anglais : interférence avec l'anglais"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          fontFamily: 'var(--f-mono)',
+                          fontSize: 9,
+                          fontWeight: 500,
+                          letterSpacing: '0.06em',
+                          textTransform: 'uppercase',
+                          color: 'var(--accent)',
+                          background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
+                          borderRadius: 'var(--r-pill)',
+                          padding: '2px 8px',
+                        }}
+                      >
+                        <AlertTriangle size={10} strokeWidth={2.25} />
+                        Piège
+                      </span>
+                    )}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p style={{ fontFamily: SANS_FONT, fontSize: 13, color: 'var(--ink-faint)', margin: 0 }}>
+                Les points de grammaire de cette île arrivent bientôt.
+              </p>
+            )}
+          </div>
+
+          {/* Le Maitre video slot — authored MDX if present, else bientot */}
+          <div data-testid="ile-maitre-video">
+            <SlotLabel>La leçon de Le Maître</SlotLabel>
+            {Content ? (
+              <div data-testid="ile-maitre-content">
+                <Content />
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  background: 'var(--paper-tint)',
+                  border: '1px dashed var(--rule)',
+                  borderRadius: 'var(--r-lg)',
+                  padding: '18px 20px',
+                }}
+              >
+                <div
+                  aria-hidden="true"
+                  style={{
+                    width: 44,
+                    height: 44,
+                    flexShrink: 0,
+                    borderRadius: 'var(--r-md)',
+                    background: 'var(--paper-edge)',
+                    color: 'var(--ink-faint)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <PlayCircle size={22} strokeWidth={1.75} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p
+                    style={{
+                      fontFamily: SANS_FONT,
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: 'var(--ink-soft)',
+                      margin: '0 0 3px',
+                    }}
+                  >
+                    La vidéo de Le Maître arrive bientôt.
+                  </p>
+                  <p style={{ fontFamily: SANS_FONT, fontSize: 13, color: 'var(--ink-faint)', margin: 0 }}>
+                    La leçon vidéo pour cette île est en préparation.
+                  </p>
+                </div>
+                <BientotTag />
+              </div>
+            )}
+          </div>
+        </Beat>
+
+        {/* ── Beat 2 — Practice ──────────────────────────────────────────── */}
+        <Beat
+          index={2}
+          testId="ile-beat-practice"
+          title="S'entraîner"
+          icon={<Dumbbell size={20} strokeWidth={1.75} />}
+        >
+          <SlotLabel>La séance</SlotLabel>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {ile.practice.map((activity) => (
+              <div
+                key={activity.id}
+                data-testid="ile-activity"
+                data-activity-type={activity.type}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  background: 'var(--paper-edge)',
+                  border: '1px dashed var(--rule)',
+                  borderRadius: 'var(--r-md)',
+                  padding: '14px 16px',
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: SANS_FONT,
+                    fontSize: 14,
+                    fontWeight: 500,
+                    color: 'var(--ink-soft)',
+                  }}
+                >
+                  {activity.label}
+                </span>
+                <BientotTag />
+              </div>
+            ))}
+          </div>
+
+          {/* Gated launch CTA — placed, but the seance walk is a later ticket. */}
+          <button
+            type="button"
+            data-testid="ile-seance-cta"
+            disabled
+            aria-disabled="true"
             style={{
-              width: 40,
-              height: 40,
-              borderRadius: 'var(--r-pill)',
-              background: 'var(--dominant)',
-              flexShrink: 0,
-              display: 'flex',
+              marginTop: 18,
+              width: '100%',
+              display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
+              gap: 8,
+              padding: '13px 20px',
+              background: 'var(--paper-edge)',
+              color: 'var(--ink-faint)',
+              border: '1px solid var(--rule)',
+              borderRadius: 'var(--r-pill)',
+              fontFamily: SANS_FONT,
+              fontWeight: 600,
+              fontSize: '0.9375rem',
+              letterSpacing: '0.01em',
+              cursor: 'not-allowed',
+              minHeight: 48,
             }}
           >
-            <span
-              style={{
-                fontFamily: 'var(--f-display)',
-                fontSize: 18,
-                color: 'var(--paper)',
-                lineHeight: 1,
-              }}
-            >
-              M
-            </span>
-          </div>
-          <p
+            Commencer la séance
+            <BientotTag />
+          </button>
+        </Beat>
+
+        {/* ── Beat 3 — Check ─────────────────────────────────────────────── */}
+        <Beat
+          index={3}
+          testId="ile-beat-check"
+          title="Vérifier"
+          icon={<ClipboardCheck size={20} strokeWidth={1.75} />}
+        >
+          <SlotLabel>Mini-examen</SlotLabel>
+          <div
+            data-testid="ile-mini-mock"
+            data-status={ile.check.miniMock.status}
             style={{
-              fontFamily: 'var(--f-ui)',
-              fontSize: 13,
-              color: 'var(--ink-soft)',
-              margin: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+              background: 'var(--paper-tint)',
+              border: '1px dashed var(--rule)',
+              borderRadius: 'var(--r-lg)',
+              padding: '18px 20px',
             }}
           >
-            Vous avez terminé cette île. Continuez avec la suivante.
-          </p>
-        </div>
+            <div>
+              <p
+                style={{
+                  fontFamily: SANS_FONT,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: 'var(--ink-soft)',
+                  margin: '0 0 3px',
+                }}
+              >
+                {ile.check.miniMock.label}
+              </p>
+              <p style={{ fontFamily: SANS_FONT, fontSize: 13, color: 'var(--ink-faint)', margin: 0 }}>
+                Mesurez ce que vous avez appris sur cette île.
+              </p>
+            </div>
+            <BientotTag />
+          </div>
+        </Beat>
       </div>
     </main>
   )

@@ -5,8 +5,8 @@
 // Trace: tests/traces/f-457.zip (desktop happy path).
 //
 // Covers: journey renders at B1, education-first current ile, the single
-// primary CTA points at the canonical ile route and lands on the IleShell
-// bientot stub (no 404), and the dashboard entry wires through to /carte.
+// primary CTA points at the canonical ile route and lands on the real 3-beat
+// ile page (F-458, no 404), and the dashboard entry wires through to /carte.
 
 import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
@@ -61,11 +61,11 @@ test.describe('F-457 — La Carte (desktop 1440, light)', () => {
 
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-457-carte-1440.png'), fullPage: true })
 
-    // No broken nav: the CTA target is a real route that lands on the IleShell
-    // bientot stub (no 404), since the education ile has no MDX authored yet.
+    // No broken nav: the CTA target is a real route that lands on the real
+    // 3-beat ile page (F-458, replaced the bientot stub), not a 404.
     await page.goto('/ile/education')
     await expect(page).toHaveURL(/\/ile\/education$/)
-    await expect(page.getByText(/cette île arrive prochainement/i)).toBeVisible()
+    await expect(page.getByTestId('ile-page')).toBeVisible()
 
     await page.context().tracing.stop({ path: path.join(TRACE_DIR, 'f-457.zip') })
   })

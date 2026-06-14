@@ -6696,3 +6696,21 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 **Tests:** `tests/unit/journey/target-level.test.ts` (resolver: default, CEFR token extraction, case-insensitivity, GENERAL/malformed fallback); `tests/unit/carte/CarteJourney.test.tsx` (B1 trail: level header, 13-cluster grammar node live, 7 iles education-first current/locked, exactly one current CTA -> /ile/education, 7 mini-mocks + 1 final-mock all bientot, island placeholder per ile; B2 fallback: grammar not live, no current CTA, iles all bientot); `tests/unit/dashboard/Dashboard.test.tsx` (+1 live carte entry -> /carte); `tests/e2e/f-457.spec.ts` (trail render + CTA href + ile-route bientot landing + dashboard->carte wire, light/dark/mobile receipts). Full unit suite 536/536 green, full e2e 897 passed / 3 pre-existing skipped / 0 failed, `npm run build` green. Receipts (gitignored per F-442): `f-457-carte-1440.png`, `-375.png`, `-dark-1440.png`; trace `f-457.zip`.
 
 **F-ID note:** next free after F-456 (BACKLOG + FE git both topped at F-456; BE git tops at F-443).
+
+## F-458 -- FE: L'Île page, the 3-beat template
+
+**Status:** Shipped (direct to main)
+
+**Scope:** Replace the generic `/ile/[theme]` bientot stub with the real 3-beat ile page, rendered from the F-456 journey model + F-457 level resolver. No seance interactivity, no authored content, no real Le Maitre video, no diagnostic, no BE. Structure + shells only; the seance makes Practice interactive in a later ticket.
+
+- **Render** (`components/iles/IleShell.tsx`, client, rewritten): resolves the level with `readTargetLevel()` (F-457, was BE-progress) and the ile with `getJourney(level).iles` by theme. Header = theme display name (THEMES label) + level + status tag. Then the 3 beats:
+  - **Beat 1 Learn:** the vocab list (chips), the ile's grammar points resolved against the journey grammar phase (chips), and a Le Maitre video slot. Authored MDX is rendered if a `content/iles/<theme>/<level>.mdx` file exists, else the slot shows a bientot shell (the 7 journey themes have no MDX, so it is bientot for them; the existing `_sample` / `cafe` MDX still renders).
+  - **Beat 2 Practice:** the 5 activity shells (one per ActivityType, all bientot) + a single "Commencer la seance" CTA that is PLACED but GATED (disabled button + bientot tag). No seance logic.
+  - **Beat 3 Check:** the mini-mock as a bientot shell.
+- **Les Pieges Anglais thread:** grammar points flagged `interference` carry a "Piège" marker (education@B1 foregrounds 2 points, both interference-flagged).
+- **No broken nav:** the carte's current-ile CTA (`/ile/education`) now lands on this real page. An unknown theme (or a non-authored level) keeps the graceful "Cette île arrive prochainement" stub, never a 404. Non-B1 levels render the full 3-beat structure with bientot status + empty learn slots.
+- Rounded-only (v3 `--r-*` radii), v3 tokens only (`--ink*`, `--paper*`, `--rule*`, `--accent`, `--success`, `--dominant`), no em-dashes.
+
+**Tests:** `tests/unit/iles/IleShell.test.tsx` (header theme/level/status, 3 beats present, 5 vocab, 2 grammar points both interference + 2 piege markers, Le Maitre slot bientot when no MDX, 5 activity shells + gated/disabled seance CTA, mini-mock bientot; unknown theme -> graceful stub; B2-via-profile renders structure with bientot status + empty learn). `tests/e2e/f-458.spec.ts` (carte CTA -> real 3-beat page, header attrs, 3 beats, vocab/grammar/piege counts, gated seance CTA, bientot mini-mock, unknown-theme stub no-404; light/dark/mobile receipts). `tests/e2e/f-457.spec.ts` reconciled: the ile-route landing assertion now expects the real `ile-page`, not the retired stub text. Full unit suite 545/545 green, `npm run build` green, full e2e green. Receipts (gitignored per F-442): `f-458-ile-education-1440.png`, `-375.png`, `-dark-1440.png`; trace `f-458.zip`.
+
+**F-ID note:** next free after F-457 (BACKLOG + FE git both topped at F-457; BE git tops at F-443).
