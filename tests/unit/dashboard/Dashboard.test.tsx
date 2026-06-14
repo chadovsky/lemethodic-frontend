@@ -121,6 +121,15 @@ describe('Dashboard', () => {
     expect(cta.querySelector('[data-testid="bientot-pill"]')).not.toBeNull()
   })
 
+  // F-457 — live dashboard entry into La Carte (the journey map).
+  it('renders a live "Voir ma carte" entry linking to /carte', () => {
+    render(<Dashboard />)
+    const entry = screen.getByTestId('dashboard-carte-entry')
+    expect(entry).toBeInTheDocument()
+    expect(entry).toHaveAttribute('href', '/carte')
+    expect(entry).toHaveTextContent(/voir ma carte/i)
+  })
+
   it('countdown widget shows days remaining when examDate is set', () => {
     render(<Dashboard />)
     const days = screen.getByTestId('countdown-days')

@@ -6679,3 +6679,20 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 **Tests:** `tests/unit/journey/journey.test.ts` -- theme order/count, B1 grammar phase (13, interference flags), 7 iles education-first, status sequencing (current then locked), 3-beat skeleton on every ile, vocab+grammarPoints seeded and referencing the phase, practice all-bientot one-per-type, mocks bientot, other-level fallback. Full unit suite 522/522 green, full e2e green, `npm run build` green.
 
 **F-ID note:** next free after the F-450..F-455 FE commit run (BACKLOG topped at F-449; F-450..455 were committed but not back-filled here). Verified free across both repo git ceilings (BE tops at F-443).
+
+## F-457 -- FE: La Carte journey map view
+
+**Status:** Shipped (direct to main)
+
+**Scope:** Replace the `/carte` bientot stub with the journey map rendered from the F-456 data model. The carte is the dashboard's live entry into the voyage; no real island art, no ile-page content, no diagnostic logic, no BE (all next-ticket / later).
+
+- **Render** (`components/carte/CarteJourney.tsx`, client): the F-456 `getJourney(level)` as a vertical trail in order -- grammar-phase node, then for each of the 7 iles (education first) the ile node followed by its mini-mock marker, then the final-mock node. Node states come straight from the data: `current` = accent-highlighted island + the single primary CTA; `completed` = success/done marker; `locked` = muted, non-interactive (no link); `bientot` = shown not-yet-live. The practice beat (5 activities, all bientot) renders as dashed not-yet-live chips inside each ile; mini-mocks + final mock render as bientot checkpoints.
+- **Level resolution** (`lib/journey/target-level.ts`): pure `levelFromTargetProfile(raw)` reads the F-365 target-profile stub (`lm.targetProfile.v1`), pulls the leading CEFR token from its `threshold` string, defaults to `B1` for the GENERAL track / missing / malformed. `readTargetLevel()` is the SSR-safe browser reader. The diagnostic ticket owns real level assignment later; this is the read-only seam. (B1 is the only authored level -- other levels render an empty grammar phase + 7 bientot iles, no current CTA.)
+- **Island art seam** (`components/carte/IslandNode.tsx`): a v3-styled rounded placeholder node (status-driven surface) NOW; the single point where real per-theme art drops in LATER without touching the carte layout. No real art this ticket.
+- **No broken nav:** the current ile CTA points at the canonical ile route (`/ile/education`). The 7 journey themes have no MDX authored, so the destination lands on IleShell's graceful "Cette île arrive prochainement" bientot stub, not a 404. The ile page itself is the next ticket.
+- **Dashboard wiring** (`components/dashboard/CarteEntry.tsx`): a live "Voir ma carte" entry -> `/carte`, added to the dashboard beneath the (still-gated) Commencer la séance CTA so the tested séance ordering is untouched.
+- Rounded-only (v3 `--r-*` radii), v3 tokens only (single `--accent`, no new colors), no em-dashes.
+
+**Tests:** `tests/unit/journey/target-level.test.ts` (resolver: default, CEFR token extraction, case-insensitivity, GENERAL/malformed fallback); `tests/unit/carte/CarteJourney.test.tsx` (B1 trail: level header, 13-cluster grammar node live, 7 iles education-first current/locked, exactly one current CTA -> /ile/education, 7 mini-mocks + 1 final-mock all bientot, island placeholder per ile; B2 fallback: grammar not live, no current CTA, iles all bientot); `tests/unit/dashboard/Dashboard.test.tsx` (+1 live carte entry -> /carte); `tests/e2e/f-457.spec.ts` (trail render + CTA href + ile-route bientot landing + dashboard->carte wire, light/dark/mobile receipts). Full unit suite 536/536 green, full e2e 897 passed / 3 pre-existing skipped / 0 failed, `npm run build` green. Receipts (gitignored per F-442): `f-457-carte-1440.png`, `-375.png`, `-dark-1440.png`; trace `f-457.zip`.
+
+**F-ID note:** next free after F-456 (BACKLOG + FE git both topped at F-456; BE git tops at F-443).

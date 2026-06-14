@@ -9,6 +9,7 @@ import StreakWidget from './StreakWidget'
 import DailyTargetWidget from './DailyTargetWidget'
 import NextLessonWidget from './NextLessonWidget'
 import CommencerSeance from './CommencerSeance'
+import CarteEntry from './CarteEntry'
 
 export default function Dashboard() {
   const [progress, setProgress] = useState<UserProgress | null>(null)
@@ -31,6 +32,8 @@ export default function Dashboard() {
       <DashboardGreeting />
 
       <CommencerSeance />
+
+      <CarteEntry />
 
       <div className="dashboard-grid">
         <CountdownWidget />
