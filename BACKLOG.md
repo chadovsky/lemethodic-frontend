@@ -6866,3 +6866,19 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 **Gates:** full unit suite 586/586 green (incl. `AppShell.test.tsx`, unaffected); `pnpm build` green; targeted e2e (CI mode, prod build) -- f-466 + dashboard + f-464 28/28. Aesthetic check at 1920: the three zones fill the 1536 column with balanced margins, neither stretched nor sparse -- PASS.
 
 **F-ID note:** next free after F-465 (BACKLOG topped at F-465; F-464 just added). Verified no `## F-466` in BACKLOG, none in PRD, none in git history before claiming.
+
+## F-467 -- FE: daily-target editor on /parametres (PROPOSED -- brief pending Chadi)
+
+**Status:** Proposed, not started. Filed from the F-466 follow-up verification; Chadi writes the full brief. Captures a real gap opened by F-464.
+
+**The gap (verified 2026-06-15):** F-464 took `DailyTargetWidget` off the dashboard surface, and that widget was the ONLY UI anywhere in the FE that edits the daily target. So the daily target is now **read-only across the whole app**: the dashboard "Objectif du jour" card displays it but nothing can change it. `/parametres` is a full bientôt stub (`<Bientot>` over inert mock rows -- "Affichage / Audio / Notifications / Compte"; the "Rappels quotidiens" row is a dead 8px grey bar, not a control), so there is no editor there.
+
+**The store (NOT localStorage):** the daily target is a **server field `daily_target_minutes`** on the user's progress record.
+- Read: `GET /api/users/me/progress` -> `UserProgress.dailyTargetMinutes` (`lib/api.ts` `users.getProgress`, mapped in `lib/types.ts`).
+- Write: `PATCH /api/users/me/progress { daily_target_minutes }` (`lib/api.ts` `users.patchProgress`, line 1041).
+- The dashboard "Objectif du jour" card reads the SAME value indirectly via `GET /api/users/me/activity-calendar` -> `todayTarget` (the BE derives `todayTarget` from `daily_target_minutes`). So the display card and a future editor share one source of truth: the server field. **There is no `lm.dailyTarget` and no daily-target field in `lm.targetProfile.v1`** (that key holds the onboarding Target Profile -- level / threshold / exam -- not the daily minutes goal).
+- **Registration does NOT write it:** signup creates the user with a server default (observed 30 min in every mock); `/bienvenue` onboarding writes `lm.targetProfile.v1` (level/exam), never the daily minutes target.
+
+**Proposed scope (for the brief, not built here):** add a real "Objectif quotidien" control to `/parametres` (or un-stub the "Rappels quotidiens" row) wired to `patchProgress({ daily_target_minutes })`. The editor already exists as `components/dashboard/DailyTargetWidget.tsx` (read `dailyTargetMinutes`, edit -> `onPatchTarget` -> PATCH) -- relocate/adapt it rather than rebuild. After this lands, the dashboard Objectif card stays the display; /parametres becomes the edit surface; both read the same server field so they stay in sync on next load. No BE work (the endpoint exists).
+
+**F-ID note:** next free after F-466 (BACKLOG topped at F-466; F-464/F-465 shipped). Verified no `## F-467` in BACKLOG, none in PRD, none in git history before claiming.
