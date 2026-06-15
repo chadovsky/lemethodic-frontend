@@ -6805,7 +6805,7 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 ## F-465 -- FE: Logged-in sidebar -> persistent icon-rail (hover-expand + pin + push) with mobile drawer
 
-**Status:** Built locally on branch `feat/f-465-icon-rail`, **holding push for Chadi** (FE auto-deploys Vercel on merge to `main`). After push + CI green, a follow-up `docs(F-465): flip status to Shipped (<SHA>)` records the squash SHA.
+**Status:** **Shipped** (`09a8e57`, squash-merged to `main`). All ship gates green: GitHub Actions success on `09a8e57` (run 27529207637, Unit + E2E jobs both green); Vercel prod READY (`dpl_DG84b1TFSExL76AUxEzvc6xjdDN4`, target production, aliased to lemethodic.com). Pre-push verification confirmed the F-463 palette survived the squash (the branch forked before `3389814`): the deployed CSS bundle carries canvas `#EAEFF3` + all four tints/sparklines + badge + heading ink, zero stale `#F3F4F6`, alongside the F-465 `--sidebar-rail`/`--sidebar-expanded`/`--lm-shell-offset` tokens. Prod behavioral spot-check 16/16 against the live deploy (rail rests icon-only, hover/focus expands to titles with `data-expanded`, content pushes, pin persists across reload, mobile drawer opens). Full local gate before push: unit 586/586, e2e (CI mode) 936 passed / 3 skipped / 1 flaky (pre-existing f-454 networkidle, retry-green).
 
 **Scope:** Convert the F-446 split app-shell sidebar (logged-in pages only) into a persistent icon-rail. TopNav and every logged-out surface are untouched. No BE.
 
