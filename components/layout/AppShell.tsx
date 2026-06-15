@@ -36,6 +36,11 @@ export default function AppShell({ children }: AppShellProps) {
   // unless the drawer is open (an open drawer always shows full titles).
   const compact = rail.railEnabled ? !rail.expanded : !drawerOpen
 
+  // F-466 — the data-dense dashboard gets a wider content column (1536) than the
+  // shared 1200 reading width every other authed route keeps. Per-route override
+  // only; no breakout hack, no change to the rest of the app shell.
+  const contentMaxWidth = pathname === '/tableau-de-bord' ? 1536 : 1200
+
   return (
     <div
       data-testid="app-shell"
@@ -95,7 +100,10 @@ export default function AppShell({ children }: AppShellProps) {
           paddingRight: 'clamp(16px, 3vw, 32px)',
         }}
       >
-        <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%' }}>
+        <div
+          data-testid="app-shell-content"
+          style={{ maxWidth: contentMaxWidth, margin: '0 auto', width: '100%' }}
+        >
           {children}
         </div>
       </main>
