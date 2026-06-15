@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 vi.mock('next/link', () => ({
@@ -60,11 +60,26 @@ describe('CarteJourney (default B1)', () => {
     expect(final).toHaveAttribute('data-status', 'bientot')
   })
 
-  it('renders an island-node placeholder per ile carrying the status', async () => {
+  it('renders the themed island art per ile with the right src and state', async () => {
     render(<CarteJourney />)
     const islands = await screen.findAllByTestId('island-node')
     expect(islands).toHaveLength(7)
+
+    // education first, current: its art is the education island.
     expect(islands[0]).toHaveAttribute('data-status', 'current')
+    expect(islands[0]).toHaveAttribute('data-state', 'current')
+    expect(within(islands[0]).getByRole('img')).toHaveAttribute(
+      'src',
+      '/iles/island-education.png',
+    )
+
+    // the rest are locked behind it, rendering their own themed art.
+    expect(islands[1]).toHaveAttribute('data-status', 'locked')
+    expect(islands[1]).toHaveAttribute('data-state', 'locked')
+    expect(within(islands[1]).getByRole('img')).toHaveAttribute(
+      'src',
+      '/iles/island-famille.png',
+    )
   })
 })
 

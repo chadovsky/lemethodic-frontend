@@ -50,6 +50,10 @@ test.describe('F-457 — La Carte (desktop 1440, light)', () => {
     await expect(iles.first()).toHaveAttribute('data-theme', 'education')
     await expect(iles.first()).toHaveAttribute('data-status', 'current')
 
+    // F-461: each ile renders its themed island art (no placeholder).
+    await expect(iles.first().getByTestId('island-node')).toHaveAttribute('data-state', 'current')
+    await expect(iles.first().locator('img')).toHaveAttribute('src', /island-education\.png/)
+
     // Mini-mocks (7) + final mock (1).
     await expect(page.getByTestId('carte-mini-mock')).toHaveCount(7)
     await expect(page.getByTestId('carte-final-mock')).toBeVisible()
