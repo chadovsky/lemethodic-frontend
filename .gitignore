@@ -54,3 +54,10 @@ audit-auth-verified.json
 # Auto-generated audit artifacts -- re-written every dispatch, never commit
 docs/audit-screenshots/
 e2e-results.txt
+
+# Scratch run logs (CI watch, e2e dumps) -- machine-local, never commit
+*.log
+
+# Scratch island proof sheets -- review-only, must never ship as prod assets
+# (real per-theme art is public/iles/island-*.png, tracked separately)
+public/iles/sheet_*.png
