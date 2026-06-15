@@ -47,8 +47,9 @@ const THEME_LABELS: Record<ThemeId, string> = Object.fromEntries(
 ) as Record<ThemeId, string>
 
 // IslandNode renders a fixed 72px footprint; the world scales it up off that.
+// Bumped ~1.4x for F-469 so the islands fill the sea like the Nano Banana mock.
 const ISLAND_BASE = 72
-const ISLAND_RENDER = 124
+const ISLAND_RENDER = 172
 
 // Inter (v3 system face) heading stack — explicitly NOT the serif display face.
 const HEADING_FONT = 'var(--f-en), var(--f-ui), -apple-system, system-ui, sans-serif'
@@ -189,9 +190,10 @@ export default function CarteWorld() {
       >
         {/* The sea + drifting clouds. Pure CSS, fully decorative. */}
         <div className="carte-sea" aria-hidden="true">
-          <span className="carte-cloud carte-cloud-1" style={{ top: '11%', left: '14%', width: 180, height: 56 }} />
-          <span className="carte-cloud carte-cloud-2" style={{ top: '20%', left: '58%', width: 240, height: 70 }} />
-          <span className="carte-cloud carte-cloud-3" style={{ top: '8%', left: '78%', width: 150, height: 48 }} />
+          <span className="carte-cloud carte-cloud-1" style={{ top: '9%', left: '12%', width: 200, height: 60 }} />
+          <span className="carte-cloud carte-cloud-2" style={{ top: '19%', left: '54%', width: 260, height: 76 }} />
+          <span className="carte-cloud carte-cloud-3" style={{ top: '7%', left: '80%', width: 160, height: 50 }} />
+          <span className="carte-cloud carte-cloud-4" style={{ top: '30%', left: '30%', width: 190, height: 58 }} />
         </div>
 
         {/* Header — over the sky band. Inter heading (NOT serif), coral NIVEAU
@@ -245,29 +247,46 @@ export default function CarteWorld() {
           style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 1 }}
         >
           <defs>
-            <filter id="carte-trail-shadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="rgba(20,30,45,0.22)" />
+            <filter id="carte-trail-shadow" x="-25%" y="-25%" width="150%" height="160%">
+              <feDropShadow dx="0" dy="5" stdDeviation="6" floodColor="rgba(20,30,45,0.28)" />
             </filter>
           </defs>
+          {/* Muted base ribbon: the whole voyage, beyond-current reads as a calm
+              raised grey trail (drawn under the coral so completed = coral). */}
           <path
             d={pathD(pts, segs, 0, n - 1)}
             fill="none"
             stroke="var(--rule)"
-            strokeWidth={7}
+            strokeWidth={16}
             strokeLinecap="round"
             strokeLinejoin="round"
-            opacity={0.85}
+            opacity={0.7}
+            filter="url(#carte-trail-shadow)"
           />
           {accentTo > 0 && (
-            <path
-              d={pathD(pts, segs, 0, accentTo)}
-              fill="none"
-              stroke="var(--accent)"
-              strokeWidth={7}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              filter="url(#carte-trail-shadow)"
-            />
+            <>
+              {/* Glossy coral 3D ribbon: a thick rounded coral trail with a soft
+                  drop-shadow (raised) and a lighter top highlight (sheen). */}
+              <path
+                d={pathD(pts, segs, 0, accentTo)}
+                fill="none"
+                stroke="var(--accent)"
+                strokeWidth={16}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                filter="url(#carte-trail-shadow)"
+              />
+              <path
+                d={pathD(pts, segs, 0, accentTo)}
+                fill="none"
+                stroke="color-mix(in srgb, var(--accent) 45%, #FFFFFF)"
+                strokeWidth={5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity={0.65}
+                transform="translate(0,-3)"
+              />
+            </>
           )}
         </svg>
 
@@ -296,13 +315,17 @@ export default function CarteWorld() {
           <IslandPin key={node.key} node={node} point={pts[i]} isCurrent={i === currentNodeIndex} />
         ))}
 
-        {/* Current-node floating card — over the sea, real ile + real progress. */}
-        {currentIle && (
+        {/* Current-node floating card — floats ON the current island (mock
+            placement), real ile + real progress. */}
+        {currentIle && currentNodeIndex >= 0 && (
           <CurrentCard
             ileNumber={currentIleIndex + 1}
             label={THEME_LABELS[currentIle.theme]}
             href={`/ile/${currentIle.theme}`}
             progressPct={progressPct}
+            point={pts[currentNodeIndex]}
+            stageW={size.w}
+            stageH={size.h}
           />
         )}
       </div>
@@ -363,16 +386,20 @@ function IslandPin({ node, point, isCurrent }: { node: WorldNode; point: Pt; isC
             marginTop: 6,
             padding: '4px 12px',
             borderRadius: 'var(--r-pill)',
-            background: 'var(--paper)',
-            boxShadow: '0 2px 10px color-mix(in srgb, var(--ink) 18%, transparent)',
+            // Frosted white in BOTH modes (mock parity); fixed dark ink text so
+            // it stays legible on the white pill even in dark mode.
+            background: 'rgba(255, 255, 255, 0.82)',
+            backdropFilter: 'blur(6px)',
+            WebkitBackdropFilter: 'blur(6px)',
+            boxShadow: '0 2px 10px rgba(20, 30, 45, 0.22)',
             textAlign: 'center',
-            maxWidth: 160,
+            maxWidth: 168,
           }}
         >
-          <p style={{ fontFamily: UI_FONT, fontSize: 13, fontWeight: 600, lineHeight: 1.2, color: 'var(--heading)', margin: 0 }}>
+          <p style={{ fontFamily: UI_FONT, fontSize: 13, fontWeight: 600, lineHeight: 1.2, color: '#1F2933', margin: 0 }}>
             {node.label}
           </p>
-          <p style={{ fontFamily: 'var(--f-mono)', fontSize: 9, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--ink-soft)', margin: '2px 0 0' }}>
+          <p style={{ fontFamily: 'var(--f-mono)', fontSize: 9, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6B7280', margin: '2px 0 0' }}>
             {node.sub}
           </p>
         </div>
@@ -483,25 +510,40 @@ function CurrentCard({
   label,
   href,
   progressPct,
+  point,
+  stageW,
+  stageH,
 }: {
   ileNumber: number
   label: string
   href: string
   progressPct: number
+  point: Pt
+  stageW: number
+  stageH: number
 }) {
+  // Float the card on/just-below the current island, clamped inside the sea so
+  // it never overflows the stage edges (the wide-viewport guard).
+  const CARD_W = 320
+  const MARGIN = 16
+  const half = CARD_W / 2
+  const left = Math.max(half + MARGIN, Math.min(point.x, stageW - half - MARGIN))
+  const top = Math.min(point.y + ISLAND_RENDER * 0.5 + 18, stageH - 210)
   return (
     <div
       data-testid="carte-current-card"
       style={{
         position: 'absolute',
-        bottom: 'clamp(20px, 3vw, 36px)',
-        left: 'clamp(20px, 3vw, 40px)',
+        left,
+        top,
+        transform: 'translateX(-50%)',
         zIndex: 5,
-        width: 'min(340px, calc(100% - 48px))',
+        width: CARD_W,
+        maxWidth: `calc(100% - ${MARGIN * 2}px)`,
         background: 'var(--paper)',
         borderRadius: 'var(--r-lg)',
         border: '1px solid var(--rule)',
-        boxShadow: '0 12px 32px color-mix(in srgb, var(--ink) 22%, transparent)',
+        boxShadow: '0 16px 40px color-mix(in srgb, var(--ink) 30%, transparent)',
         padding: '18px 20px',
         fontFamily: UI_FONT,
       }}

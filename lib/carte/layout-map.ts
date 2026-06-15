@@ -28,18 +28,19 @@ export interface NodePos {
 }
 
 // 8 authored coords, indexed in journey order (0 = grammaire, 1..7 = themes in
-// THEME order). Tuned to scatter across the sea while reading left-to-right as a
-// single voyage. Tunable against the mock; geometry is index-driven so any
-// reshuffle here just re-threads the path.
+// THEME order). Organic island scatter approximating the Nano Banana mocks: the
+// nodes fill the sea like a real archipelago rather than a single wave, and the
+// coral trail threads them as one voyage. Tunable against the mock (Chadi nudges
+// live); geometry is index-driven so any reshuffle here just re-threads the path.
 export const SCATTER_LAYOUT: NodePos[] = [
-  { x: 11, y: 32 }, // 0 — la grammaire
-  { x: 25, y: 64 }, // 1 — l'éducation
-  { x: 39, y: 33 }, // 2 — la famille
-  { x: 51, y: 70 }, // 3 — la culture
-  { x: 64, y: 38 }, // 4 — la santé
-  { x: 75, y: 71 }, // 5 — la technologie
-  { x: 84, y: 33 }, // 6 — l'environnement
-  { x: 90, y: 62 }, // 7 — l'économie
+  { x: 10, y: 42 }, // 0 — la grammaire
+  { x: 34, y: 28 }, // 1 — l'éducation
+  { x: 22, y: 70 }, // 2 — la famille
+  { x: 45, y: 55 }, // 3 — la culture
+  { x: 78, y: 30 }, // 4 — la santé
+  { x: 62, y: 50 }, // 5 — la technologie
+  { x: 58, y: 74 }, // 6 — l'environnement
+  { x: 86, y: 72 }, // 7 — l'économie
 ]
 
 // Island keys aligned to SCATTER_LAYOUT indices: grammaire first, then the 7

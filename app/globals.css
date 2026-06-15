@@ -1484,20 +1484,29 @@
   overflow: hidden;
   background: linear-gradient(
     to bottom,
-    #DBE3EB 0%,
-    #E0E9F0 16%,
-    #A6BBCC 62%,
+    #E0E9F0 0%,
+    #C2D0DD 34%,
+    #A6BBCC 66%,
     #99ABBF 100%
   );
 }
 .dark .carte-sea {
-  background: linear-gradient(
-    to bottom,
-    #1B2738 0%,
-    #16202E 30%,
-    #111B27 70%,
-    #0E1722 100%
-  );
+  /* Moonlit bloom on the horizon (low-opacity radial) layered over the deep
+     vertical gradient. Peak ~#597CA2 fades into the dark navy sea. */
+  background:
+    radial-gradient(
+      120% 70% at 50% -8%,
+      color-mix(in srgb, #597CA2 60%, transparent) 0%,
+      color-mix(in srgb, #597CA2 22%, transparent) 26%,
+      transparent 58%
+    ),
+    linear-gradient(
+      to bottom,
+      #122341 0%,
+      #1D3050 44%,
+      #122036 74%,
+      #081122 100%
+    );
 }
 
 /* Soft drifting clouds — low-opacity white blobs that wander horizontally. */
@@ -1509,21 +1518,22 @@
     color-mix(in srgb, #FFFFFF 86%, transparent),
     transparent 70%
   );
-  filter: blur(2px);
+  filter: blur(3px);
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.78;
 }
 .dark .carte-cloud {
   background: radial-gradient(
     ellipse at center,
-    color-mix(in srgb, #AEBED2 22%, transparent),
+    color-mix(in srgb, #C6D4E6 30%, transparent),
     transparent 70%
   );
-  opacity: 0.4;
+  opacity: 0.5;
 }
 .carte-cloud-1 { animation: carte-cloud-drift-1 64s ease-in-out infinite; }
 .carte-cloud-2 { animation: carte-cloud-drift-2 82s ease-in-out infinite; animation-delay: -16s; }
 .carte-cloud-3 { animation: carte-cloud-drift-3 96s ease-in-out infinite; animation-delay: -40s; }
+.carte-cloud-4 { animation: carte-cloud-drift-1 88s ease-in-out infinite; animation-delay: -28s; }
 
 @keyframes carte-cloud-drift-1 {
   0%, 100% { transform: translate3d(0, 0, 0); }
@@ -1561,5 +1571,6 @@
 @media (prefers-reduced-motion: reduce) {
   .carte-cloud-1,
   .carte-cloud-2,
-  .carte-cloud-3 { animation: none; }
+  .carte-cloud-3,
+  .carte-cloud-4 { animation: none; }
 }
