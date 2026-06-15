@@ -6855,7 +6855,7 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 ## F-466 -- FE: widen the dashboard content column to 1536 (dashboard-only)
 
-**Status:** Built locally, committed to `main`, **holding push for Chadi** (FE auto-deploys Vercel). After push + CI green + prod spot-check, a follow-up `docs(F-466): flip status to Shipped (<SHA>)` records the SHA. Direct follow-up to F-464: Chadi chose "widen dashboard" over keeping the shared 1200 column, then amended the cap 1440 -> 1536 pre-push.
+**Status:** Shipped (5460535). Pushed to `main` in the F-467 batch (e9ad76b..d01cf30); CI success on d01cf30 (run 27535120231, unit + e2e green); Vercel prod READY (dpl_4M4sXWWM2qaBgsDuQ9WQJwmeMoba, target production). Prod spot-check of the live deploy: at 1920, `/tableau-de-bord` `app-shell-content` measures **1536** (content left 224 -> balanced within the post-rail area) while `/carte` stays **1200** -- override is dashboard-only. Direct follow-up to F-464: Chadi chose "widen dashboard" over keeping the shared 1200 column, then amended the cap 1440 -> 1536 pre-push.
 
 **Scope:** The data-dense dashboard gets a wider content column (1536) than the shared 1200px reading width every other authed route keeps. `AppShell` already reads `usePathname()`; the content wrapper `maxWidth` is now a per-route value (`pathname === '/tableau-de-bord' ? 1536 : 1200`). Dashboard-only override -- no breakout hack, no negative margins, and every other authed surface (/carte, /la-methode, /parametres, ...) is byte-for-byte unchanged at 1200. The wrapper got a `data-testid="app-shell-content"` so the override is testable.
 
@@ -6867,9 +6867,9 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 **F-ID note:** next free after F-465 (BACKLOG topped at F-465; F-464 just added). Verified no `## F-466` in BACKLOG, none in PRD, none in git history before claiming.
 
-## F-467 -- FE: daily-target editor on /parametres (BUILT -- held for push)
+## F-467 -- FE: daily-target editor on /parametres (SHIPPED)
 
-**Status:** Built on feature branch, held for push (per brief). FE-only; the `/api/users/me/progress` endpoint already exists.
+**Status:** Shipped (d01cf30). FE-only; the `/api/users/me/progress` endpoint already exists. CI success on d01cf30 (run 27535120231, unit + e2e green); Vercel prod READY (dpl_4M4sXWWM2qaBgsDuQ9WQJwmeMoba, target production). Prod spot-check of the live deploy: change in /parametres -> PATCH fires `daily_target_minutes:45` -> reload persists 45 -> `/tableau-de-bord` "Objectif du jour" card shows `/ 45 min` (single source of truth confirmed end-to-end on prod).
 
 **Built (2026-06-15):**
 - New `components/parametres/DailyTargetSection.tsx` (client): reads `daily_target_minutes` via `api.users.getProgress()`, writes via `api.users.patchProgress({ daily_target_minutes })`. Optimistic update, revert on error (re-throw keeps the widget in edit mode for retry).
