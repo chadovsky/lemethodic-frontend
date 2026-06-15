@@ -29,7 +29,7 @@ import {
   type ThemeId,
   type Status,
 } from '@/lib/journey/journey'
-import type { IslandKey } from '@/lib/journey/island-art'
+import { ISLAND_ART, type IslandKey } from '@/lib/journey/island-art'
 import { readTargetLevel } from '@/lib/journey/target-level'
 import { readCompletedIles } from '@/lib/journey/progress'
 import IslandNode from '@/components/carte/IslandNode'
@@ -184,16 +184,19 @@ export default function CarteWorld() {
           position: 'relative',
           width: '100%',
           height: 'clamp(600px, 62vw, 860px)',
-          borderRadius: 'var(--r-xl)',
+          // Full-bleed: no rounded panel corners, the sea reads as open water to
+          // the content-area edges (overflow clips clouds/reflections cleanly).
+          borderRadius: 0,
           overflow: 'hidden',
         }}
       >
         {/* The sea + drifting clouds. Pure CSS, fully decorative. */}
         <div className="carte-sea" aria-hidden="true">
-          <span className="carte-cloud carte-cloud-1" style={{ top: '9%', left: '12%', width: 200, height: 60 }} />
-          <span className="carte-cloud carte-cloud-2" style={{ top: '19%', left: '54%', width: 260, height: 76 }} />
-          <span className="carte-cloud carte-cloud-3" style={{ top: '7%', left: '80%', width: 160, height: 50 }} />
-          <span className="carte-cloud carte-cloud-4" style={{ top: '30%', left: '30%', width: 190, height: 58 }} />
+          <span className="carte-cloud carte-cloud-1" style={{ top: '8%', left: '10%', width: 240, height: 72 }} />
+          <span className="carte-cloud carte-cloud-2" style={{ top: '17%', left: '52%', width: 300, height: 88 }} />
+          <span className="carte-cloud carte-cloud-3" style={{ top: '6%', left: '78%', width: 200, height: 62 }} />
+          <span className="carte-cloud carte-cloud-4" style={{ top: '28%', left: '28%', width: 220, height: 66 }} />
+          <span className="carte-cloud carte-cloud-5" style={{ top: '12%', left: '38%', width: 180, height: 56 }} />
         </div>
 
         {/* Header — over the sky band. Inter heading (NOT serif), coral NIVEAU
@@ -310,6 +313,14 @@ export default function CarteWorld() {
           srLabel={`Examen final, ${journey.finalMock.status === 'bientot' ? 'bientôt' : journey.finalMock.status}`}
         />
 
+        {/* Water reflections: a vertically-flipped, blurred, fading copy of each
+            island PNG cast on the sea beneath it, plus a soft contact glow at the
+            waterline. This is what makes the islands sit IN water (not on a panel)
+            and replaces the hard cast-shadow. Decorative, below the islands. */}
+        {nodes.map((node, i) => (
+          <IslandReflection key={`refl-${node.key}`} src={ISLAND_ART[node.key]} point={pts[i]} />
+        ))}
+
         {/* The 8 islands. */}
         {nodes.map((node, i) => (
           <IslandPin key={node.key} node={node} point={pts[i]} isCurrent={i === currentNodeIndex} />
@@ -375,7 +386,7 @@ function IslandPin({ node, point, isCurrent }: { node: WorldNode; point: Pt; isC
           </div>
         )}
 
-        <div style={{ width: ISLAND_RENDER, height: ISLAND_RENDER, position: 'relative' }}>
+        <div className="carte-world-art" style={{ width: ISLAND_RENDER, height: ISLAND_RENDER, position: 'relative' }}>
           <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}>
             <IslandNode theme={node.key} status={node.status} label={node.label} />
           </div>
@@ -440,15 +451,77 @@ function IslandPin({ node, point, isCurrent }: { node: WorldNode; point: Pt; isC
           alignItems: 'center',
         }}
       >
-        {/* Faint reflection on the sea beneath the island base. */}
-        <span
-          aria-hidden="true"
-          className="carte-reflection"
-          style={{ position: 'absolute', bottom: -6, left: '50%', transform: 'translateX(-50%)', width: ISLAND_RENDER * 0.6, height: 12 }}
-        />
         {interaction}
       </div>
     )
+}
+
+// A single island's water reflection: a vertically-flipped, blurred, downward-
+// fading copy of the island PNG cast on the sea at the island's waterline, with
+// a soft contact glow where the base meets the water. Positioned at the stage
+// level (independent of the pin's flex layout) so it sits directly under the
+// island art. Decorative, mode-aware opacity via the CSS classes.
+function IslandReflection({ src, point }: { src: string; point: Pt }) {
+  const w = ISLAND_RENDER
+  const h = ISLAND_RENDER * 0.5
+  const fade = 'linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 45%, transparent 82%)'
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        left: point.x,
+        top: point.y + ISLAND_RENDER * 0.26,
+        transform: 'translateX(-50%)',
+        width: w,
+        height: h,
+        zIndex: 1,
+        pointerEvents: 'none',
+      }}
+    >
+      {/* Soft contact glow at the waterline. */}
+      <span
+        className="carte-waterline-glow"
+        style={{
+          position: 'absolute',
+          top: -8,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: w * 0.66,
+          height: 18,
+          borderRadius: '50%',
+          filter: 'blur(5px)',
+        }}
+      />
+      {/* Flipped, faded reflection. The mask lives on this (untransformed) span
+          so the downward fade is in screen space; the inner img carries the
+          scaleY(-1) so the island base mirrors at the waterline. */}
+      <span
+        className="carte-island-reflection"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          maskImage: fade,
+          WebkitMaskImage: fade,
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt=""
+          draggable={false}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'fill',
+            transform: 'scaleY(-1)',
+            filter: 'blur(2px)',
+            userSelect: 'none',
+          }}
+        />
+      </span>
+    </div>
+  )
 }
 
 // A checkpoint buoy ON the trail: a small rounded clipboard/flag marker, not an

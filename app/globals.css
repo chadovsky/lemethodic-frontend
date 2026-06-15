@@ -1480,15 +1480,21 @@
 .carte-sea {
   position: absolute;
   inset: 0;
-  border-radius: var(--r-xl, 24px);
   overflow: hidden;
-  background: linear-gradient(
-    to bottom,
-    #E0E9F0 0%,
-    #C2D0DD 34%,
-    #A6BBCC 66%,
-    #99ABBF 100%
-  );
+  /* Water, not a flat panel: a depth gradient (sky/horizon -> mid -> deeper
+     foreground), a soft horizon-lightening band, and a very subtle layered
+     surface texture so the sea reads as moving water. Layers stack top-first. */
+  background:
+    radial-gradient(140% 60% at 22% 40%, rgba(255, 255, 255, 0.07), transparent 60%),
+    radial-gradient(120% 55% at 72% 32%, rgba(255, 255, 255, 0.06), transparent 62%),
+    radial-gradient(100% 50% at 50% 88%, rgba(70, 90, 115, 0.10), transparent 70%),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.0) 20%),
+    linear-gradient(
+      to bottom,
+      #DFE8EF 0%,
+      #A6BBCC 55%,
+      #8293A7 100%
+    );
 }
 .dark .carte-sea {
   /* Moonlit bloom on the horizon (low-opacity radial) layered over the deep
@@ -1500,6 +1506,7 @@
       color-mix(in srgb, #597CA2 22%, transparent) 26%,
       transparent 58%
     ),
+    radial-gradient(110% 50% at 50% 92%, rgba(8, 17, 34, 0.55), transparent 72%),
     linear-gradient(
       to bottom,
       #122341 0%,
@@ -1513,27 +1520,31 @@
 .carte-cloud {
   position: absolute;
   border-radius: 999px;
+  /* Denser, brighter core so the clouds actually read against the sea. */
   background: radial-gradient(
     ellipse at center,
-    color-mix(in srgb, #FFFFFF 86%, transparent),
-    transparent 70%
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(255, 255, 255, 0.62) 42%,
+    transparent 74%
   );
-  filter: blur(3px);
+  filter: blur(4px);
   pointer-events: none;
-  opacity: 0.78;
+  opacity: 0.92;
 }
 .dark .carte-cloud {
   background: radial-gradient(
     ellipse at center,
-    color-mix(in srgb, #C6D4E6 30%, transparent),
-    transparent 70%
+    color-mix(in srgb, #C6D4E6 42%, transparent) 0%,
+    color-mix(in srgb, #C6D4E6 18%, transparent) 45%,
+    transparent 74%
   );
-  opacity: 0.5;
+  opacity: 0.58;
 }
 .carte-cloud-1 { animation: carte-cloud-drift-1 64s ease-in-out infinite; }
 .carte-cloud-2 { animation: carte-cloud-drift-2 82s ease-in-out infinite; animation-delay: -16s; }
 .carte-cloud-3 { animation: carte-cloud-drift-3 96s ease-in-out infinite; animation-delay: -40s; }
 .carte-cloud-4 { animation: carte-cloud-drift-1 88s ease-in-out infinite; animation-delay: -28s; }
+.carte-cloud-5 { animation: carte-cloud-drift-2 74s ease-in-out infinite; animation-delay: -52s; }
 
 @keyframes carte-cloud-drift-1 {
   0%, 100% { transform: translate3d(0, 0, 0); }
@@ -1548,29 +1559,45 @@
   50% { transform: translate3d(30px, -10px, 0); }
 }
 
-/* Faint reflection cast on the sea directly beneath an island base. */
-.carte-reflection {
-  position: absolute;
-  border-radius: 50%;
+/* Island water reflection: the flipped PNG copy is faded + blurred inline; the
+   class just carries the mode-aware opacity/tint (dark = dimmer, cooler). */
+.carte-island-reflection {
+  opacity: 0.24;
+}
+.dark .carte-island-reflection {
+  opacity: 0.15;
+  filter: saturate(0.7) brightness(0.82);
+}
+
+/* Soft contact glow where the island base meets the water (waterline). Replaces
+   the hard cast-shadow together with the reflection. */
+.carte-waterline-glow {
   background: radial-gradient(
     ellipse at center,
-    color-mix(in srgb, #FFFFFF 42%, transparent),
-    transparent 72%
+    rgba(255, 255, 255, 0.5),
+    transparent 70%
   );
-  filter: blur(4px);
   pointer-events: none;
 }
-.dark .carte-reflection {
+.dark .carte-waterline-glow {
   background: radial-gradient(
     ellipse at center,
-    color-mix(in srgb, #6E8093 26%, transparent),
-    transparent 72%
+    rgba(140, 170, 205, 0.3),
+    transparent 70%
   );
+}
+
+/* In the desktop sea-world, the island sits in water (reflection + waterline
+   glow), so suppress the shared IslandNode hard grounding shadow. Mobile keeps
+   it (this scope never matches the serpentine). */
+.carte-world-art [data-testid='island-shadow'] {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .carte-cloud-1,
   .carte-cloud-2,
   .carte-cloud-3,
-  .carte-cloud-4 { animation: none; }
+  .carte-cloud-4,
+  .carte-cloud-5 { animation: none; }
 }
