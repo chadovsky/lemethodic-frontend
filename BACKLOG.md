@@ -6748,7 +6748,9 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 ## F-461 -- FE: Real island art on La Carte (per-theme, 3 states + grounding shadow)
 
-**Status:** In progress (push held pending Chadi confirm; FE auto-deploys to prod)
+**Status:** Shipped (direct to main) -- feature `8ae941e`, asset fix `b8f8de0`. CI green on both; Vercel prod deploy READY; prod spot-check all 8 `/iles/island-<key>.png` return 200 image/png.
+
+**Prod incident (fixed in `b8f8de0`):** the 8 `public/iles/island-<key>.png` assets the map references were untracked in git, so the first deploy (`8ae941e`) served every island as a 404 -- the carte rendered broken images. CI + local e2e missed it because the f-457 assertion only checked the img `src` attribute, not that the asset loaded (local dev serves on-disk files regardless). Fix committed the 8 PNGs and hardened the e2e to assert the first island actually loads (`complete && naturalWidth > 0`), so a missing/untracked asset now fails the built-artifact suite. `sheet_*.png` stay untracked (out of scope).
 
 **Scope:** Replace the `IslandNode` placeholder (a single FR initial in a tinted rounded box) with the real per-theme island illustrations now in `public/iles/` (8 1024-square transparent PNGs, base anchored low, landmark rising above, no baked shadow). No layout change: the node keeps its 72x72 footprint and the trail/connector spacing is untouched. `components/carte/IslandNode.tsx` only, plus a small asset map and tests. No data-model, séance, mock-marker, or canonical-doc changes.
 
