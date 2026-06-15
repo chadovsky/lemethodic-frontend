@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { useState, type CSSProperties, type ReactNode } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuthStore, signOut } from '@/lib/auth'
 import Sidebar from './Sidebar'
 import AppTopBar from './AppTopBar'
 import EmailVerificationBanner from '@/components/app/EmailVerificationBanner'
+import { useSidebarRail } from '@/lib/shell/useSidebarRail'
 
 interface AppShellProps {
   children: ReactNode
@@ -26,13 +27,25 @@ export default function AppShell({ children }: AppShellProps) {
   const user = useAuthStore((s) => s.user)
   const initials = getInitials(user?.fullName)
 
+  // F-465 — icon-rail interaction state. `offset` drives the content-column
+  // push via the --lm-shell-offset custom property (consumed by .app-shell-main
+  // and .app-topbar inside the desktop rail media query). On the drawer model
+  // the property is set but ignored (base layout keeps margin-left:0).
+  const rail = useSidebarRail()
+  // `compact` = icon-only. Desktop: collapsed unless expanded. Drawer: collapsed
+  // unless the drawer is open (an open drawer always shows full titles).
+  const compact = rail.railEnabled ? !rail.expanded : !drawerOpen
+
   return (
     <div
       data-testid="app-shell"
-      style={{
-        minHeight: '100dvh',
-        backgroundColor: 'var(--bg-canvas)',
-      }}
+      style={
+        {
+          minHeight: '100dvh',
+          backgroundColor: 'var(--bg-canvas)',
+          '--lm-shell-offset': `${rail.offset}px`,
+        } as CSSProperties
+      }
     >
       {/* F-453 — logged-in app shell top bar (search, notifications, theme,
           user menu). Replaces the prior mobile-only header; carries the
@@ -66,6 +79,8 @@ export default function AppShell({ children }: AppShellProps) {
         onLinkClick={closeDrawer}
         onClose={closeDrawer}
         initials={initials}
+        compact={compact}
+        rail={rail}
       />
 
       <EmailVerificationBanner />

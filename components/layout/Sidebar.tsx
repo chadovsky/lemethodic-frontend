@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { SANS_FONT } from '@/lib/typography'
 import SidebarLink from './SidebarLink'
 import Wordmark from '@/components/Wordmark'
 import CartButton from '@/components/store/CartButton'
+import type { SidebarRail } from '@/lib/shell/useSidebarRail'
+import { RAIL_WIDTH, EXPANDED_WIDTH } from '@/lib/shell/useSidebarRail'
 import {
   Home,
   GraduationCap,
@@ -15,20 +16,12 @@ import {
   ShoppingBag,
   Tag,
   Users,
-  ChevronLeft,
-  ChevronRight,
+  Pin,
 } from 'lucide-react'
 
-// Same cookie name as S2 (components/ui/sidebar.tsx) for future S2 deprecation parity.
-// S2 stores open state: cookie value "true" = expanded, "false" = collapsed.
-const SIDEBAR_COOKIE_NAME = 'sidebar_state'
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_KEYBOARD_SHORTCUT = 'b'
-const EXPANDED_WIDTH = 240
-const COLLAPSED_WIDTH = 64
-// F-455 — float the frosted panel inside its 240/64 footprint so the canvas
-// shows around it. The right edge stays at EXPANDED/COLLAPSED width, so the
-// top-bar (left: 240) and main (margin-left: 240) offsets are untouched.
+// F-455 — float the frosted panel inside its rail/expanded footprint so the
+// canvas shows around it. The panel's right edge stays at the footprint width,
+// so the top-bar (left) and main (margin-left) offsets are untouched.
 const PANEL_INSET = 12
 
 const NAV_ITEMS = [
@@ -50,6 +43,11 @@ interface SidebarProps {
   onLinkClick?: () => void
   onClose?: () => void
   initials?: string
+  // F-465 — icon-only rail vs full titles. Owned by AppShell so the content
+  // offset and the panel stay in lockstep. Defaults to expanded for isolated
+  // renders (unit tests render <Sidebar drawerOpen={false} />).
+  compact?: boolean
+  rail?: SidebarRail
 }
 
 export default function Sidebar({
@@ -57,70 +55,34 @@ export default function Sidebar({
   onLinkClick,
   onClose,
   initials = 'CH',
+  compact = false,
+  rail,
 }: SidebarProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false)
-  const [isDesktop, setIsDesktop] = useState(false)
-
-  // Restore collapse state from cookie on mount
-  useEffect(() => {
-    const match = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith(`${SIDEBAR_COOKIE_NAME}=`))
-    if (match) {
-      const value = match.split('=')[1]
-      setIsCollapsed(value === 'false')
-    }
-  }, [])
-
-  // Detect desktop viewport (≥1024px). Guarded for jsdom (no matchMedia).
-  useEffect(() => {
-    if (typeof window.matchMedia !== 'function') return
-    const mq = window.matchMedia('(min-width: 1024px)')
-    setIsDesktop(mq.matches)
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
-
-  const handleToggle = useCallback(() => {
-    setIsCollapsed((prev) => {
-      const next = !prev
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${!next}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
-      return next
-    })
-  }, [])
-
-  // Cmd+B (Mac) / Ctrl+B (Windows/Linux)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === SIDEBAR_KEYBOARD_SHORTCUT && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
-        handleToggle()
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleToggle])
-
-  // Collapse is desktop-only; mobile drawer behavior is unchanged
-  const collapsed = isDesktop && isCollapsed
-  const sidebarWidth = collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH
+  const panelWidth = (compact ? RAIL_WIDTH : EXPANDED_WIDTH) - PANEL_INSET
+  // Pin lives in the expanded desktop rail only; the drawer model hides it.
+  const showPin = !!rail && rail.railEnabled && rail.expanded
 
   return (
     <aside
       id="app-shell-sidebar"
       data-testid="app-shell-sidebar"
       data-drawer-open={drawerOpen}
-      data-collapsed={collapsed}
+      data-collapsed={compact}
+      data-mode={rail?.mode ?? 'icons'}
+      data-expanded={rail ? rail.expanded : false}
       aria-label="Primary"
       className="app-shell-sidebar"
+      onMouseEnter={rail?.onRailEnter}
+      onMouseLeave={rail?.onRailLeave}
+      onFocus={rail?.onRailFocus}
+      onBlur={rail?.onRailBlur}
       style={{
         position: 'fixed',
         top: PANEL_INSET,
         bottom: PANEL_INSET,
         left: PANEL_INSET,
         zIndex: 50,
-        width: sidebarWidth - PANEL_INSET,
+        width: panelWidth,
         backgroundColor: 'var(--shell-frost)',
         backdropFilter: 'saturate(180%) blur(20px)',
         WebkitBackdropFilter: 'saturate(180%) blur(20px)',
@@ -129,7 +91,6 @@ export default function Sidebar({
         boxShadow: 'var(--shell-shadow)',
         display: 'flex',
         flexDirection: 'column',
-        transition: 'width 200ms ease, transform 300ms var(--lm-ease)',
         overflow: 'hidden',
       }}
     >
@@ -139,7 +100,7 @@ export default function Sidebar({
           padding: '20px 20px 16px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: collapsed ? 'center' : 'flex-start',
+          justifyContent: compact ? 'center' : 'flex-start',
           gap: 12,
           flexShrink: 0,
         }}
@@ -165,7 +126,7 @@ export default function Sidebar({
         >
           {initials}
         </div>
-        {!collapsed && (
+        {!compact && (
           <>
             <Link
               href="/tableau-de-bord"
@@ -218,7 +179,7 @@ export default function Sidebar({
                 href={item.href}
                 label={item.label}
                 icon={item.icon}
-                isCollapsed={collapsed}
+                isCollapsed={compact}
                 onClick={onLinkClick}
               />
             </li>
@@ -234,7 +195,7 @@ export default function Sidebar({
             paddingTop: 4,
           }}
         >
-          {!collapsed && (
+          {!compact && (
             <p
               style={{
                 fontFamily: SANS_FONT,
@@ -257,7 +218,7 @@ export default function Sidebar({
                   href={item.href}
                   label={item.label}
                   icon={item.icon}
-                  isCollapsed={collapsed}
+                  isCollapsed={compact}
                   onClick={onLinkClick}
                 />
               </li>
@@ -265,7 +226,7 @@ export default function Sidebar({
             {/* F-448 — cart affordance in the logged-in shell. Opens the
                 global drawer; badge shows count only when non-empty. */}
             <li>
-              <CartButton variant="row" testId="sidebar-cart-button" isCollapsed={collapsed} />
+              <CartButton variant="row" testId="sidebar-cart-button" isCollapsed={compact} />
             </li>
           </ul>
         </div>
@@ -273,46 +234,57 @@ export default function Sidebar({
 
       {/* F-453: ThemeToggle relocated to the app shell top bar (AppTopBar). */}
       {/* F-455: sidebar logout row removed — logout now lives solely in the
-          user dropdown (AppTopBar → UserMenu), deduping the second affordance
-          the F-453 note flagged. */}
+          user dropdown (AppTopBar → UserMenu). */}
 
-      {/* Desktop-only collapse toggle */}
-      <div
-        className="hidden lg:flex"
-        style={{
-          padding: '8px 16px',
-          justifyContent: collapsed ? 'center' : 'flex-end',
-          borderTop: '1px solid var(--rule-default)',
-          flexShrink: 0,
-        }}
-      >
-        <button
-          type="button"
-          data-testid="sidebar-collapse-toggle"
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          aria-expanded={!collapsed}
-          onClick={handleToggle}
+      {/* F-465 — pin control. Visible only in the expanded desktop rail; the
+          drawer model (mobile / coarse pointer) hides it. Pinning persists
+          "titles" so the rail stays expanded across reloads. No desktop
+          hamburger or collapse toggle: the rail expands on hover/focus. */}
+      {showPin && rail && (
+        <div
           style={{
-            width: 44,
-            height: 44,
+            padding: '8px 16px',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--dominant)',
-            borderRadius: 4,
-            padding: 0,
+            justifyContent: 'flex-end',
+            borderTop: '1px solid var(--rule-default)',
             flexShrink: 0,
           }}
         >
-          {collapsed
-            ? <ChevronRight size={16} strokeWidth={1.5} />
-            : <ChevronLeft size={16} strokeWidth={1.5} />
-          }
-        </button>
-      </div>
+          <button
+            type="button"
+            data-testid="sidebar-pin"
+            aria-pressed={rail.pinned}
+            aria-label={rail.pinned ? 'Détacher le menu' : 'Épingler le menu ouvert'}
+            onClick={rail.togglePin}
+            style={{
+              width: 44,
+              height: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: rail.pinned ? 'var(--shell-pill)' : 'transparent',
+              boxShadow: rail.pinned ? 'var(--shell-pill-shadow)' : 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: rail.pinned ? 'var(--accent)' : 'var(--text-secondary)',
+              borderRadius: 10,
+              padding: 0,
+              flexShrink: 0,
+              transition:
+                'background-color var(--lm-duration-hover) var(--lm-ease), color var(--lm-duration-hover) ease, box-shadow var(--lm-duration-hover) ease',
+            }}
+          >
+            <Pin
+              size={18}
+              strokeWidth={1.5}
+              style={{
+                transform: rail.pinned ? 'rotate(45deg)' : 'none',
+                fill: rail.pinned ? 'currentColor' : 'none',
+              }}
+            />
+          </button>
+        </div>
+      )}
     </aside>
   )
 }

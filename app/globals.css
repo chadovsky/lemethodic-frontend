@@ -110,6 +110,11 @@
   --shell-pill:       var(--paper);
   --shell-pill-shadow: 0 1px 3px rgba(17, 24, 39, 0.10), 0 1px 1px rgba(17, 24, 39, 0.04);
   --shell-radius:     18px;
+  /* F-465 — icon-rail footprints. The content column is pushed right by
+     --lm-shell-offset (set per-render by AppShell), which resolves to one of
+     these two widths. */
+  --sidebar-rail:     64px;
+  --sidebar-expanded: 240px;
 
   /* Accent — brand / CTA / selected / progress (v3 coral, single accent) */
   --accent: #E05C42;
@@ -1203,14 +1208,32 @@
 .app-shell-main { margin-left: 0; padding-top: 72px; }
 .app-shell-sidebar {
   transform: translateX(-100%);
-  transition: transform 300ms var(--lm-ease);
+  /* F-465 — width animates the rail<->titles expand; transform animates the
+     mobile drawer slide. Reduced-motion (below) snaps both. */
+  transition: width 200ms var(--lm-ease), transform 300ms var(--lm-ease);
 }
 .app-shell-sidebar[data-drawer-open="true"] { transform: translateX(0); }
-@media (min-width: 1024px) {
-  .app-topbar { left: 240px; height: 64px; padding: 0 24px; }
+/* F-465 — desktop icon-rail (push) model. Gated on a real pointer AND ≥1024px:
+   a coarse pointer (touch) or a narrow viewport keeps the drawer model above.
+   The content column tracks the live rail width via --lm-shell-offset (set by
+   AppShell), falling back to the rail footprint before hydration so the first
+   paint matches the default icons-at-rest state (no expand flash). */
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .app-topbar {
+    left: var(--lm-shell-offset, var(--sidebar-rail));
+    height: 64px;
+    padding: 0 24px;
+    transition: left 200ms var(--lm-ease),
+                box-shadow var(--lm-duration-base) var(--lm-ease),
+                border-color var(--lm-duration-base) var(--lm-ease);
+  }
   .app-topbar-hamburger { display: none; }
   .app-shell-backdrop { display: none; }
-  .app-shell-main { margin-left: 240px; padding-top: 88px; }
+  .app-shell-main {
+    margin-left: var(--lm-shell-offset, var(--sidebar-rail));
+    padding-top: 88px;
+    transition: margin-left 200ms var(--lm-ease);
+  }
   .app-shell-sidebar { transform: translateX(0); }
 }
 
@@ -1238,10 +1261,14 @@
 }
 .app-shell-backdrop { animation: backdrop-fade-in 200ms ease forwards; }
 
-/* Reduce motion: instant drawer slide + no backdrop fade */
+/* Reduce motion: instant drawer slide + no backdrop fade. F-465 — also snap
+   the rail expand (sidebar width) and the content-column push (main margin /
+   topbar left). */
 @media (prefers-reduced-motion: reduce) {
   .app-shell-sidebar { transition: none; }
   .app-shell-backdrop { animation: none; }
+  .app-shell-main { transition: none; }
+  .app-topbar { transition: none; }
 }
 
 /* UI-008 — L'École lesson grid. 1-col mobile, 2-col tablet (≥640px),

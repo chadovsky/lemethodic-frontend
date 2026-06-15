@@ -6802,3 +6802,35 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 **Gates:** full unit suite 586/586 green; `pnpm build` green; full e2e (CI mode, prod build + start) 918 passed / 3 skipped / 3 flaky (all passed on retry), 0 failed -- the only repeat flake is `touch-targets` on `/` landing `tier-cta` (known dev/prod flake per the e2e-flakes memo, button-size not canvas/tint). Local non-CI `pnpm dev` run showed the documented dev-server stale-CSS flake (empty `--canvas`); resolved by running the canonical CI prod-build gate.
 
 **F-ID note:** next free after F-462 (BACKLOG topped at F-462, the La Carte serpentine map; FE git tops at F-462 `5b8720c`; BE git tops at F-443). Verified no F-463 in BACKLOG/PRD before claiming.
+
+## F-465 -- FE: Logged-in sidebar -> persistent icon-rail (hover-expand + pin + push) with mobile drawer
+
+**Status:** Built locally on branch `feat/f-465-icon-rail`, **holding push for Chadi** (FE auto-deploys Vercel on merge to `main`). After push + CI green, a follow-up `docs(F-465): flip status to Shipped (<SHA>)` records the squash SHA.
+
+**Scope:** Convert the F-446 split app-shell sidebar (logged-in pages only) into a persistent icon-rail. TopNav and every logged-out surface are untouched. No BE.
+
+**Behavior:**
+- **Desktop (gated `@media (min-width: 1024px) and (hover: hover) and (pointer: fine)`)** -- the rail-push model. Resting = icon-only rail at `--sidebar-rail` (64px footprint, floated panel = footprint − 12px inset). Hover expands to titles at `--sidebar-expanded` (240px) with a **150ms** open-intent delay and **200ms** close delay to kill flicker; `focus-within` expands immediately (keyboard parity). The content column (`.app-shell-main` margin-left + `.app-topbar` left) tracks the live width via `--lm-shell-offset` -- **push, not overlay**. No desktop hamburger or collapse toggle.
+- **Pin** -- shown only in the expanded desktop rail. Click sets mode `titles`, persisted to `localStorage` `lm.sidebarMode.v1`; rail locks expanded, content stays pushed, hover/leave no longer collapses. `aria-pressed` reflects state. Unpin returns to the icons-at-rest hover model.
+- **Mobile / coarse pointer / <1024px** -- hover model off; the AppTopBar hamburger is the only trigger, opening the existing overlay drawer (full titles); backdrop tap-out + the drawer's own dismiss. Pin hidden (drawer model).
+- The **min-width:1024 half of the gate is deliberate** (the brief specifies the pointer query alone): it preserves the existing width-based shell contract so the 375px cross-project shell tests keep resolving to the drawer model. A ≥1024px coarse-pointer (touch) device correctly falls to the drawer.
+
+**Persistence:** `lm.sidebarMode.v1` = `"icons" | "titles"`, default `"icons"`. Read in a `useEffect` (not during render) so SSR markup and the first client render agree; the `--lm-shell-offset` fallback resolves to the rail footprint pre-hydration, so the default first paint is the rail with no expand flash. `"titles"` renders pinned-expanded on load.
+
+**Design (v3):** No hardcoded hex -- new tokens `--sidebar-rail` / `--sidebar-expanded` in the shell token block; everything else references existing v3 frosted-shell tokens (`--shell-frost`, `--shell-pill`, `--accent`, `--rule-default`), so the F-463 palette flows through. Rounded corners + soft shadow + frosted blur preserved. Active-route pill reads in BOTH icon and titles states (it already paints the link background; the icon stays coral when collapsed). ThemeToggle stays in AppTopBar (locked model). All nav + revenue (Store/Pricing/Coaching) + cart rows already carry lucide icon affordances for the collapsed rail.
+
+**A11y / motion:** icon-only links keep their text label in the DOM (`aria-current` on active) so the accessible name survives collapse; pin `aria-pressed`; mobile hamburger `aria-expanded` + `aria-controls` (unchanged). `prefers-reduced-motion: reduce` snaps the rail width, the content push, and the drawer slide (no transition).
+
+**Files:**
+- `lib/shell/useSidebarRail.ts` (new) -- the interaction hook: capability `matchMedia`, persisted mode, hover intent/close timers, focus-within (with `relatedTarget` containment guard so intra-rail focus moves don't flicker), pin toggle. Exports `RAIL_WIDTH` / `EXPANDED_WIDTH` / `SIDEBAR_MODE_KEY`.
+- `components/layout/AppShell.tsx` -- calls the hook, sets `--lm-shell-offset` on the shell wrapper, derives `compact`, passes `compact` + `rail` to Sidebar.
+- `components/layout/Sidebar.tsx` -- removed the old cookie/Cmd-B collapse toggle; the panel width + `compact` are now props; hover/focus handlers on the `<aside>`; new `data-mode` / `data-expanded` attrs; pin button replaces the bottom collapse toggle.
+- `app/globals.css` -- `--sidebar-rail` / `--sidebar-expanded` tokens; the desktop responsive block repointed from a hardcoded `240px` to `var(--lm-shell-offset, var(--sidebar-rail))` and gated on pointer; reduced-motion snaps width + push.
+
+**Sequencing:** Lands BEFORE F-464 (dashboard rebuild). F-464 designs its 3-zone layout against this icon-rail-default geometry. The dashboard was NOT touched here.
+
+**Tests:** `tests/e2e/f-465.spec.ts` (new) -- rail renders icon-only at rest with content pushed by the rail width (asserts rendered `getBoundingClientRect` + computed `marginLeft`, not src attrs -- the F-461 lesson); hover AND keyboard focus expand to the expanded width; pin persists `titles` across reload via `localStorage` and unpin reverts; active pill reads while collapsed; mobile toggle opens the overlay drawer (full titles, no pin). 1440 + 375 captures. `tests/e2e/f-455.spec.ts` desktop wordmark assertion updated to hover-first (the rail rests icon-only now; the wordmark paints on expand). `tests/unit/layout/Sidebar.test.tsx` unchanged and green (renders expanded by default).
+
+**Gates:** `npm run build` green. Full unit suite 586/586 green. F-465 e2e 16/16 (desktop + mobile projects). Shell regression -- `app-shell` / `f-446` / `f-447` / `f-448` / `f-455` all green after the f-455 hover update.
+
+**F-ID note:** next free after F-463 (BACKLOG topped at F-463; FE git tops at F-462 `5b8720c`). F-463 (palette) and **F-464 (dashboard rebuild)** are reserved, so this took **F-465**. Verified no F-464/F-465 string anywhere in the repo before claiming.

@@ -51,8 +51,11 @@ test.describe('F-455 — frosted shell (desktop 1440, light)', () => {
 
     await page.goto(AUTHED_ROUTE)
 
-    // Chrome present + IA preserved.
+    // Chrome present + IA preserved. F-465 — the sidebar rests as an icon-only
+    // rail; hover expands it to titles, which is when the wordmark paints.
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
+    await page.getByTestId('app-shell-sidebar').hover()
+    await expect(page.getByTestId('app-shell-sidebar')).toHaveAttribute('data-expanded', 'true')
     await expect(page.getByTestId('sidebar-wordmark')).toContainText('Le Méthodic')
     await expect(page.getByTestId('app-topbar')).toBeVisible()
     await expect(page.getByTestId('app-topbar-title')).toHaveText('Tableau de bord')
