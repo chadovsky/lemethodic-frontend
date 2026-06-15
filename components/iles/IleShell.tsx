@@ -18,6 +18,7 @@
 
 import { useState, useEffect } from 'react'
 import type { ComponentType } from 'react'
+import Link from 'next/link'
 import {
   Lock,
   Check,
@@ -26,6 +27,7 @@ import {
   Video,
   AlertTriangle,
   PlayCircle,
+  ArrowRight,
 } from 'lucide-react'
 import {
   getJourney,
@@ -37,6 +39,7 @@ import {
   type GrammarTopic,
 } from '@/lib/journey/journey'
 import { readTargetLevel } from '@/lib/journey/target-level'
+import { readCompletedIles } from '@/lib/journey/progress'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 
 interface Props {
@@ -231,11 +234,13 @@ export default function IleShell({ theme }: Props) {
   // Level resolves client-side from the target profile (F-457); B1 keeps the
   // first paint deterministic before localStorage is read.
   const [level, setLevel] = useState<Level>('B1')
+  const [completed, setCompleted] = useState<ThemeId[]>([])
   const [Content, setContent] = useState<ComponentType | null>(null)
 
   useEffect(() => {
     const resolved = readTargetLevel()
     setLevel(resolved)
+    setCompleted(readCompletedIles(resolved))
     // Authored learn content seam: render the MDX mold sequence if a file
     // exists for this (theme, level), else the Le Maitre slot stays bientot.
     // The 7 journey themes have no MDX yet, so this resolves to bientot for
@@ -245,7 +250,7 @@ export default function IleShell({ theme }: Props) {
       .catch(() => setContent(null))
   }, [theme])
 
-  const journey = getJourney(level)
+  const journey = getJourney(level, completed)
   const ile: Ile | undefined = THEME_IDS.has(theme)
     ? journey.iles.find((candidate) => candidate.theme === theme)
     : undefined
@@ -556,35 +561,68 @@ export default function IleShell({ theme }: Props) {
             ))}
           </div>
 
-          {/* Gated launch CTA — placed, but the seance walk is a later ticket. */}
-          <button
-            type="button"
-            data-testid="ile-seance-cta"
-            disabled
-            aria-disabled="true"
-            style={{
-              marginTop: 18,
-              width: '100%',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              padding: '13px 20px',
-              background: 'var(--paper-edge)',
-              color: 'var(--ink-faint)',
-              border: '1px solid var(--rule)',
-              borderRadius: 'var(--r-pill)',
-              fontFamily: SANS_FONT,
-              fontWeight: 600,
-              fontSize: '0.9375rem',
-              letterSpacing: '0.01em',
-              cursor: 'not-allowed',
-              minHeight: 48,
-            }}
-          >
-            Commencer la séance
-            <BientotTag />
-          </button>
+          {/* Launch CTA — live for an actionable ile (current / completed),
+              gated otherwise (locked / bientot). F-460 un-gates the seance. */}
+          {ile.status === 'current' || ile.status === 'completed' ? (
+            <Link
+              href={`/seance?ile=${ile.theme}`}
+              data-testid="ile-seance-cta"
+              data-gated="false"
+              className="ed-btn-press"
+              style={{
+                marginTop: 18,
+                width: '100%',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                padding: '13px 20px',
+                background: 'var(--accent)',
+                color: 'var(--paper)',
+                border: 'none',
+                borderRadius: 'var(--r-pill)',
+                fontFamily: SANS_FONT,
+                fontWeight: 600,
+                fontSize: '0.9375rem',
+                letterSpacing: '0.01em',
+                textDecoration: 'none',
+                minHeight: 48,
+              }}
+            >
+              {ile.status === 'completed' ? 'Refaire la séance' : 'Commencer la séance'}
+              <ArrowRight size={18} strokeWidth={2} />
+            </Link>
+          ) : (
+            <button
+              type="button"
+              data-testid="ile-seance-cta"
+              data-gated="true"
+              disabled
+              aria-disabled="true"
+              style={{
+                marginTop: 18,
+                width: '100%',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                padding: '13px 20px',
+                background: 'var(--paper-edge)',
+                color: 'var(--ink-faint)',
+                border: '1px solid var(--rule)',
+                borderRadius: 'var(--r-pill)',
+                fontFamily: SANS_FONT,
+                fontWeight: 600,
+                fontSize: '0.9375rem',
+                letterSpacing: '0.01em',
+                cursor: 'not-allowed',
+                minHeight: 48,
+              }}
+            >
+              Commencer la séance
+              <BientotTag />
+            </button>
+          )}
         </Beat>
 
         {/* ── Beat 3 — Check ─────────────────────────────────────────────── */}

@@ -28,6 +28,7 @@ import {
   type Mock,
 } from '@/lib/journey/journey'
 import { readTargetLevel } from '@/lib/journey/target-level'
+import { readCompletedIles } from '@/lib/journey/progress'
 import IslandNode from '@/components/carte/IslandNode'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 
@@ -436,12 +437,15 @@ export default function CarteJourney() {
   // Level resolves client-side from the target profile; B1 default keeps the
   // first paint (and SSR) deterministic before localStorage is read.
   const [level, setLevel] = useState<Level>('B1')
+  const [completed, setCompleted] = useState<ThemeId[]>([])
 
   useEffect(() => {
-    setLevel(readTargetLevel())
+    const resolved = readTargetLevel()
+    setLevel(resolved)
+    setCompleted(readCompletedIles(resolved))
   }, [])
 
-  const journey: Journey = getJourney(level)
+  const journey: Journey = getJourney(level, completed)
 
   return (
     <div

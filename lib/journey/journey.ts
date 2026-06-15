@@ -201,15 +201,7 @@ function buildPractice(theme: ThemeId, level: Level): Activity[] {
   }))
 }
 
-// Ile status for the sample B1 journey: first ile is the entry point
-// ('current'), the rest are 'locked' behind it. Levels without an authored
-// curriculum read 'bientot' (no content yet).
-function ileStatus(level: Level, index: number): Status {
-  if (level !== 'B1') return 'bientot'
-  return index === 0 ? 'current' : 'locked'
-}
-
-function buildIle(theme: ThemeId, level: Level, index: number): Ile {
+function buildIle(theme: ThemeId, level: Level, status: Status): Ile {
   const seed = level === 'B1' ? B1_ILE_SEED[theme] : null
   return {
     theme,
@@ -227,17 +219,36 @@ function buildIle(theme: ThemeId, level: Level, index: number): Ile {
         status: 'bientot',
       },
     },
-    status: ileStatus(level, index),
+    status,
   }
+}
+
+// Resolve the 7 ile statuses for a level. Levels without an authored curriculum
+// read 'bientot' (no content yet). For B1: ides in `completed` read 'completed'
+// (F-460 seance loop), the first non-completed ile is the entry point
+// ('current'), the rest are 'locked' behind it. With no completions this is the
+// original behaviour (ile[0] current, rest locked).
+function ileStatuses(level: Level, completed: ThemeId[]): Status[] {
+  if (level !== 'B1') return THEMES.map(() => 'bientot')
+  const done = new Set(completed)
+  const currentIndex = THEMES.findIndex((theme) => !done.has(theme.id))
+  return THEMES.map((theme, index) => {
+    if (done.has(theme.id)) return 'completed'
+    if (index === currentIndex) return 'current'
+    return 'locked'
+  })
 }
 
 // Thin assembler: returns the grammar phase + the 7 iles (education first) for
 // a level. This is the single entry point the carte / ile / seance call.
-export function getJourney(level: Level): Journey {
+// `completed` (F-460) overlays the seance-progress signal: those iles read
+// 'completed' and the current marker advances to the next unfinished ile.
+export function getJourney(level: Level, completed: ThemeId[] = []): Journey {
+  const statuses = ileStatuses(level, completed)
   return {
     level,
     grammarPhase: GRAMMAR_BY_LEVEL[level] ?? [],
-    iles: THEMES.map((theme, index) => buildIle(theme.id, level, index)),
+    iles: THEMES.map((theme, index) => buildIle(theme.id, level, statuses[index])),
     finalMock: {
       id: `${level}-final-mock`,
       label: 'Examen final',

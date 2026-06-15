@@ -63,11 +63,12 @@ test.describe("F-458 — L'Île (desktop 1440, light)", () => {
     await expect(page.getByTestId('ile-grammar-point')).toHaveCount(2)
     await expect(page.getByTestId('ile-piege')).toHaveCount(2)
 
-    // Beat 2: 5 activity shells + the gated launch CTA.
+    // Beat 2: 5 activity shells + the launch CTA. F-460 un-gated it on the
+    // current ile: it is now a live link into the seance walk.
     await expect(page.getByTestId('ile-activity')).toHaveCount(5)
     const seance = page.getByTestId('ile-seance-cta')
     await expect(seance).toBeVisible()
-    await expect(seance).toBeDisabled()
+    await expect(seance).toHaveAttribute('href', '/seance?ile=education')
 
     // Beat 3: the bientot mini-mock.
     await expect(page.getByTestId('ile-mini-mock')).toHaveAttribute('data-status', 'bientot')
@@ -119,7 +120,7 @@ test.describe("F-458 — L'Île (mobile 375, light)", () => {
     await page.goto('/ile/education')
     await expect(page.getByTestId('ile-page')).toBeVisible()
     await expect(page.getByTestId('ile-beat-practice')).toBeVisible()
-    await expect(page.getByTestId('ile-seance-cta')).toBeDisabled()
+    await expect(page.getByTestId('ile-seance-cta')).toHaveAttribute('href', '/seance?ile=education')
     await page.screenshot({
       path: path.join(SCREENSHOT_DIR, 'f-458-ile-education-375.png'),
       fullPage: true,

@@ -51,13 +51,15 @@ describe('IleShell — 3-beat template (default B1)', () => {
     expect(screen.queryByTestId('ile-maitre-content')).toBeNull()
   })
 
-  it('Beat 2: lists the 5 activity shells and a placed-but-gated seance CTA', async () => {
+  it('Beat 2: lists the 5 activity shells and a live seance CTA on the current ile (F-460)', async () => {
     render(<IleShell theme="education" />)
     const activities = await screen.findAllByTestId('ile-activity')
     expect(activities).toHaveLength(5)
     const cta = screen.getByTestId('ile-seance-cta')
     expect(cta).toHaveTextContent(/commencer la séance/i)
-    expect(cta).toBeDisabled()
+    // Un-gated: a live link into the seance walk for this ile.
+    expect(cta).toHaveAttribute('data-gated', 'false')
+    expect(cta).toHaveAttribute('href', '/seance?ile=education')
   })
 
   it('Beat 3: renders the mini-mock shell as not-yet-live', async () => {
@@ -90,8 +92,26 @@ describe('IleShell — non-authored level (B2 via target profile)', () => {
     expect(header).toHaveAttribute('data-status', 'bientot')
     expect(screen.queryAllByTestId('ile-vocab-item')).toHaveLength(0)
     expect(screen.queryAllByTestId('ile-grammar-point')).toHaveLength(0)
-    // Structure is still present (the 3 beats + the gated CTA).
+    // Structure is still present (the 3 beats + the gated CTA — a bientot ile
+    // is not walkable, so the seance CTA stays disabled).
     expect(screen.getByTestId('ile-beat-practice')).toBeInTheDocument()
-    expect(screen.getByTestId('ile-seance-cta')).toBeDisabled()
+    const cta = screen.getByTestId('ile-seance-cta')
+    expect(cta).toBeDisabled()
+    expect(cta).toHaveAttribute('data-gated', 'true')
+  })
+})
+
+describe('IleShell — completed ile (F-460 progress overlay)', () => {
+  beforeEach(() => {
+    localStorage.setItem('lm.journeyProgress.v1', JSON.stringify({ B1: ['education'] }))
+  })
+
+  it('shows the completed status and a Refaire seance CTA', async () => {
+    render(<IleShell theme="education" />)
+    const header = await screen.findByTestId('ile-header')
+    await waitFor(() => expect(header).toHaveAttribute('data-status', 'completed'))
+    const cta = screen.getByTestId('ile-seance-cta')
+    expect(cta).toHaveTextContent(/refaire la séance/i)
+    expect(cta).toHaveAttribute('href', '/seance?ile=education')
   })
 })

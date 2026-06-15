@@ -92,6 +92,36 @@ describe('getJourney("B1")', () => {
   })
 })
 
+describe('getJourney("B1") with completed overlay (F-460)', () => {
+  it('marks a completed ile and advances current to the next ile', () => {
+    const journey = getJourney('B1', ['education'])
+    expect(journey.iles[0].status).toBe('completed')
+    expect(journey.iles[1].status).toBe('current')
+    for (const ile of journey.iles.slice(2)) {
+      expect(ile.status).toBe('locked')
+    }
+  })
+
+  it('marks completed iles regardless of order and keeps the first unfinished current', () => {
+    const journey = getJourney('B1', ['famille'])
+    const byTheme = Object.fromEntries(journey.iles.map((ile) => [ile.theme, ile.status]))
+    expect(byTheme.famille).toBe('completed')
+    // education is still the first unfinished ile -> current.
+    expect(byTheme.education).toBe('current')
+  })
+
+  it('leaves no current ile when all 7 are completed', () => {
+    const all = THEMES.map((t) => t.id)
+    const journey = getJourney('B1', all)
+    expect(journey.iles.every((ile) => ile.status === 'completed')).toBe(true)
+  })
+
+  it('ignores the completed overlay for non-B1 levels (all bientot)', () => {
+    const journey = getJourney('A2', ['education'])
+    expect(journey.iles.every((ile) => ile.status === 'bientot')).toBe(true)
+  })
+})
+
 describe('getJourney (other levels)', () => {
   it('returns an empty grammar phase + 7 bientot iles for an unauthored level', () => {
     const journey = getJourney('A2')

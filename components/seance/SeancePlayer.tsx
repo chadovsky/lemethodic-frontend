@@ -1,36 +1,41 @@
 'use client'
 
+// F-460 - La Seance: the linear Practice walk.
+//
+// Steps through one ile's 5 Practice activities (Ile.practice[] from the F-456
+// journey model) one at a time: a stepper with progress (n of 5), previous /
+// next, each activity rendered as a content-free shell (ActivityShell). After
+// the 5 activities a completion screen returns to the carte; finishing marks
+// the ile completed in localStorage (F-460 progress seam) so the loop visibly
+// closes on the carte (the next ile becomes current). No BE.
+//
+// Phase 2 is LINEAR only: no adaptive sequencing, no resume endpoint, no
+// scoring (all Phase 3). Rounded-only, v3 tokens only, no em-dashes.
+
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { LECONS } from '@/content/methode/lecons'
-import { SESSIONS } from '@/lib/seance/sessions'
-import type { SeanceStep } from '@/lib/seance/sessions'
-import Dialogue from '@/components/iles/molds/Dialogue'
-import ActeDeParole from '@/components/iles/molds/ActeDeParole'
-import Activite from '@/components/iles/molds/Activite'
-import Tache from '@/components/iles/molds/Tache'
-import { api } from '@/lib/api'
-import { TOKEN_KEY } from '@/lib/storage-keys'
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
+import {
+  getJourney,
+  THEMES,
+  type Level,
+  type Ile,
+  type ThemeId,
+} from '@/lib/journey/journey'
+import { readTargetLevel } from '@/lib/journey/target-level'
+import { readCompletedIles, markIleCompleted, isThemeId } from '@/lib/journey/progress'
+import ActivityShell from '@/components/seance/ActivityShell'
+import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 
-const LEVEL_LABELS: Record<string, string> = {
-  a1_a2: 'A1–A2',
-  a2_b1: 'A2–B1',
-  b1: 'B1',
-  b2_plus: 'B2+',
-}
-
-function MoldStep({ step }: { step: SeanceStep }) {
-  if (step.type === 'dialogue') return <Dialogue {...step.props} />
-  if (step.type === 'acte') return <ActeDeParole {...step.props} />
-  if (step.type === 'activite') return <Activite {...step.props} />
-  if (step.type === 'tache') return <Tache {...step.props} />
-  return null
-}
+const THEME_LABELS: Record<ThemeId, string> = Object.fromEntries(
+  THEMES.map((theme) => [theme.id, theme.label]),
+) as Record<ThemeId, string>
 
 const MAIN_STYLE = {
-  maxWidth: 820,
+  maxWidth: 720,
   margin: '0 auto',
-  padding: 'clamp(32px, 5vw, 64px) clamp(20px, 4vw, 40px)',
+  padding: 'clamp(24px, 4vw, 48px) clamp(20px, 4vw, 40px) 64px',
+  fontFamily: SANS_FONT,
 } as const
 
 const CARD_STYLE = {
@@ -41,98 +46,116 @@ const CARD_STYLE = {
   textAlign: 'center' as const,
 }
 
+// Read the ?ile=<theme> launch param (client-only; avoids the useSearchParams
+// Suspense requirement, matching the mounted-gate pattern below).
+function readIleParam(): ThemeId | null {
+  if (typeof window === 'undefined') return null
+  const value = new URLSearchParams(window.location.search).get('ile')
+  return isThemeId(value) ? value : null
+}
+
+function PrimaryLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="ed-btn-press"
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 8,
+        background: 'var(--accent)',
+        color: 'var(--paper)',
+        borderRadius: 'var(--r-pill)',
+        padding: '12px 24px',
+        fontFamily: SANS_FONT,
+        fontSize: 14,
+        fontWeight: 600,
+        textDecoration: 'none',
+        letterSpacing: '0.01em',
+        minHeight: 44,
+      }}
+    >
+      {children}
+    </Link>
+  )
+}
+
 function EmptyState() {
   return (
-    <main lang="fr" style={MAIN_STYLE}>
+    <main lang="fr" data-testid="seance-empty" style={MAIN_STYLE}>
       <div style={CARD_STYLE}>
         <p style={{ fontFamily: 'var(--f-mono)', fontSize: 10, fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ink-faint)', margin: '0 0 16px' }}>
-          Bientôt
+          La seance
         </p>
-        <h1 style={{ fontFamily: 'var(--f-display)', fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 400, color: 'var(--ink)', margin: '0 0 12px', letterSpacing: '-0.01em' }}>
-          Commence ta première île.
+        <h1 style={{ fontFamily: SERIF_FONT, fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 400, color: 'var(--ink)', margin: '0 0 12px', letterSpacing: '-0.01em' }}>
+          Aucune ile a parcourir.
         </h1>
-        <p style={{ fontFamily: 'var(--f-ui)', fontSize: 14, color: 'var(--ink-soft)', margin: '0 0 28px' }}>
-          Aucune île disponible pour ta séance. Rends-toi sur La Méthode pour démarrer une leçon.
+        <p style={{ fontFamily: SANS_FONT, fontSize: 14, color: 'var(--ink-soft)', margin: '0 0 28px' }}>
+          Choisissez votre ile en cours sur la carte pour commencer une seance.
         </p>
-        <Link
-          href="/la-methode"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            background: 'var(--dominant)',
-            color: 'var(--paper)',
-            borderRadius: 'var(--r-md)',
-            padding: '12px 28px',
-            fontFamily: 'var(--f-ui)',
-            fontSize: 14,
-            fontWeight: 600,
-            textDecoration: 'none',
-            letterSpacing: '0.01em',
-          }}
-        >
-          Aller à La Méthode
-        </Link>
+        <PrimaryLink href="/carte">
+          Aller a la carte
+          <ArrowRight size={18} strokeWidth={2} />
+        </PrimaryLink>
       </div>
     </main>
   )
 }
 
-function CompletionScreen({ displayTitle, onRedo }: { displayTitle: string; onRedo: () => void }) {
+function CompletionScreen({ label, onRedo }: { label: string; onRedo: () => void }) {
   return (
-    <main lang="fr" style={MAIN_STYLE}>
+    <main lang="fr" data-testid="seance-complete" style={MAIN_STYLE}>
       <div style={CARD_STYLE}>
+        <div
+          aria-hidden="true"
+          style={{
+            width: 56,
+            height: 56,
+            margin: '0 auto 20px',
+            borderRadius: 'var(--r-pill)',
+            background: 'color-mix(in srgb, var(--success) 16%, var(--paper))',
+            color: 'var(--success)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Check size={28} strokeWidth={2.5} />
+        </div>
         <p style={{ fontFamily: 'var(--f-mono)', fontSize: 10, fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ink-faint)', margin: '0 0 16px' }}>
-          Séance terminée
+          Seance terminee
         </p>
-        <h1 style={{ fontFamily: 'var(--f-display)', fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 400, color: 'var(--ink)', margin: '0 0 12px', letterSpacing: '-0.01em' }}>
-          Bien joué.
+        <h1 style={{ fontFamily: SERIF_FONT, fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 400, color: 'var(--ink)', margin: '0 0 12px', letterSpacing: '-0.01em' }}>
+          Bien joue.
         </h1>
-        <p style={{ fontFamily: 'var(--f-ui)', fontSize: 14, color: 'var(--ink-soft)', margin: '0 0 32px' }}>
-          Tu as complété la séance {displayTitle}. Reviens demain pour continuer.
+        <p style={{ fontFamily: SANS_FONT, fontSize: 14, color: 'var(--ink-soft)', margin: '0 0 32px' }}>
+          Vous avez parcouru les cinq activites de l&apos;ile {label}. Retrouvez votre progression sur la carte.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
+            type="button"
+            data-testid="seance-redo"
             onClick={onRedo}
+            className="ed-btn-press"
             style={{
               background: 'transparent',
               border: '1px solid var(--rule-strong)',
-              borderRadius: 'var(--r-md)',
+              borderRadius: 'var(--r-pill)',
               padding: '12px 24px',
-              fontFamily: 'var(--f-ui)',
+              fontFamily: SANS_FONT,
               fontSize: 14,
               fontWeight: 500,
               color: 'var(--ink-soft)',
               cursor: 'pointer',
-              transition: 'border-color 150ms var(--ease), color 150ms var(--ease)',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.color = 'var(--ink)'
-              e.currentTarget.style.borderColor = 'var(--ink-faint)'
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.color = 'var(--ink-soft)'
-              e.currentTarget.style.borderColor = 'var(--rule-strong)'
+              minHeight: 44,
             }}
           >
-            Refaire la séance
+            Refaire la seance
           </button>
-          <Link
-            href="/tableau-de-bord"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              background: 'var(--dominant)',
-              color: 'var(--paper)',
-              borderRadius: 'var(--r-md)',
-              padding: '12px 24px',
-              fontFamily: 'var(--f-ui)',
-              fontSize: 14,
-              fontWeight: 600,
-              textDecoration: 'none',
-            }}
-          >
-            Tableau de bord
-          </Link>
+          <PrimaryLink href="/carte">
+            Retour a la carte
+            <ArrowRight size={18} strokeWidth={2} />
+          </PrimaryLink>
         </div>
       </div>
     </main>
@@ -141,170 +164,155 @@ function CompletionScreen({ displayTitle, onRedo }: { displayTitle: string; onRe
 
 export default function SeancePlayer() {
   const [mounted, setMounted] = useState(false)
-  const [ile, setIle] = useState<string | null>(null)
-  const [level, setLevel] = useState('b1')
+  const [level, setLevel] = useState<Level>('B1')
+  const [completed, setCompleted] = useState<ThemeId[]>([])
+  const [theme, setTheme] = useState<ThemeId | null>(null)
   const [stepIdx, setStepIdx] = useState(0)
   const [done, setDone] = useState(false)
 
   useEffect(() => {
-    function initPlayer(resolvedLevel: string) {
-      // Resolve current île: explicit override → first available île that has a session
-      let activeIle: string | null = localStorage.getItem('current_ile')
-      if (activeIle && !SESSIONS.some(s => s.ile === activeIle)) {
-        activeIle = null
-      }
-      if (!activeIle) {
-        const first = LECONS.find(
-          l => l.status === 'available' && l.themeSlug && SESSIONS.some(s => s.ile === l.themeSlug),
-        )
-        activeIle = first?.themeSlug ?? null
-      }
-      setLevel(resolvedLevel)
-      setIle(activeIle)
-      setMounted(true)
-    }
-
-    // F-439: authenticated users source level from BE progress endpoint.
-    // Public visitors (no token) default to b1 without making a request.
-    const token = localStorage.getItem(TOKEN_KEY)
-    if (token) {
-      api.users.getProgress()
-        .then((p) => initPlayer(p.currentLevel ?? 'b1'))
-        .catch(() => initPlayer('b1'))
-    } else {
-      initPlayer('b1')
-    }
+    const resolvedLevel = readTargetLevel()
+    const resolvedCompleted = readCompletedIles(resolvedLevel)
+    const journey = getJourney(resolvedLevel, resolvedCompleted)
+    // Launch target: the ?ile= param if valid, else the journey's current ile.
+    const param = readIleParam()
+    const current = journey.iles.find((ile) => ile.status === 'current')
+    setLevel(resolvedLevel)
+    setCompleted(resolvedCompleted)
+    setTheme(param ?? current?.theme ?? null)
+    setMounted(true)
   }, [])
 
   if (!mounted) return null
 
-  // Resolve session: exact match on (île, level), then same île any level
-  const session = ile
-    ? (SESSIONS.find(s => s.ile === ile && s.level === level) ?? SESSIONS.find(s => s.ile === ile) ?? null)
-    : null
+  const journey = getJourney(level, completed)
+  const ile: Ile | undefined = theme
+    ? journey.iles.find((candidate) => candidate.theme === theme)
+    : undefined
 
-  if (!session) return <EmptyState />
+  // Only current / completed iles are walkable (parity with the ile-page CTA
+  // gating). Anything else (locked, bientot, unknown) shows the empty state.
+  const walkable = ile && (ile.status === 'current' || ile.status === 'completed')
+  if (!ile || !walkable) return <EmptyState />
+
+  const label = THEME_LABELS[ile.theme]
+  const activities = ile.practice
+  const totalSteps = activities.length
 
   if (done) {
-    return (
-      <CompletionScreen
-        displayTitle={session.displayTitle}
-        onRedo={() => { setStepIdx(0); setDone(false) }}
-      />
-    )
+    return <CompletionScreen label={label} onRedo={() => { setStepIdx(0); setDone(false) }} />
   }
 
-  const totalSteps = session.steps.length
-  const currentStep = session.steps[stepIdx]
   const isLast = stepIdx === totalSteps - 1
+  const isFirst = stepIdx === 0
 
-  function handleContinuer() {
+  function handleNext() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
     if (isLast) {
-      const token = localStorage.getItem(TOKEN_KEY)
-      if (token && ile) {
-        // F-439: persist île completion signals to BE (fire-and-forget)
-        api.users.patchProgress({
-          last_couche_signals: { [ile]: { level, completed_at: new Date().toISOString() } },
-        }).catch(() => {
-          // Completion UI is still shown even if the PATCH fails
-        })
-      } else {
-        // Unauthenticated fallback — STREAK SEAM (F-407)
-        localStorage.setItem(`seance_completed_${ile}_${level}`, new Date().toISOString())
-      }
+      markIleCompleted(level, ile!.theme)
+      setCompleted((prev) => (prev.includes(ile!.theme) ? prev : [...prev, ile!.theme]))
       setDone(true)
     } else {
-      setStepIdx(prev => prev + 1)
+      setStepIdx((prev) => prev + 1)
     }
   }
 
-  return (
-    <main lang="fr" style={MAIN_STYLE}>
-      {/* Session header */}
-      <div style={{ marginBottom: 32 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 12, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-            <h1 style={{ fontFamily: 'var(--f-display)', fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 400, color: 'var(--ink)', margin: 0, letterSpacing: '-0.01em' }}>
-              La Séance
-            </h1>
-            <span style={{ fontFamily: 'var(--f-mono)', fontSize: 10, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--dominant)', background: 'color-mix(in srgb, var(--dominant) 7%, transparent)', borderRadius: 'var(--r-pill)', padding: '4px 12px', whiteSpace: 'nowrap' }}>
-              {session.displayTitle}
-            </span>
-            <span style={{ fontFamily: 'var(--f-mono)', fontSize: 10, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-faint)', background: 'var(--paper-edge)', borderRadius: 'var(--r-pill)', padding: '4px 12px' }}>
-              {LEVEL_LABELS[level] ?? level.toUpperCase()}
-            </span>
-          </div>
+  function handlePrev() {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setStepIdx((prev) => Math.max(0, prev - 1))
+  }
 
-          {/* STREAK SEAM — F-407: stub placeholder.
-              Real streak = production minutes (scoring not yet landed).
-              Remove stub and wire to BE once F-407 ships. */}
-          <span
-            title="Série en cours — seam F-407"
-            style={{
-              fontFamily: 'var(--f-mono)',
-              fontSize: 11,
-              fontWeight: 500,
-              letterSpacing: '0.07em',
-              color: 'var(--ink-faint)',
-              background: 'var(--paper-edge)',
-              border: '1px solid var(--rule)',
-              borderRadius: 'var(--r-pill)',
-              padding: '5px 14px',
-              cursor: 'default',
-              userSelect: 'none',
-              whiteSpace: 'nowrap',
-              flexShrink: 0,
-            }}
-          >
-            -- jour(s)
+  return (
+    <main lang="fr" data-testid="seance-player" style={MAIN_STYLE}>
+      {/* Header: ile label + level + segmented progress + counter */}
+      <div data-testid="seance-header" data-theme={ile.theme} data-level={ile.level} style={{ marginBottom: 28 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 14 }}>
+          <h1 style={{ fontFamily: SERIF_FONT, fontSize: 'clamp(1.5rem, 2.6vw, 2.1rem)', fontWeight: 400, color: 'var(--ink)', margin: 0, letterSpacing: '-0.01em' }}>
+            La Seance
+          </h1>
+          <span style={{ fontFamily: 'var(--f-mono)', fontSize: 10, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', background: 'color-mix(in srgb, var(--accent) 10%, transparent)', borderRadius: 'var(--r-pill)', padding: '4px 12px', whiteSpace: 'nowrap' }}>
+            {label}
+          </span>
+          <span style={{ fontFamily: 'var(--f-mono)', fontSize: 10, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-faint)', background: 'var(--paper-edge)', borderRadius: 'var(--r-pill)', padding: '4px 12px' }}>
+            Niveau {ile.level}
           </span>
         </div>
 
-        {/* Segmented progress bar + step counter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div
               key={i}
               style={{
                 flex: 1,
-                height: 3,
-                borderRadius: 2,
-                background: i <= stepIdx ? 'var(--dominant)' : 'var(--paper-edge)',
+                height: 4,
+                borderRadius: 'var(--r-pill)',
+                background: i <= stepIdx ? 'var(--accent)' : 'var(--paper-edge)',
                 transition: 'background 200ms var(--ease)',
               }}
             />
           ))}
-          <span style={{ fontFamily: 'var(--f-mono)', fontSize: 10, fontWeight: 500, letterSpacing: '0.07em', color: 'var(--ink-faint)', marginLeft: 8, whiteSpace: 'nowrap', flexShrink: 0 }}>
-            {stepIdx + 1} / {totalSteps}
+          <span data-testid="seance-progress" style={{ fontFamily: 'var(--f-mono)', fontSize: 10, fontWeight: 500, letterSpacing: '0.07em', color: 'var(--ink-faint)', marginLeft: 8, whiteSpace: 'nowrap', flexShrink: 0 }}>
+            {stepIdx + 1} sur {totalSteps}
           </span>
         </div>
       </div>
 
-      {/* Current mold — reuses existing mold components unchanged */}
-      <MoldStep step={currentStep} />
+      {/* Current activity shell */}
+      <ActivityShell activity={activities[stepIdx]} />
 
-      {/* Footer CTA */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8, paddingBottom: 48 }}>
+      {/* Footer: previous / next (or terminer on the last step) */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginTop: 20 }}>
         <button
-          onClick={handleContinuer}
+          type="button"
+          data-testid="seance-prev"
+          onClick={handlePrev}
+          disabled={isFirst}
+          className="ed-btn-press"
           style={{
-            background: 'var(--dominant)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            background: 'transparent',
+            border: '1px solid var(--rule-strong)',
+            borderRadius: 'var(--r-pill)',
+            padding: '12px 22px',
+            fontFamily: SANS_FONT,
+            fontSize: 14,
+            fontWeight: 500,
+            color: isFirst ? 'var(--ink-faint)' : 'var(--ink-soft)',
+            cursor: isFirst ? 'not-allowed' : 'pointer',
+            opacity: isFirst ? 0.5 : 1,
+            minHeight: 44,
+          }}
+        >
+          <ArrowLeft size={18} strokeWidth={2} />
+          Precedent
+        </button>
+
+        <button
+          type="button"
+          data-testid="seance-next"
+          onClick={handleNext}
+          className="ed-btn-press"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            background: 'var(--accent)',
             border: 'none',
-            borderRadius: 'var(--r-md)',
-            padding: '14px 36px',
-            fontFamily: 'var(--f-ui)',
+            borderRadius: 'var(--r-pill)',
+            padding: '12px 28px',
+            fontFamily: SANS_FONT,
             fontSize: 15,
             fontWeight: 600,
             color: 'var(--paper)',
             cursor: 'pointer',
             letterSpacing: '0.01em',
-            transition: 'opacity 150ms var(--ease)',
+            minHeight: 44,
           }}
-          onMouseEnter={e => { e.currentTarget.style.opacity = '0.88' }}
-          onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
         >
-          {isLast ? 'Terminer la séance' : 'Continuer'}
+          {isLast ? 'Terminer la seance' : 'Continuer'}
+          {!isLast && <ArrowRight size={18} strokeWidth={2} />}
         </button>
       </div>
     </main>
