@@ -4,7 +4,10 @@
 // AppShell caps content at a shared 1200px reading width for every authed route;
 // F-466 overrides only /tableau-de-bord to 1536 so the data-dense dashboard gets
 // room on wide monitors. This spec proves the dashboard uses the wide cap while
-// another authed route (/carte) keeps 1200 -- i.e. the override is dashboard-only.
+// another authed route keeps 1200 -- i.e. the override is per-route.
+//
+// F-469 note: /carte joined the wide-column set (the sea-world fills up to 1536),
+// so the "stays 1200" control here is /parametres, which keeps the shared width.
 
 import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
@@ -57,12 +60,14 @@ test.describe('F-466 — dashboard wide column (desktop 1920×1080)', () => {
 
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-466-tableau-de-bord-1920.png'), fullPage: true })
 
-    // A different authed route keeps the shared 1200 reading width.
-    await page.goto('/carte')
-    await expect(page.getByTestId('carte-journey')).toBeVisible()
-    const carteWidth = await page
+    // A different authed route (/parametres) keeps the shared 1200 reading width
+    // (/carte is now in the wide-column set per F-469, so it is no longer the
+    // narrow control).
+    await page.goto('/parametres')
+    await expect(page.getByTestId('app-shell-content')).toBeVisible()
+    const narrowWidth = await page
       .getByTestId('app-shell-content')
       .evaluate((el) => el.getBoundingClientRect().width)
-    expect(carteWidth).toBeLessThanOrEqual(1201)
+    expect(narrowWidth).toBeLessThanOrEqual(1201)
   })
 })
