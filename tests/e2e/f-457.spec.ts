@@ -52,7 +52,13 @@ test.describe('F-457 — La Carte (desktop 1440, light)', () => {
 
     // F-461: each ile renders its themed island art (no placeholder).
     await expect(iles.first().getByTestId('island-node')).toHaveAttribute('data-state', 'current')
-    await expect(iles.first().locator('img')).toHaveAttribute('src', /island-education\.png/)
+    const firstIsland = iles.first().locator('img')
+    await expect(firstIsland).toHaveAttribute('src', /island-education\.png/)
+    // The PNG must actually be served, not just referenced -- guards against an
+    // untracked asset 404ing on the deployed build (F-461 prod incident).
+    await expect
+      .poll(() => firstIsland.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0))
+      .toBe(true)
 
     // Mini-mocks (7) + final mock (1).
     await expect(page.getByTestId('carte-mini-mock')).toHaveCount(7)
