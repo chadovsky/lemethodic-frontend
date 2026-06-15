@@ -29,16 +29,21 @@ Principles:
 Near-monochrome base plus one confident accent. Light mode primary; full dark mode (Apple-style true dark).
 
 ### Light
+
+Canonical light tokens (source of truth: `app/globals.css`, F-454 + F-463). The page sits on a whisper-cool off-white canvas; cards are pure white floating on top of it. Coral is the single accent.
+
 | token | hex | use |
 |---|---|---|
-| `--bg` | `#FFFFFF` | base background |
-| `--surface` | `#F5F5F7` | subtle panels, sections |
-| `--surface-elevated` | `#FFFFFF` | cards (with shadow) |
-| `--hairline` | `#E8E8ED` | borders, dividers |
-| `--ink` | `#1D1D1F` | primary text |
-| `--ink-secondary` | `#6E6E73` | secondary text |
-| `--ink-tertiary` | `#86868B` | captions, disabled |
-| `--accent` | `#E5301C` | brand accent (modern vermillion) |
+| `--canvas` | `#EAEFF3` | recessed page background (whisper-cool off-white) |
+| `--paper` | `#FFFFFF` | card / elevated surface |
+| `--paper-edge` | `#EAEFF3` | subtle chips / muted fills (canvas tier) |
+| `--rule` | `#D1D5DB` | borders, hairlines |
+| `--heading` | `#1F2933` | headings, emphasis |
+| `--ink` | `#4B5563` | primary body text |
+| `--ink-soft` | `#9CA3AF` | secondary / muted text |
+| `--accent` | `#E05C42` | the single brand accent (coral): CTA, selected, progress |
+| `--badge-success` | `#BFE0C4` | success badge fill (status, not brand) |
+| `--badge-success-check` | `#2E7D4F` | success badge check glyph |
 
 ### Dark (true dark)
 | token | hex | use |
@@ -52,6 +57,21 @@ Near-monochrome base plus one confident accent. Light mode primary; full dark mo
 | `--accent` | `#FF453A` | accent on dark |
 
 Accent is rare. Most of the UI is ink-on-paper. The red appears on the primary CTA, prices, active progress, and the occasional brand moment. Nowhere else.
+
+### Tint card-fills (F-463)
+
+A soft tint family for tinted card fills, sourced from the approved Nano Banana dashboard mock. These are **surface fills, not accents**: coral (`--accent`) remains the single brand accent. The tints carry no brand meaning, they give a grid of cards quiet variety. Each tint pairs with a deeper sparkline shade for the per-card data line. Heading and body text (`--heading` / `--ink`) pass on every tint; an emphasis number may take coral.
+
+| fill token | hex | sparkline token | hex |
+|---|---|---|---|
+| `--tint-sage` | `#CCD9CE` | `--tint-sage-spark` | `#6E8B72` |
+| `--tint-slate` | `#A8B8C8` | `--tint-slate-spark` | `#5E7A96` |
+| `--tint-cream` | `#F2E9D7` | `--tint-cream-spark` | `#C98A6A` |
+| `--tint-peach` | `#F7C3AB` | `--tint-peach-spark` | `#D85A30` |
+
+These are **additive tokens**: introduced for the dashboard to consume, **not retro-applied** to existing surfaces. The only global visual change shipped with them is the canvas shift to `#EAEFF3`.
+
+**Dark tints:** flagged follow-up, needs a dark mock. Until then the four tint tokens alias the dark card surface (`#1C1F22`) as a safe fallback, so dark mode is token-complete and nothing breaks. Real dark tints come from a future dark mock, not invented here.
 
 ---
 
@@ -173,6 +193,6 @@ Retired from v2:
 
 ## Locked decisions (2026-06-11)
 
-1. **Accent color:** `#E5301C` (modern vermillion) light, `#FF453A` dark. One accent only.
+1. **Accent color:** coral `#E05C42` light (canonical `--accent`; the shipped F-454 coral refined the originally-locked vermillion), dark per `.dark --accent`. One accent only.
 2. **Display typeface:** Inter system. A distinctive display face is deferred, revisited once surfaces exist.
 3. **Logotype mark:** modern Inter wordmark ships first; a short mark/glyph exploration (glossy island dot / single geometric glyph) is queued as a follow-on.

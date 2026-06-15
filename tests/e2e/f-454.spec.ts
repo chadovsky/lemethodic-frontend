@@ -42,7 +42,7 @@ async function forceTheme(page: import('@playwright/test').Page, theme: 'light' 
 // v3 canonical canvas values (DESIGN.md v3 / F-454). Computed --canvas resolves
 // to rgb() in the browser.
 const V3_CANVAS = {
-  light: 'rgb(243, 244, 246)', // #F3F4F6
+  light: 'rgb(234, 239, 243)', // #EAEFF3 (F-463 cooler canvas)
   dark: 'rgb(10, 12, 14)', //    #0A0C0E
 }
 

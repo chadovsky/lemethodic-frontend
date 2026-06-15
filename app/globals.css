@@ -82,10 +82,10 @@
   /* ── DESIGN.md v3 — canonical palette (M2 t12, F-454, 2026-06-14) ────────── */
 
   /* Surface tiers */
-  --canvas: #F3F4F6;        /* canvas / app bg (recessed page) */
+  --canvas: #EAEFF3;        /* canvas / app bg (recessed page, whisper-cool off-white — F-463) */
   --paper: #FFFFFF;         /* surface / card */
   --paper-tint: #FFFFFF;    /* raised tint folds into surface in v3 flat system */
-  --paper-edge: #F3F4F6;    /* subtle / muted chip = canvas tier */
+  --paper-edge: #EAEFF3;    /* subtle / muted chip = canvas tier (follows canvas — F-463) */
 
   /* Ink / text */
   --ink: #4B5563;           /* primary text / menu */
@@ -115,6 +115,33 @@
   --accent: #E05C42;
   --accent-soft: #F87171;            /* data secondary coral */
   --accent-deep: hsl(9 65% 45%);     /* hover depth, ~12% darker than #E05C42 */
+
+  /* ── v3 tint card-fill family (F-463, 2026-06-15) ──────────────────────────
+     Soft tinted card fills for the dashboard, from the approved Nano Banana
+     dashboard mock. ADDITIVE — consumed by the dashboard surface only, NOT
+     retro-applied to existing surfaces. Surface fills, not accents: coral
+     (--accent) stays the single brand accent. Each tint pairs with a deeper
+     sparkline shade for its per-card data line. Dark-mode tints are a flagged
+     follow-up (needs a dark mock); the .dark block aliases all four to the
+     dark card surface as a safe fallback so dark stays token-complete. */
+  --tint-sage:  #CCD9CE;
+  --tint-slate: #A8B8C8;
+  --tint-cream: #F2E9D7;
+  --tint-peach: #F7C3AB;
+  --tint-sage-spark:  #6E8B72;   /* deeper sage — sparkline on --tint-sage */
+  --tint-slate-spark: #5E7A96;   /* deeper slate — sparkline on --tint-slate */
+  --tint-cream-spark: #C98A6A;   /* deeper cream — sparkline on --tint-cream */
+  --tint-peach-spark: #D85A30;   /* deeper peach — sparkline on --tint-peach */
+
+  /* Success badge — soft mint fill + deep check glyph (status, not brand).
+     Self-contained chip (light fill + dark check), valid in both modes. */
+  --badge-success:       #BFE0C4;
+  --badge-success-check: #2E7D4F;
+
+  /* Heading ink — deepest text tier for dashboard headings + emphasis on the
+     pale tints. Body stays --ink (#4B5563), muted --ink-soft (#9CA3AF).
+     ADDITIVE, not retro-applied; flips to primary ink in .dark. */
+  --heading: #1F2933;
 
   /* Couche identity tokens — 4 couches map to primary-text (neutral interim,
      FLAG for couche-display surface paint), Pièges Anglais gets accent */
@@ -263,6 +290,17 @@
   --accent-soft: #F27A6C;            /* data secondary coral (dark) */
   --accent-deep: hsl(9 60% 48%);     /* hover depth for dark-mode coral */
 
+  /* F-463 — tint card-fills: no dark mock yet, so alias all four to the dark
+     card surface (#1C1F22 = --paper) as a safe fallback. Real dark tints are a
+     flagged follow-up requiring a dark mock; not invented here. Sparkline +
+     badge tokens are mid-tone / self-contained and stay valid in both modes
+     (inherited from :root). Heading flips to primary dark ink. */
+  --tint-sage:  var(--paper);
+  --tint-slate: var(--paper);
+  --tint-cream: var(--paper);
+  --tint-peach: var(--paper);
+  --heading: var(--ink);
+
   /* F-455 — frosted shell chrome (dark): deeper translucency + stronger shadow */
   --shell-frost:      color-mix(in srgb, var(--paper) 66%, transparent);
   --shell-shadow:     0 6px 30px -10px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.40);
@@ -374,6 +412,19 @@
   --color-dominant-deep: var(--dominant-deep);
   --color-couche-default: var(--couche-default);
   --color-couche-pieges: var(--couche-pieges);
+
+  /* F-463 — tint card-fill family + sparklines + success badge + heading ink */
+  --color-heading: var(--heading);
+  --color-tint-sage: var(--tint-sage);
+  --color-tint-slate: var(--tint-slate);
+  --color-tint-cream: var(--tint-cream);
+  --color-tint-peach: var(--tint-peach);
+  --color-tint-sage-spark: var(--tint-sage-spark);
+  --color-tint-slate-spark: var(--tint-slate-spark);
+  --color-tint-cream-spark: var(--tint-cream-spark);
+  --color-tint-peach-spark: var(--tint-peach-spark);
+  --color-badge-success: var(--badge-success);
+  --color-badge-success-check: var(--badge-success-check);
 
   /* F-VISUAL-001 — canonical token surface exposed as Tailwind
      utilities (bg-bg-canvas, text-text-primary, border-rule-default,

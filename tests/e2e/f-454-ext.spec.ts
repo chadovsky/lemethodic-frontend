@@ -22,7 +22,7 @@ async function forceTheme(page: import('@playwright/test').Page, theme: 'light' 
   await page.addInitScript((t) => localStorage.setItem('theme', t), theme)
 }
 
-const V3_CANVAS = { light: 'rgb(243, 244, 246)', dark: 'rgb(10, 12, 14)' }
+const V3_CANVAS = { light: 'rgb(234, 239, 243)', dark: 'rgb(10, 12, 14)' } // light #EAEFF3 (F-463)
 
 async function assertCanvas(page: import('@playwright/test').Page, theme: 'light' | 'dark') {
   if (theme === 'dark') await expect(page.locator('html')).toHaveClass(/dark/)

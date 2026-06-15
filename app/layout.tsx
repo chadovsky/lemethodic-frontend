@@ -94,7 +94,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#F3F4F6', // v3 --canvas
+  themeColor: '#EAEFF3', // v3 --canvas (F-463)
   width: 'device-width',
   initialScale: 1,
   // userScalable defaults to true — explicitly omitted per WCAG 2.1
