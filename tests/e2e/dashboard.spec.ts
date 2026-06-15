@@ -1,10 +1,19 @@
 import { test, expect } from '@playwright/test'
 import { injectAuthToken } from '../helpers/auth-e2e'
 
-// Shared API mocks: intercept recordings + lessons + progress so widgets resolve
-// without a live BE, and inject an exam date so the countdown renders.
-async function setupDashboardRoutes(page: Parameters<typeof page.route>[0]) {
+// F-464 — three-zone /tableau-de-bord. Shared mocks: a future exam date (Examen
+// card), the progress endpoint (Série + Production), and the activity calendar
+// (Objectif + weekly chart + heatmap). A B1 target profile is seeded so the
+// journey resolves (Niveau card + La Carte hero = education).
+async function setupDashboard(page: Parameters<typeof injectAuthToken>[0]) {
   const futureDate = new Date(Date.now() + 45 * 86400000).toISOString().slice(0, 10)
+  const today = new Date().toISOString().slice(0, 10)
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+
+  await page.addInitScript(() => {
+    localStorage.setItem('lm.targetProfile.v1', JSON.stringify({ level: 'B1' }))
+    localStorage.setItem('lm.journeyProgress.v1', JSON.stringify({}))
+  })
 
   await page.route('**/api/auth/me', (route) => {
     route.fulfill({
@@ -16,59 +25,13 @@ async function setupDashboardRoutes(page: Parameters<typeof page.route>[0]) {
         full_name: 'Test User',
         is_admin: false,
         email_verified: true,
-        current_level: null,
-        target_level: null,
+        current_level: 'b1',
+        target_level: 'b1',
         exam_date: futureDate,
       }),
     })
   })
 
-  await page.route('**/api/recordings*', (route) => {
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify([]),
-    })
-  })
-
-  await page.route('**/api/ecole/lessons*', (route) => {
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        lessons: [
-          {
-            id: 1,
-            lesson_number: 1,
-            code: 'L001',
-            title: 'Introduction',
-            short_description: '',
-            status: 'completed',
-            quiz_attempts: 1,
-            quiz_best_score: 90,
-            completed_at: '2026-05-01T10:00:00Z',
-            phase: 1,
-            subline_en: null,
-          },
-          {
-            id: 2,
-            lesson_number: 2,
-            code: 'L002',
-            title: 'Le rythme de la phrase',
-            short_description: '',
-            status: 'unlocked',
-            quiz_attempts: 0,
-            quiz_best_score: null,
-            completed_at: null,
-            phase: 1,
-            subline_en: null,
-          },
-        ],
-      }),
-    })
-  })
-
-  // F-440: progress endpoint feeds StreakWidget and DailyTargetWidget
   await page.route('**/api/users/me/progress', (route) => {
     route.fulfill({
       status: 200,
@@ -79,7 +42,7 @@ async function setupDashboardRoutes(page: Parameters<typeof page.route>[0]) {
         streak_days: 0,
         longest_streak_days: 0,
         streak_last_active_date: null,
-        production_minutes_total: 0,
+        production_minutes_total: 240,
         daily_target_minutes: 30,
         tache_attempts: 0,
         last_couche_signals: {},
@@ -87,23 +50,24 @@ async function setupDashboardRoutes(page: Parameters<typeof page.route>[0]) {
     })
   })
 
-  // F-444: activity calendar endpoint feeds CalendarWidget
   await page.route('**/api/users/me/activity-calendar*', (route) => {
-    const today = new Date().toISOString().slice(0, 10)
+    const today2 = new Date().toISOString().slice(0, 10)
     route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({
         current_streak: 3,
         longest_streak: 7,
-        today_count: 15,
+        today_count: 30,
         today_target: 30,
         days: [
-          { date: today, count: 15, target_met: false },
+          { date: yesterday, count: 20, target_met: false },
+          { date: today2, count: 30, target_met: true },
         ],
       }),
     })
   })
+  void today
 }
 
 test.describe('Dashboard — desktop (1280×800)', () => {
@@ -111,72 +75,83 @@ test.describe('Dashboard — desktop (1280×800)', () => {
 
   test.beforeEach(async ({ page }) => {
     await injectAuthToken(page)
-    await setupDashboardRoutes(page)
+    await setupDashboard(page)
   })
 
-  test('welcome heading and today\'s date render', async ({ page }) => {
+  test('greeting and the three zones render inside the shell', async ({ page }) => {
     await page.goto('/dashboard')
     await expect(page.getByRole('heading', { level: 1, name: /bonjour/i })).toBeVisible()
-    await expect(page.getByTestId('dashboard-today')).toBeVisible()
-  })
-
-  test('all 5 widget sections are visible inside the (app) shell', async ({ page }) => {
-    await page.goto('/dashboard')
+    // LEFT zone = the F-465 icon rail (shell sidebar).
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
-    await expect(page.getByRole('heading', { level: 2, name: /compte à rebours/i })).toBeVisible()
-    await expect(page.getByRole('heading', { level: 2, name: /série active/i })).toBeVisible()
-    await expect(page.getByRole('heading', { level: 2, name: /objectif du jour/i })).toBeVisible()
-    await expect(page.getByRole('heading', { level: 2, name: /prochaine leçon/i })).toBeVisible()
+    // MAIN + RIGHT zones.
+    await expect(page.getByTestId('dashboard-zone-main')).toBeVisible()
+    await expect(page.getByTestId('dashboard-zone-rail')).toBeVisible()
   })
 
-  test('countdown widget renders days remaining > 0', async ({ page }) => {
+  test('La Carte hero links to /carte and renders the current island art (loaded)', async ({ page }) => {
     await page.goto('/dashboard')
-    const days = page.getByTestId('countdown-days')
-    await expect(days).toBeVisible()
-    const text = await days.textContent()
-    expect(Number(text?.trim())).toBeGreaterThan(0)
+    const cta = page.getByTestId('dashboard-carte-hero-cta')
+    await expect(cta).toBeVisible()
+    await expect(cta).toHaveAttribute('href', '/carte')
+    const art = page.getByTestId('dashboard-carte-hero-art')
+    await expect(art).toHaveAttribute('src', /island-education\.png/)
+    // F-461 load guard: the PNG actually decoded (not a 404), naturalWidth > 0.
+    await expect
+      .poll(async () => art.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0))
+      .toBe(true)
   })
 
-  test('daily target widget shows daily_target_minutes from progress (30)', async ({ page }) => {
+  test('all six metric cards render', async ({ page }) => {
     await page.goto('/dashboard')
-    await expect(page.getByTestId('daily-target-value')).toHaveText('30')
+    for (const id of [
+      'dashboard-metric-serie',
+      'dashboard-metric-objectif',
+      'dashboard-metric-production',
+      'dashboard-metric-iles',
+      'dashboard-metric-niveau',
+      'dashboard-metric-examen',
+    ]) {
+      await expect(page.getByTestId(id)).toBeVisible()
+    }
   })
 
-  test('streak widget resolves (0 for progress streak_days=0)', async ({ page }) => {
+  test('wired cards show real data; unwired Pièges stat is bientôt', async ({ page }) => {
     await page.goto('/dashboard')
-    await expect(page.getByTestId('streak-count')).toBeVisible()
-    await expect(page.getByTestId('streak-count')).toHaveText('0')
+    await expect(page.getByTestId('dashboard-metric-niveau-value')).toHaveText('B1')
+    await expect(page.getByTestId('dashboard-metric-iles-value')).toHaveText('0')
+    const examVal = page.getByTestId('dashboard-metric-examen-value')
+    expect(Number((await examVal.textContent())?.trim())).toBeGreaterThan(0)
+    // Unwired metric: bientôt, no fabricated number.
+    await expect(page.getByTestId('dashboard-stat-pieges').getByTestId('bientot-pill')).toBeVisible()
+    await expect(page.getByTestId('dashboard-stat-pieges-value')).toHaveCount(0)
   })
 
-  test('next lesson widget shows unlocked lesson and Reprendre CTA', async ({ page }) => {
+  test('right rail renders the calendar with a coral active (target-met) day', async ({ page }) => {
     await page.goto('/dashboard')
-    await expect(page.getByTestId('next-lesson-title')).toBeVisible()
-    const link = page.getByRole('link', { name: /reprendre/i })
-    await expect(link).toHaveAttribute('href', '/la-methode/lecon-2')
+    const calendar = page.getByTestId('dashboard-widget-calendar')
+    await expect(calendar).toBeVisible()
+    const todayCell = page.getByTestId('calendar-cell-today')
+    await expect(todayCell).toBeVisible()
+    // target_met:true -> coral outline (#E05C42 = rgb(224, 92, 66)).
+    const outline = await todayCell.evaluate((el) => window.getComputedStyle(el).outlineColor)
+    expect(outline).toBe('rgb(224, 92, 66)')
   })
 
-  // F-453: heatmap CalendarWidget removed from the dashboard; the gated
-  // "Commencer la séance" CTA now leads the surface.
-  test('gated Commencer la séance CTA renders at the top', async ({ page }) => {
+  test('metric cards use the F-463 tint tokens (computed fill = tint, not white)', async ({ page }) => {
     await page.goto('/dashboard')
-    await expect(page.getByTestId('dashboard-commencer-seance')).toBeVisible()
+    const serie = page.getByTestId('dashboard-metric-serie')
+    await expect(serie).toHaveAttribute('data-tint', 'sage')
+    // --tint-sage = #CCD9CE = rgb(204, 217, 206) in light mode.
+    const bg = await serie.evaluate((el) => window.getComputedStyle(el).backgroundColor)
+    expect(bg).toBe('rgb(204, 217, 206)')
   })
 
-  test('widget cards carry ed-card-lift class', async ({ page }) => {
+  test('content sits within the icon-rail offset (main is pushed right of the rail)', async ({ page }) => {
     await page.goto('/dashboard')
-    await expect(page.getByTestId('dashboard-widget-countdown')).toHaveClass(/ed-card-lift/)
-    await expect(page.getByTestId('dashboard-widget-streak')).toHaveClass(/ed-card-lift/)
-    await expect(page.getByTestId('dashboard-widget-daily-target')).toHaveClass(/ed-card-lift/)
-    await expect(page.getByTestId('dashboard-widget-prochaine-lecon')).toHaveClass(/ed-card-lift/)
-  })
-
-  test('daily target edit button opens input; cancel restores the value', async ({ page }) => {
-    await page.goto('/dashboard')
-    await page.getByTestId('daily-target-edit-btn').click()
-    await expect(page.getByTestId('daily-target-input')).toBeVisible()
-    await expect(page.getByTestId('daily-target-value')).not.toBeVisible()
-    await page.getByTestId('daily-target-cancel-btn').click()
-    await expect(page.getByTestId('daily-target-value')).toHaveText('30')
+    const main = page.locator('.app-shell-main')
+    const marginLeft = await main.evaluate((el) => parseFloat(window.getComputedStyle(el).marginLeft))
+    // Desktop rail pushes the content column by --lm-shell-offset (>= 64px rail).
+    expect(marginLeft).toBeGreaterThanOrEqual(60)
   })
 })
 
@@ -185,37 +160,33 @@ test.describe('Dashboard — mobile (375×667)', () => {
 
   test.beforeEach(async ({ page }) => {
     await injectAuthToken(page)
-    await setupDashboardRoutes(page)
+    await setupDashboard(page)
   })
 
-  test('widgets stack vertically and remain reachable on scroll', async ({ page }) => {
+  test('zones stack into one column; rail content comes after the main zone', async ({ page }) => {
     await page.goto('/dashboard')
-    await expect(page.getByRole('heading', { level: 1, name: /bonjour/i })).toBeVisible()
-    for (const name of [
-      /compte à rebours/i,
-      /série active/i,
-      /objectif du jour/i,
-      /prochaine leçon/i,
-    ]) {
-      const heading = page.getByRole('heading', { level: 2, name })
-      await heading.scrollIntoViewIfNeeded()
-      await expect(heading).toBeVisible()
-    }
+    const main = page.getByTestId('dashboard-zone-main')
+    const rail = page.getByTestId('dashboard-zone-rail')
+    await expect(main).toBeVisible()
+    const mainBox = await main.boundingBox()
+    const railBox = await rail.boundingBox()
+    // Stacked: the rail sits below the main zone.
+    expect(railBox!.y).toBeGreaterThan(mainBox!.y)
   })
 
-  test('no horizontal overflow on /dashboard', async ({ page }) => {
+  test('no horizontal overflow on /dashboard at 375px', async ({ page }) => {
     await page.goto('/dashboard')
     const scrollWidth = await page.evaluate(() => document.body.scrollWidth)
     const clientWidth = await page.evaluate(() => document.body.clientWidth)
     expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1)
   })
 
-  test('stacked widgets have bottom separator border in mobile view', async ({ page }) => {
+  test('the six metric cards remain reachable on scroll', async ({ page }) => {
     await page.goto('/dashboard')
-    const countdownWidget = page.getByTestId('dashboard-widget-countdown')
-    const borderBottom = await countdownWidget.evaluate(
-      (el) => window.getComputedStyle(el).borderBottomWidth,
-    )
-    expect(parseFloat(borderBottom)).toBeGreaterThan(0)
+    for (const id of ['dashboard-metric-serie', 'dashboard-metric-examen']) {
+      const card = page.getByTestId(id)
+      await card.scrollIntoViewIfNeeded()
+      await expect(card).toBeVisible()
+    }
   })
 })

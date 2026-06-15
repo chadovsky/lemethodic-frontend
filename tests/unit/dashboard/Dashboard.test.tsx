@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 vi.mock('next/link', () => ({
@@ -10,37 +10,22 @@ vi.mock('next/link', () => ({
   ),
 }))
 
-// Stub useAuthStore: hydrated user with an exam date 30 days from now
-const FUTURE_DATE = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10)
-vi.mock('@/lib/auth', () => ({
-  useAuthStore: (selector: (s: { user: { examDate: string }; hydrated: boolean }) => unknown) =>
-    selector({ user: { examDate: FUTURE_DATE }, hydrated: true }),
+// Dates are computed in vi.hoisted so the hoisted vi.mock factories can read them.
+const { FUTURE_DATE, TODAY, YESTERDAY } = vi.hoisted(() => ({
+  FUTURE_DATE: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
+  TODAY: new Date().toISOString().slice(0, 10),
+  YESTERDAY: new Date(Date.now() - 86400000).toISOString().slice(0, 10),
 }))
 
-// Stub api: recordings returns empty list; lessons returns one unlocked lesson;
-// users.getProgress returns a progress object with streak_days=0, daily_target_minutes=30
+// Hydrated user: full name (greeting) + an exam date 30 days out (Examen card).
+vi.mock('@/lib/auth', () => ({
+  useAuthStore: (
+    selector: (s: { user: { fullName: string; examDate: string }; hydrated: boolean }) => unknown,
+  ) => selector({ user: { fullName: 'Marie Dupont', examDate: FUTURE_DATE }, hydrated: true }),
+}))
+
 vi.mock('@/lib/api', () => ({
   api: {
-    recordings: {
-      list: vi.fn().mockResolvedValue([]),
-    },
-    lessons: {
-      list: vi.fn().mockResolvedValue([
-        {
-          id: 1,
-          lessonNumber: 3,
-          code: 'L003',
-          title: 'Le rythme de la phrase',
-          shortDescription: '',
-          status: 'unlocked',
-          quizAttempts: 0,
-          quizBestScore: null,
-          completedAt: null,
-          phase: 1,
-          sublineEn: null,
-        },
-      ]),
-    },
     users: {
       getProgress: vi.fn().mockResolvedValue({
         currentLevel: 'b1',
@@ -48,19 +33,21 @@ vi.mock('@/lib/api', () => ({
         streakDays: 0,
         longestStreakDays: 0,
         streakLastActiveDate: null,
-        productionMinutesTotal: 0,
+        productionMinutesTotal: 240,
         dailyTargetMinutes: 30,
         tacheAttempts: 0,
         lastCoucheSignals: {},
       }),
       patchProgress: vi.fn(),
-      // F-444 — activity calendar mock
       getActivityCalendar: vi.fn().mockResolvedValue({
         currentStreak: 3,
         longestStreak: 7,
         todayCount: 15,
         todayTarget: 30,
-        days: [],
+        days: [
+          { date: YESTERDAY, count: 20, targetMet: false },
+          { date: TODAY, count: 15, targetMet: false },
+        ],
       }),
     },
   },
@@ -70,100 +57,103 @@ import Dashboard from '@/components/dashboard/Dashboard'
 
 beforeEach(() => {
   vi.clearAllMocks()
+  window.localStorage.clear()
+  // B1 journey, nothing completed -> current île = education (first theme).
+  window.localStorage.setItem('lm.targetProfile.v1', JSON.stringify({ level: 'B1' }))
 })
 
-describe('Dashboard', () => {
-  it('renders the welcome heading "Bonjour"', () => {
+describe('Dashboard (F-464 three-zone)', () => {
+  it('renders the "Bonjour, Marie" greeting', () => {
     render(<Dashboard />)
-    expect(
-      screen.getByRole('heading', { level: 1, name: /bonjour/i }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /bonjour, marie/i })).toBeInTheDocument()
   })
 
-  it("renders today's date in French long format", () => {
+  it('renders the three zones (main + complementary rail; nav is the shell)', () => {
     render(<Dashboard />)
-    const today = new Date()
-    const expected = new Intl.DateTimeFormat('fr-CA', { dateStyle: 'full' }).format(today)
-    expect(screen.getByTestId('dashboard-today')).toHaveTextContent(expected)
+    expect(screen.getByTestId('dashboard-zone-main')).toBeInTheDocument()
+    const rail = screen.getByTestId('dashboard-zone-rail')
+    expect(rail).toBeInTheDocument()
+    expect(rail.tagName).toBe('ASIDE')
+    expect(rail).toHaveAttribute('aria-label')
   })
 
-  // F-453 — heatmap CalendarWidget removed; 4 widget headings remain.
-  it('renders all 4 widget headings', () => {
+  it('La Carte hero links to /carte and renders the current island art', async () => {
     render(<Dashboard />)
-    expect(
-      screen.getByRole('heading', { level: 2, name: /compte à rebours/i }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { level: 2, name: /série active/i }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { level: 2, name: /objectif du jour/i }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { level: 2, name: /prochaine leçon/i }),
-    ).toBeInTheDocument()
-  })
-
-  // F-453 — the heatmap activity widget is gone from the dashboard.
-  it('no longer renders the activity heatmap heading', () => {
-    render(<Dashboard />)
-    expect(
-      screen.queryByRole('heading', { level: 2, name: /activité/i }),
-    ).not.toBeInTheDocument()
-  })
-
-  // F-453 — gated primary CTA at the top, surfaced via the bientôt pattern.
-  it('renders the gated "Commencer la séance" CTA with a bientôt pill', () => {
-    render(<Dashboard />)
-    const cta = screen.getByTestId('dashboard-commencer-seance')
-    expect(cta).toBeInTheDocument()
-    expect(cta).toHaveTextContent(/commencer la séance/i)
-    expect(cta.querySelector('[data-testid="bientot-pill"]')).not.toBeNull()
-  })
-
-  // F-457 — live dashboard entry into La Carte (the journey map).
-  it('renders a live "Voir ma carte" entry linking to /carte', () => {
-    render(<Dashboard />)
-    const entry = screen.getByTestId('dashboard-carte-entry')
-    expect(entry).toBeInTheDocument()
-    expect(entry).toHaveAttribute('href', '/carte')
-    expect(entry).toHaveTextContent(/voir ma carte/i)
-  })
-
-  it('countdown widget shows days remaining when examDate is set', () => {
-    render(<Dashboard />)
-    const days = screen.getByTestId('countdown-days')
-    expect(Number(days.textContent)).toBeGreaterThan(0)
-  })
-
-  it('daily target widget shows daily_target_minutes from progress (30)', async () => {
-    render(<Dashboard />)
+    const hero = screen.getByTestId('dashboard-carte-hero')
     await waitFor(() => {
-      expect(screen.getByTestId('daily-target-value')).toHaveTextContent('30')
-    })
-  })
-
-  it('streak widget resolves to 0 for progress with streakDays=0', async () => {
-    render(<Dashboard />)
-    await waitFor(() => {
-      expect(screen.getByTestId('streak-count')).toHaveTextContent('0')
-    })
-  })
-
-  it('next lesson widget renders the unlocked lesson title after load', async () => {
-    render(<Dashboard />)
-    await waitFor(() => {
-      expect(screen.getByTestId('next-lesson-title')).toHaveTextContent(
-        /leçon 3.*rythme/i,
+      expect(within(hero).getByTestId('dashboard-carte-hero-art')).toHaveAttribute(
+        'src',
+        '/iles/island-education.png',
       )
     })
+    const cta = screen.getByTestId('dashboard-carte-hero-cta')
+    expect(cta).toHaveAttribute('href', '/carte')
   })
 
-  it('next lesson CTA links to the correct lesson route', async () => {
+  it('renders all six metric cards', () => {
+    render(<Dashboard />)
+    for (const id of [
+      'dashboard-metric-serie',
+      'dashboard-metric-objectif',
+      'dashboard-metric-production',
+      'dashboard-metric-iles',
+      'dashboard-metric-niveau',
+      'dashboard-metric-examen',
+    ]) {
+      expect(screen.getByTestId(id)).toBeInTheDocument()
+    }
+  })
+
+  it('wired cards show real data: streak 0, îles 0/7, niveau B1', async () => {
     render(<Dashboard />)
     await waitFor(() => {
-      const cta = screen.getByRole('link', { name: /reprendre/i })
-      expect(cta).toHaveAttribute('href', '/la-methode/lecon-3')
+      expect(screen.getByTestId('dashboard-metric-serie-value')).toHaveTextContent('0')
+      expect(screen.getByTestId('dashboard-metric-iles-value')).toHaveTextContent('0')
+      expect(screen.getByTestId('dashboard-metric-niveau-value')).toHaveTextContent('B1')
+    })
+  })
+
+  it('Objectif card shows today vs target from the calendar (15 / 30 min)', async () => {
+    render(<Dashboard />)
+    await waitFor(() => {
+      expect(screen.getByTestId('dashboard-metric-objectif-value')).toHaveTextContent('15')
+    })
+    expect(screen.getByTestId('dashboard-metric-objectif')).toHaveTextContent('/ 30 min')
+    expect(screen.getByTestId('dashboard-metric-objectif-progress')).toBeInTheDocument()
+  })
+
+  it('Examen card shows a J- countdown when an exam date is set', async () => {
+    render(<Dashboard />)
+    await waitFor(() => {
+      const val = screen.getByTestId('dashboard-metric-examen-value')
+      expect(Number(val.textContent)).toBeGreaterThan(0)
+    })
+  })
+
+  it('metric cards use the F-463 tint tokens, not literal hex', () => {
+    render(<Dashboard />)
+    const serie = screen.getByTestId('dashboard-metric-serie')
+    expect(serie).toHaveAttribute('data-tint', 'sage')
+    expect(serie.style.background).toContain('var(--tint-sage)')
+  })
+
+  it('unwired Pièges stat renders a bientôt state (no fabricated number)', () => {
+    render(<Dashboard />)
+    const pieges = screen.getByTestId('dashboard-stat-pieges')
+    expect(within(pieges).getByTestId('bientot-pill')).toBeInTheDocument()
+    expect(screen.queryByTestId('dashboard-stat-pieges-value')).not.toBeInTheDocument()
+  })
+
+  it('right rail renders the activity calendar', () => {
+    render(<Dashboard />)
+    const rail = screen.getByTestId('dashboard-zone-rail')
+    expect(within(rail).getByTestId('dashboard-widget-calendar')).toBeInTheDocument()
+  })
+
+  it('weekly chart renders when the calendar has >= 2 days', async () => {
+    render(<Dashboard />)
+    await waitFor(() => {
+      expect(screen.getByTestId('dashboard-weekly-chart')).toBeInTheDocument()
     })
   })
 })

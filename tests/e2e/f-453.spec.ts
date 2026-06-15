@@ -54,9 +54,9 @@ test.describe('F-453 — app shell top bar (desktop 1440)', () => {
     await expect(topbar.getByTestId('theme-toggle')).toBeVisible()
     await expect(page.getByTestId('user-menu-trigger')).toBeVisible()
 
-    // Heatmap is gone; gated CTA leads the surface.
-    expect(await page.getByTestId('dashboard-widget-calendar').count()).toBe(0)
-    await expect(page.getByTestId('dashboard-commencer-seance')).toBeVisible()
+    // F-464 — the dashboard surface is now the three-zone tableau; assert it
+    // renders under the top bar (the top bar is this spec's subject).
+    await expect(page.getByTestId('dashboard-zone-main')).toBeVisible()
 
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-453-tableau-de-bord-1440.png'), fullPage: false })
 
@@ -101,7 +101,7 @@ test.describe('F-453 — app shell top bar (mobile 375)', () => {
     await expect(page.getByTestId('app-topbar')).toBeVisible()
     await expect(page.getByTestId('app-shell-hamburger')).toBeVisible()
     await expect(page.getByTestId('app-topbar').getByTestId('theme-toggle')).toBeVisible()
-    await expect(page.getByTestId('dashboard-commencer-seance')).toBeVisible()
+    await expect(page.getByTestId('dashboard-zone-main')).toBeVisible()
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-453-tableau-de-bord-375.png'), fullPage: false })
 
     await page.getByTestId('user-menu-trigger').click()

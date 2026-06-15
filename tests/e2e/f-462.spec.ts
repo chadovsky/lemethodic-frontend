@@ -97,7 +97,8 @@ test.describe('F-462 — La Carte serpentine (desktop 1440, light)', () => {
 
   test('dashboard entry wires through to /carte', async ({ page }) => {
     await page.goto('/tableau-de-bord')
-    const entry = page.getByTestId('dashboard-carte-entry')
+    // F-464 — the dashboard's La Carte entry is now the hero "Continuer" CTA.
+    const entry = page.getByTestId('dashboard-carte-hero-cta')
     await expect(entry).toBeVisible()
     await entry.click()
     await expect(page).toHaveURL(/\/carte$/)
