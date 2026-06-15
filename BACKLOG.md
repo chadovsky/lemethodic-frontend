@@ -6867,9 +6867,17 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 **F-ID note:** next free after F-465 (BACKLOG topped at F-465; F-464 just added). Verified no `## F-466` in BACKLOG, none in PRD, none in git history before claiming.
 
-## F-467 -- FE: daily-target editor on /parametres (PROPOSED -- brief pending Chadi)
+## F-467 -- FE: daily-target editor on /parametres (BUILT -- held for push)
 
-**Status:** Proposed, not started. Filed from the F-466 follow-up verification; Chadi writes the full brief. Captures a real gap opened by F-464.
+**Status:** Built on feature branch, held for push (per brief). FE-only; the `/api/users/me/progress` endpoint already exists.
+
+**Built (2026-06-15):**
+- New `components/parametres/DailyTargetSection.tsx` (client): reads `daily_target_minutes` via `api.users.getProgress()`, writes via `api.users.patchProgress({ daily_target_minutes })`. Optimistic update, revert on error (re-throw keeps the widget in edit mode for retry).
+- Reuses the parked `components/dashboard/DailyTargetWidget.tsx` (not rebuilt). Bounds tightened to 5-120 min, step 5 (was max 240): `max={120}` + upper-bound guard in `saveEdit`; `saveEdit` now `catch`es so a failed PATCH no longer surfaces an unhandled rejection.
+- `/parametres` page now renders an "Objectif quotidien" section above the remaining Bientôt stub.
+- One source of truth: no `lm.*` mirror, no second store. The dashboard "Objectif du jour" card still reads `activity-calendar.todayTarget` (BE-derived from the same field); e2e proves the card reflects the new value after a save + reload.
+
+**Gates:** 592 unit pass (kept the DailyTargetWidget suite, added the /parametres mount suite + an upper-bound test). `pnpm build` green. F-467 e2e (6 tests) pass on the prod build (`pnpm start`): change target -> PATCH fires with `daily_target_minutes:45` -> reload persists -> `/tableau-de-bord` Objectif card shows `/ 45 min`. F-225 receipts: `tests/screenshots/f-467-parametres-objectif{,-dark,-375}.png`, trace `tests/traces/f-467.zip`.
 
 **The gap (verified 2026-06-15):** F-464 took `DailyTargetWidget` off the dashboard surface, and that widget was the ONLY UI anywhere in the FE that edits the daily target. So the daily target is now **read-only across the whole app**: the dashboard "Objectif du jour" card displays it but nothing can change it. `/parametres` is a full bientôt stub (`<Bientot>` over inert mock rows -- "Affichage / Audio / Notifications / Compte"; the "Rappels quotidiens" row is a dead 8px grey bar, not a control), so there is no editor there.
 

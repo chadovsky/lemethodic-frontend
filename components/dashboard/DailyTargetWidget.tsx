@@ -29,11 +29,13 @@ export default function DailyTargetWidget({ progress, progressError, onPatchTarg
 
   async function saveEdit() {
     const val = parseInt(draft, 10)
-    if (isNaN(val) || val < 5) return
+    if (isNaN(val) || val < 5 || val > 120) return
     setSaving(true)
     try {
       await onPatchTarget(val)
       setEditing(false)
+    } catch {
+      // onPatchTarget reverts on failure; keep edit mode open so the user can retry.
     } finally {
       setSaving(false)
     }
@@ -107,7 +109,7 @@ export default function DailyTargetWidget({ progress, progressError, onPatchTarg
             data-testid="daily-target-input"
             type="number"
             min={5}
-            max={240}
+            max={120}
             step={5}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}

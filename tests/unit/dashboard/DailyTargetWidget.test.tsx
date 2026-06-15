@@ -109,4 +109,15 @@ describe('DailyTargetWidget', () => {
     fireEvent.click(screen.getByTestId('daily-target-save-btn'))
     expect(onPatch).not.toHaveBeenCalled()
   })
+
+  it('does not save if value is above maximum (> 120)', async () => {
+    const onPatch = vi.fn()
+    render(
+      <DailyTargetWidget progress={mockProgress} progressError={false} onPatchTarget={onPatch} />,
+    )
+    fireEvent.click(screen.getByTestId('daily-target-edit-btn'))
+    fireEvent.change(screen.getByTestId('daily-target-input'), { target: { value: '150' } })
+    fireEvent.click(screen.getByTestId('daily-target-save-btn'))
+    expect(onPatch).not.toHaveBeenCalled()
+  })
 })

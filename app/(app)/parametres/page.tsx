@@ -1,5 +1,6 @@
 import Bientot from '@/components/bientot/Bientot'
 import { SANS_FONT, SERIF_FONT } from '@/lib/typography'
+import DailyTargetSection from '@/components/parametres/DailyTargetSection'
 
 export const metadata = {
   title: 'Paramètres | Le Méthodic',
@@ -44,6 +45,9 @@ export default function ParametresPage() {
       >
         Paramètres
       </h1>
+      <div style={{ marginBottom: 32 }}>
+        <DailyTargetSection />
+      </div>
       <Bientot level="surface" label="La gestion fine des paramètres arrive bientôt.">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
           {SECTIONS.map((section) => (
