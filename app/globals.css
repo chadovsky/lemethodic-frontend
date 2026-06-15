@@ -1467,3 +1467,99 @@
     stroke-dashoffset: 0 !important;
   }
 }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   F-469 — La Carte: immersive sea-world (desktop scatter).
+
+   Theme-aware sea, drifting clouds, island reflections. The sea is a pure CSS
+   vertical gradient (no baked raster): a calm light sea by default, a deep
+   desaturated navy in dark mode. Clouds drift slowly and are stripped under
+   prefers-reduced-motion. Hexes live here (the world palette source of truth),
+   never inline in the component — same doctrine as the rest of globals.
+   ─────────────────────────────────────────────────────────────────────────── */
+.carte-sea {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-xl, 24px);
+  overflow: hidden;
+  background: linear-gradient(
+    to bottom,
+    #DBE3EB 0%,
+    #E0E9F0 16%,
+    #A6BBCC 62%,
+    #99ABBF 100%
+  );
+}
+.dark .carte-sea {
+  background: linear-gradient(
+    to bottom,
+    #1B2738 0%,
+    #16202E 30%,
+    #111B27 70%,
+    #0E1722 100%
+  );
+}
+
+/* Soft drifting clouds — low-opacity white blobs that wander horizontally. */
+.carte-cloud {
+  position: absolute;
+  border-radius: 999px;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, #FFFFFF 86%, transparent),
+    transparent 70%
+  );
+  filter: blur(2px);
+  pointer-events: none;
+  opacity: 0.55;
+}
+.dark .carte-cloud {
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, #AEBED2 22%, transparent),
+    transparent 70%
+  );
+  opacity: 0.4;
+}
+.carte-cloud-1 { animation: carte-cloud-drift-1 64s ease-in-out infinite; }
+.carte-cloud-2 { animation: carte-cloud-drift-2 82s ease-in-out infinite; animation-delay: -16s; }
+.carte-cloud-3 { animation: carte-cloud-drift-3 96s ease-in-out infinite; animation-delay: -40s; }
+
+@keyframes carte-cloud-drift-1 {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(46px, 8px, 0); }
+}
+@keyframes carte-cloud-drift-2 {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-38px, 12px, 0); }
+}
+@keyframes carte-cloud-drift-3 {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(30px, -10px, 0); }
+}
+
+/* Faint reflection cast on the sea directly beneath an island base. */
+.carte-reflection {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, #FFFFFF 42%, transparent),
+    transparent 72%
+  );
+  filter: blur(4px);
+  pointer-events: none;
+}
+.dark .carte-reflection {
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, #6E8093 26%, transparent),
+    transparent 72%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carte-cloud-1,
+  .carte-cloud-2,
+  .carte-cloud-3 { animation: none; }
+}

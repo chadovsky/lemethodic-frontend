@@ -37,9 +37,11 @@ export default function AppShell({ children }: AppShellProps) {
   const compact = rail.railEnabled ? !rail.expanded : !drawerOpen
 
   // F-466 — the data-dense dashboard gets a wider content column (1536) than the
-  // shared 1200 reading width every other authed route keeps. Per-route override
+  // shared 1200 reading width every other authed route keeps. F-469 — /carte
+  // joins it so the sea-world composition can fill up to 1536. Per-route override
   // only; no breakout hack, no change to the rest of the app shell.
-  const contentMaxWidth = pathname === '/tableau-de-bord' ? 1536 : 1200
+  const WIDE_ROUTES = new Set(['/tableau-de-bord', '/carte'])
+  const contentMaxWidth = WIDE_ROUTES.has(pathname) ? 1536 : 1200
 
   return (
     <div

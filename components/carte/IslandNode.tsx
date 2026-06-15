@@ -17,11 +17,14 @@
 
 import Image from 'next/image'
 import { Check } from 'lucide-react'
-import type { ThemeId, Status } from '@/lib/journey/journey'
-import { ISLAND_ART } from '@/lib/journey/island-art'
+import type { Status } from '@/lib/journey/journey'
+import { ISLAND_ART, type IslandKey } from '@/lib/journey/island-art'
 
 interface IslandNodeProps {
-  theme: ThemeId
+  // IslandKey = the 7 ThemeIds + 'grammaire'. Widened in F-469 so the desktop
+  // sea-world can render the grammar foundation island through the same node;
+  // every mobile caller still passes a ThemeId (a subset), unaffected.
+  theme: IslandKey
   status: Status
   // French theme label, used as the image alt text.
   label: string

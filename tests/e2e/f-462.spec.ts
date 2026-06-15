@@ -1,8 +1,13 @@
 // F-457 / F-462 — La Carte serpentine journey map (FE).
 // Receipts:
-//   f-462-carte-1440.png      / -375.png        (light)
-//   f-462-carte-dark-1440.png                   (dark)
-// Trace: tests/traces/f-462.zip (desktop happy path).
+//   f-462-carte-900.png       / -375.png        (light)
+//   f-462-carte-dark-900.png                    (dark)
+// Trace: tests/traces/f-462.zip (serpentine happy path).
+//
+// F-469 migration: the serpentine is now the <1024px presentation only (desktop
+// >=1024 renders the CarteWorld sea-world, owned by f-469.spec.ts). These checks
+// therefore run at 900px so they keep exercising the serpentine + its journey
+// invariants. The DOM contract is identical across both presentations.
 //
 // Covers the F-462 serpentine rebuild while preserving the F-457 journey-chain
 // invariants: the map renders at B1, education-first current ile, the grammar
@@ -30,8 +35,8 @@ async function authDark(page: Page) {
   await page.addInitScript(() => localStorage.setItem('theme', 'dark'))
 }
 
-test.describe('F-462 — La Carte serpentine (desktop 1440, light)', () => {
-  test.use({ viewport: { width: 1440, height: 900 } })
+test.describe('F-462 — La Carte serpentine (<1024 tablet 900, light)', () => {
+  test.use({ viewport: { width: 900, height: 1200 } })
 
   test.beforeEach(async ({ page }) => {
     await injectAuthToken(page)
@@ -84,7 +89,7 @@ test.describe('F-462 — La Carte serpentine (desktop 1440, light)', () => {
     await expect(cta).toHaveCount(1)
     await expect(cta).toHaveAttribute('href', '/ile/education')
 
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-462-carte-1440.png'), fullPage: true })
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-462-carte-900.png'), fullPage: true })
 
     // No broken nav: the current-node link lands the real 3-beat ile page
     // (F-458), not a 404.
@@ -106,8 +111,8 @@ test.describe('F-462 — La Carte serpentine (desktop 1440, light)', () => {
   })
 })
 
-test.describe('F-462 — La Carte serpentine (desktop 1440, dark)', () => {
-  test.use({ viewport: { width: 1440, height: 900 } })
+test.describe('F-462 — La Carte serpentine (<1024 tablet 900, dark)', () => {
+  test.use({ viewport: { width: 900, height: 1200 } })
 
   test.beforeEach(async ({ page }) => {
     await authDark(page)
@@ -119,7 +124,7 @@ test.describe('F-462 — La Carte serpentine (desktop 1440, dark)', () => {
     await expect(page.locator('html')).toHaveClass(/dark/)
     await expect(page.getByTestId('carte-map')).toBeVisible()
     await expect(page.getByTestId('carte-current-cta')).toBeVisible()
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-462-carte-dark-1440.png'), fullPage: true })
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-462-carte-dark-900.png'), fullPage: true })
   })
 })
 
