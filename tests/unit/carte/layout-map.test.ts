@@ -39,7 +39,7 @@ describe('layout-map — geometry', () => {
   it('layoutPoints returns one pixel point per node', () => {
     const pts = layoutPoints(1200, 700)
     expect(pts).toHaveLength(8)
-    expect(pts[0]).toEqual({ x: (10 / 100) * 1200, y: (42 / 100) * 700 })
+    expect(pts[0]).toEqual({ x: (16 / 100) * 1200, y: (53 / 100) * 700 })
   })
 
   it('buildSegments returns one segment per gap (n-1)', () => {

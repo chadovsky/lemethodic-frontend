@@ -33,14 +33,14 @@ export interface NodePos {
 // coral trail threads them as one voyage. Tunable against the mock (Chadi nudges
 // live); geometry is index-driven so any reshuffle here just re-threads the path.
 export const SCATTER_LAYOUT: NodePos[] = [
-  { x: 10, y: 42 }, // 0 — la grammaire
-  { x: 34, y: 28 }, // 1 — l'éducation
-  { x: 22, y: 70 }, // 2 — la famille
-  { x: 45, y: 55 }, // 3 — la culture
-  { x: 78, y: 30 }, // 4 — la santé
-  { x: 62, y: 50 }, // 5 — la technologie
-  { x: 58, y: 74 }, // 6 — l'environnement
-  { x: 86, y: 72 }, // 7 — l'économie
+  { x: 16, y: 53 }, // 0 — la grammaire
+  { x: 38, y: 44 }, // 1 — l'éducation
+  { x: 27, y: 78 }, // 2 — la famille
+  { x: 45, y: 64 }, // 3 — la culture
+  { x: 82, y: 44 }, // 4 — la santé
+  { x: 70, y: 56 }, // 5 — la technologie
+  { x: 58, y: 76 }, // 6 — l'environnement
+  { x: 89, y: 71 }, // 7 — l'économie
 ]
 
 // Island keys aligned to SCATTER_LAYOUT indices: grammaire first, then the 7

@@ -47,9 +47,18 @@ const THEME_LABELS: Record<ThemeId, string> = Object.fromEntries(
 ) as Record<ThemeId, string>
 
 // IslandNode renders a fixed 72px footprint; the world scales it up off that.
-// Bumped ~1.4x for F-469 so the islands fill the sea like the Nano Banana mock.
+// Sized large to fill the sea like the Nano Banana mock; each island is then
+// depth-scaled by its vertical position (front/lower = bigger) for isometric
+// perspective via depthScale().
 const ISLAND_BASE = 72
-const ISLAND_RENDER = 172
+const ISLAND_RENDER = 222
+
+// Isometric depth: islands lower on screen (nearer the foreground) render
+// larger, matching the mock's camera. Returns a multiplier on ISLAND_RENDER.
+function depthScale(y: number, stageH: number): number {
+  const d = stageH > 0 ? Math.min(1, Math.max(0, y / stageH)) : 0.5
+  return 0.82 + 0.36 * d
+}
 
 // Inter (v3 system face) heading stack — explicitly NOT the serif display face.
 const HEADING_FONT = 'var(--f-en), var(--f-ui), -apple-system, system-ui, sans-serif'
@@ -183,7 +192,7 @@ export default function CarteWorld() {
         style={{
           position: 'relative',
           width: '100%',
-          height: 'clamp(600px, 62vw, 860px)',
+          height: 'clamp(620px, 66vw, 920px)',
           // Full-bleed: no rounded panel corners, the sea reads as open water to
           // the content-area edges (overflow clips clouds/reflections cleanly).
           borderRadius: 0,
@@ -192,11 +201,13 @@ export default function CarteWorld() {
       >
         {/* The sea + drifting clouds. Pure CSS, fully decorative. */}
         <div className="carte-sea" aria-hidden="true">
-          <span className="carte-cloud carte-cloud-1" style={{ top: '8%', left: '10%', width: 240, height: 72 }} />
-          <span className="carte-cloud carte-cloud-2" style={{ top: '17%', left: '52%', width: 300, height: 88 }} />
-          <span className="carte-cloud carte-cloud-3" style={{ top: '6%', left: '78%', width: 200, height: 62 }} />
-          <span className="carte-cloud carte-cloud-4" style={{ top: '28%', left: '28%', width: 220, height: 66 }} />
-          <span className="carte-cloud carte-cloud-5" style={{ top: '12%', left: '38%', width: 180, height: 56 }} />
+          {/* Soft drifting clouds, all in the sky band above the horizon (~34%).
+              cloud-4 hugs the horizon line on the left ("cloud under the horizon"). */}
+          <span className="carte-cloud carte-cloud-1" style={{ top: '11%', left: '7%', width: 230, height: 70 }} />
+          <span className="carte-cloud carte-cloud-2" style={{ top: '15%', left: '46%', width: 280, height: 84 }} />
+          <span className="carte-cloud carte-cloud-3" style={{ top: '8%', left: '75%', width: 300, height: 90 }} />
+          <span className="carte-cloud carte-cloud-4" style={{ top: '30%', left: '5%', width: 210, height: 60 }} />
+          <span className="carte-cloud carte-cloud-5" style={{ top: '20%', left: '29%', width: 170, height: 54 }} />
         </div>
 
         {/* Header — over the sky band. Inter heading (NOT serif), coral NIVEAU
@@ -251,46 +262,44 @@ export default function CarteWorld() {
         >
           <defs>
             <filter id="carte-trail-shadow" x="-25%" y="-25%" width="150%" height="160%">
-              <feDropShadow dx="0" dy="5" stdDeviation="6" floodColor="rgba(20,30,45,0.28)" />
+              <feDropShadow dx="0" dy="6" stdDeviation="7" floodColor="rgba(20,30,45,0.30)" />
             </filter>
           </defs>
-          {/* Muted base ribbon: the whole voyage, beyond-current reads as a calm
-              raised grey trail (drawn under the coral so completed = coral). */}
+          {/* Coral 3D bridge ribbon threading every island (uniform coral like the
+              mock). The whole voyage is coral; the not-yet-reached portion is
+              slightly softer, the completed prefix fully saturated. A lighter
+              top stroke gives the raised glossy sheen. */}
           <path
             d={pathD(pts, segs, 0, n - 1)}
             fill="none"
-            stroke="var(--rule)"
-            strokeWidth={16}
+            stroke="var(--accent)"
+            strokeWidth={24}
             strokeLinecap="round"
             strokeLinejoin="round"
-            opacity={0.7}
+            opacity={0.82}
             filter="url(#carte-trail-shadow)"
           />
           {accentTo > 0 && (
-            <>
-              {/* Glossy coral 3D ribbon: a thick rounded coral trail with a soft
-                  drop-shadow (raised) and a lighter top highlight (sheen). */}
-              <path
-                d={pathD(pts, segs, 0, accentTo)}
-                fill="none"
-                stroke="var(--accent)"
-                strokeWidth={16}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                filter="url(#carte-trail-shadow)"
-              />
-              <path
-                d={pathD(pts, segs, 0, accentTo)}
-                fill="none"
-                stroke="color-mix(in srgb, var(--accent) 45%, #FFFFFF)"
-                strokeWidth={5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                opacity={0.65}
-                transform="translate(0,-3)"
-              />
-            </>
+            <path
+              d={pathD(pts, segs, 0, accentTo)}
+              fill="none"
+              stroke="var(--accent)"
+              strokeWidth={24}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           )}
+          {/* Glossy top highlight along the whole ribbon. */}
+          <path
+            d={pathD(pts, segs, 0, n - 1)}
+            fill="none"
+            stroke="color-mix(in srgb, var(--accent) 40%, #FFFFFF)"
+            strokeWidth={8}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={0.6}
+            transform="translate(0,-5)"
+          />
         </svg>
 
         {/* Mini-mock buoys between islands + the final mock past the last. */}
@@ -318,12 +327,12 @@ export default function CarteWorld() {
             waterline. This is what makes the islands sit IN water (not on a panel)
             and replaces the hard cast-shadow. Decorative, below the islands. */}
         {nodes.map((node, i) => (
-          <IslandReflection key={`refl-${node.key}`} src={ISLAND_ART[node.key]} point={pts[i]} />
+          <IslandReflection key={`refl-${node.key}`} src={ISLAND_ART[node.key]} point={pts[i]} stageH={size.h} />
         ))}
 
         {/* The 8 islands. */}
         {nodes.map((node, i) => (
-          <IslandPin key={node.key} node={node} point={pts[i]} isCurrent={i === currentNodeIndex} />
+          <IslandPin key={node.key} node={node} point={pts[i]} stageH={size.h} isCurrent={i === currentNodeIndex} />
         ))}
 
         {/* Current-node floating card — floats ON the current island (mock
@@ -349,8 +358,9 @@ export default function CarteWorld() {
 // foundation and locked/bientot iles are non-interactive role="link"s (no href).
 // The single carte-current-cta lives on the floating card, NOT here, so there is
 // exactly one across the surface.
-function IslandPin({ node, point, isCurrent }: { node: WorldNode; point: Pt; isCurrent: boolean }) {
-    const scale = ISLAND_RENDER / ISLAND_BASE
+function IslandPin({ node, point, stageH, isCurrent }: { node: WorldNode; point: Pt; stageH: number; isCurrent: boolean }) {
+    const renderSize = ISLAND_RENDER * depthScale(point.y, stageH)
+    const scale = renderSize / ISLAND_BASE
     const navigable = !!node.href
     const grammar = node.key === 'grammaire'
 
@@ -386,7 +396,7 @@ function IslandPin({ node, point, isCurrent }: { node: WorldNode; point: Pt; isC
           </div>
         )}
 
-        <div className="carte-world-art" style={{ width: ISLAND_RENDER, height: ISLAND_RENDER, position: 'relative' }}>
+        <div className="carte-world-art" style={{ width: renderSize, height: renderSize, position: 'relative' }}>
           <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}>
             <IslandNode theme={node.key} status={node.status} label={node.label} />
           </div>
@@ -407,11 +417,8 @@ function IslandPin({ node, point, isCurrent }: { node: WorldNode; point: Pt; isC
             maxWidth: 168,
           }}
         >
-          <p style={{ fontFamily: UI_FONT, fontSize: 13, fontWeight: 600, lineHeight: 1.2, color: '#1F2933', margin: 0 }}>
+          <p style={{ fontFamily: UI_FONT, fontSize: 14, fontWeight: 600, lineHeight: 1.2, color: '#1F2933', margin: 0 }}>
             {node.label}
-          </p>
-          <p style={{ fontFamily: 'var(--f-mono)', fontSize: 9, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6B7280', margin: '2px 0 0' }}>
-            {node.sub}
           </p>
         </div>
       </>
@@ -445,7 +452,9 @@ function IslandPin({ node, point, isCurrent }: { node: WorldNode; point: Pt; isC
           left: point.x,
           top: point.y,
           transform: 'translate(-50%, -50%)',
-          zIndex: isCurrent ? 4 : 2,
+          // Isometric depth order: lower (nearer) islands overlap the ones
+          // behind them; the current island always stays above its neighbours.
+          zIndex: isCurrent ? 900 : 100 + Math.round(point.y),
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -461,9 +470,10 @@ function IslandPin({ node, point, isCurrent }: { node: WorldNode; point: Pt; isC
 // a soft contact glow where the base meets the water. Positioned at the stage
 // level (independent of the pin's flex layout) so it sits directly under the
 // island art. Decorative, mode-aware opacity via the CSS classes.
-function IslandReflection({ src, point }: { src: string; point: Pt }) {
-  const w = ISLAND_RENDER
-  const h = ISLAND_RENDER * 0.5
+function IslandReflection({ src, point, stageH }: { src: string; point: Pt; stageH: number }) {
+  const renderSize = ISLAND_RENDER * depthScale(point.y, stageH)
+  const w = renderSize
+  const h = renderSize * 0.5
   const fade = 'linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 45%, transparent 82%)'
   return (
     <div
@@ -471,7 +481,7 @@ function IslandReflection({ src, point }: { src: string; point: Pt }) {
       style={{
         position: 'absolute',
         left: point.x,
-        top: point.y + ISLAND_RENDER * 0.26,
+        top: point.y + renderSize * 0.26,
         transform: 'translateX(-50%)',
         width: w,
         height: h,
@@ -556,16 +566,17 @@ function Buoy({
         top: point.y,
         transform: 'translate(-50%, -50%)',
         zIndex: 2,
-        width: 40,
-        height: 40,
-        borderRadius: 'var(--r-pill)',
+        width: 38,
+        height: 38,
+        borderRadius: 11,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: live ? 'var(--paper)' : 'var(--paper-edge)',
-        border: live ? '1px solid var(--rule-strong)' : '1px dashed var(--rule)',
-        color: 'var(--ink-faint)',
-        boxShadow: '0 3px 10px color-mix(in srgb, var(--ink) 16%, transparent)',
+        background: 'var(--paper)',
+        border: `1.5px solid color-mix(in srgb, var(--accent) ${live ? 55 : 30}%, var(--rule))`,
+        color: 'var(--accent)',
+        opacity: live ? 1 : 0.82,
+        boxShadow: '0 4px 12px color-mix(in srgb, var(--ink) 18%, transparent)',
       }}
     >
       <span aria-hidden="true" style={{ display: 'flex' }}>
@@ -595,13 +606,14 @@ function CurrentCard({
   stageW: number
   stageH: number
 }) {
-  // Float the card on/just-below the current island, clamped inside the sea so
-  // it never overflows the stage edges (the wide-viewport guard).
+  // Float the card up toward the sky just above the current island (mock
+  // placement: top-centre), clamped inside the stage on every edge.
   const CARD_W = 320
   const MARGIN = 16
   const half = CARD_W / 2
-  const left = Math.max(half + MARGIN, Math.min(point.x, stageW - half - MARGIN))
-  const top = Math.min(point.y + ISLAND_RENDER * 0.5 + 18, stageH - 210)
+  const renderSize = ISLAND_RENDER * depthScale(point.y, stageH)
+  const left = Math.max(half + MARGIN, Math.min(point.x + renderSize * 0.28, stageW - half - MARGIN))
+  const top = Math.max(56, Math.min(point.y - renderSize * 0.62 - 28, stageH - 210))
   return (
     <div
       data-testid="carte-current-card"
@@ -610,7 +622,7 @@ function CurrentCard({
         left,
         top,
         transform: 'translateX(-50%)',
-        zIndex: 5,
+        zIndex: 1000,
         width: CARD_W,
         maxWidth: `calc(100% - ${MARGIN * 2}px)`,
         background: 'var(--paper)',
@@ -621,27 +633,23 @@ function CurrentCard({
         fontFamily: UI_FONT,
       }}
     >
-      <p style={{ fontFamily: 'var(--f-mono)', fontSize: 10, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--accent)', margin: '0 0 4px' }}>
-        Étape actuelle
-      </p>
-      <p style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--heading)', margin: '0 0 14px', lineHeight: 1.2 }}>
+      <p style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--heading)', margin: '0 0 12px', lineHeight: 1.2 }}>
         Île {ileNumber} : {label}
       </p>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-        <span style={{ fontSize: 12, color: 'var(--ink-soft)' }}>Progression</span>
-        <span data-testid="carte-progress-pct" style={{ fontFamily: 'var(--f-mono)', fontSize: 12, fontWeight: 600, color: 'var(--accent)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+        <div
+          role="progressbar"
+          aria-valuenow={progressPct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          style={{ flex: 1, height: 9, borderRadius: 'var(--r-pill)', background: 'var(--paper-edge)', overflow: 'hidden' }}
+        >
+          <div style={{ width: `${progressPct}%`, height: '100%', borderRadius: 'var(--r-pill)', background: 'var(--accent)' }} />
+        </div>
+        <span data-testid="carte-progress-pct" style={{ fontFamily: 'var(--f-mono)', fontSize: 13, fontWeight: 600, color: 'var(--ink-soft)' }}>
           {progressPct}%
         </span>
-      </div>
-      <div
-        role="progressbar"
-        aria-valuenow={progressPct}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        style={{ height: 8, borderRadius: 'var(--r-pill)', background: 'var(--paper-edge)', overflow: 'hidden', marginBottom: 16 }}
-      >
-        <div style={{ width: `${progressPct}%`, height: '100%', borderRadius: 'var(--r-pill)', background: 'var(--accent)' }} />
       </div>
 
       <Link
