@@ -37,7 +37,7 @@ import type { IslandKey } from '@/lib/journey/island-art'
 import { readTargetLevel } from '@/lib/journey/target-level'
 import { readCompletedIles } from '@/lib/journey/progress'
 import { HOTSPOTS, SCENE_SRC, SCENE_ASPECT, type Hotspot } from '@/lib/carte/hotspots'
-import { orderedPoints, ribbonPath, VIEW_W, VIEW_H } from '@/lib/carte/path'
+import { screenOrderedPoints, ribbonPath, VIEW_W, VIEW_H } from '@/lib/carte/path'
 
 const THEME_LABELS: Record<ThemeId, string> = Object.fromEntries(
   THEMES.map((theme) => [theme.id, theme.label]),
@@ -118,16 +118,10 @@ export default function CarteWorld() {
   // Real journey progress: completed iles out of the 7 themes. No fabrication.
   const progressPct = Math.round((completed.length / THEMES.length) * 100)
 
-  // Coral ribbon through the 8 hotspots in journey order (grammaire = node 0, so
-  // the current ile is its index + 1). Solid through the current node, muted
-  // beyond; whole ribbon solid once every ile is done; nothing solid when no ile
-  // is current (unauthored levels).
-  const points = useMemo(() => orderedPoints(), [])
-  const allDone = journey.iles.length > 0 && journey.iles.every((ile) => ile.status === 'completed')
-  const currentNodeIndex = currentIleIndex >= 0 ? currentIleIndex + 1 : -1
-  const accentTo = currentNodeIndex >= 0 ? currentNodeIndex : allDone ? points.length - 1 : 0
-  const fullD = useMemo(() => ribbonPath(points), [points])
-  const solidD = useMemo(() => ribbonPath(points, 0, accentTo), [points, accentTo])
+  // Coral ribbon: ONE smooth curve routed by screen position (top row L->R, down
+  // the right side, bottom row R->L) touching all 8 islands. Uniform coral, no
+  // per-segment colouring, no diagonal across open water.
+  const ribbonD = useMemo(() => ribbonPath(screenOrderedPoints()), [])
 
   return (
     <div
@@ -176,10 +170,10 @@ export default function CarteWorld() {
           }}
         />
 
-        {/* Coral chain path — an SVG ribbon threading the 8 hotspots in journey
-            order (the baked scene has no path). Solid prefix = completed through
-            the current node; muted = upcoming. Decorative, under the badges +
-            labels (zIndex below the hotspots). */}
+        {/* Coral chain path — ONE smooth SVG curve winding through all 8 islands
+            by screen position (the baked scene has no path): across the top,
+            down the right side, back across the bottom. Uniform coral, rounded.
+            Decorative, under the badges + labels (zIndex below the hotspots). */}
         <svg
           data-testid="carte-path"
           aria-hidden="true"
@@ -187,10 +181,7 @@ export default function CarteWorld() {
           preserveAspectRatio="none"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 10, pointerEvents: 'none' }}
         >
-          <path d={fullD} fill="none" stroke="var(--accent)" strokeWidth={1.3} strokeLinecap="round" strokeLinejoin="round" opacity={0.3} />
-          {solidD && (
-            <path d={solidD} fill="none" stroke="var(--accent)" strokeWidth={1.3} strokeLinecap="round" strokeLinejoin="round" />
-          )}
+          <path d={ribbonD} fill="none" stroke="var(--accent)" strokeWidth={1.3} strokeLinecap="round" strokeLinejoin="round" />
         </svg>
 
         {/* Header — over the sky band of the image. Inter heading (NOT serif),

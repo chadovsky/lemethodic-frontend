@@ -33,11 +33,11 @@ describe('CarteWorld (baked scene + overlays, default B1)', () => {
     expect(screen.queryByTestId('carte-mini-mock')).toBeNull()
     expect(screen.queryByTestId('carte-final-mock')).toBeNull()
 
-    // The coral path is an SVG overlay (the baked image has none): a muted full
-    // ribbon + a solid prefix through the current node.
+    // The coral path is a single SVG ribbon overlay (the baked image has none):
+    // one smooth uniform-coral curve winding through all 8 islands.
     const path = screen.getByTestId('carte-path')
     expect(path.tagName.toLowerCase()).toBe('svg')
-    expect(path.querySelectorAll('path').length).toBe(2)
+    expect(path.querySelectorAll('path').length).toBe(1)
   })
 
   it('renders 8 hotspots: the grammar foundation + the 7 themes, each labelled', async () => {

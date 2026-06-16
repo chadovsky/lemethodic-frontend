@@ -1,23 +1,21 @@
-// F-470 — La Carte: coral ribbon path through the 8 island hotspots (desktop).
+// F-470 — La Carte: coral ribbon path through the 8 islands (desktop).
 //
 // The baked scene (carte-scene-light.png) is ocean + islands only — NO path. The
-// coral chain is drawn as an SVG overlay threading the 8 hotspots in journey
-// order (grammaire -> the 7 themes), so it always tracks whatever the hotspots
-// are tuned to. Completed segments render solid; upcoming segments render muted.
+// coral chain is drawn as ONE smooth SVG curve routed by SCREEN POSITION, not
+// journey order: across the TOP row left-to-right, down the right side, then back
+// across the BOTTOM row right-to-left — a single continuous winding road touching
+// all 8 islands with no straight diagonal cutting across open water. Uniform
+// coral (no per-segment colouring).
 //
 // The SVG uses a viewBox of VIEW_W x VIEW_H where VIEW_W = 100 (x is already a
 // percent of width) and VIEW_H = 100 / SCENE_ASPECT (so y percent maps in with the
 // SAME unit scale on both axes). Because the scene box's aspect-ratio equals the
 // viewBox aspect, preserveAspectRatio="none" fills the box exactly with zero
 // stroke distortion (scaleX === scaleY). Pure + unit-tested; CarteWorld just draws
-// the two `d` strings.
+// the single `d` string.
 
-import { THEMES } from '@/lib/journey/journey'
 import type { IslandKey } from '@/lib/journey/island-art'
 import { HOTSPOTS, SCENE_ASPECT } from './hotspots'
-
-// Journey order: the grammar foundation first, then the 7 themes in THEME order.
-export const JOURNEY_ORDER: IslandKey[] = ['grammaire', ...THEMES.map((t) => t.id)]
 
 // SVG viewBox dimensions (see header). VIEW_H keeps the y axis at the same unit
 // scale as x so the ribbon never distorts.
@@ -29,26 +27,36 @@ export interface UPt {
   y: number
 }
 
-// The 8 hotspot centres in viewBox units, in journey order. x = percent (0..100),
-// y = percent / aspect (so a square in screen space stays square in viewBox).
-export function orderedPoints(): UPt[] {
-  return JOURNEY_ORDER.map((key) => ({
-    x: HOTSPOTS[key].x,
-    y: HOTSPOTS[key].y / SCENE_ASPECT,
+// The 8 hotspots ordered as a SCREEN-POSITION serpentine and mapped into viewBox
+// units. Top row (the islands above the vertical midpoint) left-to-right, then the
+// bottom row right-to-left, so the curve flows: across the top, down the right
+// side, back across the bottom. x = percent (0..100); y = percent / aspect (so a
+// square in screen space stays square in viewBox). Derived from the coords (not a
+// hardcoded sequence) so it survives hotspot tuning as long as the layout stays a
+// top/bottom grid.
+export function screenOrderedPoints(): UPt[] {
+  const pts = (Object.keys(HOTSPOTS) as IslandKey[]).map((k) => ({
+    x: HOTSPOTS[k].x,
+    y: HOTSPOTS[k].y,
   }))
+  const ys = pts.map((p) => p.y)
+  const midY = (Math.min(...ys) + Math.max(...ys)) / 2
+  const top = pts.filter((p) => p.y < midY).sort((a, b) => a.x - b.x) // left -> right
+  const bottom = pts.filter((p) => p.y >= midY).sort((a, b) => b.x - a.x) // right -> left
+  return [...top, ...bottom].map((p) => ({ x: p.x, y: p.y / SCENE_ASPECT }))
 }
 
 function r(n: number): number {
   return Math.round(n * 100) / 100
 }
 
-// Catmull-Rom -> cubic-bezier path string for the gaps [from, to). A smooth curve
-// through every hotspot centre with matched tangents, so the solid prefix and the
-// muted full path share the exact same shape. Empty for an empty range.
-export function ribbonPath(pts: UPt[], from = 0, to = pts.length - 1): string {
-  if (to <= from || pts.length === 0) return ''
-  let d = `M ${r(pts[from].x)} ${r(pts[from].y)}`
-  for (let i = from; i < to; i++) {
+// Catmull-Rom -> cubic-bezier path string through every point in order, with
+// matched tangents for a smooth, rounded curve. The endpoints duplicate their
+// neighbour so the curve starts/ends cleanly (no overshoot into open water).
+export function ribbonPath(pts: UPt[]): string {
+  if (pts.length === 0) return ''
+  let d = `M ${r(pts[0].x)} ${r(pts[0].y)}`
+  for (let i = 0; i < pts.length - 1; i++) {
     const p0 = pts[i - 1] ?? pts[i]
     const p1 = pts[i]
     const p2 = pts[i + 1]
