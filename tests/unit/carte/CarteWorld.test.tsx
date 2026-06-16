@@ -1,5 +1,5 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { describe, expect, it, beforeEach, vi } from 'vitest'
 
 vi.mock('next/link', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -16,28 +16,47 @@ beforeEach(() => {
   localStorage.clear()
 })
 
-describe('CarteWorld (desktop sea-world, default B1)', () => {
-  it('renders the world shell at B1 when no target profile is stored', async () => {
+describe('CarteWorld (baked scene + overlays, default B1)', () => {
+  it('renders the world shell + the baked scene image at B1', async () => {
     render(<CarteWorld />)
     await waitFor(() => {
       expect(screen.getByTestId('carte-level')).toHaveTextContent('Niveau B1')
     })
     expect(screen.getByTestId('carte-journey')).toBeInTheDocument()
     expect(screen.getByTestId('carte-map')).toBeInTheDocument()
+    // The scene is a baked image, not painted: one img pointing at the asset.
+    const scene = screen.getByTestId('carte-scene')
+    expect(scene.tagName).toBe('IMG')
+    expect(scene).toHaveAttribute('src', '/iles/carte-scene-light.png')
+    // No CSS-world artifacts remain on desktop: no painted islands, no buoys.
+    expect(screen.queryByTestId('island-node')).toBeNull()
+    expect(screen.queryByTestId('carte-mini-mock')).toBeNull()
+    expect(screen.queryByTestId('carte-final-mock')).toBeNull()
+
+    // The coral path is an SVG overlay (the baked image has none): a muted full
+    // ribbon + a solid prefix through the current node.
+    const path = screen.getByTestId('carte-path')
+    expect(path.tagName.toLowerCase()).toBe('svg')
+    expect(path.querySelectorAll('path').length).toBe(2)
   })
 
-  it('renders 8 islands: the grammar foundation first, then the 7 themes', async () => {
+  it('renders 8 hotspots: the grammar foundation + the 7 themes, each labelled', async () => {
     render(<CarteWorld />)
-    const islands = await screen.findAllByTestId('island-node')
-    expect(islands).toHaveLength(8)
-    // Grammar is its own island on desktop (unlike the mobile marker).
-    const grammar = screen.getByTestId('carte-grammar')
+    // 1 grammar hotspot + 7 ile hotspots = 8 overlays over the baked image.
+    const grammar = await screen.findByTestId('carte-grammar')
     expect(grammar).toHaveAttribute('data-live', 'true')
     expect(grammar).toHaveAttribute('data-theme', 'grammaire')
-    expect(within(grammar).getByRole('img')).toHaveAttribute('src', '/iles/island-grammaire.png')
+    expect(within(grammar).getByText('La grammaire')).toBeInTheDocument()
+
+    const iles = screen.getAllByTestId('carte-ile')
+    expect(iles).toHaveLength(7)
+    // Each ile hotspot carries its theme + a visible label (labels are overlays,
+    // not baked into the image).
+    expect(iles[0]).toHaveAttribute('data-theme', 'education')
+    expect(within(iles[0]).getByText("L'éducation")).toBeInTheDocument()
   })
 
-  it('renders 7 ile islands, education first + current, the rest locked', async () => {
+  it('renders 7 ile hotspots, education first + current, the rest locked', async () => {
     render(<CarteWorld />)
     const iles = await screen.findAllByTestId('carte-ile')
     expect(iles).toHaveLength(7)
@@ -54,26 +73,19 @@ describe('CarteWorld (desktop sea-world, default B1)', () => {
     expect(ctas).toHaveLength(1)
     expect(ctas[0].tagName).toBe('A')
     expect(ctas[0]).toHaveAttribute('href', '/ile/education')
-    // It lives in the floating current card, which names the current ile.
     const card = screen.getByTestId('carte-current-card')
     expect(card).toHaveTextContent("Île 1 : L'éducation")
     expect(within(card).getByTestId('carte-progress-pct')).toHaveTextContent('0%')
   })
 
-  it('renders buoys as checkpoint markers, not islands: 7 mini-mocks + 1 final', async () => {
+  it('marks the current island with the "Vous êtes ici" pin', async () => {
     render(<CarteWorld />)
-    const mini = await screen.findAllByTestId('carte-mini-mock')
-    expect(mini).toHaveLength(7)
-    for (const m of mini) {
-      expect(m).toHaveAttribute('data-status', 'bientot')
-      expect(within(m).queryByTestId('island-node')).toBeNull()
-    }
-    const final = screen.getByTestId('carte-final-mock')
-    expect(final).toHaveAttribute('data-status', 'bientot')
-    expect(within(final).queryByTestId('island-node')).toBeNull()
+    const iles = await screen.findAllByTestId('carte-ile')
+    const education = iles.find((el) => el.getAttribute('data-theme') === 'education')!
+    expect(within(education).getByTestId('carte-here-marker')).toBeInTheDocument()
   })
 
-  it('renders a locked ile as a non-navigable role="link", not an anchor', async () => {
+  it('renders a locked ile as a non-navigable, aria-disabled role="link"', async () => {
     render(<CarteWorld />)
     const iles = await screen.findAllByTestId('carte-ile')
     const famille = iles.find((el) => el.getAttribute('data-theme') === 'famille')!
@@ -110,6 +122,7 @@ describe('CarteWorld (seance progress advances the current node + progress)', ()
     const education = iles.find((el) => el.getAttribute('data-theme') === 'education')!
     const famille = iles.find((el) => el.getAttribute('data-theme') === 'famille')!
 
+    // Completed ile is navigable back to its ile route.
     expect(education).toHaveAttribute('data-status', 'completed')
     expect(education.querySelector('a')).toHaveAttribute('href', '/ile/education')
 
