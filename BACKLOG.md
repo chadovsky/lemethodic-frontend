@@ -6891,6 +6891,10 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 **F-ID note:** next free after F-466 (BACKLOG topped at F-466; F-464/F-465 shipped). Verified no `## F-467` in BACKLOG, none in PRD, none in git history before claiming.
 
+## F-468 — Reserved: registration daily-minutes capture (parked, feeds recommended-duration pace calc, dead until built)
+
+**Status:** Reserved / parked, never built. This stub only closes the F-468 namespace gap below the F-472 ceiling (the ID was skipped at F-469 time per that ticket's F-ID note). No prior work, no commit SHA. Dead until built.
+
 ## F-469 -- FE: La Carte immersive sea-world + scatter layout (desktop)
 
 **SUPERSEDED ON DESKTOP by F-470 (2026-06-16):** CSS cannot match a rendered ocean. The desktop `/carte` is now ONE baked Nano Banana image + interactive overlays, not a CSS sea/scatter. F-469's CSS sea, clouds, reflections, waterline glow, `SCATTER_LAYOUT`/`layout-map`, the SVG trail, the buoys and the per-island `IslandNode` rendering are removed on desktop. The DOM contract and the `<1024` F-462 serpentine are unchanged. See F-470.
