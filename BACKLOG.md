@@ -7010,7 +7010,7 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 ## F-473 -- FE: brand logo wiring (favicon + sidebar header + sign-in card)
 
-**Status:** Built on `feat/brand-logo-and-loader`; **HOLD for Chadi's Vercel preview review -- do NOT merge to main.** Commit on the feature branch (see gate report for SHA). Gates green locally: full unit suite 581/581, `pnpm build` clean (exit 0), F-473 e2e 8/8 on the prod build (`pnpm start`). Vercel preview produced for review.
+**Status:** Shipped -- squash-merged `3db737a` (PR #9, `feat/brand-logo-and-loader` -> main) after Chadi approved the Vercel preview. All ship gates green: CI `success` on the PR (Unit (vitest) + E2E (Playwright) both green), Vercel preview READY + asset-decode verified on the live deploy (`/icon.png`, `/apple-icon.png`, `/brand/lemethodic-{logo,mark}.png` all 200 `image/png`, no 404 -- F-461 lesson holds), local prod-build gates (unit 581/581, `pnpm build` clean, F-473 e2e 8/8) + F-225 receipts (local; `tests/screenshots`+`tests/traces` are gitignored). Production deploy auto-triggered on merge. No tag (F-4xx one-off FE tickets are not on the `v0.<section>.<count>` scheme).
 
 **Why:** The app had no real brand mark wired anywhere. The favicon `metadata.icons` block pointed at four files that never existed in `/public` (`/icon-light-32x32.png`, `/icon-dark-32x32.png`, `/icon.svg`, `/apple-icon.png` -- dangling 404 links). The sidebar header showed a placeholder "CH" avatar + the animated typewriter `<Wordmark>` box, and `/connexion` rendered the same typewriter box on a card whose chrome was set in the retired Instrument Serif. Chadi placed the real assets (`public/brand/lemethodic-logo.png` wordmark, `public/brand/lemethodic-mark.png` square mark); this ticket wires them in.
 
@@ -7030,7 +7030,7 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 ## F-474 -- FE: auth-gate loader flash fix (peach -> destination canvas)
 
-**Status:** Built on `feat/brand-logo-and-loader`; **HOLD for Chadi's Vercel preview review -- do NOT merge to main.** Commit on the feature branch (see gate report for SHA). Gates green locally: full unit suite 581/581 (incl. the new ProtectedRoute loader test), `pnpm build` clean (exit 0).
+**Status:** Shipped -- squash-merged `3db737a` (PR #9, `feat/brand-logo-and-loader` -> main, bundled with F-473). All ship gates green: CI `success` on the PR (Unit (vitest) + E2E (Playwright) both green), full unit suite 581/581 (incl. the new ProtectedRoute loader test), `pnpm build` clean. Production deploy auto-triggered on merge. No tag (F-4xx one-off FE tickets are not on the `v0.<section>.<count>` scheme).
 
 **Why:** `ProtectedRoute` paints a content-free full-height frame while it hydrates the auth store + verifies the token (states 1-3 of 4). That frame's background was `var(--lm-pastel-peach)` (#FFD8C2) with a stale "matches /onboarding" comment -- but protected routes land on the **app canvas** (`/tableau-de-bord` et al., `var(--bg-canvas)` = #EAEFF3, the F-463 v3 canvas), not onboarding. So the gate flashed peach for a beat before the destination painted behind it.
 
