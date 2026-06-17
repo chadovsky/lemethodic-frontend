@@ -12,20 +12,12 @@ interface AppShellProps {
   children: ReactNode
 }
 
-function getInitials(fullName?: string | null): string {
-  if (!fullName?.trim()) return 'CH'
-  const parts = fullName.trim().split(/\s+/)
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-}
-
 export default function AppShell({ children }: AppShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const closeDrawer = () => setDrawerOpen(false)
   const pathname = usePathname()
   const router = useRouter()
   const user = useAuthStore((s) => s.user)
-  const initials = getInitials(user?.fullName)
 
   // F-465 — icon-rail interaction state. `offset` drives the content-column
   // push via the --lm-shell-offset custom property (consumed by .app-shell-main
@@ -85,7 +77,6 @@ export default function AppShell({ children }: AppShellProps) {
         drawerOpen={drawerOpen}
         onLinkClick={closeDrawer}
         onClose={closeDrawer}
-        initials={initials}
         compact={compact}
         rail={rail}
       />

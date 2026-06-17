@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test'
 
 const FAKE_TOKEN = 'fake-jwt-token'
-// full_name: null so getInitials() returns the default 'CH' after setAuth maps the user.
+// full_name: null — a minimal authed user; no display name is required by the shell.
 const FAKE_USER = { id: 1, email: 'test@example.com', full_name: null }
 
 /**

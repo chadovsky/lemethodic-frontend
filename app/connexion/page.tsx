@@ -3,20 +3,20 @@
 import { useEffect, useState, type KeyboardEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { api, ApiError } from '@/lib/api'
 import { useAuthStore } from '@/lib/auth'
 import {
   INK,
   INK_SOFT,
   INK_MUTED,
-  CTA_DISABLED,
-  DISPLAY_FONT,
 } from '@/components/onboarding/OnboardingScreen'
-import Wordmark from '@/components/Wordmark'
 
 // F-206 — bg migrated to editorial system. Inner card chrome left in
 // place for v1 (matches signup pattern; full editorial pass is F-206.deep).
 const BG = 'var(--lm-bg-base)'
+// F-473 — sign-in chrome moved off the retired Instrument Serif onto Inter.
+const UI_FONT = 'var(--f-en)'
 
 function validate(email: string, password: string): string | null {
   const trimmed = email.trim()
@@ -130,16 +130,30 @@ export default function ConnexionPage() {
           boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
         }}
       >
-        {/* Brand mark */}
-        <div style={{ marginBottom: 24 }}>
-          <Wordmark size="nav" />
+        {/* Brand mark — F-473: centered wordmark at the top of the card. */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginBottom: 24,
+          }}
+        >
+          <Image
+            data-testid="connexion-logo"
+            src="/brand/lemethodic-logo.png"
+            alt="Le Méthodic"
+            width={2668}
+            height={1329}
+            priority
+            style={{ height: 32, width: 'auto' }}
+          />
         </div>
 
         {/* Heading */}
         <h1
           style={{
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 800,
+            fontFamily: UI_FONT,
+            fontWeight: 600,
             fontSize: 28,
             lineHeight: '36px',
             color: INK,
@@ -167,7 +181,7 @@ export default function ConnexionPage() {
           <label
             htmlFor="email"
             style={{
-              fontFamily: DISPLAY_FONT,
+              fontFamily: UI_FONT,
               fontWeight: 600,
               fontSize: 12,
               color: INK_MUTED,
@@ -193,7 +207,7 @@ export default function ConnexionPage() {
               border: `1.5px solid ${INK_MUTED}`,
               backgroundColor: 'var(--lm-bg-surface)',
               padding: '0 16px',
-              fontFamily: DISPLAY_FONT,
+              fontFamily: UI_FONT,
               fontWeight: 500,
               fontSize: 15,
               color: INK,
@@ -207,7 +221,7 @@ export default function ConnexionPage() {
           <label
             htmlFor="password"
             style={{
-              fontFamily: DISPLAY_FONT,
+              fontFamily: UI_FONT,
               fontWeight: 600,
               fontSize: 12,
               color: INK_MUTED,
@@ -231,7 +245,7 @@ export default function ConnexionPage() {
               border: `1.5px solid ${INK_MUTED}`,
               backgroundColor: 'var(--lm-bg-surface)',
               padding: '0 16px',
-              fontFamily: DISPLAY_FONT,
+              fontFamily: UI_FONT,
               fontWeight: 500,
               fontSize: 15,
               color: INK,
@@ -250,12 +264,15 @@ export default function ConnexionPage() {
             marginTop: 24,
             width: '100%',
             height: 52,
-            backgroundColor: isLoading ? CTA_DISABLED : INK,
+            // F-473 — filled with the v3 accent token (#E05C42 light / #DC5D4B
+            // dark). Loading dims via opacity so no hardcoded disabled hex.
+            backgroundColor: 'var(--accent)',
+            opacity: isLoading ? 0.6 : 1,
             color: 'hsl(0 0% 100%)',
             borderRadius: 14,
             border: 'none',
-            fontFamily: DISPLAY_FONT,
-            fontWeight: 700,
+            fontFamily: UI_FONT,
+            fontWeight: 600,
             fontSize: 15,
             cursor: isLoading ? 'not-allowed' : 'pointer',
             letterSpacing: '-0.01em',
@@ -280,7 +297,7 @@ export default function ConnexionPage() {
             role="alert"
             style={{
               marginTop: 12,
-              fontFamily: DISPLAY_FONT,
+              fontFamily: UI_FONT,
               fontWeight: 500,
               fontSize: 13,
               lineHeight: '18px',
