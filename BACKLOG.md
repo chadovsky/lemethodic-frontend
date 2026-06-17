@@ -7027,3 +7027,18 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 **F-225 receipts:** `tests/screenshots/f-473-connexion-{1440,375}.png` + `tests/screenshots/f-473-sidebar-{1440,375}.png` + trace `tests/traces/f-473.zip`. The logo/mark decode assertions (not just `src` set) are the real prod-404 gate.
 
 **F-ID note:** F-473 next free after F-472 (F-468 is a reserved stub; BACKLOG/PRD topped at F-472). Verified no `## F-473` in BACKLOG, none in PRD, none in git history before claiming. FE+BE share the F-namespace; this repo's BACKLOG is the FE record.
+
+## F-474 -- FE: auth-gate loader flash fix (peach -> destination canvas)
+
+**Status:** Built on `feat/brand-logo-and-loader`; **HOLD for Chadi's Vercel preview review -- do NOT merge to main.** Commit on the feature branch (see gate report for SHA). Gates green locally: full unit suite 581/581 (incl. the new ProtectedRoute loader test), `pnpm build` clean (exit 0).
+
+**Why:** `ProtectedRoute` paints a content-free full-height frame while it hydrates the auth store + verifies the token (states 1-3 of 4). That frame's background was `var(--lm-pastel-peach)` (#FFD8C2) with a stale "matches /onboarding" comment -- but protected routes land on the **app canvas** (`/tableau-de-bord` et al., `var(--bg-canvas)` = #EAEFF3, the F-463 v3 canvas), not onboarding. So the gate flashed peach for a beat before the destination painted behind it.
+
+**Built (2026-06-17):**
+- **`components/auth/ProtectedRoute.tsx`:** `LOADER_BG` changed from `var(--lm-pastel-peach)` to `var(--bg-canvas)`; the stale "peach, matches /onboarding" comment replaced with one explaining it matches the destination canvas. The frame stays content-free (no header, shell, or branded loader) -- only the colour token changed.
+
+**Tests:** `tests/unit/auth/ProtectedRoute.test.tsx` (new) -- renders the unhydrated state, asserts the loader frame (1) renders no children (content-free, no secret leak), (2) carries `var(--bg-canvas)` in its inline style, (3) does NOT carry `peach`. (jsdom preserves `var()` in the serialized inline style, so this is a real token assertion, not a resolved-colour one.)
+
+**Verification note:** the loader is a transient pre-auth frame (sub-second flash), not a steady-state surface, so no F-225 screenshot battery -- the deterministic unit test is the gate. Non-visual in steady state.
+
+**F-ID note:** F-474 next free after F-473. Verified no `## F-474` in BACKLOG, none in PRD, none in git history before claiming.

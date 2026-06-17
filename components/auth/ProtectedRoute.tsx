@@ -22,7 +22,9 @@ import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/lib/auth'
 import { useVerifyAuth } from '@/hooks/useVerifyAuth'
 
-const LOADER_BG = 'var(--lm-pastel-peach)' // peach, matches /onboarding so the redirect is seamless
+// F-474 — matches the destination canvas (--bg-canvas, #EAEFF3) so the auth
+// gate doesn't flash peach before the app surface paints behind it.
+const LOADER_BG = 'var(--bg-canvas)'
 
 export default function ProtectedRoute({
   children,
