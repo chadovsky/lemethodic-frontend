@@ -6956,7 +6956,7 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 ## F-471 -- FE: La Carte real learning path (Duolingo-style bubble trail, all breakpoints)
 
-**Status:** Built on `feat/f-471-carte-path`, FE gates green. **Pushed as a feature branch for a Vercel PREVIEW only -- NOT merged to main. Holding for Chadi to approve the preview.**
+**Status:** Shipped -- squash-merged `0438d40` (PR #7, `feat/f-471-carte-path` -> main) after Chadi approved the Vercel preview. All ship gates green: CI `success` on the PR (run 27668686043 -- Unit (vitest) + E2E (Playwright) both green), Vercel preview READY (`dpl_FRaJKmKvin6CYzUv7uHeirDp2dz7`, commit `232f474`, approved), local prod-build gates (unit 580/580, `pnpm build` clean, carte e2e 1440+375 light+dark) + F-225 receipts. Production deploy auto-triggered on merge. No tag (carte F-4xx tickets are not on the `v0.<section>.<count>` scheme).
 
 **Why:** Every prior carte visual chased a hard look (F-457 list -> F-462 serpentine -> F-469 CSS sea-world -> F-470 baked image) and the baked image still wasn't a real, themeable, dark-mode-safe surface (static art, no locale text, desktop/mobile split). F-471 replaces all of it with ONE clean, on-brand v3 "learning path": a centered winding trail of chunky pressable bubbles, rendered by a single component at every width. Generic Duolingo-style pattern, original code (no repo copied verbatim).
 
