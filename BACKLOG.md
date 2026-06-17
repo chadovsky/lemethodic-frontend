@@ -6980,7 +6980,7 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 ## F-472 -- FE: La Carte informative table (replaces the path/timeline)
 
-**Status:** Built on `feat/f-472-carte-table`, FE gates green. **Pushed as a feature branch for a Vercel PREVIEW only -- NOT merged to main. Holding for Chadi to review the preview.**
+**Status:** Shipped -- squash-merged `b2e7b06` (PR #8, `feat/f-472-carte-table` -> main) after Chadi approved the Vercel preview. All ship gates green: CI `success` on the PR (run 27670768128 -- Unit (vitest) + E2E (Playwright) both green), Vercel preview READY (`dpl_BjRNdWs451nz5UitTAnqJdK4ynri`, commit `6272a38`, approved), local prod-build gates (unit 581/581, `pnpm build` clean, carte e2e 1440+375 light+dark) + F-225 receipts. Production deploy auto-triggered on merge. No tag (carte F-4xx tickets are not on the `v0.<section>.<count>` scheme).
 
 **Why:** The path/timeline/bubble framing (F-471) reads as decorative; the journey is better served as an INFORMATIVE table the learner can scan. F-472 drops the path idea entirely: `/carte` is now a 4-column table (>=640) that stacks to cards (<640). Off-brand on purpose -- a per-theme palette replaces coral so the surface reads as information, not a CTA wall.
 
