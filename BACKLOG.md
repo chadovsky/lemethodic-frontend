@@ -6926,6 +6926,8 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 ## F-470 -- FE: La Carte baked Nano Banana scene + interactive overlays (desktop)
 
+**SUPERSEDED by F-471 (2026-06-17):** the baked-image carte (and the whole desktop/mobile split) is replaced by `CartePath` -- a single clean vertical "learning path" (Duolingo-style bubble trail) at all breakpoints. `CarteWorld.tsx`, `public/iles/carte-scene-light.png`, `lib/carte/hotspots.ts`, `lib/carte/path.ts` are all removed in F-471. See F-471.
+
 **Status:** Built, all FE gates green. Direct-to-main, committed + **holding for Chadi's push** (do not deploy until pushed). Asset landed 2026-06-16.
 
 **Why:** CSS cannot match a rendered ocean (F-469's 3 refinement passes chased the Nano Banana mock and still couldn't). New approach: the scene is ONE baked image (Chadi's render). The FE generates NO visuals -- it places the image as a fixed-ratio background and overlays interactivity + real journey state on top. This supersedes the F-469 CSS sea-world on desktop only; mobile (`<1024`) keeps the F-462 serpentine verbatim.
@@ -6951,3 +6953,25 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 **Refinement (2026-06-16, path re-route):** the first path drew in JOURNEY order, which jumped culture(top-right)->sante(bottom-left) as a straight diagonal slashing across open water. Re-routed by SCREEN POSITION instead: `lib/carte/path.ts: screenOrderedPoints()` orders the islands as a serpentine (top row L->R, down the right side, bottom row R->L), and `ribbonPath()` draws ONE smooth Catmull-Rom curve through them -- a single continuous winding road touching all 8 islands, no diagonals across water. Uniform coral (dropped the solid/muted per-segment split per Chadi). Overlays (checkmarks, pin, card, labels) unchanged. Gates: unit 609/609, `next build` green, f-470 e2e 3/3 on prod build, 1920 receipt recaptured + eyeballed (winding road confirmed).
 
 **F-ID note:** F-470 next free after F-469. Verified no `## F-470` in BACKLOG, none in PRD, none in git history before claiming.
+
+## F-471 -- FE: La Carte real learning path (Duolingo-style bubble trail, all breakpoints)
+
+**Status:** Built on `feat/f-471-carte-path`, FE gates green. **Pushed as a feature branch for a Vercel PREVIEW only -- NOT merged to main. Holding for Chadi to approve the preview.**
+
+**Why:** Every prior carte visual chased a hard look (F-457 list -> F-462 serpentine -> F-469 CSS sea-world -> F-470 baked image) and the baked image still wasn't a real, themeable, dark-mode-safe surface (static art, no locale text, desktop/mobile split). F-471 replaces all of it with ONE clean, on-brand v3 "learning path": a centered winding trail of chunky pressable bubbles, rendered by a single component at every width. Generic Duolingo-style pattern, original code (no repo copied verbatim).
+
+**Built (2026-06-17):**
+- **`components/carte/CartePath.tsx`** (new, the single component, all breakpoints): a centered column (max 620px) with a deterministic width-driven winding vertical SVG trail (Catmull-Rom -> cubic bezier) weaving through 8 nodes -- grammaire (node 0) + the 7 themes. Trail is **coral (`--accent`) up to the current node, neutral slate (`--rule`) after**, round caps. Bubbles are chunky + pressable (solid bottom "lip" via a hard offset box-shadow + soft shadow), each with its lucide theme icon. States: **done** = coral fill + white icon + check badge; **current** = white fill + coral ring + scale-up + idle bounce + a compact card (eyebrow "Île N", theme title, coral % bar with the real completed-iles %, **Continuer** -> `/ile/<currentTheme>`); **locked** = light-slate fill + muted icon + lock badge. Theme labels are real DOM text under each bubble (locale + dark-mode safe, never baked). Header: Inter "La Carte" + coral NIVEAU pill. Data wiring unchanged (`readTargetLevel` + `readCompletedIles` -> `getJourney`); the data layer is NOT touched. Scroll-current-into-view + the bounce are motion-safe.
+- **`app/(app)/carte/page.tsx`:** renders `CartePath` directly (the `CarteResponsive` desktop/mobile split is gone). `ProtectedRoute` + the `/carte` route are unchanged.
+- **`app/globals.css`:** the F-470 `.carte-scene` block replaced with the F-471 `carte-node-bounce` keyframe (the one piece needing a keyframe); motion-safe.
+- **Deleted:** `components/carte/CarteWorld.tsx`, `components/carte/CarteResponsive.tsx`, `components/carte/CarteMap.tsx`, `components/carte/IslandNode.tsx`, `lib/carte/hotspots.ts`, `lib/carte/path.ts`, and `public/iles/carte-scene-light.png` (untracked + removed). `lib/journey/island-art.ts` + the `island-*.png` assets are KEPT (still used by the dashboard `CarteHero`). Dead tests removed: `tests/unit/carte/{CarteWorld,CarteMap,IslandNode}.test.tsx`, `tests/unit/carte/{hotspots,path}.test.ts`, `tests/e2e/{f-462,f-470}.spec.ts` (their serpentine / baked-scene DOM no longer exists).
+
+**DOM contract preserved (existing e2e depend on it):** `carte-journey`, `carte-map`, `carte-level`, `carte-grammar` (+`data-live`/`data-theme`/`data-status`), `carte-ile` x7 (`data-theme`/`data-status`), `/ile/<theme>` links, exactly one `carte-current-cta` -> `/ile/<current>`, `carte-current-card`, `carte-progress-pct`. New: `carte-bubble` x8, `carte-trail`, `carte-check-badge`, `carte-lock-badge`. f-458/459/460/464 (which visit /carte) keep passing on the preserved contract.
+
+**Tests:** `tests/unit/carte/CartePath.test.tsx` (new) -- 8 bubbles, grammar live + the 7 themes, education current first + rest locked, single current-cta on the card -> `/ile/education` + "Île 1"/"L'éducation"/0%, lock badge on locked, completed navigable + check badge, B2 unauthored (no card/cta, grammar not live), seance-progress -> "Île 2"/"La famille"/14% -> `/ile/famille`. `tests/e2e/f-471.spec.ts` (new) -- 1440 + 375 (same component), light + dark: carte-journey, carte-level, 8 `carte-bubble`, grammar live, 7 iles education-current/rest-locked, single Continuer lands the real F-458 ile page, no horizontal overflow.
+
+**Gates:** unit (full suite), `pnpm build` clean, carte e2e on the prod build (1440 + 375, light + dark), F-225 receipts `tests/screenshots/f-471-carte-{1440,375}.png` + trace -- recorded in the gate report. **CI on the PR is the truth; HOLD for Chadi's preview approval before any merge to main.**
+
+**Decisions (Chadi, 2026-06-17):** (1) Replace the baked carte + the desktop/mobile split with one `CartePath` at all breakpoints. (2) Feature branch + Vercel preview, do NOT push to main until the preview is approved. (3) `CarteMap`/`IslandNode` (the old serpentine + art node) are deleted too, since the responsive split is gone and they were left fully orphaned.
+
+**F-ID note:** F-471 next free after F-470. Verified no `## F-471` in BACKLOG, none in PRD, none in git history before claiming. (FE+BE share the F-namespace; this repo's BACKLOG is the FE record and had no F-471.)

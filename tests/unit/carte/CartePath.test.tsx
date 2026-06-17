@@ -10,98 +10,80 @@ vi.mock('next/link', () => ({
   ),
 }))
 
-import CarteWorld from '@/components/carte/CarteWorld'
+import CartePath from '@/components/carte/CartePath'
 
 beforeEach(() => {
   localStorage.clear()
 })
 
-describe('CarteWorld (baked scene + overlays, default B1)', () => {
-  it('renders the world shell + the baked scene image at B1', async () => {
-    render(<CarteWorld />)
+describe('CartePath (learning path, default B1)', () => {
+  it('renders the journey shell, the trail, and the level pill', async () => {
+    render(<CartePath />)
     await waitFor(() => {
       expect(screen.getByTestId('carte-level')).toHaveTextContent('Niveau B1')
     })
     expect(screen.getByTestId('carte-journey')).toBeInTheDocument()
     expect(screen.getByTestId('carte-map')).toBeInTheDocument()
-    // The scene is a baked image, not painted: one img pointing at the asset.
-    const scene = screen.getByTestId('carte-scene')
-    expect(scene.tagName).toBe('IMG')
-    expect(scene).toHaveAttribute('src', '/iles/carte-scene-light.png')
-    // No CSS-world artifacts remain on desktop: no painted islands, no buoys.
-    expect(screen.queryByTestId('island-node')).toBeNull()
-    expect(screen.queryByTestId('carte-mini-mock')).toBeNull()
-    expect(screen.queryByTestId('carte-final-mock')).toBeNull()
-
-    // The coral path is a single SVG ribbon overlay (the baked image has none):
-    // one smooth uniform-coral curve winding through all 8 islands.
-    const path = screen.getByTestId('carte-path')
-    expect(path.tagName.toLowerCase()).toBe('svg')
-    expect(path.querySelectorAll('path').length).toBe(1)
+    // The winding trail is an SVG with a slate full path + a coral prefix (B1 has
+    // a current node, so the coral prefix exists -> 2 paths).
+    const trail = screen.getByTestId('carte-trail')
+    expect(trail.tagName.toLowerCase()).toBe('svg')
+    expect(trail.querySelectorAll('path').length).toBe(2)
   })
 
-  it('renders 8 hotspots: the grammar foundation + the 7 themes, each labelled', async () => {
-    render(<CarteWorld />)
-    // 1 grammar hotspot + 7 ile hotspots = 8 overlays over the baked image.
-    const grammar = await screen.findByTestId('carte-grammar')
+  it('renders 8 bubbles: the grammar foundation + the 7 themes, each labelled', async () => {
+    render(<CartePath />)
+    const bubbles = await screen.findAllByTestId('carte-bubble')
+    expect(bubbles).toHaveLength(8)
+
+    const grammar = screen.getByTestId('carte-grammar')
     expect(grammar).toHaveAttribute('data-live', 'true')
     expect(grammar).toHaveAttribute('data-theme', 'grammaire')
+    expect(grammar).toHaveAttribute('data-status', 'completed')
     expect(within(grammar).getByText('La grammaire')).toBeInTheDocument()
 
     const iles = screen.getAllByTestId('carte-ile')
     expect(iles).toHaveLength(7)
-    // Each ile hotspot carries its theme + a visible label (labels are overlays,
-    // not baked into the image).
     expect(iles[0]).toHaveAttribute('data-theme', 'education')
     expect(within(iles[0]).getByText("L'éducation")).toBeInTheDocument()
   })
 
-  it('renders 7 ile hotspots, education first + current, the rest locked', async () => {
-    render(<CarteWorld />)
+  it('marks education current + the rest locked, with the right badges', async () => {
+    render(<CartePath />)
     const iles = await screen.findAllByTestId('carte-ile')
-    expect(iles).toHaveLength(7)
-    expect(iles[0]).toHaveAttribute('data-theme', 'education')
     expect(iles[0]).toHaveAttribute('data-status', 'current')
     for (const ile of iles.slice(1)) {
       expect(ile).toHaveAttribute('data-status', 'locked')
+      // Locked iles carry a lock badge, not a navigable anchor.
+      expect(within(ile).getByTestId('carte-lock-badge')).toBeInTheDocument()
+      expect(ile.querySelector('a')).toBeNull()
+      expect(within(ile).getByRole('link')).toHaveAttribute('aria-disabled', 'true')
     }
+    // The completed grammar foundation shows a check badge.
+    expect(within(screen.getByTestId('carte-grammar')).getByTestId('carte-check-badge')).toBeInTheDocument()
   })
 
-  it('exposes exactly one current-node CTA, on the floating card, to the ile route', async () => {
-    render(<CarteWorld />)
+  it('exposes exactly one current-node CTA, on the card, to the ile route', async () => {
+    render(<CartePath />)
     const ctas = await screen.findAllByTestId('carte-current-cta')
     expect(ctas).toHaveLength(1)
     expect(ctas[0].tagName).toBe('A')
     expect(ctas[0]).toHaveAttribute('href', '/ile/education')
+
     const card = screen.getByTestId('carte-current-card')
-    expect(card).toHaveTextContent("Île 1 : L'éducation")
+    expect(card).toHaveTextContent('Île 1')
+    expect(card).toHaveTextContent("L'éducation")
     expect(within(card).getByTestId('carte-progress-pct')).toHaveTextContent('0%')
-  })
-
-  it('marks the current island with the "Vous êtes ici" pin', async () => {
-    render(<CarteWorld />)
-    const iles = await screen.findAllByTestId('carte-ile')
-    const education = iles.find((el) => el.getAttribute('data-theme') === 'education')!
-    expect(within(education).getByTestId('carte-here-marker')).toBeInTheDocument()
-  })
-
-  it('renders a locked ile as a non-navigable, aria-disabled role="link"', async () => {
-    render(<CarteWorld />)
-    const iles = await screen.findAllByTestId('carte-ile')
-    const famille = iles.find((el) => el.getAttribute('data-theme') === 'famille')!
-    expect(famille).toHaveAttribute('data-status', 'locked')
-    expect(famille.querySelector('a')).toBeNull()
-    expect(within(famille).getByRole('link')).toHaveAttribute('aria-disabled', 'true')
   })
 })
 
-describe('CarteWorld (target profile resolves the level)', () => {
+describe('CartePath (target profile resolves the level)', () => {
   it('renders B2 with no authored content: grammar not live, no current card', async () => {
     localStorage.setItem(
       'lm.targetProfile.v1',
       JSON.stringify({ exam: 'TCF', threshold: 'B2 (CLB 7-8)' }),
     )
-    render(<CarteWorld />)
+    render(<CartePath />)
     await waitFor(() => {
       expect(screen.getByTestId('carte-level')).toHaveTextContent('Niveau B2')
     })
@@ -114,21 +96,23 @@ describe('CarteWorld (target profile resolves the level)', () => {
   })
 })
 
-describe('CarteWorld (seance progress advances the current node + progress)', () => {
-  it('advances the current card to the next ile and reflects real progress', async () => {
+describe('CartePath (seance progress advances the current node + progress)', () => {
+  it('advances the card to the next ile and reflects real progress', async () => {
     localStorage.setItem('lm.journeyProgress.v1', JSON.stringify({ B1: ['education'] }))
-    render(<CarteWorld />)
+    render(<CartePath />)
     const iles = await screen.findAllByTestId('carte-ile')
     const education = iles.find((el) => el.getAttribute('data-theme') === 'education')!
     const famille = iles.find((el) => el.getAttribute('data-theme') === 'famille')!
 
-    // Completed ile is navigable back to its ile route.
+    // Completed ile is navigable back to its ile route + shows a check badge.
     expect(education).toHaveAttribute('data-status', 'completed')
     expect(education.querySelector('a')).toHaveAttribute('href', '/ile/education')
+    expect(within(education).getByTestId('carte-check-badge')).toBeInTheDocument()
 
     expect(famille).toHaveAttribute('data-status', 'current')
     const card = screen.getByTestId('carte-current-card')
-    expect(card).toHaveTextContent('Île 2 : La famille')
+    expect(card).toHaveTextContent('Île 2')
+    expect(card).toHaveTextContent('La famille')
     // 1 of 7 themes complete -> 14%.
     expect(within(card).getByTestId('carte-progress-pct')).toHaveTextContent('14%')
     expect(within(card).getByTestId('carte-current-cta')).toHaveAttribute('href', '/ile/famille')

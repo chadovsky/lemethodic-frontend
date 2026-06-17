@@ -1469,16 +1469,21 @@
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
-   F-470 — La Carte: baked Nano Banana scene (desktop).
+   F-471 — La Carte: the single "learning path" (Duolingo-style bubble trail).
 
-   Supersedes the F-469 CSS sea-world on desktop. The ocean, the 8 islands and
-   the coral chain path are now ONE baked image (public/iles/carte-scene-light.png),
-   placed by CarteWorld as a fixed-ratio background; interactivity + journey state
-   are inline-styled overlays on top. There is therefore no CSS sea / clouds /
-   reflections here any more — the image carries all of it. The .carte-scene hook
-   below exists only as a stable class for the scene box; all overlay visuals live
-   inline in the component (token-driven), so nothing else is needed.
+   Supersedes every prior carte visual (F-457 list, F-462 serpentine, F-469
+   CSS sea-world, F-470 baked scene). CartePath renders one centered winding
+   trail with chunky bubbles; all bubble/card visuals are inline + token-driven,
+   so the only thing that lives here is the current-node idle bounce (the one
+   piece that needs a keyframe). Motion-safe: stripped under reduced motion.
    ─────────────────────────────────────────────────────────────────────────── */
-.carte-scene {
-  background: var(--paper-edge, transparent);
+@keyframes carte-node-bounce {
+  0%, 100% { transform: scale(1.06) translateY(0); }
+  50% { transform: scale(1.06) translateY(-5px); }
+}
+.carte-node-bounce {
+  animation: carte-node-bounce 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .carte-node-bounce { animation: none; }
 }
