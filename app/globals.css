@@ -1469,21 +1469,22 @@
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
-   F-471 — La Carte: the single "learning path" (Duolingo-style bubble trail).
+   F-472 — La Carte: informative table (replaces the F-471 bubble trail).
 
-   Supersedes every prior carte visual (F-457 list, F-462 serpentine, F-469
-   CSS sea-world, F-470 baked scene). CartePath renders one centered winding
-   trail with chunky bubbles; all bubble/card visuals are inline + token-driven,
-   so the only thing that lives here is the current-node idle bounce (the one
-   piece that needs a keyframe). Motion-safe: stripped under reduced motion.
+   CarteTable renders a 4-column table (>=640) that stacks to cards (<640). All
+   tile/bar/state visuals are inline + token-driven (per-theme palette in
+   lib/carte/table-data), so the only thing that lives here is the row + card
+   hover affordance. Subtle, token-based, so it works light + dark.
    ─────────────────────────────────────────────────────────────────────────── */
-@keyframes carte-node-bounce {
-  0%, 100% { transform: scale(1.06) translateY(0); }
-  50% { transform: scale(1.06) translateY(-5px); }
+.carte-row {
+  transition: background-color 0.15s ease;
 }
-.carte-node-bounce {
-  animation: carte-node-bounce 2.4s ease-in-out infinite;
+.carte-row:hover {
+  background-color: color-mix(in srgb, var(--ink) 4%, transparent);
 }
-@media (prefers-reduced-motion: reduce) {
-  .carte-node-bounce { animation: none; }
+.carte-card {
+  transition: box-shadow 0.15s ease;
+}
+.carte-card:hover {
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--ink) 14%, transparent);
 }
