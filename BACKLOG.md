@@ -7042,3 +7042,22 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 **Verification note:** the loader is a transient pre-auth frame (sub-second flash), not a steady-state surface, so no F-225 screenshot battery -- the deterministic unit test is the gate. Non-visual in steady state.
 
 **F-ID note:** F-474 next free after F-473. Verified no `## F-474` in BACKLOG, none in PRD, none in git history before claiming.
+
+## F-475 -- FE: TopNav brand logo + logo sizing (sign-in focal + sidebar expanded)
+
+**Status:** In review -- feature branch `feat/brand-topnav-sizing`, **not merged**. One Vercel preview produced for Chadi to approve; merge held per dispatch. All local gates green (see Tests). No tag (F-4xx one-off FE tickets are not on the `v0.<section>.<count>` scheme).
+
+**Why:** F-473 wired the real brand assets into the sidebar header and the sign-in card, but the **logged-out TopNav** (the landing/marketing shell) was missed -- it still rendered the old boxed typewriter `<Wordmark>` ("the surface that didn't change"). Separately, the sign-in page was not yet a focused auth surface (the global `StickyHeader` still painted a boxed wordmark + marketing nav links at top-left), and both the sign-in card logo and the sidebar expanded wordmark were sized too small to read as the brand.
+
+**Built (2026-06-18):**
+- **TopNav (`components/nav/TopNav.tsx`):** the boxed `<Wordmark size="nav">` (desktop + mobile header) is replaced by the real wordmark asset (`/brand/lemethodic-logo.png`, `next/image`) via a local `NavLogo` helper, **linking home (`/`)** instead of `/la-methode`. Testids `topnav-logo-img` (desktop) / `topnav-logo-img-mobile` (mobile); sized `height:28` for the 64px nav row. The `Wordmark` import is dropped from TopNav (the component itself stays -- still used by StickyHeader, Footer, signup, etc.).
+- **Sign-in focal (`app/connexion/page.tsx`):** the centered card logo enlarged from `height:32` (~64px wide) to `width:200` (`maxWidth:100%`, `height:auto`) so it reads as the card's focal point.
+- **Focused auth surface (`components/layout/StickyHeader.tsx`):** `/connexion` removed from `MARKETING_PREFIXES`, so the global marketing header (boxed wordmark + Examens/Tarifs/Les Pièges/Sign in links + mobile hamburger) no longer renders there. The sign-in card's enlarged logo is now the page's sole brand element. (`/inscription` keeps its header -- out of scope.)
+- **Sidebar expanded wordmark (`components/layout/Sidebar.tsx`):** enlarged from `height:28` (~56px wide) to `width:150` (`maxWidth:100%`, `height:auto`); the wrapping link gets `minWidth:0` so the logo shrinks gracefully in the mobile drawer where the close button shares the header row. The collapsed square mark is left as-is.
+- **v3 compliance:** no hardcoded hex introduced, no new colours, rounded-only (no radius changes), no coral outside the existing accent. Only `next/image` sizing + a prefix-list edit.
+
+**Tests:** `tests/e2e/f-475.spec.ts` (new) -- landing `/` (1440 + 375): TopNav logo decodes (`complete && naturalWidth>0`), links home, logo-click→`/` happy path, no overflow, trace `tests/traces/f-475.zip`; `/connexion` (1440 + 375): no `sticky-header`, card logo decodes + enlarged (boundingBox width ≥180 at 1440), no overflow; `/tableau-de-bord` (1440): hover-expanded sidebar wordmark decodes + enlarged (boundingBox width ≥130). Updated: `tests/unit/nav/TopNav.test.tsx` (dead `Wordmark` mock → `next/image` mock; new "brand logo links home" test), `tests/unit/layout/StickyHeader.test.tsx` (new "does not render on /connexion"), `tests/e2e/f-445.spec.ts` (nav `wordmark` testid → `topnav-logo-img`).
+
+**F-225 receipts:** `tests/screenshots/f-475-{landing,connexion}-{1440,375}.png` + `tests/screenshots/f-475-sidebar-1440.png` + trace `tests/traces/f-475.zip` (local; `tests/screenshots`+`tests/traces` are gitignored). The logo decode assertions (not just `src` set) are the real prod-404 gate.
+
+**F-ID note:** F-475 next free after F-474 (F-468 is a reserved stub; BACKLOG topped at F-474, PRD does not track F-4xx). Verified no `## F-475` in BACKLOG, none in PRD, none in git history before claiming. FE+BE share the F-namespace; this repo's BACKLOG is the FE record.

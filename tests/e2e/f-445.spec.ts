@@ -1,6 +1,6 @@
 // F-445 -- Landing/marketing header migration to locked IA.
 // Verifies: TopNav renders on landing page, full IA nav visible, Start Free present,
-// Les Pièges absent, framed wordmark present, StickyHeader gone on /, mobile section works.
+// Les Pièges absent, brand logo present (F-475), StickyHeader gone on /, mobile section works.
 
 import { test, expect } from '@playwright/test'
 import { injectAuthToken } from '../helpers/auth-e2e'
@@ -77,10 +77,10 @@ test.describe('F-445 -- Landing nav (unauthenticated, desktop 1440)', () => {
     await expect(nav.getByText(/pièges/i)).not.toBeVisible()
   })
 
-  test('framed wordmark is present in the nav', async ({ page }) => {
+  test('brand logo is present in the nav (F-475)', async ({ page }) => {
     await page.goto('/')
     const nav = page.getByRole('navigation', { name: 'Primary' })
-    await expect(nav.getByTestId('wordmark')).toBeVisible()
+    await expect(nav.getByTestId('topnav-logo-img')).toBeVisible()
   })
 
   test('StickyHeader does not render on landing page', async ({ page }) => {
