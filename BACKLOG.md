@@ -6956,6 +6956,8 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 ## F-471 -- FE: La Carte real learning path (Duolingo-style bubble trail, all breakpoints)
 
+**SUPERSEDED by F-472 (2026-06-17):** the path/timeline/bubble idea is dropped entirely in favour of an informative TABLE (`CarteTable`). `CartePath.tsx` + all path/SVG/bubble code removed in F-472; the per-theme palette replaces coral on the carte. See F-472.
+
 **Status:** Shipped -- squash-merged `0438d40` (PR #7, `feat/f-471-carte-path` -> main) after Chadi approved the Vercel preview. All ship gates green: CI `success` on the PR (run 27668686043 -- Unit (vitest) + E2E (Playwright) both green), Vercel preview READY (`dpl_FRaJKmKvin6CYzUv7uHeirDp2dz7`, commit `232f474`, approved), local prod-build gates (unit 580/580, `pnpm build` clean, carte e2e 1440+375 light+dark) + F-225 receipts. Production deploy auto-triggered on merge. No tag (carte F-4xx tickets are not on the `v0.<section>.<count>` scheme).
 
 **Why:** Every prior carte visual chased a hard look (F-457 list -> F-462 serpentine -> F-469 CSS sea-world -> F-470 baked image) and the baked image still wasn't a real, themeable, dark-mode-safe surface (static art, no locale text, desktop/mobile split). F-471 replaces all of it with ONE clean, on-brand v3 "learning path": a centered winding trail of chunky pressable bubbles, rendered by a single component at every width. Generic Duolingo-style pattern, original code (no repo copied verbatim).
@@ -6975,3 +6977,29 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 **Decisions (Chadi, 2026-06-17):** (1) Replace the baked carte + the desktop/mobile split with one `CartePath` at all breakpoints. (2) Feature branch + Vercel preview, do NOT push to main until the preview is approved. (3) `CarteMap`/`IslandNode` (the old serpentine + art node) are deleted too, since the responsive split is gone and they were left fully orphaned.
 
 **F-ID note:** F-471 next free after F-470. Verified no `## F-471` in BACKLOG, none in PRD, none in git history before claiming. (FE+BE share the F-namespace; this repo's BACKLOG is the FE record and had no F-471.)
+
+## F-472 -- FE: La Carte informative table (replaces the path/timeline)
+
+**Status:** Built on `feat/f-472-carte-table`, FE gates green. **Pushed as a feature branch for a Vercel PREVIEW only -- NOT merged to main. Holding for Chadi to review the preview.**
+
+**Why:** The path/timeline/bubble framing (F-471) reads as decorative; the journey is better served as an INFORMATIVE table the learner can scan. F-472 drops the path idea entirely: `/carte` is now a 4-column table (>=640) that stacks to cards (<640). Off-brand on purpose -- a per-theme palette replaces coral so the surface reads as information, not a CTA wall.
+
+**Built (2026-06-17):**
+- **`components/carte/CarteTable.tsx`** (new, replaces `CartePath`): ONE component, two layouts off one measured container width. **>=640px** = a 4-column table (Île [colour tile + "Île N"/"Fondations" eyebrow + name] / Focus [blurb] / Progression [theme-colour bar + %] / État). **<640px** = each île stacked as a card (tile + name + focus + bar + action), no horizontal scroll. States: **done** = coloured tile + 100% bar + green "Terminé" pill (name links to `/ile/<theme>`); **current** = tinted row + left colour accent + partial bar + a theme-coloured **Continuer ->** button routing `/ile/<current>` (the single `carte-current-cta`); **locked** = gray tile + empty bar + "Verrouillé" pill (non-navigable). Rounded card container, no gridlines, subtle row separators, hover, soft shadow. Inter + DM Mono. Light + dark via tokens. NIVEAU pill is indigo (`#4F46E5`), not coral. Data wiring unchanged (`readTargetLevel` + `readCompletedIles` -> `getJourney`); the data layer is NOT touched.
+- **`lib/carte/table-data.ts`** (new, editable data map): `THEME_COLOR` (per-theme palette, NO coral -- grammaire `#4F46E5`, education `#0EA5E9`, famille `#14B8A6`, culture `#22C55E`, sante `#EC4899`, technologie `#8B5CF6`, environnement `#84CC16`, economie `#06B6D4`), `FOCUS_BLURB` (one-line placeholder copy per row, swap freely), `LEVEL_PILL_COLOR` (indigo), `DONE_GREEN`.
+- **`app/(app)/carte/page.tsx`:** renders `CarteTable`. `ProtectedRoute` + the `/carte` route unchanged.
+- **`app/globals.css`:** the F-471 `carte-node-bounce` keyframe replaced with the F-472 `.carte-row` / `.carte-card` hover (token-based, light + dark).
+- **Deleted:** `components/carte/CartePath.tsx` + all path/SVG/bubble code; `tests/unit/carte/CartePath.test.tsx`; `tests/e2e/f-471.spec.ts`.
+- **No coral on the carte:** verified no `#E05C42` / `#DC5D4B` / `var(--accent)` in `components/carte` or `lib/carte`.
+
+**DOM contract preserved (existing e2e depend on it):** `carte-journey`, `carte-map`, `carte-level`, `carte-grammar` (+`data-live`/`data-theme`/`data-status`), `carte-ile` x7 (`data-theme`/`data-status`), `/ile/<theme>` links (done rows + the current CTA), exactly one `carte-current-cta` -> `/ile/<current>`. f-458/459/460/464 (which visit /carte) keep passing on this. The path-only testids (`carte-bubble`/`carte-trail`/`carte-current-card`/`carte-progress-pct`/`carte-*-badge`) are gone (only f-471/CartePath referenced them, both removed).
+
+**Tests:** `tests/unit/carte/CarteTable.test.tsx` (new) -- renders the table (jsdom default width), 8 rows grammaire+themes with focus copy, education current first + rest locked (Verrouillé), single CTA -> `/ile/education`, grammar Terminé, B2 unauthored (no CTA, all bientot), seance-progress -> education Terminé + navigable + CTA -> `/ile/famille`. `tests/e2e/f-472.spec.ts` (new) -- 1440 (real `<table>`) + 375 (stacked, no `<table>`), light + dark: contract + states + single Continuer lands the real F-458 ile page + no horizontal overflow.
+
+**Gates:** unit (full suite), `pnpm build` clean, carte e2e on the prod build (1440 + 375, light + dark), F-225 receipts `tests/screenshots/f-472-carte-{1440,1440-dark,375}.png` + trace -- recorded in the gate report. **CI on the PR is the truth; HOLD for Chadi's preview review before any merge to main.**
+
+**Open call (flagged for review):** the journey model has no per-ile fractional progress, so the **current row's Progression bar shows the real overall journey % (completed iles / 7)** -- which is 0% on a brand-new journey (the "current" state is still unmistakable via the tinted row + left accent + Continuer button). Easy to swap for a fixed visual "in progress" sliver if preferred.
+
+**Decisions (Chadi, 2026-06-17):** (1) Drop the path/bubble idea entirely; `/carte` is an informative table. (2) Per-theme palette, NO coral; NIVEAU pill indigo. (3) Focus blurbs in an editable data map (placeholder copy fine). (4) Feature branch + Vercel preview, do NOT merge to main until reviewed.
+
+**F-ID note:** F-472 next free after F-471 (the horizontal-table variant was never built, so the ID was free). Verified no `## F-472` in BACKLOG, none in PRD, none in git history before claiming.

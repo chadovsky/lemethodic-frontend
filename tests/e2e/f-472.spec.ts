@@ -1,15 +1,14 @@
-// F-471 — La Carte: the single "learning path" (Duolingo-style bubble trail).
+// F-472 — La Carte: informative table (replaces the F-471 bubble trail).
 // Receipts:
-//   f-471-carte-1440.png   (wide desktop, light)
-//   f-471-carte-375.png    (mobile, light — SAME component)
-// Trace: tests/traces/f-471.zip (desktop happy path).
+//   f-472-carte-1440.png   (table, light)
+//   f-472-carte-1440-dark.png
+//   f-472-carte-375.png    (stacked cards, light)
+// Trace: tests/traces/f-472.zip (desktop happy path).
 //
-// Replaces the F-462 serpentine + F-469/F-470 sea-world/baked-scene and the
-// desktop/mobile split: ONE component (CartePath) renders the journey identically
-// at every width. Asserts the journey invariants + the preserved DOM contract:
-// 8 bubbles (grammaire + 7 themes), state-driven (done/current/locked), the single
-// current-node CTA deep-links to and lands the real ile route, no horizontal
-// overflow at either width, dark mode intact.
+// Asserts the journey invariants + the preserved DOM contract on the table:
+// 8 rows (grammaire + 7 themes), state-driven (done/current/locked), the single
+// current CTA deep-links to and lands the real ile route, the table renders at
+// 1440 and stacks to cards at 375 (no horizontal scroll), dark mode intact.
 
 import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
@@ -41,8 +40,7 @@ async function expectContract(page: Page) {
   await expect(page.getByTestId('carte-map')).toBeVisible()
   await expect(page.getByTestId('carte-level')).toHaveText('Niveau B1')
 
-  // 8 bubbles: grammaire foundation + 7 themes.
-  await expect(page.getByTestId('carte-bubble')).toHaveCount(8)
+  // 8 rows: grammaire foundation + 7 themes.
   const grammar = page.getByTestId('carte-grammar')
   await expect(grammar).toHaveAttribute('data-live', 'true')
   await expect(grammar).toHaveAttribute('data-theme', 'grammaire')
@@ -52,72 +50,77 @@ async function expectContract(page: Page) {
   await expect(iles.first()).toHaveAttribute('data-theme', 'education')
   await expect(iles.first()).toHaveAttribute('data-status', 'current')
 
-  // A locked ile is non-navigable (aria-disabled role="link", no anchor).
+  // States present: a locked row shows the Verrouillé pill (and no link).
   const locked = page.locator('[data-testid="carte-ile"][data-theme="famille"]')
   await expect(locked).toHaveAttribute('data-status', 'locked')
+  await expect(locked.getByText('Verrouillé')).toBeVisible()
   await expect(locked.locator('a')).toHaveCount(0)
-  await expect(locked.getByRole('link')).toHaveAttribute('aria-disabled', 'true')
 
-  // Exactly one current-node CTA -> the canonical ile route.
+  // Exactly one current CTA -> the canonical ile route.
   const cta = page.getByTestId('carte-current-cta')
   await expect(cta).toHaveCount(1)
   await expect(cta).toHaveAttribute('href', '/ile/education')
 }
 
-test.describe('F-471 — La Carte learning path (desktop 1440, light)', () => {
+test.describe('F-472 — La Carte table (desktop 1440, light)', () => {
   test.use({ viewport: { width: 1440, height: 900 } })
 
   test.beforeEach(async ({ page }) => {
     await injectAuthToken(page)
   })
 
-  test('renders the bubble trail, states, and lands the current ile route', async ({ page }) => {
+  test('renders the table, states, and lands the current ile route', async ({ page }) => {
     ensureDir(SCREENSHOT_DIR)
     ensureDir(TRACE_DIR)
     await page.context().tracing.start({ screenshots: true, snapshots: true })
 
     await page.goto('/carte')
     await expectContract(page)
+    // The >=640 layout is a real table.
+    await expect(page.locator('[data-testid="carte-map"] table')).toBeVisible()
     await expectNoOverflow(page)
 
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-471-carte-1440.png'), fullPage: true })
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-472-carte-1440.png'), fullPage: true })
 
-    // Continuer lands the real 3-beat ile page (F-458), not a 404.
     await page.getByTestId('carte-current-cta').click()
     await expect(page).toHaveURL(/\/ile\/education$/)
     await expect(page.getByTestId('ile-page')).toBeVisible()
 
-    await page.context().tracing.stop({ path: path.join(TRACE_DIR, 'f-471.zip') })
+    await page.context().tracing.stop({ path: path.join(TRACE_DIR, 'f-472.zip') })
   })
 })
 
-test.describe('F-471 — La Carte learning path (desktop 1440, dark)', () => {
+test.describe('F-472 — La Carte table (desktop 1440, dark)', () => {
   test.use({ viewport: { width: 1440, height: 900 } })
 
   test.beforeEach(async ({ page }) => {
     await authDark(page)
   })
 
-  test('renders the trail + states intact in dark mode (token-driven)', async ({ page }) => {
+  test('renders the table + states intact in dark mode (token-driven)', async ({ page }) => {
+    ensureDir(SCREENSHOT_DIR)
     await page.goto('/carte')
     await expect(page.locator('html')).toHaveClass(/dark/)
     await expectContract(page)
     await expectNoOverflow(page)
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-472-carte-1440-dark.png'), fullPage: true })
   })
 })
 
-test.describe('F-471 — La Carte learning path (mobile 375, same component)', () => {
+test.describe('F-472 — La Carte table (mobile 375, stacked cards)', () => {
   test.use({ viewport: { width: 375, height: 667 } })
 
   test.beforeEach(async ({ page }) => {
     await injectAuthToken(page)
   })
 
-  test('renders the same trail with no horizontal overflow', async ({ page }) => {
+  test('stacks each ile as a card with no horizontal scroll', async ({ page }) => {
     ensureDir(SCREENSHOT_DIR)
     await page.goto('/carte')
     await expectContract(page)
+    // <640 stacks to cards: no <table> rendered.
+    await expect(page.locator('[data-testid="carte-map"] table')).toHaveCount(0)
     await expectNoOverflow(page)
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-471-carte-375.png'), fullPage: true })
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'f-472-carte-375.png'), fullPage: true })
   })
 })
