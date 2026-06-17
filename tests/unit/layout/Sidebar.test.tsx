@@ -16,6 +16,15 @@ vi.mock('next/link', () => ({
   ),
 }))
 
+vi.mock('next/image', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  default: ({ src, alt, priority, ...rest }: any) => {
+    void priority
+    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+    return <img src={typeof src === 'string' ? src : ''} alt={alt} {...rest} />
+  },
+}))
+
 import Sidebar from '@/components/layout/Sidebar'
 
 describe('Sidebar', () => {
@@ -24,9 +33,13 @@ describe('Sidebar', () => {
     mockUsePathname.mockReturnValue('/tableau-de-bord')
   })
 
-  it('renders the wordmark "Le Méthodic"', () => {
+  // F-473 — header brand is now the logo image (expanded), linking to the dash.
+  it('renders the brand wordmark image linking to the dashboard', () => {
     render(<Sidebar drawerOpen={false} />)
-    expect(screen.getByTestId('sidebar-wordmark')).toHaveTextContent('Le Méthodic')
+    const link = screen.getByTestId('sidebar-wordmark')
+    expect(link).toHaveAttribute('href', '/tableau-de-bord')
+    expect(screen.getByTestId('sidebar-logo-img')).toBeInTheDocument()
+    expect(screen.getByAltText('Le Méthodic')).toBeInTheDocument()
   })
 
   it('exposes a primary nav landmark', () => {
@@ -97,20 +110,19 @@ describe('Sidebar', () => {
     expect(screen.getByTestId('app-shell-sidebar')).toHaveAttribute('data-drawer-open', 'true')
   })
 
-  // MOCK-006 — avatar + active row treatment
-  it('renders avatar element with sidebar-avatar testid', () => {
+  // F-473 — the CH avatar + boxed typewriter wordmark are retired in favour of
+  // the brand logo (expanded) / square mark (collapsed).
+  it('no longer renders the CH avatar', () => {
     render(<Sidebar drawerOpen={false} />)
-    expect(screen.getByTestId('sidebar-avatar')).toBeInTheDocument()
+    expect(screen.queryByTestId('sidebar-avatar')).not.toBeInTheDocument()
   })
 
-  it('avatar displays default initials "CH"', () => {
-    render(<Sidebar drawerOpen={false} />)
-    expect(screen.getByTestId('sidebar-avatar')).toHaveTextContent('CH')
-  })
-
-  it('avatar accepts custom initials prop', () => {
-    render(<Sidebar drawerOpen={false} initials="AB" />)
-    expect(screen.getByTestId('sidebar-avatar')).toHaveTextContent('AB')
+  it('renders the square mark (not the wordmark) when compact', () => {
+    render(<Sidebar drawerOpen={false} compact />)
+    const mark = screen.getByTestId('sidebar-mark')
+    expect(mark).toHaveAttribute('href', '/tableau-de-bord')
+    expect(screen.getByTestId('sidebar-mark-img')).toBeInTheDocument()
+    expect(screen.queryByTestId('sidebar-wordmark')).not.toBeInTheDocument()
   })
 
   it('active link row has sidebar-active-row class', () => {

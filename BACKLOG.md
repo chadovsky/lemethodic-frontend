@@ -7007,3 +7007,38 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 **Decisions (Chadi, 2026-06-17):** (1) Drop the path/bubble idea entirely; `/carte` is an informative table. (2) Per-theme palette, NO coral; NIVEAU pill indigo. (3) Focus blurbs in an editable data map (placeholder copy fine). (4) Feature branch + Vercel preview, do NOT merge to main until reviewed.
 
 **F-ID note:** F-472 next free after F-471 (the horizontal-table variant was never built, so the ID was free). Verified no `## F-472` in BACKLOG, none in PRD, none in git history before claiming.
+
+## F-473 -- FE: brand logo wiring (favicon + sidebar header + sign-in card)
+
+**Status:** Built on `feat/brand-logo-and-loader`; **HOLD for Chadi's Vercel preview review -- do NOT merge to main.** Commit on the feature branch (see gate report for SHA). Gates green locally: full unit suite 581/581, `pnpm build` clean (exit 0), F-473 e2e 8/8 on the prod build (`pnpm start`). Vercel preview produced for review.
+
+**Why:** The app had no real brand mark wired anywhere. The favicon `metadata.icons` block pointed at four files that never existed in `/public` (`/icon-light-32x32.png`, `/icon-dark-32x32.png`, `/icon.svg`, `/apple-icon.png` -- dangling 404 links). The sidebar header showed a placeholder "CH" avatar + the animated typewriter `<Wordmark>` box, and `/connexion` rendered the same typewriter box on a card whose chrome was set in the retired Instrument Serif. Chadi placed the real assets (`public/brand/lemethodic-logo.png` wordmark, `public/brand/lemethodic-mark.png` square mark); this ticket wires them in.
+
+**Built (2026-06-17):**
+- **Assets committed:** `public/brand/lemethodic-logo.png` (2668x1329 wordmark) + `public/brand/lemethodic-mark.png` (610x610 square mark), each `git add`ed by explicit path (F-461 lesson: untracked assets pass CI but 404 in prod).
+- **Favicon (App Router file convention):** `app/icon.png` + `app/apple-icon.png`, both the square mark. The dangling `metadata.icons` block in `app/layout.tsx` removed -- the file convention is now the single source of truth (verified `<head>` emits `<link rel="icon" href="/icon.png?..." sizes="610x610">` + `apple-touch-icon`, and no `icon-light-32x32`/`icon-dark-32x32`/`icon.svg` refs remain).
+- **Sidebar header (`components/layout/Sidebar.tsx`):** the "CH" avatar (`sidebar-avatar`) and the boxed `<Wordmark>` are gone. Expanded shows the full wordmark (`/brand/lemethodic-logo.png`, testid `sidebar-logo-img`, link `sidebar-wordmark`); collapsed shows the square mark (`/brand/lemethodic-mark.png`, testid `sidebar-mark-img`, link `sidebar-mark`). Both `next/image`, both link to `/tableau-de-bord`. The `initials` prop is dropped from `SidebarProps`.
+- **`components/layout/AppShell.tsx`:** dead `getInitials()` + the `initials` prop plumbing removed (the only consumer was the retired avatar; the topbar `UserMenu` avatar is separate and untouched).
+- **Sign-in (`app/connexion/page.tsx`):** clean rounded white card (kept), centered wordmark image at the top (testid `connexion-logo`). All card chrome -- "Welcome back", subtext, EMAIL/PASSWORD labels, fields, button, error, forgot-password -- moved off Instrument Serif (`DISPLAY_FONT`) onto Inter (`var(--f-en)`). Submit button is full-width, rounded, filled with the v3 accent token (`var(--accent)` = #E05C42 light / #DC5D4B dark; loading dims via opacity, no hardcoded disabled hex). Rounded fields + "Forgot password?" link kept.
+- **v3 compliance:** tokens only (no hardcoded hex introduced -- the retired `CTA_DISABLED` hex usage is gone), rounded corners, soft shadow, no italics, accent used only as the existing accent.
+
+**Tests:** `tests/e2e/f-473.spec.ts` (new) -- /connexion (1440 + 375): heading, centered logo decodes (`complete && naturalWidth>0`), submit bg == `rgb(224,92,66)`, no overflow; /tableau-de-bord sidebar (1440): collapsed mark decodes + hover swaps to the wordmark which decodes; (375): drawer opens to the wordmark which decodes. Updated: `tests/unit/layout/Sidebar.test.tsx` (avatar tests replaced with logo/mark image assertions; `next/image` mocked like `next/link`), `tests/unit/layout/AppShell.test.tsx` (`next/image` mock added), `tests/e2e/app-shell.spec.ts` ("CH avatar" -> brand-mark-decodes), `tests/e2e/f-455.spec.ts` (expanded wordmark text -> image), `tests/helpers/auth-e2e.ts` (stale `getInitials` comment).
+
+**F-225 receipts:** `tests/screenshots/f-473-connexion-{1440,375}.png` + `tests/screenshots/f-473-sidebar-{1440,375}.png` + trace `tests/traces/f-473.zip`. The logo/mark decode assertions (not just `src` set) are the real prod-404 gate.
+
+**F-ID note:** F-473 next free after F-472 (F-468 is a reserved stub; BACKLOG/PRD topped at F-472). Verified no `## F-473` in BACKLOG, none in PRD, none in git history before claiming. FE+BE share the F-namespace; this repo's BACKLOG is the FE record.
+
+## F-474 -- FE: auth-gate loader flash fix (peach -> destination canvas)
+
+**Status:** Built on `feat/brand-logo-and-loader`; **HOLD for Chadi's Vercel preview review -- do NOT merge to main.** Commit on the feature branch (see gate report for SHA). Gates green locally: full unit suite 581/581 (incl. the new ProtectedRoute loader test), `pnpm build` clean (exit 0).
+
+**Why:** `ProtectedRoute` paints a content-free full-height frame while it hydrates the auth store + verifies the token (states 1-3 of 4). That frame's background was `var(--lm-pastel-peach)` (#FFD8C2) with a stale "matches /onboarding" comment -- but protected routes land on the **app canvas** (`/tableau-de-bord` et al., `var(--bg-canvas)` = #EAEFF3, the F-463 v3 canvas), not onboarding. So the gate flashed peach for a beat before the destination painted behind it.
+
+**Built (2026-06-17):**
+- **`components/auth/ProtectedRoute.tsx`:** `LOADER_BG` changed from `var(--lm-pastel-peach)` to `var(--bg-canvas)`; the stale "peach, matches /onboarding" comment replaced with one explaining it matches the destination canvas. The frame stays content-free (no header, shell, or branded loader) -- only the colour token changed.
+
+**Tests:** `tests/unit/auth/ProtectedRoute.test.tsx` (new) -- renders the unhydrated state, asserts the loader frame (1) renders no children (content-free, no secret leak), (2) carries `var(--bg-canvas)` in its inline style, (3) does NOT carry `peach`. (jsdom preserves `var()` in the serialized inline style, so this is a real token assertion, not a resolved-colour one.)
+
+**Verification note:** the loader is a transient pre-auth frame (sub-second flash), not a steady-state surface, so no F-225 screenshot battery -- the deterministic unit test is the gate. Non-visual in steady state.
+
+**F-ID note:** F-474 next free after F-473. Verified no `## F-474` in BACKLOG, none in PRD, none in git history before claiming.

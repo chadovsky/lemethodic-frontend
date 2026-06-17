@@ -56,7 +56,8 @@ test.describe('F-455 — frosted shell (desktop 1440, light)', () => {
     await expect(page.getByTestId('app-shell-sidebar')).toBeVisible()
     await page.getByTestId('app-shell-sidebar').hover()
     await expect(page.getByTestId('app-shell-sidebar')).toHaveAttribute('data-expanded', 'true')
-    await expect(page.getByTestId('sidebar-wordmark')).toContainText('Le Méthodic')
+    // F-473 — the expanded rail paints the brand wordmark image (was text).
+    await expect(page.getByTestId('sidebar-logo-img')).toBeVisible()
     await expect(page.getByTestId('app-topbar')).toBeVisible()
     await expect(page.getByTestId('app-topbar-title')).toHaveText('Tableau de bord')
     await expect(page.getByTestId('app-topbar-lang')).toBeVisible()

@@ -83,14 +83,11 @@ export const metadata: Metadata = {
     title: 'Le Méthodic',
     description: 'Method-based oral exam prep for anglophone French exam candidates pursuing Quebec PR.',
   },
-  icons: {
-    icon: [
-      { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
-      { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
-      { url: '/icon.svg', type: 'image/svg+xml' },
-    ],
-    apple: '/apple-icon.png',
-  },
+  // F-473 — favicon + touch icon come from the App Router file convention
+  // (app/icon.png + app/apple-icon.png, both the square brand mark). The prior
+  // metadata.icons block pointed at /icon-light-32x32.png, /icon-dark-32x32.png,
+  // /icon.svg and /apple-icon.png — none of which existed in /public (dangling
+  // 404 links). The file convention is now the single source of truth.
 }
 
 export const viewport: Viewport = {

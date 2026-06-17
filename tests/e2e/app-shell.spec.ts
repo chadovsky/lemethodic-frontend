@@ -8,11 +8,18 @@ test.beforeEach(async ({ page }) => {
 test.describe('App shell — desktop (1280×800)', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
-  // MOCK-006 — avatar + active left-tab
-  test('sidebar shows CH avatar circle', async ({ page }) => {
+  // F-473 — the CH avatar is retired. The rail rests collapsed on desktop and
+  // shows the square brand mark; it must actually decode (F-461 no-404 lesson).
+  test('sidebar shows the brand mark (collapsed rail) and it loads', async ({ page }) => {
     await page.goto('/tableau-de-bord')
-    await expect(page.getByTestId('sidebar-avatar')).toBeVisible()
-    await expect(page.getByTestId('sidebar-avatar')).toHaveText('CH')
+    const mark = page.getByTestId('sidebar-mark-img')
+    await expect(mark).toBeVisible()
+    await expect(page.getByTestId('sidebar-mark')).toHaveAttribute('href', '/tableau-de-bord')
+    // Poll until the bytes finish decoding (not just layout-visible) — the real
+    // "loaded, not 404" gate (F-461 lesson) without a load-timing race.
+    await expect
+      .poll(() => mark.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0))
+      .toBe(true)
   })
 
   // F-455 — legacy left-tab replaced by the active pill on the link itself.

@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { SANS_FONT } from '@/lib/typography'
 import SidebarLink from './SidebarLink'
-import Wordmark from '@/components/Wordmark'
 import CartButton from '@/components/store/CartButton'
 import type { SidebarRail } from '@/lib/shell/useSidebarRail'
 import { RAIL_WIDTH, EXPANDED_WIDTH } from '@/lib/shell/useSidebarRail'
@@ -42,7 +42,6 @@ interface SidebarProps {
   drawerOpen: boolean
   onLinkClick?: () => void
   onClose?: () => void
-  initials?: string
   // F-465 — icon-only rail vs full titles. Owned by AppShell so the content
   // offset and the panel stay in lockstep. Defaults to expanded for isolated
   // renders (unit tests render <Sidebar drawerOpen={false} />).
@@ -54,7 +53,6 @@ export default function Sidebar({
   drawerOpen,
   onLinkClick,
   onClose,
-  initials = 'CH',
   compact = false,
   rail,
 }: SidebarProps) {
@@ -94,7 +92,9 @@ export default function Sidebar({
         overflow: 'hidden',
       }}
     >
-      {/* Header: avatar + wordmark */}
+      {/* Header: brand. F-473 — the CH avatar + boxed typewriter wordmark are
+          retired. Expanded shows the full wordmark, collapsed the square mark;
+          both link to /tableau-de-bord. */}
       <div
         style={{
           padding: '20px 20px 16px',
@@ -105,28 +105,24 @@ export default function Sidebar({
           flexShrink: 0,
         }}
       >
-        <div
-          data-testid="sidebar-avatar"
-          aria-label={`User initials: ${initials}`}
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: '50%',
-            backgroundColor: 'var(--cta-utility)',
-            color: '#fff',
-            fontFamily: SANS_FONT,
-            fontWeight: 600,
-            fontSize: '0.8125rem',
-            letterSpacing: '0.03em',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}
-        >
-          {initials}
-        </div>
-        {!compact && (
+        {compact ? (
+          <Link
+            href="/tableau-de-bord"
+            data-testid="sidebar-mark"
+            onClick={onLinkClick}
+            style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+          >
+            <Image
+              data-testid="sidebar-mark-img"
+              src="/brand/lemethodic-mark.png"
+              alt="Le Méthodic"
+              width={610}
+              height={610}
+              priority
+              style={{ width: 32, height: 32 }}
+            />
+          </Link>
+        ) : (
           <>
             <Link
               href="/tableau-de-bord"
@@ -134,7 +130,15 @@ export default function Sidebar({
               onClick={onLinkClick}
               style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}
             >
-              <Wordmark size="nav" />
+              <Image
+                data-testid="sidebar-logo-img"
+                src="/brand/lemethodic-logo.png"
+                alt="Le Méthodic"
+                width={2668}
+                height={1329}
+                priority
+                style={{ height: 28, width: 'auto' }}
+              />
             </Link>
             {onClose && (
               <button
