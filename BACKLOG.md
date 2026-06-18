@@ -7061,3 +7061,17 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 **F-225 receipts:** `tests/screenshots/f-475-{landing,connexion}-{1440,375}.png` + `tests/screenshots/f-475-sidebar-1440.png` + trace `tests/traces/f-475.zip` (local; `tests/screenshots`+`tests/traces` are gitignored). The logo decode assertions (not just `src` set) are the real prod-404 gate.
 
 **F-ID note:** F-475 next free after F-474 (F-468 is a reserved stub; BACKLOG topped at F-474, PRD does not track F-4xx). Verified no `## F-475` in BACKLOG, none in PRD, none in git history before claiming. FE+BE share the F-namespace; this repo's BACKLOG is the FE record.
+
+## F-476 -- FE: homepage head-title broadened (TCF-Quebec -> French-first)
+
+**Status:** In review -- branch `feat/homepage-head-title`, **do not merge** (awaiting Chadi approval of the Vercel preview). Gates: unit + `pnpm build` clean + e2e (CI authoritative on full suite; targeted homepage e2e local). SHA + CI + preview reported in the dispatch message.
+
+**Why:** The homepage page-level `metadata` narrowed the whole product to a single exam + region ("Pass TCF Canada. Get to Quebec." / "...anglophone TCF Canada candidates pursuing Quebec PR."). The spine is exam-agnostic and TCF is only the first exam lit (complete-site doctrine), so the homepage head should sell the method broadly, French-first. The TCF-Quebec line is correct *on the TCF page* and stays there -- this ticket only touches the homepage head.
+
+**Built (2026-06-18):**
+- **Homepage metadata only (`app/page.tsx`):** `title` `'Pass TCF Canada. Get to Quebec. | Le Méthodic'` -> `'Le Méthodic | Learn French that sounds native'` (pipe separator kept to match every existing page title in the repo + the house no-em-dash rule; the brief's recommended em-dash form is a one-token tune away if preferred). `description` `'Method-based oral exam prep for anglophone TCF Canada candidates pursuing Quebec PR.'` -> `'A grammar-first method for anglophones learning French, built by the author of 28 French linguistics books.'`
+- **Scope guard:** `app/layout.tsx` site-wide default (already broad), the TCF page's own metadata, and the TCF-Quebec copy in `components/seo/JsonLd.tsx` are all intentionally untouched (out of scope).
+
+**Verification:** `non-visual change: verification skipped` for F-225 captures (head-only metadata, no rendered-layout change). Unit suite + `pnpm build` run as gates; no test asserts the homepage title/description string (`m0-audit.spec.ts` records `page.title()` into an audit object but never asserts it).
+
+**F-ID note:** F-476 next free after F-475 (F-468 reserved stub; BACKLOG topped at F-475, PRD does not track F-4xx). Verified no `## F-476` in BACKLOG, none in PRD, none in git history before claiming. FE+BE share the F-namespace; this repo's BACKLOG is the FE record.
