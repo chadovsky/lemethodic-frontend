@@ -7045,7 +7045,7 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 ## F-475 -- FE: TopNav brand logo + logo sizing (sign-in focal + sidebar expanded)
 
-**Status:** In review -- feature branch `feat/brand-topnav-sizing`, **not merged**. One Vercel preview produced for Chadi to approve; merge held per dispatch. All local gates green (see Tests). No tag (F-4xx one-off FE tickets are not on the `v0.<section>.<count>` scheme).
+**Status:** Shipped -- squash-merged `659a3df` (PR #10, `feat/brand-topnav-sizing` -> main) after Chadi approved the Vercel preview. Includes the follow-up logo bump (TopNav `height:28` -> `height:48`, commit `70d667e`). All ship gates green: CI `success` on the PR (Unit (vitest) 583/583 + E2E (Playwright) both green, e2e 11m59s), Vercel preview READY + asset-decode verified, local prod-build gates (unit 583/583, `pnpm build` clean, F-475 e2e green; the lone local e2e blip was the documented `touch-targets` boundary flake on `tier-cta`, passed on re-run). Production deploy auto-triggered on merge. No tag (F-4xx one-off FE tickets are not on the `v0.<section>.<count>` scheme).
 
 **Why:** F-473 wired the real brand assets into the sidebar header and the sign-in card, but the **logged-out TopNav** (the landing/marketing shell) was missed -- it still rendered the old boxed typewriter `<Wordmark>` ("the surface that didn't change"). Separately, the sign-in page was not yet a focused auth surface (the global `StickyHeader` still painted a boxed wordmark + marketing nav links at top-left), and both the sign-in card logo and the sidebar expanded wordmark were sized too small to read as the brand.
 
