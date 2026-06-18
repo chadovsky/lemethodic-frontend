@@ -146,8 +146,9 @@ function BientotChip() {
 
 // F-475 — brand logo. Replaces the boxed typewriter <Wordmark> in the
 // logged-out nav with the real wordmark asset (next/image), linking home (/).
-// Sized for the 64px nav row; the sign-in card + sidebar logos are sized for
-// their own surfaces. Decode is gated in e2e (complete && naturalWidth > 0).
+// height:48 makes it the brand anchor (clearly larger than the 14px nav links)
+// while still clearing the 64px nav row; the sign-in card + sidebar logos are
+// sized for their own surfaces. Decode is gated in e2e (complete && naturalWidth > 0).
 function NavLogo({ testId }: { testId: string }) {
   return (
     <Link
@@ -162,7 +163,7 @@ function NavLogo({ testId }: { testId: string }) {
         width={2668}
         height={1329}
         priority
-        style={{ height: 28, width: 'auto' }}
+        style={{ height: 48, width: 'auto' }}
       />
     </Link>
   )
