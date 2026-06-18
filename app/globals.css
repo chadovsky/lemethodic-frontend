@@ -1165,28 +1165,34 @@
    open drawer is never occluded. */
 /* F-455 — frosted top bar. Translucent paper + backdrop blur; the bottom rule
    is dropped in favour of a soft shadow that fades in once content scrolls. */
+/* F-479 — the app top bar is a centered floating pill (matches the marketing
+   TopNav pill), not a full-bleed bar. Fixed + centered within the content band
+   (left/right insets + margin auto + max-width), rounded capsule, frosted, with
+   the shared pill shadow. The bottom rule is gone — the pill is detached. */
 .app-topbar {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 10px;
+  left: 12px;
+  right: 12px;
+  margin: 0 auto;
+  max-width: 1176px;
   height: 56px;
   z-index: 30;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 12px;
+  padding: 0 14px;
+  border-radius: 9999px;
   background-color: var(--shell-frost);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid transparent;
-  box-shadow: none;
+  border: 1px solid var(--lm-border-subtle);
+  box-shadow: var(--shell-pill-shadow);
   transition: box-shadow var(--lm-duration-base) var(--lm-ease),
-              border-color var(--lm-duration-base) var(--lm-ease);
+              left 200ms var(--lm-ease);
 }
 .app-topbar[data-scrolled="true"] {
   box-shadow: var(--shell-shadow-bar);
-  border-bottom-color: var(--rule-default);
 }
 .app-topbar-search {
   align-items: center;
@@ -1205,7 +1211,7 @@
    UI-006 convention, the shell's responsive display is plain CSS. Base =
    shown; ≥1024px (the desktop-sidebar breakpoint) = hidden. */
 .app-topbar-hamburger { display: inline-flex; }
-.app-shell-main { margin-left: 0; padding-top: 72px; }
+.app-shell-main { margin-left: 0; padding-top: 78px; }
 .app-shell-sidebar {
   transform: translateX(-100%);
   /* F-465 — width animates the rail<->titles expand; transform animates the
@@ -1220,12 +1226,16 @@
    paint matches the default icons-at-rest state (no expand flash). */
 @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
   .app-topbar {
-    left: var(--lm-shell-offset, var(--sidebar-rail));
-    height: 64px;
-    padding: 0 24px;
+    /* Centered floating pill within the content column (right of the rail). */
+    left: calc(var(--lm-shell-offset, var(--sidebar-rail)) + 16px);
+    right: 16px;
+    top: 12px;
+    height: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
     transition: left 200ms var(--lm-ease),
-                box-shadow var(--lm-duration-base) var(--lm-ease),
-                border-color var(--lm-duration-base) var(--lm-ease);
+                box-shadow var(--lm-duration-base) var(--lm-ease);
   }
   .app-topbar-hamburger { display: none; }
   .app-shell-backdrop { display: none; }

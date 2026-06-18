@@ -3,7 +3,6 @@ import { Instrument_Serif, Crimson_Pro, Instrument_Sans, Inter, DM_Mono } from '
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import TopNav from '@/components/nav/TopNav'
-import StickyHeader from '@/components/layout/StickyHeader'
 import CartDrawer from '@/components/store/CartDrawer'
 import QueryProvider from '@/components/QueryProvider'
 import { ThemeProvider } from '@/components/ThemeProvider'
@@ -109,11 +108,11 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <QueryProvider>
-            {/* UI-004 — marketing header (logo + Sign in). Shows on all paths;
-                TopNav handles authenticated in-product paths separately. */}
-            <StickyHeader />
-            {/* V-013c — desktop-only top nav. Returns null on marketing /
-                conversion / legal paths and below md breakpoint. */}
+            {/* F-479 — TopNav (the floating pill) is the SINGLE logged-out
+                marketing nav across every public surface (StickyHeader retired).
+                Returns null when authenticated (AppShell takes over) and on the
+                focused auth + conversion-funnel routes (/connexion, /onboarding,
+                /paywall). */}
             <TopNav />
             {/* F-448 — global cart drawer; opened by any CartButton (TopNav,
                 sidebar, store header). Renders null until opened. */}

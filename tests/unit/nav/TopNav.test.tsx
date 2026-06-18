@@ -116,6 +116,23 @@ describe('TopNav — unauthenticated', () => {
     const { container } = render(<TopNav />)
     expect(container.firstChild).not.toBeNull()
   })
+
+  // F-479 — TopNav is now the single marketing nav: it renders on every route
+  // StickyHeader used to serve (the pill replaces the boxed header there).
+  it('renders on the previously-StickyHeader routes (F-479 consolidation)', () => {
+    for (const route of ['/tarifs', '/librairie', '/examens', '/pieges', '/inscription', '/a-propos', '/faq', '/mentions-legales']) {
+      mockPathname.mockReturnValue(route)
+      const { container, unmount } = render(<TopNav />)
+      expect(container.firstChild, `TopNav should render on ${route}`).not.toBeNull()
+      unmount()
+    }
+  })
+
+  it('returns null on /onboarding (conversion funnel stays headerless)', () => {
+    mockPathname.mockReturnValue('/onboarding')
+    const { container } = render(<TopNav />)
+    expect(container.firstChild).toBeNull()
+  })
 })
 
 // F-446 shell split: TopNav returns null when token is present.
@@ -144,7 +161,9 @@ describe('TopNav — authenticated (shell split)', () => {
   })
 })
 
-describe('TopNav — landing page mobile section', () => {
+// F-479 — the mobile pill header renders on EVERY route TopNav serves (it is
+// logged-out only, so there is never an AppShell topbar to defer to).
+describe('TopNav — mobile pill header (all served routes)', () => {
   beforeEach(() => {
     mockToken = null
     mockHydrated.value = true
@@ -156,17 +175,28 @@ describe('TopNav — landing page mobile section', () => {
     expect(screen.getByTestId('topnav-mobile')).toBeInTheDocument()
   })
 
-  it('does NOT render the mobile header on /la-methode (AppShell handles mobile)', () => {
+  it('renders the mobile header on a marketing route (/tarifs)', () => {
+    mockPathname.mockReturnValue('/tarifs')
+    render(<TopNav />)
+    expect(screen.getByTestId('topnav-mobile')).toBeInTheDocument()
+  })
+
+  it('renders the mobile header on a product route (/la-methode) when logged out', () => {
     mockPathname.mockReturnValue('/la-methode')
+    render(<TopNav />)
+    expect(screen.getByTestId('topnav-mobile')).toBeInTheDocument()
+  })
+
+  it('does NOT render the mobile header on an excluded route (/connexion)', () => {
+    mockPathname.mockReturnValue('/connexion')
     render(<TopNav />)
     expect(screen.queryByTestId('topnav-mobile')).toBeNull()
   })
 
-  it('mobile header is present with hamburger on landing', () => {
-    mockPathname.mockReturnValue('/')
+  it('mobile header is present with hamburger', () => {
+    mockPathname.mockReturnValue('/tarifs')
     render(<TopNav />)
-    const mobileHeader = screen.getByTestId('topnav-mobile')
-    expect(mobileHeader).toBeInTheDocument()
+    expect(screen.getByTestId('topnav-mobile')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /open menu/i })).toBeInTheDocument()
   })
 })
