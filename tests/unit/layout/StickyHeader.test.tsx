@@ -35,6 +35,13 @@ describe('StickyHeader', () => {
     expect(screen.queryByTestId('sticky-header')).toBeNull()
   })
 
+  // F-475 — /connexion is a focused auth surface: no marketing header chrome.
+  it('does not render on the sign-in page (/connexion)', () => {
+    mockUsePathname.mockReturnValue('/connexion')
+    render(<StickyHeader />)
+    expect(screen.queryByTestId('sticky-header')).toBeNull()
+  })
+
   it('renders logo link and Sign in link', () => {
     mockUsePathname.mockReturnValue('/tarifs')
     render(<StickyHeader />)

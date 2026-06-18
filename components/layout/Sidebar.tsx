@@ -128,7 +128,9 @@ export default function Sidebar({
               href="/tableau-de-bord"
               data-testid="sidebar-wordmark"
               onClick={onLinkClick}
-              style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}
+              // minWidth:0 lets the logo shrink in the mobile drawer, where the
+              // close button shares this header row (F-475).
+              style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: 44, minWidth: 0 }}
             >
               <Image
                 data-testid="sidebar-logo-img"
@@ -137,7 +139,9 @@ export default function Sidebar({
                 width={2668}
                 height={1329}
                 priority
-                style={{ height: 28, width: 'auto' }}
+                // F-475 — enlarged from height:28 (~56px wide) so the expanded
+                // wordmark reads clearly; maxWidth caps it inside the drawer.
+                style={{ width: 150, maxWidth: '100%', height: 'auto' }}
               />
             </Link>
             {onClose && (

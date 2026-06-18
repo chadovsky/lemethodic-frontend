@@ -20,10 +20,15 @@ vi.mock('next/link', () => ({
   ),
 }))
 
-vi.mock('@/components/Wordmark', () => ({
-  default: ({ href }: { href?: string }) => (
-    <a href={href ?? '/'} data-testid="wordmark">Le Méthodic</a>
-  ),
+// F-475 — TopNav now renders the brand logo (next/image) in place of the
+// boxed <Wordmark>. Mock next/image to a plain <img> like the layout tests.
+vi.mock('next/image', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  default: ({ src, alt, priority, ...rest }: any) => {
+    void priority
+    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+    return <img src={typeof src === 'string' ? src : ''} alt={alt} {...rest} />
+  },
 }))
 
 // Auth store mock — swap token/hydrated per test.
@@ -83,6 +88,15 @@ describe('TopNav — unauthenticated', () => {
   it('does not show avatar when unauthenticated', () => {
     render(<TopNav />)
     expect(screen.queryByTestId('topnav-avatar')).toBeNull()
+  })
+
+  // F-475 — the boxed <Wordmark> is replaced by the brand logo image, linking home.
+  it('renders the brand logo in the nav, linking home (/)', () => {
+    render(<TopNav />)
+    const logo = screen.getByTestId('topnav-logo-img')
+    expect(logo).toBeInTheDocument()
+    expect(logo).toHaveAttribute('src', '/brand/lemethodic-logo.png')
+    expect(logo.closest('a')).toHaveAttribute('href', '/')
   })
 
   it('returns null on excluded prefix (/connexion)', () => {

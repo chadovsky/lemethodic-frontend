@@ -130,7 +130,9 @@ export default function ConnexionPage() {
           boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
         }}
       >
-        {/* Brand mark — F-473: centered wordmark at the top of the card. */}
+        {/* Brand mark — F-473: centered wordmark at the top of the card.
+            F-475: enlarged to the card's focal point (StickyHeader no longer
+            renders on /connexion, so this is the page's sole brand element). */}
         <div
           style={{
             display: 'flex',
@@ -145,7 +147,7 @@ export default function ConnexionPage() {
             width={2668}
             height={1329}
             priority
-            style={{ height: 32, width: 'auto' }}
+            style={{ width: 200, maxWidth: '100%', height: 'auto' }}
           />
         </div>
 

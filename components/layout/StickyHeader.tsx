@@ -17,7 +17,9 @@ const MARKETING_EXACT: ReadonlySet<string> = new Set([
 
 const MARKETING_PREFIXES = [
   '/inscription',
-  '/connexion',
+  // F-475 — '/connexion' intentionally omitted: the sign-in page is a focused
+  // auth surface with no marketing header (boxed wordmark + nav links). The
+  // sign-in card's own enlarged centered logo is the sole brand element.
   '/legal',
   '/method',
   '/about',

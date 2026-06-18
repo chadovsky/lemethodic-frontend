@@ -8,9 +8,9 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useAuthStore } from '@/lib/auth'
-import Wordmark from '@/components/Wordmark'
 import CartButton from '@/components/store/CartButton'
 
 const ED_BG = 'var(--lm-bg-base)'
@@ -144,6 +144,31 @@ function BientotChip() {
   )
 }
 
+// F-475 — brand logo. Replaces the boxed typewriter <Wordmark> in the
+// logged-out nav with the real wordmark asset (next/image), linking home (/).
+// height:48 makes it the brand anchor (clearly larger than the 14px nav links)
+// while still clearing the 64px nav row; the sign-in card + sidebar logos are
+// sized for their own surfaces. Decode is gated in e2e (complete && naturalWidth > 0).
+function NavLogo({ testId }: { testId: string }) {
+  return (
+    <Link
+      href="/"
+      aria-label="Le Méthodic, home"
+      style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}
+    >
+      <Image
+        data-testid={testId}
+        src="/brand/lemethodic-logo.png"
+        alt="Le Méthodic"
+        width={2668}
+        height={1329}
+        priority
+        style={{ height: 48, width: 'auto' }}
+      />
+    </Link>
+  )
+}
+
 export default function TopNav() {
   const pathname = usePathname() ?? '/'
   const token = useAuthStore((s) => s.token)
@@ -227,8 +252,8 @@ export default function TopNav() {
           height: '100%',
         }}
       >
-        {/* LEFT -- wordmark */}
-        <Wordmark size="nav" href="/la-methode" />
+        {/* LEFT -- brand logo (F-475) */}
+        <NavLogo testId="topnav-logo-img" />
 
         {/* CENTER -- nav links */}
         <ul
@@ -531,7 +556,7 @@ export default function TopNav() {
               height: '100%',
             }}
           >
-            <Wordmark size="nav" href="/la-methode" />
+            <NavLogo testId="topnav-logo-img-mobile" />
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <CartButton variant="icon" testId="topnav-cart-button-mobile" />
             <button
