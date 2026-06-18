@@ -13,39 +13,24 @@ import { usePathname } from 'next/navigation'
 import { useAuthStore } from '@/lib/auth'
 import CartButton from '@/components/store/CartButton'
 
-const ED_BG = 'var(--lm-bg-base)'
 const ED_FG = 'var(--lm-text-primary)'
 const ED_FG_SOFT = 'var(--lm-text-secondary)'
 const ED_RULE = 'var(--lm-border-subtle)'
 const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-serif'
 
-// Routes that should NOT render the in-product top nav. Marketing,
-// conversion funnel, legal, and auth surfaces have their own chrome.
+// F-479 — nav consolidation. TopNav (the floating pill) is now the SINGLE
+// logged-out marketing nav across every public surface. StickyHeader is retired,
+// so its routes (/tarifs, /librairie, /examens, /pieges, /inscription, /a-propos,
+// /faq, /blog, legal pages, /library) now adopt this pill. The only routes that
+// stay headerless are the focused auth surface (/connexion, F-475) and the
+// conversion funnel (/onboarding, /paywall) — no nav-away chrome there.
 const EXCLUDED_PREFIXES = [
-  '/inscription',
   '/connexion',
   '/onboarding',
   '/paywall',
-  '/mentions-legales',
-  '/confidentialite',
-  '/cgv',
-  '/refund',
-  '/examens',
-  '/a-propos',
-  '/faq',
-  '/tarifs',
-  '/blog',
-  '/pieges',
-  '/librairie',
 ] as const
 
-const EXCLUDED_EXACT: ReadonlySet<string> = new Set([
-  '/library',
-  '/fr/library',
-])
-
 function shouldHideOn(pathname: string): boolean {
-  if (EXCLUDED_EXACT.has(pathname)) return true
   for (const prefix of EXCLUDED_PREFIXES) {
     if (pathname === prefix || pathname.startsWith(prefix + '/')) return true
   }
@@ -215,9 +200,9 @@ export default function TopNav() {
   // left sidebar (AppShell) as their nav; TopNav must not render alongside it.
   if (token) return null
 
-  // Landing page (/ and /fr): show a mobile header since there is no AppShell topbar
-  // or BottomNav on public marketing routes.
-  const isLanding = pathname === '/' || pathname === '/fr'
+  // F-479 — the mobile pill header shows on EVERY route TopNav serves. TopNav is
+  // logged-out-only (returns null on token), so there is never an AppShell topbar
+  // here; the marketing routes need their own mobile chrome, not just the landing.
 
   return (
     <>
@@ -227,14 +212,19 @@ export default function TopNav() {
       className={`hidden md:flex${scrolled ? ' sticky-header--scrolled' : ''}`}
       style={{
         position: 'sticky',
-        top: 0,
+        top: 12,
         zIndex: 50,
-        height: 64,
-        backgroundColor: scrolled ? 'var(--lm-bg-blur)' : ED_BG,
-        backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
-        borderBottom: scrolled ? `1px solid ${ED_RULE}` : '1px solid transparent',
-        transition: 'background-color var(--lm-duration-hover) var(--lm-ease-spring), border-color var(--lm-duration-hover) var(--lm-ease-spring), backdrop-filter var(--lm-duration-hover) var(--lm-ease-spring)',
+        margin: '12px auto 0',
+        maxWidth: 1180,
+        width: 'calc(100% - 32px)',
+        height: 60,
+        borderRadius: 9999,
+        backgroundColor: 'var(--shell-frost)',
+        backdropFilter: 'saturate(180%) blur(20px)',
+        WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+        border: `1px solid ${ED_RULE}`,
+        boxShadow: 'var(--shell-pill-shadow)',
+        transition: 'box-shadow var(--lm-duration-hover) var(--lm-ease-spring), border-color var(--lm-duration-hover) var(--lm-ease-spring)',
         alignItems: 'center',
         fontFamily: SANS,
       }}
@@ -242,13 +232,11 @@ export default function TopNav() {
       <div
         style={{
           width: '100%',
-          maxWidth: 1280,
-          margin: '0 auto',
-          padding: '0 clamp(24px, 3vw, 40px)',
+          padding: '0 clamp(16px, 2vw, 28px)',
           display: 'grid',
           gridTemplateColumns: 'auto 1fr auto',
           alignItems: 'center',
-          gap: 32,
+          gap: 24,
           height: '100%',
         }}
       >
@@ -526,30 +514,32 @@ export default function TopNav() {
       </div>
     </nav>
 
-    {/* Mobile header — landing page only. Product routes have AppShell topbar + BottomNav. */}
-    {isLanding && (
+    {/* F-479 — mobile pill header on every served route (logged-out only). */}
+    {(
       <>
         <header
           data-testid="topnav-mobile"
           className="flex md:hidden"
           style={{
             position: 'sticky',
-            top: 0,
+            top: 10,
             zIndex: 50,
-            height: 64,
-            backgroundColor: scrolled ? 'var(--lm-bg-blur)' : ED_BG,
-            backdropFilter: scrolled ? 'blur(12px)' : 'none',
-            WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
-            borderBottom: scrolled ? `1px solid ${ED_RULE}` : '1px solid transparent',
-            transition: 'background-color var(--lm-duration-hover) var(--lm-ease-spring), border-color var(--lm-duration-hover) var(--lm-ease-spring)',
+            margin: '10px clamp(12px, 4vw, 20px) 0',
+            height: 56,
+            borderRadius: 9999,
+            backgroundColor: 'var(--shell-frost)',
+            backdropFilter: 'saturate(180%) blur(20px)',
+            WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+            border: `1px solid ${ED_RULE}`,
+            boxShadow: 'var(--shell-pill-shadow)',
+            transition: 'box-shadow var(--lm-duration-hover) var(--lm-ease-spring), border-color var(--lm-duration-hover) var(--lm-ease-spring)',
             alignItems: 'center',
-            width: '100%',
           }}
         >
           <div
             style={{
               width: '100%',
-              padding: '0 clamp(20px, 5vw, 40px)',
+              padding: '0 clamp(12px, 4vw, 18px)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
