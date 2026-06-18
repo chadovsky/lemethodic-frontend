@@ -7092,3 +7092,19 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 **Out of scope:** the TEF / DELF / DALF exam overlays (still deferred per the F-091 family + F-095). This ticket only lights the no-exam general path; it does not touch the deferred exams.
 
 **F-ID note:** F-477 next free after F-476 (F-468 is a reserved stub; BACKLOG ceiling F-476, PRD does not track F-4xx). Verified no `F-477` in BACKLOG, none in PRD, none in git history before claiming. FE+BE share the F-namespace; this repo's BACKLOG is the FE record.
+
+## F-478 -- FE: homepage positioning cleanup (retire stale USD pricing teaser + broaden Org JSON-LD)
+
+**Status:** In review -- branch `feat/homepage-positioning-cleanup`, **do not merge** (awaiting Chadi approval of the Vercel preview). Gates: unit 581/581, `pnpm build` clean, e2e (CI authoritative on full suite; local landing-pricing + landing-hero 28/28). SHA + CI + preview reported in the dispatch message.
+
+**Why:** The F-476 audit (Task A) found two TCF/region positioning leaks on the homepage: (1) a stale USD multi-tier teaser (`À la carte $9–19 / Daily Bundle $19 / Exam Bundle $29 / Pro $49 / Sprint $199`) that contradicted the canonical €uro ladder on /tarifs, put prices on the landing page, was reachable only by scroll and linked from no nav; (2) the Organization JSON-LD still narrowed the brand to "anglophone TCF Canada candidates pursuing Quebec Permanent Residency." Both fixed here, in the spirit of F-476 (broad, French-first homepage head).
+
+**Built (2026-06-18):**
+- **`components/landing/PricingTeaser.tsx`:** the 5-tier USD card grid is removed and replaced by a minimal no-price hook -- one value line ("Start free. Upgrade when you're ready.") + a single "View pricing" CTA (`data-testid="pricing-cta"`) linking to **/tarifs**. No prices anywhere on the homepage. v3 tokens only (`--bg-canvas`, `--rule-default`, `--text-primary`, `--cta-primary`, and `--accent-foreground` for the on-coral CTA text -- no hardcoded hex; the prior teaser + Hero hardcode `#ffffff`, deliberately avoided here). The full homepage-hook redesign stays parked.
+- **`components/seo/JsonLd.tsx`:** Organization `description` broadened to "A grammar-first French-learning method for anglophones, built by the author of 28 French linguistics books." CourseJsonLd + FaqJsonLd keep their TCF wording (legitimately TCF-specific; out of scope). TCF page metadata untouched.
+
+**Tests:** `tests/unit/landing/PricingTeaser.test.tsx` rewritten (pricing landmark region, single h2 value line, one "View pricing" CTA → /tarifs, ed-btn-press, no prices, retired testids absent). `tests/e2e/landing-pricing.spec.ts` rewritten (1440 + 375: hook + CTA render, CTA → /tarifs, no prices in the pricing region, retired tier cards absent; footer social links retained). Verified in the prerendered `/` artifact: no `$9/$19/$29/$49/$199`, CTA → /tarifs, broadened Org JSON-LD, old Org string gone.
+
+**Verification:** F-225 receipts `tests/screenshots/f-478-landing-{1440,375}.png` captured by the e2e (local; `tests/screenshots` is gitignored). Visible-surface change with e2e coverage; full battery deferred per the accepted F-225 debt (pre-battery marker absent).
+
+**F-ID note:** F-478 next free after F-477 (F-468 reserved stub; BACKLOG ceiling F-477, PRD does not track F-4xx). Verified no `F-478` in BACKLOG, none in PRD, none in git history before claiming. FE+BE share the F-namespace; this repo's BACKLOG is the FE record.

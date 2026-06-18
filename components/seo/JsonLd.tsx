@@ -7,7 +7,7 @@ export function OrganizationJsonLd() {
     name: 'Le Methodic',
     url: BASE,
     description:
-      'Method-based French exam prep for anglophone TCF Canada candidates pursuing Quebec Permanent Residency.',
+      'A grammar-first French-learning method for anglophones, built by the author of 28 French linguistics books.',
     sameAs: [],
   }
   return (

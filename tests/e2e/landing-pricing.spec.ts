@@ -1,40 +1,43 @@
 import { test, expect } from '@playwright/test'
 
-test.describe('Landing pricing — desktop (1280×800)', () => {
-  test.use({ viewport: { width: 1280, height: 800 } })
+// F-478 — the 5-tier USD teaser is retired. The homepage pricing section is now a
+// minimal no-price hook: a value line + a single "View pricing" CTA → /tarifs.
 
-  test('five tier cards render', async ({ page }) => {
+const PRICE_RE = /\$\s?\d|\d\s?€|€\s?\d/
+
+test.describe('Landing pricing hook — desktop (1440×900)', () => {
+  test.use({ viewport: { width: 1440, height: 900 } })
+
+  test('renders the no-price hook with a single View pricing CTA', async ({ page }) => {
     await page.goto('/')
-    const cards = page.getByTestId('pricing-tier')
-    await cards.first().scrollIntoViewIfNeeded()
-    await expect(cards).toHaveCount(5)
+    const cta = page.getByTestId('pricing-cta')
+    await cta.scrollIntoViewIfNeeded()
+    await expect(cta).toBeVisible()
+    await expect(cta).toHaveText('View pricing')
+    await expect(cta).toHaveAttribute('href', '/tarifs')
+    // F-225 receipt (gitignored): desktop pricing section.
+    await page.screenshot({ path: 'tests/screenshots/f-478-landing-1440.png', fullPage: true })
   })
 
-  test('Daily Bundle is highlighted as Most popular', async ({ page }) => {
+  test('the pricing section shows no prices and no retired tier cards', async ({ page }) => {
     await page.goto('/')
-    const badge = page.getByTestId('pricing-badge-popular')
-    await badge.scrollIntoViewIfNeeded()
-    await expect(badge).toBeVisible()
-    await expect(badge).toHaveText('Most popular')
+    const section = page.getByRole('region', { name: /pricing/i })
+    await section.scrollIntoViewIfNeeded()
+    await expect(section).toBeVisible()
+    const text = (await section.textContent()) ?? ''
+    expect(text).not.toMatch(PRICE_RE)
+    await expect(page.getByTestId('pricing-tier')).toHaveCount(0)
+    await expect(page.getByTestId('pricing-badge-popular')).toHaveCount(0)
   })
 
-  // MOCK-004 — Daily Bundle hover lifts card (ed-card-lift)
-  test('Daily Bundle card gains translateY(-2px) on hover', async ({ page, isMobile }) => {
-    test.skip(isMobile, '@media (hover: hover) does not apply on touch devices')
+  test('View pricing CTA navigates to /tarifs', async ({ page }) => {
     await page.goto('/')
-    const dailyCard = page.getByTestId('pricing-tier').filter({ hasText: 'Daily Bundle' })
-    await dailyCard.scrollIntoViewIfNeeded()
-    await page.waitForTimeout(300)
-    await dailyCard.hover()
-    await page.waitForTimeout(300)
-    const transform = await dailyCard.evaluate((el) =>
-      window.getComputedStyle(el).transform
-    )
-    const ty = parseFloat(transform.split(',')[5])
-    expect(ty).toBeLessThan(0)
+    const cta = page.getByTestId('pricing-cta')
+    await cta.scrollIntoViewIfNeeded()
+    await cta.click()
+    await expect(page).toHaveURL(/\/tarifs$/, { timeout: 15_000 })
   })
 
-  // MOCK-004 — social links present in footer
   test('footer social links are present', async ({ page }) => {
     await page.goto('/')
     const gh = page.getByTestId('footer-social-github')
@@ -43,18 +46,9 @@ test.describe('Landing pricing — desktop (1280×800)', () => {
     await expect(gh).toBeVisible()
     await expect(tw).toBeVisible()
   })
-
-  test('Daily Bundle CTA navigates to /inscription?tier=daily-bundle', async ({ page }) => {
-    await page.goto('/')
-    const dailyCard = page.getByTestId('pricing-tier').filter({ hasText: 'Daily Bundle' })
-    const cta = dailyCard.getByTestId('tier-cta')
-    await cta.scrollIntoViewIfNeeded()
-    await cta.click()
-    await expect(page).toHaveURL(/\/inscription\?tier=daily-bundle/, { timeout: 15_000 })
-  })
 })
 
-test.describe('Landing pricing — mobile (375×667)', () => {
+test.describe('Landing pricing hook — mobile (375×667)', () => {
   test.use({ viewport: { width: 375, height: 667 } })
 
   test('no horizontal overflow', async ({ page }) => {
@@ -64,13 +58,15 @@ test.describe('Landing pricing — mobile (375×667)', () => {
     expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1)
   })
 
-  test('all five tier cards visible on scroll', async ({ page }) => {
+  test('hook + CTA visible on scroll, no prices', async ({ page }) => {
     await page.goto('/')
-    const cards = page.getByTestId('pricing-tier')
-    await expect(cards).toHaveCount(5)
-    for (let i = 0; i < 5; i++) {
-      await cards.nth(i).scrollIntoViewIfNeeded()
-      await expect(cards.nth(i)).toBeVisible()
-    }
+    const cta = page.getByTestId('pricing-cta')
+    await cta.scrollIntoViewIfNeeded()
+    await expect(cta).toBeVisible()
+    const section = page.getByRole('region', { name: /pricing/i })
+    const text = (await section.textContent()) ?? ''
+    expect(text).not.toMatch(PRICE_RE)
+    // F-225 receipt (gitignored): mobile pricing section.
+    await page.screenshot({ path: 'tests/screenshots/f-478-landing-375.png', fullPage: true })
   })
 })
