@@ -7064,7 +7064,7 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 ## F-476 -- FE: homepage head-title broadened (TCF-Quebec -> French-first)
 
-**Status:** In review -- branch `feat/homepage-head-title`, **do not merge** (awaiting Chadi approval of the Vercel preview). Gates: unit + `pnpm build` clean + e2e (CI authoritative on full suite; targeted homepage e2e local). SHA + CI + preview reported in the dispatch message.
+**Status:** Shipped -- squash-merged `7912a4b` (PR #11, `feat/homepage-head-title` -> main) after Chadi approved the Vercel preview and kept the pipe title as shipped. All ship gates green: CI `success` on the PR (run 27744032552: Unit (vitest) 583/583 + E2E (Playwright) pass, e2e 12m35s), Vercel preview READY (built from `7ff92ed`), local prod-build gates (unit 583/583, `pnpm build` clean, homepage e2e smoke `landing-hero` 16/16; new title + desc verified in the prerendered `/` HTML, old TCF-Quebec title absent). Non-visual head-only metadata change: F-225 captures skipped. Production deploy auto-triggered on merge. No tag (F-4xx one-off FE tickets are not on the `v0.<section>.<count>` scheme).
 
 **Why:** The homepage page-level `metadata` narrowed the whole product to a single exam + region ("Pass TCF Canada. Get to Quebec." / "...anglophone TCF Canada candidates pursuing Quebec PR."). The spine is exam-agnostic and TCF is only the first exam lit (complete-site doctrine), so the homepage head should sell the method broadly, French-first. The TCF-Quebec line is correct *on the TCF page* and stays there -- this ticket only touches the homepage head.
 
