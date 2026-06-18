@@ -12,9 +12,9 @@ import { OrganizationJsonLd, CourseJsonLd, FaqJsonLd } from '@/components/seo/Js
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Pass TCF Canada. Get to Quebec. | Le Méthodic',
+  title: 'Le Méthodic | Learn French that sounds native',
   description:
-    'Method-based oral exam prep for anglophone TCF Canada candidates pursuing Quebec PR.',
+    'A grammar-first method for anglophones learning French, built by the author of 28 French linguistics books.',
   alternates: {
     canonical: '/',
     languages: {
