@@ -133,9 +133,11 @@ test.describe('F-448 -- Detail + cart (desktop 1440)', () => {
 
     await page.reload()
     // Drawer is closed after reload; the badge reflects the persisted line.
-    await expect(page.getByTestId('store-cart-button-badge')).toHaveText('1')
+    // F-479 — /librairie is now served by the TopNav pill (StickyHeader retired),
+    // so the store cart is the unified topnav-cart-button.
+    await expect(page.getByTestId('topnav-cart-button-badge')).toHaveText('1')
     // Reopen and confirm the line survived.
-    await page.getByTestId('store-cart-button').click()
+    await page.getByTestId('topnav-cart-button').click()
     await expect(page.getByTestId(`cart-line-${BOOK}`)).toBeVisible()
   })
 })
