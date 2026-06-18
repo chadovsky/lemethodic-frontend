@@ -1937,7 +1937,7 @@ _(F-091.0 shipped 2026-04-27 â€” see entry under "Shipped â€” Week 2 (
 - Estimate: 2-3 days. Filed 2026-04-27.
 
 **F-091 (epic)** â¸ Multi-exam routing â€” TCF + TEF Section B + DELF B1/B2
-- Decision (April 27, 2026): deferred from launch sprint to **post-launch week 1**. For the May 4 launch, FluentPath ships TCF-only (see **F-091.0** in the launch-prep queue for the V1 lock). Multi-exam returns post-launch with proper scope.
+- Decision (April 27, 2026): deferred from launch sprint to **post-launch week 1**. For the May 4 launch, Le Méthodic ships TCF-only (see **F-091.0** in the launch-prep queue for the V1 lock). Multi-exam returns post-launch with proper scope.
 - **Goal:** one engine, swap prompts and scoring per exam. Three concrete targets: TCF Canada (already shipped, baseline), TEF Section B, DELF B1/B2.
 - **Architectural cornerstone:** `app/services/exam_profiles/` already has the dispatch shape (`base.py` interface + `tcf_canada.py` concrete). The epic extends that pattern to the other two exams without forking the engine.
 - **Composed of three sub-tickets â€” ships when all three are green. Total estimate ~2.5 days.**
@@ -7075,3 +7075,20 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 **Verification:** `non-visual change: verification skipped` for F-225 captures (head-only metadata, no rendered-layout change). Unit suite + `pnpm build` run as gates; no test asserts the homepage title/description string (`m0-audit.spec.ts` records `page.title()` into an audit object but never asserts it).
 
 **F-ID note:** F-476 next free after F-475 (F-468 reserved stub; BACKLOG topped at F-475, PRD does not track F-4xx). Verified no `## F-476` in BACKLOG, none in PRD, none in git history before claiming. FE+BE share the F-namespace; this repo's BACKLOG is the FE record.
+
+## F-477 -- FE: General-learner (non-exam) track + de-TCF onboarding
+
+**Status:** Queued / not started. Filed 2026-06-18. Pre-launch correctness ticket; **sequenced after the first authored île cell** (content gate). Does NOT change the deferred status of TEF (F-091 / F-091b / F-094), DELF (F-091 / F-091b / F-091c), or DALF (F-095) -- those stay post-launch.
+
+**Why:** The `general` onboarding goal currently force-maps to `'tcf_canada'` (the false-promise pattern at BACKLOG:484): a user who picks "just learning French" is silently routed into TCF framing -- exam claims, TCF scoring, and TCF-specific dashboard/journey copy. The spine is exam-agnostic by doctrine; a general-learner who has chosen no exam should see zero TCF framing. F-476 broadened the marketing head in the same spirit (homepage no longer single-exam); this ticket fixes the in-product path.
+
+**Scope:**
+- **Onboarding + diagnostic profile:** add a general-learner (non-exam) goal/profile so `general` stops force-mapping to `'tcf_canada'`. The general path carries no exam, no TCF threshold, no TCF scoring.
+- **Journey + dashboard:** the general-learner journey uses the existing café + general learning-track themes; that track's dashboard and journey copy make no TCF-specific claim.
+- **Copy:** broaden onboarding + diagnostic copy that assumes TCF to be exam-neutral / French-first whenever the user has not chosen an exam.
+
+**Acceptance:** a user who picks "just learning French" lands in a general track with **zero TCF framing** (no TCF score, no TCF threshold, no TCF-specific dashboard or journey copy).
+
+**Out of scope:** the TEF / DELF / DALF exam overlays (still deferred per the F-091 family + F-095). This ticket only lights the no-exam general path; it does not touch the deferred exams.
+
+**F-ID note:** F-477 next free after F-476 (F-468 is a reserved stub; BACKLOG ceiling F-476, PRD does not track F-4xx). Verified no `F-477` in BACKLOG, none in PRD, none in git history before claiming. FE+BE share the F-namespace; this repo's BACKLOG is the FE record.
