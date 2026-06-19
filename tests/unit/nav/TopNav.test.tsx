@@ -111,6 +111,14 @@ describe('TopNav — unauthenticated', () => {
     expect(container.firstChild).toBeNull()
   })
 
+  // F-480 — /inscription is now a headerless focused auth surface (like
+  // /connexion). The pill nav no longer doubles up with the signup card logo.
+  it('returns null on excluded prefix (/inscription)', () => {
+    mockPathname.mockReturnValue('/inscription')
+    const { container } = render(<TopNav />)
+    expect(container.firstChild).toBeNull()
+  })
+
   it('does NOT return null on / (landing page)', () => {
     mockPathname.mockReturnValue('/')
     const { container } = render(<TopNav />)
@@ -119,8 +127,10 @@ describe('TopNav — unauthenticated', () => {
 
   // F-479 — TopNav is now the single marketing nav: it renders on every route
   // StickyHeader used to serve (the pill replaces the boxed header there).
+  // F-480 — /inscription dropped from this list: it is now a headerless auth
+  // surface (asserted above), not a pill-nav marketing route.
   it('renders on the previously-StickyHeader routes (F-479 consolidation)', () => {
-    for (const route of ['/tarifs', '/librairie', '/examens', '/pieges', '/inscription', '/a-propos', '/faq', '/mentions-legales']) {
+    for (const route of ['/tarifs', '/librairie', '/examens', '/pieges', '/a-propos', '/faq', '/mentions-legales']) {
       mockPathname.mockReturnValue(route)
       const { container, unmount } = render(<TopNav />)
       expect(container.firstChild, `TopNav should render on ${route}`).not.toBeNull()

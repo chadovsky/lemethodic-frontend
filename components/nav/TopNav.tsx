@@ -20,12 +20,16 @@ const SANS = 'var(--font-geist), -apple-system, "Segoe UI", system-ui, sans-seri
 
 // F-479 — nav consolidation. TopNav (the floating pill) is now the SINGLE
 // logged-out marketing nav across every public surface. StickyHeader is retired,
-// so its routes (/tarifs, /librairie, /examens, /pieges, /inscription, /a-propos,
-// /faq, /blog, legal pages, /library) now adopt this pill. The only routes that
-// stay headerless are the focused auth surface (/connexion, F-475) and the
-// conversion funnel (/onboarding, /paywall) — no nav-away chrome there.
+// so its routes (/tarifs, /librairie, /examens, /pieges, /a-propos, /faq, /blog,
+// legal pages, /library) now adopt this pill. The routes that stay headerless are
+// the focused auth surfaces (/connexion + /inscription) and the conversion funnel
+// (/onboarding, /paywall) — no nav-away chrome there.
+// F-480 — /inscription joins /connexion as a headerless auth surface. The pill
+// nav also rendered its own brand logo, so it doubled up with the signup card's
+// wordmark; excluding it leaves the card's single logo as the sole brand element.
 const EXCLUDED_PREFIXES = [
   '/connexion',
+  '/inscription',
   '/onboarding',
   '/paywall',
 ] as const

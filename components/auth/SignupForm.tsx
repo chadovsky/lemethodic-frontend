@@ -3,9 +3,9 @@
 import { useState, useRef, useEffect, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { SANS_FONT } from '@/lib/typography'
-import Wordmark from '@/components/Wordmark'
 import FormField from './FormField'
 import PasswordStrength from './PasswordStrength'
 import { api, ApiError } from '@/lib/api'
@@ -108,9 +108,25 @@ export default function SignupForm({ tier }: SignupFormProps) {
           padding: 'clamp(32px, 4vw, 48px) clamp(24px, 3vw, 40px)',
         }}
       >
-        {/* Wordmark */}
-        <div style={{ marginBottom: 24 }}>
-          <Wordmark size="nav" />
+        {/* Brand mark — F-480: the real wordmark asset, centered, matching the
+            /connexion card treatment (was the boxed <Wordmark>). With the pill
+            nav now excluded from /inscription, this is the page's sole logo. */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginBottom: 24,
+          }}
+        >
+          <Image
+            data-testid="inscription-logo"
+            src="/brand/lemethodic-logo.png"
+            alt="Le Méthodic"
+            width={2668}
+            height={1329}
+            priority
+            style={{ width: 200, maxWidth: '100%', height: 'auto' }}
+          />
         </div>
 
         {/* Tier label */}

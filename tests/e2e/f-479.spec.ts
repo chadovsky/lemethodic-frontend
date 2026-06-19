@@ -28,6 +28,8 @@ async function expectDecoded(img: Locator) {
 }
 
 // Every route StickyHeader used to own — now served by the TopNav pill.
+// F-480 — /inscription removed: it is now a headerless focused auth surface
+// (covered by f-480.spec.ts), not a pill-nav route.
 const MIGRATED_ROUTES = [
   '/tarifs',
   '/librairie',
@@ -35,7 +37,6 @@ const MIGRATED_ROUTES = [
   '/pieges',
   '/a-propos',
   '/faq',
-  '/inscription',
   '/mentions-legales',
 ] as const
 
