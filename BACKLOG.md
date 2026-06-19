@@ -7131,7 +7131,7 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 ## F-480 -- FE: /inscription headerless + new card logo (auth surfaces consistent)
 
-**Status:** In progress -- branch `feat/inscription-fix` pushed; merge held pending Chadi's Vercel preview review. All local ship gates green (unit + targeted e2e + clean `pnpm build`).
+**Status:** Shipped -- squash-merged `5b53b73` (PR #14, `feat/inscription-fix` -> main). All ship gates green: CI `success` on the PR (run 27820632438: Unit (vitest) 575/575 + E2E (Playwright) pass 13m23s + Vercel pass), Vercel preview READY (`b7d9545`). Local prod-build gates: unit 575/575, `pnpm build` clean, f-480 + f-479 + signup-flow + f-475 e2e green against `pnpm start` (the dev-server first-compile timeouts were the documented on-demand-compile flakes). F-225 receipts `tests/screenshots/f-480-inscription-{1440,375}.png` + trace `f-480.zip` (local; gitignored). Production deploy auto-triggered on merge. No tag (F-4xx one-off FE tickets are not on the `v0.<section>.<count>` scheme).
 
 **Why:** `/inscription` showed the same brand logo twice -- the F-479 floating pill nav rendered its own brand wordmark at the top of the page, and the signup card still carried the old boxed `<Wordmark>` beneath it. Two logos, and the two auth pages were inconsistent: `/connexion` is already headerless (F-475) with the real wordmark asset centered in its card, while `/inscription` kept the pill plus the legacy mark. F-480 makes `/inscription` match `/connexion`: one logo, both auth surfaces consistent.
 
