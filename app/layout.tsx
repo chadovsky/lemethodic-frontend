@@ -5,7 +5,6 @@ import './globals.css'
 import TopNav from '@/components/nav/TopNav'
 import CartDrawer from '@/components/store/CartDrawer'
 import QueryProvider from '@/components/QueryProvider'
-import { ThemeProvider } from '@/components/ThemeProvider'
 import { PlausibleAnalytics } from '@/components/analytics/Plausible'
 
 // M2 t11 — Type A font stack per DESIGN.md v2 (Atelier Français):
@@ -106,22 +105,29 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning className={`${instrumentSerif.variable} ${crimsonPro.variable} ${instrumentSans.variable} ${inter.variable} ${dmMono.variable}`}>
       <body className="font-sans antialiased">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <QueryProvider>
-            {/* F-479 — TopNav (the floating pill) is the SINGLE logged-out
-                marketing nav across every public surface (StickyHeader retired).
-                Returns null when authenticated (AppShell takes over) and on the
-                focused auth + conversion-funnel routes (/connexion, /onboarding,
-                /paywall). */}
-            <TopNav />
-            {/* F-448 — global cart drawer; opened by any CartButton (TopNav,
-                sidebar, store header). Renders null until opened. */}
-            <CartDrawer />
-            {children}
-            {process.env.NODE_ENV === 'production' && <Analytics />}
-            <PlausibleAnalytics />
-          </QueryProvider>
-        </ThemeProvider>
+        {/* F-481 — the next-themes provider is NOT at the root. It is mounted on
+            the authed surfaces only: ProtectedRoute (the (app) group + the
+            standalone authed routes) and AuthAwareShell (the authed (shell)
+            view), plus app/dev/layout.tsx for the dev token galleries. Logged-out
+            and marketing surfaces get no provider and no theme script, so they
+            always render the v3 light palette by construction (the .dark class is
+            never applied) with zero flash, regardless of the visitor OS color
+            scheme. Dark mode and the ThemeToggle stay fully live for authed
+            users. */}
+        <QueryProvider>
+          {/* F-479 — TopNav (the floating pill) is the SINGLE logged-out
+              marketing nav across every public surface (StickyHeader retired).
+              Returns null when authenticated (AppShell takes over) and on the
+              focused auth + conversion-funnel routes (/connexion, /onboarding,
+              /paywall). */}
+          <TopNav />
+          {/* F-448 — global cart drawer; opened by any CartButton (TopNav,
+              sidebar, store header). Renders null until opened. */}
+          <CartDrawer />
+          {children}
+          {process.env.NODE_ENV === 'production' && <Analytics />}
+          <PlausibleAnalytics />
+        </QueryProvider>
       </body>
     </html>
   )

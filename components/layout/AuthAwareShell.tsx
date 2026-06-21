@@ -10,6 +10,7 @@
 import { useEffect, type ReactNode } from 'react'
 import { useAuthStore } from '@/lib/auth'
 import AppShell from './AppShell'
+import { ThemeProvider } from '@/components/ThemeProvider'
 
 export default function AuthAwareShell({ children }: { children: ReactNode }) {
   const token = useAuthStore((s) => s.token)
@@ -20,7 +21,17 @@ export default function AuthAwareShell({ children }: { children: ReactNode }) {
   }, [])
 
   // Authenticated: hand off to AppShell (sidebar + mobile topbar + chrome).
-  if (hydrated && token) return <AppShell>{children}</AppShell>
+  // F-481 — (shell) routes (e.g. /la-methode) reach the app shell through here,
+  // NOT through ProtectedRoute, so the theme provider is mounted on this authed
+  // branch too. Dark mode + the ThemeToggle work the same as in the (app) group.
+  // The logged-out branch below mounts no provider, so the public view of a
+  // (shell) route stays on the v3 light palette.
+  if (hydrated && token)
+    return (
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <AppShell>{children}</AppShell>
+      </ThemeProvider>
+    )
 
   // Unauthenticated or pre-hydration: render without sidebar.
   // Mirrors app-shell-main padding so content layout is consistent.
