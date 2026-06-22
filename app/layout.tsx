@@ -6,6 +6,9 @@ import TopNav from '@/components/nav/TopNav'
 import CartDrawer from '@/components/store/CartDrawer'
 import QueryProvider from '@/components/QueryProvider'
 import { PlausibleAnalytics } from '@/components/analytics/Plausible'
+import MarketingThemeGuard from '@/components/theme/MarketingThemeGuard'
+import { AUTHED_PREFIXES } from '@/lib/theme/authed-prefixes'
+import { TOKEN_KEY } from '@/lib/storage-keys'
 
 // M2 t11 — Type A font stack per DESIGN.md v2 (Atelier Français):
 //   Instrument Serif — display/hero/wordmark (--f-display)
@@ -97,6 +100,31 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 }
 
+// F-482 — pre-paint, route-aware theme initializer. Runs synchronously in <head>
+// before first paint (the next-themes technique: a raw inline script, NOT
+// next/script). It reads the path against the shared AUTHED_PREFIXES list:
+//   - marketing / logged-out path: always strip .dark, never read the token, so
+//     marketing renders v3 light on every full load (closes the stale-.dark case
+//     where a prior authed dark session left "theme=dark" in storage).
+//   - authed path WITH a token: apply the stored theme before paint (dark / light,
+//     or system resolved via matchMedia), which removes the F-481 app entry snap.
+//   - authed path WITHOUT a token: strip .dark (a logged-out visitor on an
+//     auth-aware route like /la-methode renders light). Everything is wrapped in
+//     try/catch so a storage / matchMedia failure can never throw before paint.
+// "theme" is the next-themes default storageKey (no storageKey override exists).
+const themeInitScript = `(function(){try{
+var p=location.pathname;
+var A=${JSON.stringify(AUTHED_PREFIXES)};
+var authed=A.some(function(x){return p===x||p.indexOf(x+"/")===0;});
+var d=document.documentElement;
+var tok=null;try{tok=localStorage.getItem(${JSON.stringify(TOKEN_KEY)});}catch(e){}
+if(authed&&tok){
+var t=null;try{t=localStorage.getItem("theme");}catch(e){}
+var dark=t==="dark"||((!t||t==="system")&&typeof window.matchMedia==="function"&&window.matchMedia("(prefers-color-scheme: dark)").matches);
+if(dark){d.classList.add("dark");}else{d.classList.remove("dark");}
+}else{d.classList.remove("dark");}
+}catch(e){}})();`
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -104,16 +132,26 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" suppressHydrationWarning className={`${instrumentSerif.variable} ${crimsonPro.variable} ${instrumentSans.variable} ${inter.variable} ${dmMono.variable}`}>
+      <head>
+        {/* F-482 — pre-paint, route-aware theme init (see themeInitScript above).
+            Marketing paths always end up light; authed paths apply the stored
+            theme before paint. Raw inline script so it runs before hydration. */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="font-sans antialiased">
         {/* F-481 — the next-themes provider is NOT at the root. It is mounted on
             the authed surfaces only: ProtectedRoute (the (app) group + the
             standalone authed routes) and AuthAwareShell (the authed (shell)
-            view), plus app/dev/layout.tsx for the dev token galleries. Logged-out
-            and marketing surfaces get no provider and no theme script, so they
-            always render the v3 light palette by construction (the .dark class is
-            never applied) with zero flash, regardless of the visitor OS color
-            scheme. Dark mode and the ThemeToggle stay fully live for authed
-            users. */}
+            view), plus app/dev/layout.tsx for the dev token galleries. Marketing
+            surfaces get NO provider, so the .dark class is never owned there.
+            F-482 adds the pre-paint script above (light by construction on full
+            load) and the MarketingThemeGuard below (strips .dark on client-side
+            nav into marketing). Dark mode + the ThemeToggle stay fully live for
+            authed users. */}
+        {/* F-482 — client-nav guard: strips a stale .dark when an authed dark
+            session routes into a marketing path without a full reload. No-op on
+            authed paths. */}
+        <MarketingThemeGuard />
         <QueryProvider>
           {/* F-479 — TopNav (the floating pill) is the SINGLE logged-out
               marketing nav across every public surface (StickyHeader retired).

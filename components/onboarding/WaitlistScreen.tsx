@@ -169,7 +169,8 @@ export default function WaitlistScreen() {
   function handleSignOut() {
     // F-222 — canonical sign-out via lib/auth.signOut helper. Clears
     // submit-response + onboarding + auth stores in one shot.
-    signOut(router)
+    // F-482 — signOut now does a full-page navigation itself (no router arg).
+    signOut()
   }
 
   return (

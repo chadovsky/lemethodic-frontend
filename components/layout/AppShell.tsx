@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, type CSSProperties, type ReactNode } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useAuthStore, signOut } from '@/lib/auth'
 import Sidebar from './Sidebar'
 import AppTopBar from './AppTopBar'
@@ -16,7 +16,6 @@ export default function AppShell({ children }: AppShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const closeDrawer = () => setDrawerOpen(false)
   const pathname = usePathname()
-  const router = useRouter()
   const user = useAuthStore((s) => s.user)
 
   // F-465 — icon-rail interaction state. `offset` drives the content-column
@@ -54,7 +53,7 @@ export default function AppShell({ children }: AppShellProps) {
         drawerOpen={drawerOpen}
         fullName={user?.fullName}
         email={user?.email}
-        onSignOut={() => signOut(router)}
+        onSignOut={() => signOut()}
       />
 
       {/* Mobile backdrop — hidden at ≥1024px via .app-shell-backdrop */}

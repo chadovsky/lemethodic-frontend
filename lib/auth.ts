@@ -97,20 +97,23 @@ export const useAuthStore = create<AuthState>((set) => ({
 // F-222 — canonical sign-out helper. Clears all FE-side persisted state
 // (auth + onboarding answers + waitlist response) so a subsequent sign-in
 // starts fresh, then routes to landing. Use from any surface that exposes
-// a "Sign out" affordance — currently /profile and the waitlist screen's
-// footer link. Caller passes a router instance (Next 16 useRouter()); the
-// MinimalRouter shape avoids dragging next/navigation types into lib/.
+// a "Sign out" affordance.
+//
+// F-482 — sign-out now does a FULL-PAGE navigation (window.location.assign),
+// not a client-side router.push. A push would leave the authed dark session's
+// .dark class on <html> as the user lands on the (marketing) landing page,
+// rendering it dark. A full load triggers a fresh server render plus the
+// pre-paint theme script in app/layout.tsx, which strips .dark for the marketing
+// path. The router argument is gone; callers now invoke signOut() with no args.
 
 import { useOnboardingStore } from './onboarding'
 import { useSubmitResponseStore } from './submitResponse'
 
-interface MinimalRouter {
-  push: (href: string) => void
-}
-
-export function signOut(router: MinimalRouter): void {
+export function signOut(): void {
   useAuthStore.getState().clearAuth()
   useOnboardingStore.getState().reset()
   useSubmitResponseStore.getState().clear()
-  router.push('/')
+  if (typeof window !== 'undefined') {
+    window.location.assign('/')
+  }
 }
