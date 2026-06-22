@@ -1557,7 +1557,11 @@
 .couche-stack li {
   position: relative;
   list-style: none;
+  /* Locked identical width so every couche's right edge is the same line (no
+     content-sizing, no flex grow/shrink); long phrases wrap inside, never widen. */
   width: 360px;
+  box-sizing: border-box;
+  flex: 0 0 auto;
   min-height: 72px;
   z-index: var(--i);                 /* 1 top .. 5 bottom: lower couche sits in front */
   padding: 13px 22px 0;              /* content top-aligned so the hidden strip stays empty */
@@ -1605,6 +1609,13 @@
   transform: skewX(45deg);
   transition: 0.3s;
 }
+/* Bottom couche has no neighbour below, so its left face is fully exposed and the
+   skew pushes its lower-left corner past the block's bottom silhouette (a detached
+   flap). Clip that bottom-left overhang so the left wall ends cleanly at the
+   front-face bottom. */
+.couche-stack li:last-child::before {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 78%);
+}
 .couche-stack li:hover {            /* the movement, straight from the reference */
   transform: translateX(-20px);
 }
@@ -1622,6 +1633,7 @@
   font-weight: 800;
   line-height: 1.15;
   color: var(--couche-ink);
+  overflow-wrap: anywhere;            /* a long phrase wraps inside the fixed width, never widens it */
 }
 /* Reduced motion: the global rule sets animation-name: none, which would leave
    the li opacity:0 base stuck hidden. Re-assert the visible end-state. */
