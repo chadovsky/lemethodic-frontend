@@ -1500,25 +1500,23 @@
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
-   F-483 — La Méthode 5-couche visualizer (/la-methode), SVG rebuild.
+   F-483 — La Méthode 5-couche visualizer (/la-methode).
 
-   The five couches render as one isometric 3D block built from exact SVG
-   polygons (components/la-methode/CoucheStack.tsx) — this replaced the earlier
-   CSS skew + pseudo-element build, which left a white wedge, soft corners, and
-   seam leaks. The polygons make every edge crisp and leave no canvas gap by
-   construction; the SVG <text> rides the same shear so the type lies on the
-   isometric plane.
+   The uiverse skewed-stack: the <ul> is tilted with skewY(-14deg) and each <li>
+   is an extruded block — ::before is the left face (skewY 45deg), ::after is the
+   top face (skewX 45deg). The 20px depth is the only geometry taste param (kept
+   in sync across left:-20 / top:-20 / face width + height); li min-height is the
+   other. Lower couches sit in front (z-index 1..5) so no label is covered. The
+   eyebrow + phrase ride the stack skew, so the type lies on the isometric plane.
 
-   The only thing CSS owns now is the colour identity below: a centralized sky
-   ramp of three blue tones per couche (top / front / side). Every face is blue —
-   no white, no transparent. Coral is removed from THIS surface only; the global
-   --accent coral token is untouched. The SVG consumes these via fill: var(...).
+   Colours come from the centralized sky tokens (three blue tones per couche:
+   front / side / top) — every face is blue, no white/transparent. Coral is
+   removed from THIS surface only; the global --accent coral token is untouched.
 
-   Isometric block adapted from a uiverse.io community component (by
-   andrew-demchenk0), MIT License; rebuilt as SVG and reskinned to sky.
+   Skewed-stack technique from a Uiverse.io component by andrew-demchenk0 (MIT).
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
-  --couche-top-1:  #E8F6FE;   /* Le Propos          — top cap (c0) / gradient top */
+  --couche-top-1:  #E8F6FE;   /* Le Propos          — top face */
   --couche-top-2:  #DCF1FE;   /* Le Plan */
   --couche-top-3:  #B6E4FB;   /* La Construction */
   --couche-top-4:  #74CFF4;   /* Les Pièges Anglais */
@@ -1528,11 +1526,100 @@
   --couche-ramp-3: #93DAF9;   /* La Construction */
   --couche-ramp-4: #54C3F2;   /* Les Pièges Anglais */
   --couche-ramp-5: #1FAEE8;   /* La Musique */
-  --couche-side-1: #C8E9FC;   /* Le Propos          — side / depth wall */
+  --couche-side-1: #C8E9FC;   /* Le Propos          — left side / depth face */
   --couche-side-2: #A3DCF8;   /* Le Plan */
   --couche-side-3: #66C7F1;   /* La Construction */
   --couche-side-4: #2CA8E5;   /* Les Pièges Anglais */
   --couche-side-5: #0A8BC6;   /* La Musique */
   /* One dark ink for every couche — eyebrow + phrase. No white text anywhere. */
   --couche-ink: #1F2937;
+}
+
+.couche-viz {
+  display: flex;
+  justify-content: center;
+  padding: 48px 24px 56px;
+  /* The left face (-20px) + hover slide must never add horizontal scroll on a
+     narrow viewport; clip horizontally, keep vertical (skew + top faces) visible. */
+  overflow-x: clip;
+  animation: coucheRise 0.6s ease both;
+}
+@keyframes coucheRise {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.couche-stack {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  transform: skewY(-14deg);
+}
+.couche-stack li {
+  position: relative;
+  list-style: none;
+  width: 360px;
+  min-height: 70px;
+  z-index: var(--i);
+  padding: 13px 22px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: var(--front);
+  transition: transform 0.3s ease;
+  opacity: 0;
+  animation: coucheFade 0.45s ease forwards;
+  animation-delay: calc(var(--i) * 0.09s);
+}
+@keyframes coucheFade {
+  to { opacity: 1; }
+}
+.couche-stack li::before {          /* left face */
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -20px;
+  width: 20px;
+  height: 100%;
+  background: var(--side);
+  transform-origin: right;
+  transform: skewY(45deg);
+  transition: 0.3s;
+}
+.couche-stack li::after {           /* top face */
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: var(--top);
+  transform-origin: bottom;
+  transform: skewX(45deg);
+  transition: 0.3s;
+}
+.couche-stack li:hover {            /* the movement, straight from the reference */
+  transform: translateX(-20px);
+}
+.couche-ey {
+  font-family: var(--f-mono), 'DM Mono', ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--couche-ink);
+}
+.couche-ph {
+  font-family: var(--f-en), 'Inter', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--couche-ink);
+}
+/* Reduced motion: the global rule sets animation-name: none, which would leave
+   the li opacity:0 base stuck hidden. Re-assert the visible end-state. */
+@media (prefers-reduced-motion: reduce) {
+  .couche-viz,
+  .couche-stack li {
+    opacity: 1;
+  }
 }

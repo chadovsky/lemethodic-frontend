@@ -20,7 +20,7 @@ const HEADLINES = [
   'How to sound native, not assembled',
 ]
 
-describe('CoucheStack (SVG)', () => {
+describe('CoucheStack', () => {
   it('renders the section as a labelled region', () => {
     render(<CoucheStack />)
     expect(
@@ -28,19 +28,9 @@ describe('CoucheStack (SVG)', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders an SVG image with a title + desc covering all five couches', () => {
+  it('renders the five couches as a list, eyebrow + phrase in order', () => {
     const { container } = render(<CoucheStack />)
-    const svg = screen.getByTestId('couche-stack-svg')
-    expect(svg.tagName.toLowerCase()).toBe('svg')
-    expect(svg).toHaveAttribute('role', 'img')
-    expect(container.querySelector('title')?.textContent).toMatch(/five layers/i)
-    const desc = container.querySelector('desc')?.textContent ?? ''
-    EYEBROWS.forEach((e) => expect(desc).toContain(e))
-    HEADLINES.forEach((h) => expect(desc).toContain(h))
-  })
-
-  it('renders the five eyebrows + headlines in order', () => {
-    render(<CoucheStack />)
+    expect(container.querySelectorAll('.couche-stack > li')).toHaveLength(5)
     expect(
       screen.getAllByTestId('couche-stack-eyebrow').map((el) => el.textContent),
     ).toEqual(EYEBROWS)
@@ -55,21 +45,17 @@ describe('CoucheStack (SVG)', () => {
     expect(screen.getByText('La Musique')).toBeInTheDocument()
   })
 
-  it('renders five front + five side polygons plus the couche-0 top cap', () => {
+  it('drives each layer from the sky tokens (front/side/top) + z-index, no raw hex', () => {
     const { container } = render(<CoucheStack />)
-    // 5 side wall + 1 top cap + 5 front faces = 11 polygons.
-    expect(container.querySelectorAll('polygon')).toHaveLength(11)
-  })
-
-  it('drives every face from the sky tokens — no raw hex in the SVG', () => {
-    const { container } = render(<CoucheStack />)
-    const svg = screen.getByTestId('couche-stack-svg')
-    // Fills reference var(--couche-*); ink references var(--couche-ink).
-    expect(svg.outerHTML).toContain('var(--couche-ramp-1)')
-    expect(svg.outerHTML).toContain('var(--couche-side-5)')
-    expect(svg.outerHTML).toContain('var(--couche-top-1)')
-    expect(svg.outerHTML).not.toMatch(/#[0-9a-fA-F]{3,6}\b/)
-    expect(container.innerHTML).not.toMatch(/#[0-9a-fA-F]{3,6}\b/)
+    const lis = container.querySelectorAll<HTMLLIElement>('.couche-stack > li')
+    lis.forEach((li, i) => {
+      const style = li.getAttribute('style') ?? ''
+      expect(style).toContain(`--i: ${i + 1}`)
+      expect(style).toContain(`--front: var(--couche-ramp-${i + 1})`)
+      expect(style).toContain(`--side: var(--couche-side-${i + 1})`)
+      expect(style).toContain(`--top: var(--couche-top-${i + 1})`)
+      expect(style).not.toMatch(/#[0-9a-fA-F]{3,6}\b/)
+    })
   })
 
   it('uses no em-dashes in the rendered output', () => {

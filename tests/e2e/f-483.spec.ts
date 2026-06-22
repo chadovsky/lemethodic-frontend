@@ -1,12 +1,12 @@
-// F-483 — La Méthode 5-couche visualizer (/la-methode), SVG isometric block.
+// F-483 — La Méthode 5-couche visualizer (/la-methode), uiverse skewed stack.
 // Receipts:
-//   f-483-la-methode-1440.png  (sky SVG isometric block, desktop)
-//   f-483-la-methode-375.png   (same SVG scaled, mobile)
+//   f-483-la-methode-1440.png  (sky skewed-stack block, desktop)
+//   f-483-la-methode-375.png   (same block, mobile)
 // Trace: tests/traces/f-483.zip (desktop happy path).
 //
 // Asserts the launch contract: the component is visible; the five couche labels
-// (eyebrows) and their five How-to phrases render in order (as SVG <text>); no
-// horizontal overflow at either width.
+// (eyebrows) and their five How-to phrases render in order; no horizontal
+// overflow at either width.
 
 import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
@@ -79,6 +79,8 @@ test.describe('F-483 — couche stack (desktop 1440, sky)', () => {
     await expectContent(page)
     await expectNoOverflow(page)
 
+    // Let the staggered entrance settle so the receipt is not mid-fade.
+    await page.waitForTimeout(1100)
     await page.screenshot({
       path: path.join(SCREENSHOT_DIR, 'f-483-la-methode-1440.png'),
       fullPage: true,
@@ -88,11 +90,11 @@ test.describe('F-483 — couche stack (desktop 1440, sky)', () => {
   })
 })
 
-test.describe('F-483 — couche stack (mobile 375, flat fallback)', () => {
+test.describe('F-483 — couche stack (mobile 375)', () => {
   test.use({ viewport: { width: 375, height: 667 } })
-  test.skip(({ isMobile }) => !isMobile, 'mobile flat fallback')
+  test.skip(({ isMobile }) => !isMobile, 'mobile viewport')
 
-  test('renders the five labels + phrases upright, no horizontal scroll', async ({ page }) => {
+  test('renders the five labels + phrases, no horizontal scroll', async ({ page }) => {
     ensureDir(SCREENSHOT_DIR)
     await page.goto('/la-methode')
     await expectContent(page)
@@ -103,6 +105,7 @@ test.describe('F-483 — couche stack (mobile 375, flat fallback)', () => {
     }
 
     await expectNoOverflow(page)
+    await page.waitForTimeout(1100)
     await page.screenshot({
       path: path.join(SCREENSHOT_DIR, 'f-483-la-methode-375.png'),
       fullPage: true,
