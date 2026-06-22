@@ -78,8 +78,17 @@ describe('CoucheStack', () => {
     const layers = screen.getAllByTestId('couche-stack-layer')
     layers.forEach((layer, i) => {
       expect(layer.getAttribute('style')).toContain(
-        `--layer-bg: var(--couche-ramp-${i + 1})`,
+        `--face-top: var(--couche-ramp-${i + 1})`,
       )
+    })
+  })
+
+  it('assigns AA-safe text color per layer (dark on upper, light on deepest)', () => {
+    render(<CoucheStack />)
+    const expected = ['black', 'black', 'black', 'white', 'white']
+    const layers = screen.getAllByTestId('couche-stack-layer')
+    layers.forEach((layer, i) => {
+      expect(layer.getAttribute('style')).toContain(`--face-text: ${expected[i]}`)
     })
   })
 

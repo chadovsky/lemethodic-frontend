@@ -15,39 +15,47 @@ type Couche = {
   eyebrow: string
   headline: string
   detail: string
-  ramp: string
+  face: string // top-face fill (coral ramp token)
+  text: 'black' | 'white' // AA-safe text color for that step
 }
 
+// Light at the top, deep at the bottom. The upper three steps take dark text,
+// the lower two take light text, so small text clears 4.5:1 on every layer.
 const COUCHES: Couche[] = [
   {
     eyebrow: 'Le Propos',
     headline: 'How to say what you actually mean',
     detail: 'The intent behind your words, shaped before you speak.',
-    ramp: 'var(--couche-ramp-1)',
+    face: 'var(--couche-ramp-1)',
+    text: 'black',
   },
   {
     eyebrow: 'Le Plan',
     headline: 'How to organize your ideas in French',
     detail: 'The order and flow that make you sound structured, not scattered.',
-    ramp: 'var(--couche-ramp-2)',
+    face: 'var(--couche-ramp-2)',
+    text: 'black',
   },
   {
     eyebrow: 'La Construction',
     headline: 'How to build sentences that hold up',
     detail: 'The grammar and syntax that carry the meaning correctly.',
-    ramp: 'var(--couche-ramp-3)',
+    face: 'var(--couche-ramp-3)',
+    text: 'black',
   },
   {
     eyebrow: 'Les Pièges Anglais',
     headline: 'How to dodge the English traps',
     detail: 'Faux amis, calques, and the reflexes that give anglophones away.',
-    ramp: 'var(--couche-ramp-4)',
+    face: 'var(--couche-ramp-4)',
+    text: 'white',
   },
   {
     eyebrow: 'La Musique',
     headline: 'How to sound native, not assembled',
     detail: 'Rhythm, stress, and intonation, the layer most learners skip.',
-    ramp: 'var(--couche-ramp-5)',
+    face: 'var(--couche-ramp-5)',
+    text: 'white',
   },
 ]
 
@@ -97,8 +105,12 @@ export default function CoucheStack() {
           role="list"
           aria-label="Les cinq couches de La Méthode"
         >
-          {COUCHES.map((couche) => (
-            <li key={couche.eyebrow} className="couche-stack__item">
+          {COUCHES.map((couche, i) => (
+            <li
+              key={couche.eyebrow}
+              className="couche-stack__item"
+              style={{ ['--i' as string]: i + 1 } as CSSProperties}
+            >
               <div
                 className="couche-layer"
                 data-testid="couche-stack-layer"
@@ -106,7 +118,12 @@ export default function CoucheStack() {
                 role="group"
                 aria-label={`${couche.eyebrow}: ${couche.headline}`}
                 tabIndex={0}
-                style={{ ['--layer-bg' as string]: couche.ramp } as CSSProperties}
+                style={
+                  {
+                    ['--face-top']: couche.face,
+                    ['--face-text']: couche.text,
+                  } as CSSProperties
+                }
               >
                 <div className="couche-layer__content">
                   <span

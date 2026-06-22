@@ -99,6 +99,8 @@ test.describe('F-483 — couche stack (desktop 1440, v3 light)', () => {
     await expect(firstDetail).toBeVisible()
 
     await expectNoOverflow(page)
+    // Let the 0.3s lift/reveal settle so the receipt is not caught mid-transition.
+    await page.waitForTimeout(450)
     await page.screenshot({
       path: path.join(SCREENSHOT_DIR, 'f-483-la-methode-1440.png'),
       fullPage: true,

@@ -6,18 +6,7 @@ export const metadata = {
 }
 
 export default function EcolePage() {
-  // F-483 — the 5-couche methodology visualizer leads the page (the
-  // methodology-visible-in-product surface), then the 27 lessons that teach it.
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 'clamp(40px, 6vw, 72px)',
-      }}
-    >
-      <CoucheStack />
-      <LessonListContainer />
-    </div>
-  )
+  // F-483 — the page h1 ("La Méthode") leads; the 5-couche visualizer is the h2
+  // section right under it (passed as the methodology slot), then the 27 lessons.
+  return <LessonListContainer methodology={<CoucheStack />} />
 }
