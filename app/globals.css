@@ -1503,17 +1503,18 @@
    F-483 — La Méthode 5-couche isometric 3D stack visualizer (/la-methode).
 
    The five couches rendered as a thick isometric stack. The wrapper is tilted
-   with skewY; each layer is an extruded block: a front face (holds the text)
+   with skewY; each layer is an extruded block: a top face (holds the headline)
    plus two depth faces built from pseudo-elements — ::before is the left face
-   (skewY 45deg, origin right), ::after is the top face (skewX 45deg, origin
-   bottom). That is what gives the stack visible thickness instead of reading as
-   a flat tilted plane. Per-layer z-index keeps the blocks ordered front to back.
+   (skewY 45deg, origin right), ::after is the back/top face (skewX 45deg, origin
+   bottom). That gives the stack visible thickness. Per-layer z-index keeps the
+   blocks ordered front to back.
 
-   Each layer leads with a plain-English How-to headline (Inter); the French
-   couche name sits above it as a small DM Mono eyebrow for method identity. On
-   hover and on keyboard focus the block lifts (translateX) and its detail line
-   expands. On touch (no hover) every detail stays visible. Mobile drops the
-   skew + faces for a flat, full-width fallback.
+   Each block carries ONE short How-to headline (Inter) that lies ON the slanted
+   face — it inherits the wrapper skew and is NOT counter-skewed, so the type
+   sits on the same isometric plane as the face, exactly like the uiverse
+   reference. No couche-name eyebrows, no detail line on the face: one line only,
+   sized + nowrap so it never wraps or clips. Mobile drops the skew + faces for a
+   flat, upright, full-width fallback.
 
    The angular geometry is intentional for this one component and overrides the
    general no-sharp-corners default. All raw uiverse hex is replaced with v3
@@ -1525,9 +1526,9 @@
 :root {
   /* Stepped coral ramp — five distinct steps, light at the top layer to deep at
      the bottom (NOT a smooth blend). AA-tuned: the upper three steps take dark
-     text, the lower two take light text, so small text (eyebrow + detail) clears
-     4.5:1 on every layer. Placeholder ramp; Chadi refines the exact steps on
-     preview (incl. whether Les Pièges Anglais gets standout emphasis). */
+     text, the lower two take light text, so the headline clears 4.5:1 on every
+     layer. Placeholder ramp; Chadi refines the exact steps on preview (incl.
+     whether Les Pièges Anglais gets standout emphasis). */
   --couche-ramp-1: #FAD4CB;   /* Le Propos          — lightest  (dark text 10.8:1) */
   --couche-ramp-2: #F4A28F;   /* Le Plan                        (dark text 7.3:1) */
   --couche-ramp-3: #ED7259;   /* La Construction                (dark text 5.0:1) */
@@ -1535,16 +1536,16 @@
   --couche-ramp-5: #9E3019;   /* La Musique         — deepest   (light text 7.3:1) */
   --couche-skew: -14deg;      /* wrapper tilt (uiverse reference value) */
   --couche-depth: clamp(26px, 3vw, 38px);   /* thickness of the 3D faces */
-  --couche-lift: clamp(12px, 1.6vw, 20px);  /* hover / focus translateX */
+  --couche-lift: clamp(10px, 1.4vw, 16px);  /* hover translateX */
 }
 
 /* Generous top/side room for the iso overhang (skew + top faces); overflow-x is
-   clipped (keeps the lift from ever adding horizontal scroll) while overflow-y
-   stays visible so the thickness above the top layer is never cut. */
+   clipped (keeps the hover lift from ever adding horizontal scroll) while
+   overflow-y stays visible so the thickness above the top block is never cut. */
 .couche-stack-frame {
   overflow-x: clip;
   overflow-y: visible;
-  padding: clamp(70px, 13vw, 160px) clamp(40px, 6vw, 72px) clamp(48px, 8vw, 90px)
+  padding: clamp(64px, 11vw, 140px) clamp(40px, 6vw, 72px) clamp(40px, 7vw, 80px)
     clamp(44px, 7vw, 80px);
 }
 
@@ -1552,7 +1553,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  max-width: 420px;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
   gap: var(--couche-depth);            /* each top face sits in the gap above its block */
@@ -1563,9 +1564,8 @@
   position: relative;
   z-index: var(--i, 1);                /* front-to-back order (uiverse z-index: var(--i)) */
 }
-/* Bring the hovered / focused block fully forward over its neighbours. */
-.couche-stack__item:has(> .couche-layer:hover),
-.couche-stack__item:has(> .couche-layer:focus-visible) {
+/* Bring the hovered block fully forward over its neighbours. */
+.couche-stack__item:has(> .couche-layer:hover) {
   z-index: 10;
 }
 
@@ -1573,10 +1573,9 @@
   position: relative;
   display: block;
   width: 100%;
-  background-color: var(--face-top, var(--couche-ramp-1));   /* front face */
+  background-color: var(--face-top, var(--couche-ramp-1));   /* the face the text sits on */
   color: var(--face-text, black);
-  padding: clamp(18px, 2vw, 24px) clamp(20px, 2.4vw, 28px);
-  cursor: default;
+  padding: clamp(16px, 2vw, 22px) clamp(20px, 2.4vw, 30px);
   transition: transform var(--lm-duration-state, 0.3s) var(--lm-ease, ease);
 }
 
@@ -1593,7 +1592,7 @@
   transform: skewY(45deg);
 }
 
-/* Top depth face — skewX 45deg from the bottom edge. */
+/* Back/top depth face — skewX 45deg from the bottom edge. */
 .couche-layer::after {
   content: "";
   position: absolute;
@@ -1606,79 +1605,29 @@
   transform: skewX(45deg);
 }
 
-/* Counter-skew so the type sits upright on the tilted front face. The wrapper's
-   skewY and this inverse skewY compose to identity, so text reads straight. */
-.couche-layer__content {
+/* The headline lies ON the slanted face: it inherits the wrapper skew (NOT
+   counter-skewed), so the type sits on the isometric plane like the reference.
+   One line — sized + nowrap so it never wraps or clips off the face edge. */
+.couche-layer__headline {
   position: relative;
   z-index: 1;                          /* above the depth faces */
-  transform: skewY(calc(-1 * var(--couche-skew)));
-}
-
-.couche-layer__eyebrow {
-  display: block;
-  font-family: var(--f-mono), "DM Mono", ui-monospace, monospace;
-  font-weight: 500;
-  font-size: 0.75rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--face-text, black);
-  margin: 0 0 4px;
-}
-
-.couche-layer__headline {
+  margin: 0;
   font-family: var(--f-en), "Inter", -apple-system, system-ui, sans-serif;
   font-weight: 600;
-  font-size: clamp(1.0625rem, 1.8vw, 1.375rem);
-  line-height: 1.25;
+  font-size: clamp(1.0625rem, 1.4vw, 1.1875rem);
+  line-height: 1.2;
   letter-spacing: -0.01em;
   color: var(--face-text, black);
-  margin: 0;
+  white-space: nowrap;
 }
 
-/* Detail collapses with a grid-rows trick: it stays in the accessibility tree
-   (screen readers read it always), but is visually revealed on hover / focus. */
-.couche-layer__detail-wrap {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows var(--lm-duration-state, 0.3s) var(--lm-ease, ease);
-}
-.couche-layer__detail-inner {
-  overflow: hidden;
-  min-height: 0;
-}
-.couche-layer__detail {
-  font-family: var(--f-en), "Inter", -apple-system, system-ui, sans-serif;
-  font-weight: 400;
-  font-size: 0.9375rem;
-  line-height: 1.5;
-  color: var(--face-text, black);
-  margin: 0;
-  padding-top: 8px;
-}
-
-/* Hover + keyboard focus: lift the block out of the stack, reveal its detail. */
-.couche-layer:hover,
-.couche-layer:focus-visible {
+/* Hover: lift the block out of the stack (decorative; the face is static text). */
+.couche-layer:hover {
   transform: translateX(calc(-1 * var(--couche-lift)));
-}
-.couche-layer:focus-visible {
-  outline: 2px solid var(--face-text, black);
-  outline-offset: 4px;
-}
-.couche-layer:hover .couche-layer__detail-wrap,
-.couche-layer:focus-visible .couche-layer__detail-wrap {
-  grid-template-rows: 1fr;
-}
-
-/* Touch / no-hover: every detail stays visible (there is no hover to reveal it). */
-@media (hover: none) {
-  .couche-layer__detail-wrap {
-    grid-template-rows: 1fr;
-  }
 }
 
 /* Narrow viewports: drop the iso geometry entirely (skew + depth faces fight
-   small widths). Flat, full-width, all details open, no horizontal overflow. */
+   small widths). Flat, upright, full-width, headlines may wrap, no overflow. */
 @media (max-width: 640px) {
   .couche-stack-frame {
     overflow: visible;
@@ -1693,19 +1642,15 @@
   .couche-layer::after {
     display: none;
   }
-  .couche-layer__content {
-    transform: none;
-  }
-  .couche-layer__detail-wrap {
-    grid-template-rows: 1fr;
+  .couche-layer__headline {
+    white-space: normal;
   }
 }
 
 /* Reduced motion: keep the static geometry (it is layout, not motion), but no
-   lift or reveal transitions. */
+   hover-lift transition. */
 @media (prefers-reduced-motion: reduce) {
-  .couche-layer,
-  .couche-layer__detail-wrap {
+  .couche-layer {
     transition: none;
   }
 }

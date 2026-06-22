@@ -1,62 +1,31 @@
 import type { CSSProperties } from 'react'
 
-// F-483 — La Méthode 5-couche skewed-stack visualizer.
+// F-483 — La Méthode 5-couche isometric 3D stack visualizer.
 //
 // The five couches are the lens over Beacco that defines the method; they must
-// be visible in-product (launch criterion). This renders them as stacked strata
-// using the uiverse skewY effect, reskinned to v3 (coral ramp + Inter / DM Mono;
-// styles live in app/globals.css under the F-483 block). The audience is
-// anglophone, so each band LEADS with a plain How-to headline; the French couche
-// name is a small eyebrow above it for method identity.
+// be visible in-product (launch criterion). This renders them as an isometric
+// 3D stack using the uiverse skewY effect, reskinned to v3 (coral ramp + Inter;
+// styles live in app/globals.css under the F-483 block).
 //
-// Copy and the coral ramp are placeholders — Chadi refines both on preview.
+// Each block carries ONE short How-to headline that lies ON the slanted face
+// (it inherits the wrapper skew, like the reference). No couche-name eyebrows,
+// no detail line on the face — one clean line per block. Copy and the coral ramp
+// are placeholders; Chadi refines both on preview.
 
 type Couche = {
-  eyebrow: string
   headline: string
-  detail: string
   face: string // top-face fill (coral ramp token)
   text: 'black' | 'white' // AA-safe text color for that step
 }
 
 // Light at the top, deep at the bottom. The upper three steps take dark text,
-// the lower two take light text, so small text clears 4.5:1 on every layer.
+// the lower two take light text, so the headline clears 4.5:1 on every layer.
 const COUCHES: Couche[] = [
-  {
-    eyebrow: 'Le Propos',
-    headline: 'How to say what you actually mean',
-    detail: 'The intent behind your words, shaped before you speak.',
-    face: 'var(--couche-ramp-1)',
-    text: 'black',
-  },
-  {
-    eyebrow: 'Le Plan',
-    headline: 'How to organize your ideas in French',
-    detail: 'The order and flow that make you sound structured, not scattered.',
-    face: 'var(--couche-ramp-2)',
-    text: 'black',
-  },
-  {
-    eyebrow: 'La Construction',
-    headline: 'How to build sentences that hold up',
-    detail: 'The grammar and syntax that carry the meaning correctly.',
-    face: 'var(--couche-ramp-3)',
-    text: 'black',
-  },
-  {
-    eyebrow: 'Les Pièges Anglais',
-    headline: 'How to dodge the English traps',
-    detail: 'Faux amis, calques, and the reflexes that give anglophones away.',
-    face: 'var(--couche-ramp-4)',
-    text: 'white',
-  },
-  {
-    eyebrow: 'La Musique',
-    headline: 'How to sound native, not assembled',
-    detail: 'Rhythm, stress, and intonation, the layer most learners skip.',
-    face: 'var(--couche-ramp-5)',
-    text: 'white',
-  },
+  { headline: 'How to say what you actually mean', face: 'var(--couche-ramp-1)', text: 'black' },
+  { headline: 'How to organize your ideas in French', face: 'var(--couche-ramp-2)', text: 'black' },
+  { headline: 'How to build sentences that hold up', face: 'var(--couche-ramp-3)', text: 'black' },
+  { headline: 'How to dodge the English traps', face: 'var(--couche-ramp-4)', text: 'white' },
+  { headline: 'How to sound native, not assembled', face: 'var(--couche-ramp-5)', text: 'white' },
 ]
 
 const INTER = 'var(--f-en), "Inter", -apple-system, system-ui, sans-serif'
@@ -107,17 +76,13 @@ export default function CoucheStack() {
         >
           {COUCHES.map((couche, i) => (
             <li
-              key={couche.eyebrow}
+              key={couche.headline}
               className="couche-stack__item"
               style={{ ['--i' as string]: i + 1 } as CSSProperties}
             >
               <div
                 className="couche-layer"
                 data-testid="couche-stack-layer"
-                data-couche={couche.eyebrow}
-                role="group"
-                aria-label={`${couche.eyebrow}: ${couche.headline}`}
-                tabIndex={0}
                 style={
                   {
                     ['--face-top']: couche.face,
@@ -125,28 +90,12 @@ export default function CoucheStack() {
                   } as CSSProperties
                 }
               >
-                <div className="couche-layer__content">
-                  <span
-                    className="couche-layer__eyebrow"
-                    data-testid="couche-stack-eyebrow"
-                  >
-                    {couche.eyebrow}
-                  </span>
-                  <h3
-                    className="couche-layer__headline"
-                    data-testid="couche-stack-headline"
-                  >
-                    {couche.headline}
-                  </h3>
-                  <div className="couche-layer__detail-wrap">
-                    <div
-                      className="couche-layer__detail-inner"
-                      data-testid="couche-stack-detail"
-                    >
-                      <p className="couche-layer__detail">{couche.detail}</p>
-                    </div>
-                  </div>
-                </div>
+                <h3
+                  className="couche-layer__headline"
+                  data-testid="couche-stack-headline"
+                >
+                  {couche.headline}
+                </h3>
               </div>
             </li>
           ))}
