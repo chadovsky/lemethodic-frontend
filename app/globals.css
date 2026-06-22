@@ -1524,21 +1524,27 @@
    (by andrew-demchenk0), MIT License. Geometry kept; colours reskinned to sky.
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Sky ramp — front fills, light at the top layer to mid at the bottom; every
-     fill stays light enough for the single dark ink below. Placeholder ramp;
-     Chadi refines on preview. (Drives the bars together with the component
-     array; no raw hex in the markup.) */
-  --couche-ramp-1: #E8F6FE;   /* Le Propos */
+  /* Sky ramp — three blue tones per layer (top / front / side), light at the top
+     layer to mid at the bottom. Every tone is blue: no white, no transparent
+     face anywhere. The front face is a top-lit vertical gradient top -> front;
+     the side/depth faces use the darker side tone. Placeholder ramp; Chadi
+     refines on preview. (Drives the bars with the component array; no raw hex in
+     the markup.) */
+  --couche-top-1:  #E8F6FE;   /* Le Propos          — top (lighter) */
+  --couche-top-2:  #DCF1FE;   /* Le Plan */
+  --couche-top-3:  #B6E4FB;   /* La Construction */
+  --couche-top-4:  #74CFF4;   /* Les Pièges Anglais */
+  --couche-top-5:  #3FBBEC;   /* La Musique */
+  --couche-ramp-1: #E8F6FE;   /* Le Propos          — front (mid) */
   --couche-ramp-2: #C7EBFC;   /* Le Plan */
   --couche-ramp-3: #93DAF9;   /* La Construction */
   --couche-ramp-4: #54C3F2;   /* Les Pièges Anglais */
   --couche-ramp-5: #1FAEE8;   /* La Musique */
-  /* Per-layer depth / side face shade (one step deeper, same sky family). */
-  --couche-side-1: #C8E9FC;
-  --couche-side-2: #A3DCF8;
-  --couche-side-3: #66C7F1;
-  --couche-side-4: #2CA8E5;
-  --couche-side-5: #0C8FC9;
+  --couche-side-1: #C8E9FC;   /* Le Propos          — side / depth (darker) */
+  --couche-side-2: #A3DCF8;   /* Le Plan */
+  --couche-side-3: #66C7F1;   /* La Construction */
+  --couche-side-4: #2CA8E5;   /* Les Pièges Anglais */
+  --couche-side-5: #0A8BC6;   /* La Musique */
   /* One dark ink for every layer — eyebrow + phrase. No white text anywhere. */
   --couche-ink: #1F2937;
   --couche-skew: -14deg;      /* wrapper tilt (uiverse reference value) */
@@ -1580,7 +1586,13 @@
   position: relative;
   display: block;
   width: 100%;
-  background-color: var(--face-top, var(--couche-ramp-1));   /* the front face */
+  /* Front face — top-lit: a vertical gradient from the top tone down to the
+     front tone. All blue, no white. */
+  background-image: linear-gradient(
+    180deg,
+    var(--face-top, var(--couche-top-1)),
+    var(--face-front, var(--couche-ramp-1))
+  );
   color: var(--couche-ink);
   padding: clamp(16px, 2vw, 20px) clamp(22px, 2.4vw, 30px);
   border-radius: 7px;
@@ -1602,9 +1614,9 @@
   transform: skewY(45deg);
 }
 
-/* Top face — only the FIRST layer needs one (the top of the contiguous block).
-   Per-layer top faces would jut in over the upright text of the layer above, so
-   they are suppressed; the depth reads on the left face + this single top. */
+/* Top face — only the FIRST layer needs one (the top of the contiguous block);
+   per-layer top faces would jut over the text below. Uses the lighter top tone
+   (top-lit), so the top of the block reads as the lightest blue. */
 .couche-layer::after {
   content: "";
   position: absolute;
@@ -1612,7 +1624,7 @@
   left: 0;
   width: 100%;
   height: var(--couche-depth);
-  background-color: var(--face-side, var(--couche-side-1));
+  background-color: var(--face-top, var(--couche-top-1));
   border-radius: 7px;
   transform-origin: bottom;
   transform: skewX(45deg);
@@ -1622,12 +1634,12 @@
   display: block;
 }
 
-/* Upright wrapper: inverse skew of the bar, so eyebrow + phrase render straight
-   while the bar keeps its skew. Sits above the depth faces. */
+/* Content wrapper: NO counter-skew — the eyebrow + phrase inherit the bar's
+   skew, so the type slants WITH the box and sits on the isometric plane (like
+   the reference). Sits above the depth faces. */
 .couche-layer__content {
   position: relative;
   z-index: 1;
-  transform: skewY(calc(-1 * var(--couche-skew)));
 }
 
 .couche-layer__eyebrow {
@@ -1674,9 +1686,6 @@
   }
   .couche-layer {
     padding: clamp(16px, 4vw, 20px) clamp(18px, 4vw, 22px);
-  }
-  .couche-layer__content {
-    transform: none;
   }
 }
 

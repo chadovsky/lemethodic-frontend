@@ -58,12 +58,13 @@ describe('CoucheStack', () => {
     })
   })
 
-  it('drives each block from the sky front + side ramp tokens (no raw hex)', () => {
+  it('drives each block from the sky top + front + side ramp tokens (no raw hex)', () => {
     render(<CoucheStack />)
     const layers = screen.getAllByTestId('couche-stack-layer')
     layers.forEach((layer, i) => {
       const style = layer.getAttribute('style') ?? ''
-      expect(style).toContain(`--face-top: var(--couche-ramp-${i + 1})`)
+      expect(style).toContain(`--face-top: var(--couche-top-${i + 1})`)
+      expect(style).toContain(`--face-front: var(--couche-ramp-${i + 1})`)
       expect(style).toContain(`--face-side: var(--couche-side-${i + 1})`)
       // No coral / sky hex leaked into the markup.
       expect(style).not.toMatch(/#[0-9a-fA-F]{3,6}/)

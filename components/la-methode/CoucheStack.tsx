@@ -16,38 +16,44 @@ import type { CSSProperties } from 'react'
 type Couche = {
   eyebrow: string // couche name (uppercased via CSS)
   headline: string // How-to phrase
-  front: string // front-face fill (sky ramp token)
-  side: string // depth / side-face shade (sky ramp token)
+  top: string // top-face / gradient-top tone (sky ramp token)
+  front: string // front-face tone (sky ramp token)
+  side: string // depth / side-face tone (sky ramp token)
 }
 
 const COUCHES: Couche[] = [
   {
     eyebrow: 'Le Propos',
     headline: 'How to say what you actually mean',
+    top: 'var(--couche-top-1)',
     front: 'var(--couche-ramp-1)',
     side: 'var(--couche-side-1)',
   },
   {
     eyebrow: 'Le Plan',
     headline: 'How to organize your ideas in French',
+    top: 'var(--couche-top-2)',
     front: 'var(--couche-ramp-2)',
     side: 'var(--couche-side-2)',
   },
   {
     eyebrow: 'La Construction',
     headline: 'How to build sentences that hold up',
+    top: 'var(--couche-top-3)',
     front: 'var(--couche-ramp-3)',
     side: 'var(--couche-side-3)',
   },
   {
     eyebrow: 'Les Pièges Anglais',
     headline: 'How to dodge the English traps',
+    top: 'var(--couche-top-4)',
     front: 'var(--couche-ramp-4)',
     side: 'var(--couche-side-4)',
   },
   {
     eyebrow: 'La Musique',
     headline: 'How to sound native, not assembled',
+    top: 'var(--couche-top-5)',
     front: 'var(--couche-ramp-5)',
     side: 'var(--couche-side-5)',
   },
@@ -111,7 +117,8 @@ export default function CoucheStack() {
                 data-couche={couche.eyebrow}
                 style={
                   {
-                    ['--face-top']: couche.front,
+                    ['--face-top']: couche.top,
+                    ['--face-front']: couche.front,
                     ['--face-side']: couche.side,
                   } as CSSProperties
                 }
