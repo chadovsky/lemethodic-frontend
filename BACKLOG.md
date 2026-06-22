@@ -7147,7 +7147,7 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 ## F-481 -- FE: lock logged-out / marketing routes to the v3 LIGHT theme (ignore OS dark, kill the dark FOUC)
 
-**Status:** Built on `feat/f-481-marketing-light-lock`; pending Chadi go for squash-merge (per dispatch, merge only on confirmation). Squash SHA to be filled in at merge.
+**Status:** Shipped -- squash-merged `a896dd4` (PR #15, `feat/f-481-marketing-light-lock` -> main, 2026-06-22). All ship gates green: CI `success` on the PR (Unit (vitest) 575/575 pass 1m48s + E2E (Playwright) pass 17m25s + Vercel preview READY). Local prod-build gates: unit 575/575, `tsc` clean for touched files, `pnpm build` clean (fresh `rm -rf .next`), full dark e2e battery (f-454, f-454-ext, f-455, f-458, f-459, f-460, f-464, f-467, f-472) + marketing (f-479, f-480) + f-481 green 114/114 (serial, prod build). F-225 receipts `tests/screenshots/f-481-{home,tarifs,connexion,inscription}-{1440,375}.png` + trace `f-481.zip` (local; gitignored). Production deploy auto-triggered on merge. No tag (F-4xx one-off FE tickets are not on the `v0.<section>.<count>` scheme). le-methodic-ship gate: SHIP.
 
 **Why:** Marketing / logged-out pages rendered dark for visitors whose OS or browser color scheme is dark, because the single `next-themes` provider in the root layout used `defaultTheme="system" enableSystem` and wrapped the whole site. The marketing hex were never migrated to the v3 dark tokens, so that dark render is broken (mixed: token-driven elements flip, hardcoded-hex elements do not). Marketing must always render the v3 LIGHT palette regardless of system preference, with no flash of dark before paint.
 
