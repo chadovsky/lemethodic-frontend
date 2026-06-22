@@ -21,6 +21,7 @@ import { useEffect, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/lib/auth'
 import { useVerifyAuth } from '@/hooks/useVerifyAuth'
+import { ThemeProvider } from '@/components/ThemeProvider'
 
 // F-474 — matches the destination canvas (--bg-canvas, #EAEFF3) so the auth
 // gate doesn't flash peach before the app surface paints behind it.
@@ -58,5 +59,18 @@ export default function ProtectedRoute({
     return <div style={{ minHeight: '100dvh', backgroundColor: LOADER_BG }} />
   }
 
-  return <>{children}</>
+  // F-481 — dark mode is an authenticated-only capability (the ThemeToggle lives
+  // in the app shell, reachable only when signed in). Mounting the next-themes
+  // provider here, at the single auth gate, scopes the theme to every authed
+  // surface at once: the (app) shell and the standalone authed routes that wrap
+  // ProtectedRoute directly (/bienvenue, /more, /la-methode/intro, ...). Every
+  // logged-out / marketing surface mounts no provider, so the .dark class is
+  // never applied there and it renders the v3 light palette by construction,
+  // ignoring the OS color scheme with no flash. (The /dev token galleries get
+  // their own scoped provider in app/dev/layout.tsx since they are not authed.)
+  return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      {children}
+    </ThemeProvider>
+  )
 }
