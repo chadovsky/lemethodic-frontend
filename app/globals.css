@@ -1498,3 +1498,171 @@
 .carte-card:hover {
   box-shadow: 0 6px 22px color-mix(in srgb, var(--ink) 14%, transparent);
 }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   F-483 — La Méthode 5-couche skewed-stack visualizer (/la-methode).
+
+   The five couches rendered as stacked strata, tilted with the uiverse skewY
+   effect. Each band leads with a plain-English How-to headline; the French
+   couche name sits above it as a small eyebrow for method identity. On hover
+   and on keyboard focus the band lifts (translateX) and its detail line
+   expands. On touch (no hover) every detail stays visible.
+
+   The angular skew is intentional for this one component and overrides the
+   general no-sharp-corners default. All raw uiverse hex is replaced with v3
+   tokens; per-band fill is the computed coral ramp below.
+
+   Skewed-stack effect adapted from a uiverse.io community component (MIT).
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Computed coral ramp — anchored on --accent-soft #F87171 (lightest, top
+     band) and --accent #E05C42 (deepest, bottom band); the three middle steps
+     are even RGB interpolations between the two anchors. Placeholder ramp;
+     Chadi refines the exact steps on preview. */
+  --couche-ramp-1: #F87171;   /* Le Propos          — lightest (= --accent-soft) */
+  --couche-ramp-2: #F26C65;   /* Le Plan            — interpolated */
+  --couche-ramp-3: #EC675A;   /* La Construction    — interpolated */
+  --couche-ramp-4: #E6614E;   /* Les Pièges Anglais — interpolated */
+  --couche-ramp-5: #E05C42;   /* La Musique         — deepest (= --accent) */
+  --couche-skew: -4deg;
+}
+
+/* Frame clips the hover lift so a band can never add horizontal scroll. */
+.couche-stack-frame {
+  overflow: hidden;
+  padding: clamp(44px, 5vw, 56px) clamp(12px, 2vw, 24px);
+}
+
+.couche-stack {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 600px;
+  transform: skewY(var(--couche-skew));
+}
+
+.couche-stack__item {
+  display: block;
+}
+
+.couche-layer {
+  position: relative;
+  display: block;
+  width: 100%;
+  background-color: var(--layer-bg, var(--couche-ramp-1));
+  color: var(--heading);
+  padding: clamp(16px, 2vw, 22px) clamp(20px, 2.4vw, 28px);
+  cursor: default;
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--ink) 12%, transparent);
+  transition:
+    transform var(--lm-duration-state, 0.3s) var(--lm-ease, ease),
+    box-shadow var(--lm-duration-state, 0.3s) var(--lm-ease, ease);
+}
+
+/* Pseudo-element 3D side — a darker extruded left edge that gives the stack its
+   strata thickness (the uiverse effect's depth, reskinned to a coral shade). */
+.couche-layer::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 6px;
+  background-color: color-mix(in srgb, var(--layer-bg, var(--couche-ramp-1)) 78%, black);
+}
+
+/* Counter-skew so the type sits straight on the tilted band. */
+.couche-layer__content {
+  position: relative;
+  transform: skewY(calc(-1 * var(--couche-skew)));
+}
+
+.couche-layer__eyebrow {
+  display: block;
+  font-family: var(--f-mono), "DM Mono", ui-monospace, monospace;
+  font-weight: 500;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--heading);
+  margin: 0 0 4px;
+}
+
+.couche-layer__headline {
+  font-family: var(--f-en), "Inter", -apple-system, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.0625rem, 1.8vw, 1.375rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--heading);
+  margin: 0;
+}
+
+/* Detail collapses with a grid-rows trick: it stays in the accessibility tree
+   (screen readers read it always), but is visually revealed on hover / focus. */
+.couche-layer__detail-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--lm-duration-state, 0.3s) var(--lm-ease, ease);
+}
+.couche-layer__detail-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+.couche-layer__detail {
+  font-family: var(--f-en), "Inter", -apple-system, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--heading);
+  margin: 0;
+  padding-top: 8px;
+}
+
+/* Hover + keyboard focus: lift the band out of the stack, reveal its detail. */
+.couche-layer:hover,
+.couche-layer:focus-visible {
+  transform: translateX(clamp(10px, 1.5vw, 18px));
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--ink) 22%, transparent);
+}
+.couche-layer:focus-visible {
+  outline: 2px solid var(--heading);
+  outline-offset: 3px;
+}
+.couche-layer:hover .couche-layer__detail-wrap,
+.couche-layer:focus-visible .couche-layer__detail-wrap {
+  grid-template-rows: 1fr;
+}
+
+/* Touch / no-hover: every detail stays visible (there is no hover to reveal it). */
+@media (hover: none) {
+  .couche-layer__detail-wrap {
+    grid-template-rows: 1fr;
+  }
+}
+
+/* Narrow viewports: drop the skew (the angular geometry fights small widths),
+   go full width, and keep all details open. */
+@media (max-width: 640px) {
+  .couche-stack-frame {
+    overflow: visible;
+    padding: 0;
+  }
+  .couche-stack {
+    max-width: 100%;
+    transform: none;
+  }
+  .couche-layer__content {
+    transform: none;
+  }
+  .couche-layer__detail-wrap {
+    grid-template-rows: 1fr;
+  }
+}
+
+/* Reduced motion: keep the static skew (it is layout, not motion), but no
+   lift or reveal transitions. */
+@media (prefers-reduced-motion: reduce) {
+  .couche-layer,
+  .couche-layer__detail-wrap {
+    transition: none;
+  }
+}
