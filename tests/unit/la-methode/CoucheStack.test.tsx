@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import CoucheStack from '@/components/la-methode/CoucheStack'
@@ -20,7 +20,7 @@ const HEADLINES = [
   'How to sound native, not assembled',
 ]
 
-describe('CoucheStack', () => {
+describe('CoucheStack (SVG)', () => {
   it('renders the section as a labelled region', () => {
     render(<CoucheStack />)
     expect(
@@ -28,9 +28,19 @@ describe('CoucheStack', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders five blocks, each with its eyebrow + headline in order', () => {
+  it('renders an SVG image with a title + desc covering all five couches', () => {
+    const { container } = render(<CoucheStack />)
+    const svg = screen.getByTestId('couche-stack-svg')
+    expect(svg.tagName.toLowerCase()).toBe('svg')
+    expect(svg).toHaveAttribute('role', 'img')
+    expect(container.querySelector('title')?.textContent).toMatch(/five layers/i)
+    const desc = container.querySelector('desc')?.textContent ?? ''
+    EYEBROWS.forEach((e) => expect(desc).toContain(e))
+    HEADLINES.forEach((h) => expect(desc).toContain(h))
+  })
+
+  it('renders the five eyebrows + headlines in order', () => {
     render(<CoucheStack />)
-    expect(screen.getAllByTestId('couche-stack-layer')).toHaveLength(5)
     expect(
       screen.getAllByTestId('couche-stack-eyebrow').map((el) => el.textContent),
     ).toEqual(EYEBROWS)
@@ -45,30 +55,21 @@ describe('CoucheStack', () => {
     expect(screen.getByText('La Musique')).toBeInTheDocument()
   })
 
-  it('pairs each eyebrow with its headline inside the same block', () => {
-    render(<CoucheStack />)
-    const layers = screen.getAllByTestId('couche-stack-layer')
-    layers.forEach((layer, i) => {
-      expect(within(layer).getByTestId('couche-stack-eyebrow')).toHaveTextContent(
-        EYEBROWS[i],
-      )
-      expect(within(layer).getByTestId('couche-stack-headline')).toHaveTextContent(
-        HEADLINES[i],
-      )
-    })
+  it('renders five front + five side polygons plus the couche-0 top cap', () => {
+    const { container } = render(<CoucheStack />)
+    // 5 side wall + 1 top cap + 5 front faces = 11 polygons.
+    expect(container.querySelectorAll('polygon')).toHaveLength(11)
   })
 
-  it('drives each block from the sky top + front + side ramp tokens (no raw hex)', () => {
-    render(<CoucheStack />)
-    const layers = screen.getAllByTestId('couche-stack-layer')
-    layers.forEach((layer, i) => {
-      const style = layer.getAttribute('style') ?? ''
-      expect(style).toContain(`--face-top: var(--couche-top-${i + 1})`)
-      expect(style).toContain(`--face-front: var(--couche-ramp-${i + 1})`)
-      expect(style).toContain(`--face-side: var(--couche-side-${i + 1})`)
-      // No coral / sky hex leaked into the markup.
-      expect(style).not.toMatch(/#[0-9a-fA-F]{3,6}/)
-    })
+  it('drives every face from the sky tokens — no raw hex in the SVG', () => {
+    const { container } = render(<CoucheStack />)
+    const svg = screen.getByTestId('couche-stack-svg')
+    // Fills reference var(--couche-*); ink references var(--couche-ink).
+    expect(svg.outerHTML).toContain('var(--couche-ramp-1)')
+    expect(svg.outerHTML).toContain('var(--couche-side-5)')
+    expect(svg.outerHTML).toContain('var(--couche-top-1)')
+    expect(svg.outerHTML).not.toMatch(/#[0-9a-fA-F]{3,6}\b/)
+    expect(container.innerHTML).not.toMatch(/#[0-9a-fA-F]{3,6}\b/)
   })
 
   it('uses no em-dashes in the rendered output', () => {

@@ -1,12 +1,12 @@
-// F-483 — La Méthode 5-couche isometric stack visualizer (/la-methode), sky reskin.
+// F-483 — La Méthode 5-couche visualizer (/la-methode), SVG isometric block.
 // Receipts:
-//   f-483-la-methode-1440.png  (flush sky isometric block, desktop)
-//   f-483-la-methode-375.png   (flat upright fallback, mobile)
+//   f-483-la-methode-1440.png  (sky SVG isometric block, desktop)
+//   f-483-la-methode-375.png   (same SVG scaled, mobile)
 // Trace: tests/traces/f-483.zip (desktop happy path).
 //
 // Asserts the launch contract: the component is visible; the five couche labels
-// (eyebrows) and their five How-to phrases render in order; no horizontal
-// overflow; mobile flat fallback intact.
+// (eyebrows) and their five How-to phrases render in order (as SVG <text>); no
+// horizontal overflow at either width.
 
 import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'

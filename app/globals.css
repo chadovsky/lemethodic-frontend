@@ -1500,199 +1500,39 @@
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
-   F-483 — La Méthode 5-couche isometric stack visualizer (/la-methode).
+   F-483 — La Méthode 5-couche visualizer (/la-methode), SVG rebuild.
 
-   The five couches rendered as one flush, contiguous isometric block. The
-   wrapper is tilted with skewY; each layer is an extruded block — a front face
-   (holds the upright text) plus two depth faces built from pseudo-elements:
-   ::before is the left side face (skewY 45deg, origin right), ::after is the
-   top face (skewX 45deg, origin bottom). Per-layer z-index orders them front to
-   back. Layers are flush (gap 0); each layer carries a bottom-shelf padding =
-   the face depth, so the layer below's top face lands on that shelf and never
-   covers the text above.
+   The five couches render as one isometric 3D block built from exact SVG
+   polygons (components/la-methode/CoucheStack.tsx) — this replaced the earlier
+   CSS skew + pseudo-element build, which left a white wedge, soft corners, and
+   seam leaks. The polygons make every edge crisp and leave no canvas gap by
+   construction; the SVG <text> rides the same shear so the type lies on the
+   isometric plane.
 
-   Each layer shows a DM Mono uppercase couche eyebrow above an Inter extrabold
-   How-to phrase. Both ride inside a counter-skewed wrapper, so the type renders
-   UPRIGHT while the bars keep their skew + rightward fan. Mobile drops the skew
-   + faces for a flat, upright, full-width fallback.
+   The only thing CSS owns now is the colour identity below: a centralized sky
+   ramp of three blue tones per couche (top / front / side). Every face is blue —
+   no white, no transparent. Coral is removed from THIS surface only; the global
+   --accent coral token is untouched. The SVG consumes these via fill: var(...).
 
-   Colours: a centralized sky ramp (front fills + per-layer side shades); one
-   dark ink for all text. Coral is removed from THIS surface only — the global
-   --accent coral token is untouched. Rounded 7px corners (no sharp corners).
-
-   Isometric stacked-list effect adapted from a uiverse.io community component
-   (by andrew-demchenk0), MIT License. Geometry kept; colours reskinned to sky.
+   Isometric block adapted from a uiverse.io community component (by
+   andrew-demchenk0), MIT License; rebuilt as SVG and reskinned to sky.
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Sky ramp — three blue tones per layer (top / front / side), light at the top
-     layer to mid at the bottom. Every tone is blue: no white, no transparent
-     face anywhere. The front face is a top-lit vertical gradient top -> front;
-     the side/depth faces use the darker side tone. Placeholder ramp; Chadi
-     refines on preview. (Drives the bars with the component array; no raw hex in
-     the markup.) */
-  --couche-top-1:  #E8F6FE;   /* Le Propos          — top (lighter) */
+  --couche-top-1:  #E8F6FE;   /* Le Propos          — top cap (c0) / gradient top */
   --couche-top-2:  #DCF1FE;   /* Le Plan */
   --couche-top-3:  #B6E4FB;   /* La Construction */
   --couche-top-4:  #74CFF4;   /* Les Pièges Anglais */
   --couche-top-5:  #3FBBEC;   /* La Musique */
-  --couche-ramp-1: #E8F6FE;   /* Le Propos          — front (mid) */
+  --couche-ramp-1: #E8F6FE;   /* Le Propos          — front face */
   --couche-ramp-2: #C7EBFC;   /* Le Plan */
   --couche-ramp-3: #93DAF9;   /* La Construction */
   --couche-ramp-4: #54C3F2;   /* Les Pièges Anglais */
   --couche-ramp-5: #1FAEE8;   /* La Musique */
-  --couche-side-1: #C8E9FC;   /* Le Propos          — side / depth (darker) */
+  --couche-side-1: #C8E9FC;   /* Le Propos          — side / depth wall */
   --couche-side-2: #A3DCF8;   /* Le Plan */
   --couche-side-3: #66C7F1;   /* La Construction */
   --couche-side-4: #2CA8E5;   /* Les Pièges Anglais */
   --couche-side-5: #0A8BC6;   /* La Musique */
-  /* One dark ink for every layer — eyebrow + phrase. No white text anywhere. */
+  /* One dark ink for every couche — eyebrow + phrase. No white text anywhere. */
   --couche-ink: #1F2937;
-  --couche-skew: -14deg;      /* wrapper tilt (uiverse reference value) */
-  --couche-depth: clamp(24px, 2.8vw, 34px);   /* thickness of the 3D faces */
-  --couche-lift: clamp(10px, 1.4vw, 16px);    /* hover translateX */
-}
-
-/* Generous top/side room for the iso overhang (skew + top faces); overflow-x is
-   clipped (keeps the hover lift from ever adding horizontal scroll) while
-   overflow-y stays visible so the thickness above the top block is never cut. */
-.couche-stack-frame {
-  overflow-x: clip;
-  overflow-y: visible;
-  padding: clamp(60px, 10vw, 130px) clamp(40px, 6vw, 72px) clamp(36px, 6vw, 72px)
-    clamp(44px, 7vw, 80px);
-}
-
-.couche-stack {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  max-width: 500px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;                              /* flush — one contiguous block */
-  transform: skewY(var(--couche-skew));
-}
-
-.couche-stack__item {
-  position: relative;
-  z-index: var(--i, 1);                /* front-to-back order (uiverse z-index: var(--i)) */
-}
-/* Bring the hovered block fully forward over its neighbours. */
-.couche-stack__item:has(> .couche-layer:hover) {
-  z-index: 10;
-}
-
-.couche-layer {
-  position: relative;
-  display: block;
-  width: 100%;
-  /* Front face — top-lit: a vertical gradient from the top tone down to the
-     front tone. All blue, no white. */
-  background-image: linear-gradient(
-    180deg,
-    var(--face-top, var(--couche-top-1)),
-    var(--face-front, var(--couche-ramp-1))
-  );
-  color: var(--couche-ink);
-  padding: clamp(16px, 2vw, 20px) clamp(22px, 2.4vw, 30px);
-  border-radius: 7px;
-  transition: transform var(--lm-duration-state, 0.3s) var(--lm-ease, ease);
-}
-
-/* Left side face — skewY 45deg from the right edge. The per-layer side shades
-   stack into the continuous left face of the contiguous block. */
-.couche-layer::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: calc(-1 * var(--couche-depth));
-  width: var(--couche-depth);
-  height: 100%;
-  background-color: var(--face-side, var(--couche-side-1));
-  border-radius: 7px;
-  transform-origin: right;
-  transform: skewY(45deg);
-}
-
-/* Top face — only the FIRST layer needs one (the top of the contiguous block);
-   per-layer top faces would jut over the text below. Uses the lighter top tone
-   (top-lit), so the top of the block reads as the lightest blue. */
-.couche-layer::after {
-  content: "";
-  position: absolute;
-  top: calc(-1 * var(--couche-depth));
-  left: 0;
-  width: 100%;
-  height: var(--couche-depth);
-  background-color: var(--face-top, var(--couche-top-1));
-  border-radius: 7px;
-  transform-origin: bottom;
-  transform: skewX(45deg);
-  display: none;
-}
-.couche-stack__item:first-child .couche-layer::after {
-  display: block;
-}
-
-/* Content wrapper: NO counter-skew — the eyebrow + phrase inherit the bar's
-   skew, so the type slants WITH the box and sits on the isometric plane (like
-   the reference). Sits above the depth faces. */
-.couche-layer__content {
-  position: relative;
-  z-index: 1;
-}
-
-.couche-layer__eyebrow {
-  display: block;
-  margin: 0 0 6px;
-  font-family: var(--f-mono), "DM Mono", ui-monospace, monospace;
-  font-weight: 500;
-  font-size: 0.65rem;                  /* ~10.5px */
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--couche-ink);
-}
-
-.couche-layer__headline {
-  margin: 0;
-  font-family: var(--f-en), "Inter", -apple-system, system-ui, sans-serif;
-  font-weight: 800;                    /* extrabold */
-  font-size: clamp(1.0625rem, 1.4vw, 1.1875rem);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  color: var(--couche-ink);
-}
-
-/* Hover: lift the block out of the stack (decorative). */
-.couche-layer:hover {
-  transform: translateX(calc(-1 * var(--couche-lift)));
-}
-
-/* Narrow viewports: drop the iso geometry entirely (skew + depth faces fight
-   small widths). Flat, upright, full-width, flush, no overflow. */
-@media (max-width: 640px) {
-  .couche-stack-frame {
-    overflow: visible;
-    padding: 0;
-  }
-  .couche-stack {
-    max-width: 100%;
-    transform: none;
-  }
-  .couche-layer::before,
-  .couche-layer::after,
-  .couche-stack__item:first-child .couche-layer::after {
-    display: none;
-  }
-  .couche-layer {
-    padding: clamp(16px, 4vw, 20px) clamp(18px, 4vw, 22px);
-  }
-}
-
-/* Reduced motion: keep the static geometry (it is layout, not motion), but no
-   hover-lift transition. */
-@media (prefers-reduced-motion: reduce) {
-  .couche-layer {
-    transition: none;
-  }
 }
