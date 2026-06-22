@@ -7189,3 +7189,24 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 **Residuals (accepted by Chadi, do NOT chase):** (a) an authed dark user navigating from a marketing route BACK into the app by client-side nav may see a brief flash before the provider applies dark (the pre-paint script only runs on full loads). (b) a mid-session 401 WHILE sitting on `/la-methode` clears auth without a redirect, so a lingering `.dark` could show until the next full load. Both are the same polish class as the F-481 tradeoff; out of scope here.
 
 **F-ID note:** F-482 next free after F-481 (BACKLOG ceiling F-481; PRD does not track F-4xx). FE+BE share the F-namespace; this FE-root BACKLOG is canonical for both. Reserved as the F-481 follow-up; no other `F-482` exists.
+
+## F-483 -- FE: 5-couche methodology visualizer on /la-methode (skewed-stack)
+
+**Status:** Built on `feat/f-483-couche-visualizer` (off main `6472f8a`). NOT merged -- holds for Chadi's preview to lock copy and the exact coral ramp, then squash-merge on his confirmation (per brief). Local gates: unit (new `CoucheStack` suite) 8/8; clean `pnpm build` (fresh `rm -rf .next`); f-483 e2e. F-225 receipts `tests/screenshots/f-483-la-methode-{1440,375}.png` + trace `f-483.zip` (gitignored).
+
+**Why:** The five couches are the lens over Beacco that defines the method and are a launch criterion to be visible in-product. /la-methode previously rendered only the 27-lesson list; the methodology itself was not shown on its own surface.
+
+**Scope:** A skewed-stack layered visual (the uiverse skewY effect) showing the five couches as stacked strata, reskinned to v3. Each band leads with a plain How-to headline (Inter), with the French couche name as a small DM Mono eyebrow above it for method identity, plus a detail line revealed on hover / keyboard focus. The geometric skew is intentional for this one component and overrides the general no-sharp-corners default (Chadi sourced the effect). Slotted at the TOP of /la-methode, above the lesson list.
+
+**Built:**
+- **`components/la-methode/CoucheStack.tsx` (new, server component):** section heading + intro, then a `role="list"` of five `role="group"` bands. Each band is `tabIndex=0` with `aria-label="{couche}: {headline}"`, carries `data-testid` hooks (`couche-stack`, `couche-stack-{layer,eyebrow,headline,detail}`) and sets its fill via a `--layer-bg` CSS var pointing at the ramp token. Detail text is always in the DOM (screen-reader reachable) even when visually collapsed.
+- **`app/(shell)/la-methode/page.tsx`:** renders `<CoucheStack />` above `<LessonListContainer />` in a flex column.
+- **`app/globals.css` (F-483 block):** the computed coral ramp tokens `--couche-ramp-1..5` + `--couche-skew`, the `.couche-stack*` styles (skewY tilt + counter-skewed content, pseudo-element 3D left edge, soft shadows, grid-rows detail collapse, hover/`:focus-visible` lift + reveal), `@media (hover: none)` and `@media (max-width: 640px)` (drop skew, open all details, full width, no overflow), and a `prefers-reduced-motion` guard. uiverse MIT attribution comment included. All raw uiverse hex replaced with v3 tokens; the only new hex is the computed coral ramp.
+
+**Palette (placeholder, Chadi refines on preview):** 5-step coral ramp, even RGB interpolation, anchored on `--accent-soft #F87171` (lightest, top) and `--accent #E05C42` (deepest, bottom): `#F87171 / #F26C65 / #EC675A / #E6614E / #E05C42`. Whether Les Pièges Anglais gets standout emphasis (the accent couche elsewhere) is deferred to the preview pass; the clean ramp ships first.
+
+**Copy (placeholder, Chadi refines on preview):** the five How-to headlines + detail lines and the section heading/intro are first-pass copy. No em-dashes anywhere.
+
+**Open for the preview pass (surfaced, not blocking):** band text is dark `--heading` (#1F2933) on the coral fills, which is the most legible choice across this mid-tone ramp; headlines (large) clear AA everywhere, but small text on the two deepest bands sits ~4.0-4.3:1 (just under AA-small). If Chadi wants strict AA on the detail/eyebrow, lighten the deepest one or two ramp steps on the preview pass.
+
+**F-ID note:** F-483 next free after F-482 (BACKLOG ceiling F-482, merged `f769cf5`/PR #16; PRD does not track F-4xx). Verified no `F-483` existed in repo before claiming. FE+BE share the F-namespace; this FE-root BACKLOG is canonical for both.
