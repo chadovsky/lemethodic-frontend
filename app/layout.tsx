@@ -47,7 +47,8 @@ const instrumentSans = Instrument_Sans({
 const inter = Inter({
   subsets: ['latin', 'latin-ext'],
   variable: '--font-inter',
-  weight: ['400', '500', '600'],
+  // 800 (extrabold) added for the F-483 couche-stack phrases.
+  weight: ['400', '500', '600', '800'],
   display: 'swap',
 })
 

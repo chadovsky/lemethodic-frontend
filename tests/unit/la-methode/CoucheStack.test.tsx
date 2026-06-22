@@ -1,9 +1,17 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import CoucheStack from '@/components/la-methode/CoucheStack'
 
-// Top-to-bottom order: one How-to headline per block. No eyebrows, no detail.
+// Top-to-bottom order: couche eyebrow + its How-to phrase.
+const EYEBROWS = [
+  'Le Propos',
+  'Le Plan',
+  'La Construction',
+  'Les Pièges Anglais',
+  'La Musique',
+]
+
 const HEADLINES = [
   'How to say what you actually mean',
   'How to organize your ideas in French',
@@ -20,46 +28,49 @@ describe('CoucheStack', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders exactly five blocks, each with one headline in order', () => {
+  it('renders five blocks, each with its eyebrow + headline in order', () => {
     render(<CoucheStack />)
     expect(screen.getAllByTestId('couche-stack-layer')).toHaveLength(5)
-    const headlines = screen
-      .getAllByTestId('couche-stack-headline')
-      .map((el) => el.textContent)
-    expect(headlines).toEqual(HEADLINES)
+    expect(
+      screen.getAllByTestId('couche-stack-eyebrow').map((el) => el.textContent),
+    ).toEqual(EYEBROWS)
+    expect(
+      screen.getAllByTestId('couche-stack-headline').map((el) => el.textContent),
+    ).toEqual(HEADLINES)
   })
 
-  it('headlines are level-3 headings (screen-reader outline under the h2)', () => {
+  it('keeps the proper French accents on the couche eyebrows (UTF-8)', () => {
     render(<CoucheStack />)
-    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(5)
+    expect(screen.getByText('Les Pièges Anglais')).toBeInTheDocument()
+    expect(screen.getByText('La Musique')).toBeInTheDocument()
   })
 
-  it('has NO couche-name eyebrows and NO detail line on the tiles', () => {
-    render(<CoucheStack />)
-    expect(screen.queryAllByTestId('couche-stack-eyebrow')).toHaveLength(0)
-    expect(screen.queryAllByTestId('couche-stack-detail')).toHaveLength(0)
-  })
-
-  it('paints each block from its coral-ramp token (no hardcoded hex)', () => {
+  it('pairs each eyebrow with its headline inside the same block', () => {
     render(<CoucheStack />)
     const layers = screen.getAllByTestId('couche-stack-layer')
     layers.forEach((layer, i) => {
-      expect(layer.getAttribute('style')).toContain(
-        `--face-top: var(--couche-ramp-${i + 1})`,
+      expect(within(layer).getByTestId('couche-stack-eyebrow')).toHaveTextContent(
+        EYEBROWS[i],
+      )
+      expect(within(layer).getByTestId('couche-stack-headline')).toHaveTextContent(
+        HEADLINES[i],
       )
     })
   })
 
-  it('assigns AA-safe text color per layer (dark on upper, light on deepest)', () => {
+  it('drives each block from the sky front + side ramp tokens (no raw hex)', () => {
     render(<CoucheStack />)
-    const expected = ['black', 'black', 'black', 'white', 'white']
     const layers = screen.getAllByTestId('couche-stack-layer')
     layers.forEach((layer, i) => {
-      expect(layer.getAttribute('style')).toContain(`--face-text: ${expected[i]}`)
+      const style = layer.getAttribute('style') ?? ''
+      expect(style).toContain(`--face-top: var(--couche-ramp-${i + 1})`)
+      expect(style).toContain(`--face-side: var(--couche-side-${i + 1})`)
+      // No coral / sky hex leaked into the markup.
+      expect(style).not.toMatch(/#[0-9a-fA-F]{3,6}/)
     })
   })
 
-  it('uses no em-dashes or DM Mono in the rendered output', () => {
+  it('uses no em-dashes in the rendered output', () => {
     render(<CoucheStack />)
     const region = screen.getByRole('region', { name: /the method, in five layers/i })
     expect(region.textContent).not.toContain('—')

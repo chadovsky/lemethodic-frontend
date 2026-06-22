@@ -1500,43 +1500,50 @@
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
-   F-483 — La Méthode 5-couche isometric 3D stack visualizer (/la-methode).
+   F-483 — La Méthode 5-couche isometric stack visualizer (/la-methode).
 
-   The five couches rendered as a thick isometric stack. The wrapper is tilted
-   with skewY; each layer is an extruded block: a top face (holds the headline)
-   plus two depth faces built from pseudo-elements — ::before is the left face
-   (skewY 45deg, origin right), ::after is the back/top face (skewX 45deg, origin
-   bottom). That gives the stack visible thickness. Per-layer z-index keeps the
-   blocks ordered front to back.
+   The five couches rendered as one flush, contiguous isometric block. The
+   wrapper is tilted with skewY; each layer is an extruded block — a front face
+   (holds the upright text) plus two depth faces built from pseudo-elements:
+   ::before is the left side face (skewY 45deg, origin right), ::after is the
+   top face (skewX 45deg, origin bottom). Per-layer z-index orders them front to
+   back. Layers are flush (gap 0); each layer carries a bottom-shelf padding =
+   the face depth, so the layer below's top face lands on that shelf and never
+   covers the text above.
 
-   Each block carries ONE short How-to headline (Inter) that lies ON the slanted
-   face — it inherits the wrapper skew and is NOT counter-skewed, so the type
-   sits on the same isometric plane as the face, exactly like the uiverse
-   reference. No couche-name eyebrows, no detail line on the face: one line only,
-   sized + nowrap so it never wraps or clips. Mobile drops the skew + faces for a
-   flat, upright, full-width fallback.
+   Each layer shows a DM Mono uppercase couche eyebrow above an Inter extrabold
+   How-to phrase. Both ride inside a counter-skewed wrapper, so the type renders
+   UPRIGHT while the bars keep their skew + rightward fan. Mobile drops the skew
+   + faces for a flat, upright, full-width fallback.
 
-   The angular geometry is intentional for this one component and overrides the
-   general no-sharp-corners default. All raw uiverse hex is replaced with v3
-   coral tokens; the only new hex is the computed coral ramp below.
+   Colours: a centralized sky ramp (front fills + per-layer side shades); one
+   dark ink for all text. Coral is removed from THIS surface only — the global
+   --accent coral token is untouched. Rounded 7px corners (no sharp corners).
 
    Isometric stacked-list effect adapted from a uiverse.io community component
-   (by andrew-demchenk0), MIT License. Geometry kept; colors reskinned to v3.
+   (by andrew-demchenk0), MIT License. Geometry kept; colours reskinned to sky.
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Stepped coral ramp — five distinct steps, light at the top layer to deep at
-     the bottom (NOT a smooth blend). AA-tuned: the upper three steps take dark
-     text, the lower two take light text, so the headline clears 4.5:1 on every
-     layer. Placeholder ramp; Chadi refines the exact steps on preview (incl.
-     whether Les Pièges Anglais gets standout emphasis). */
-  --couche-ramp-1: #FAD4CB;   /* Le Propos          — lightest  (dark text 10.8:1) */
-  --couche-ramp-2: #F4A28F;   /* Le Plan                        (dark text 7.3:1) */
-  --couche-ramp-3: #ED7259;   /* La Construction                (dark text 5.0:1) */
-  --couche-ramp-4: #C43E26;   /* Les Pièges Anglais             (light text 5.2:1) */
-  --couche-ramp-5: #9E3019;   /* La Musique         — deepest   (light text 7.3:1) */
+  /* Sky ramp — front fills, light at the top layer to mid at the bottom; every
+     fill stays light enough for the single dark ink below. Placeholder ramp;
+     Chadi refines on preview. (Drives the bars together with the component
+     array; no raw hex in the markup.) */
+  --couche-ramp-1: #E8F6FE;   /* Le Propos */
+  --couche-ramp-2: #C7EBFC;   /* Le Plan */
+  --couche-ramp-3: #93DAF9;   /* La Construction */
+  --couche-ramp-4: #54C3F2;   /* Les Pièges Anglais */
+  --couche-ramp-5: #1FAEE8;   /* La Musique */
+  /* Per-layer depth / side face shade (one step deeper, same sky family). */
+  --couche-side-1: #C8E9FC;
+  --couche-side-2: #A3DCF8;
+  --couche-side-3: #66C7F1;
+  --couche-side-4: #2CA8E5;
+  --couche-side-5: #0C8FC9;
+  /* One dark ink for every layer — eyebrow + phrase. No white text anywhere. */
+  --couche-ink: #1F2937;
   --couche-skew: -14deg;      /* wrapper tilt (uiverse reference value) */
-  --couche-depth: clamp(26px, 3vw, 38px);   /* thickness of the 3D faces */
-  --couche-lift: clamp(10px, 1.4vw, 16px);  /* hover translateX */
+  --couche-depth: clamp(24px, 2.8vw, 34px);   /* thickness of the 3D faces */
+  --couche-lift: clamp(10px, 1.4vw, 16px);    /* hover translateX */
 }
 
 /* Generous top/side room for the iso overhang (skew + top faces); overflow-x is
@@ -1545,7 +1552,7 @@
 .couche-stack-frame {
   overflow-x: clip;
   overflow-y: visible;
-  padding: clamp(64px, 11vw, 140px) clamp(40px, 6vw, 72px) clamp(40px, 7vw, 80px)
+  padding: clamp(60px, 10vw, 130px) clamp(40px, 6vw, 72px) clamp(36px, 6vw, 72px)
     clamp(44px, 7vw, 80px);
 }
 
@@ -1556,7 +1563,7 @@
   max-width: 500px;
   display: flex;
   flex-direction: column;
-  gap: var(--couche-depth);            /* each top face sits in the gap above its block */
+  gap: 0;                              /* flush — one contiguous block */
   transform: skewY(var(--couche-skew));
 }
 
@@ -1573,13 +1580,15 @@
   position: relative;
   display: block;
   width: 100%;
-  background-color: var(--face-top, var(--couche-ramp-1));   /* the face the text sits on */
-  color: var(--face-text, black);
-  padding: clamp(16px, 2vw, 22px) clamp(20px, 2.4vw, 30px);
+  background-color: var(--face-top, var(--couche-ramp-1));   /* the front face */
+  color: var(--couche-ink);
+  padding: clamp(16px, 2vw, 20px) clamp(22px, 2.4vw, 30px);
+  border-radius: 7px;
   transition: transform var(--lm-duration-state, 0.3s) var(--lm-ease, ease);
 }
 
-/* Left depth face — skewY 45deg from the right edge. */
+/* Left side face — skewY 45deg from the right edge. The per-layer side shades
+   stack into the continuous left face of the contiguous block. */
 .couche-layer::before {
   content: "";
   position: absolute;
@@ -1587,12 +1596,15 @@
   left: calc(-1 * var(--couche-depth));
   width: var(--couche-depth);
   height: 100%;
-  background-color: color-mix(in srgb, var(--face-top, var(--couche-ramp-1)) 64%, black);
+  background-color: var(--face-side, var(--couche-side-1));
+  border-radius: 7px;
   transform-origin: right;
   transform: skewY(45deg);
 }
 
-/* Back/top depth face — skewX 45deg from the bottom edge. */
+/* Top face — only the FIRST layer needs one (the top of the contiguous block).
+   Per-layer top faces would jut in over the upright text of the layer above, so
+   they are suppressed; the depth reads on the left face + this single top. */
 .couche-layer::after {
   content: "";
   position: absolute;
@@ -1600,34 +1612,52 @@
   left: 0;
   width: 100%;
   height: var(--couche-depth);
-  background-color: color-mix(in srgb, var(--face-top, var(--couche-ramp-1)) 80%, black);
+  background-color: var(--face-side, var(--couche-side-1));
+  border-radius: 7px;
   transform-origin: bottom;
   transform: skewX(45deg);
+  display: none;
+}
+.couche-stack__item:first-child .couche-layer::after {
+  display: block;
 }
 
-/* The headline lies ON the slanted face: it inherits the wrapper skew (NOT
-   counter-skewed), so the type sits on the isometric plane like the reference.
-   One line — sized + nowrap so it never wraps or clips off the face edge. */
-.couche-layer__headline {
+/* Upright wrapper: inverse skew of the bar, so eyebrow + phrase render straight
+   while the bar keeps its skew. Sits above the depth faces. */
+.couche-layer__content {
   position: relative;
-  z-index: 1;                          /* above the depth faces */
+  z-index: 1;
+  transform: skewY(calc(-1 * var(--couche-skew)));
+}
+
+.couche-layer__eyebrow {
+  display: block;
+  margin: 0 0 6px;
+  font-family: var(--f-mono), "DM Mono", ui-monospace, monospace;
+  font-weight: 500;
+  font-size: 0.65rem;                  /* ~10.5px */
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--couche-ink);
+}
+
+.couche-layer__headline {
   margin: 0;
   font-family: var(--f-en), "Inter", -apple-system, system-ui, sans-serif;
-  font-weight: 600;
+  font-weight: 800;                    /* extrabold */
   font-size: clamp(1.0625rem, 1.4vw, 1.1875rem);
   line-height: 1.2;
   letter-spacing: -0.01em;
-  color: var(--face-text, black);
-  white-space: nowrap;
+  color: var(--couche-ink);
 }
 
-/* Hover: lift the block out of the stack (decorative; the face is static text). */
+/* Hover: lift the block out of the stack (decorative). */
 .couche-layer:hover {
   transform: translateX(calc(-1 * var(--couche-lift)));
 }
 
 /* Narrow viewports: drop the iso geometry entirely (skew + depth faces fight
-   small widths). Flat, upright, full-width, headlines may wrap, no overflow. */
+   small widths). Flat, upright, full-width, flush, no overflow. */
 @media (max-width: 640px) {
   .couche-stack-frame {
     overflow: visible;
@@ -1635,15 +1665,18 @@
   }
   .couche-stack {
     max-width: 100%;
-    gap: 12px;
     transform: none;
   }
   .couche-layer::before,
-  .couche-layer::after {
+  .couche-layer::after,
+  .couche-stack__item:first-child .couche-layer::after {
     display: none;
   }
-  .couche-layer__headline {
-    white-space: normal;
+  .couche-layer {
+    padding: clamp(16px, 4vw, 20px) clamp(18px, 4vw, 22px);
+  }
+  .couche-layer__content {
+    transform: none;
   }
 }
 

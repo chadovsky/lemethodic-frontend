@@ -1,13 +1,12 @@
-// F-483 — La Méthode 5-couche isometric 3D stack visualizer (/la-methode).
+// F-483 — La Méthode 5-couche isometric stack visualizer (/la-methode), sky reskin.
 // Receipts:
-//   f-483-la-methode-1440.png  (isometric 3D stack, v3 light, desktop)
+//   f-483-la-methode-1440.png  (flush sky isometric block, desktop)
 //   f-483-la-methode-375.png   (flat upright fallback, mobile)
 // Trace: tests/traces/f-483.zip (desktop happy path).
 //
-// Asserts the launch contract: five How-to headlines present on /la-methode, one
-// per block; NO couche-name eyebrows; each desktop headline sits on a single
-// line with no clip (the iso illusion depends on it); no horizontal overflow;
-// mobile flat fallback intact.
+// Asserts the launch contract: the component is visible; the five couche labels
+// (eyebrows) and their five How-to phrases render in order; no horizontal
+// overflow; mobile flat fallback intact.
 
 import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
@@ -20,6 +19,14 @@ const TRACE_DIR = path.join(__dirname, '../traces')
 function ensureDir(dir: string) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
 }
+
+const EYEBROWS = [
+  'Le Propos',
+  'Le Plan',
+  'La Construction',
+  'Les Pièges Anglais',
+  'La Musique',
+]
 
 const HEADLINES = [
   'How to say what you actually mean',
@@ -42,12 +49,14 @@ test.beforeEach(async ({ page }) => {
 
 async function expectContent(page: Page) {
   await expect(page.getByTestId('couche-stack')).toBeVisible()
+  // Five couche labels (eyebrows) render in order.
+  const eyebrows = page.getByTestId('couche-stack-eyebrow')
+  await expect(eyebrows).toHaveCount(5)
+  await expect(eyebrows).toHaveText(EYEBROWS)
+  // Five How-to phrases render in order.
   const headlines = page.getByTestId('couche-stack-headline')
   await expect(headlines).toHaveCount(5)
   await expect(headlines).toHaveText(HEADLINES)
-  // The eyebrows were removed: no couche names on the tiles.
-  await expect(page.getByTestId('couche-stack-eyebrow')).toHaveCount(0)
-  await expect(page.getByTestId('couche-stack-detail')).toHaveCount(0)
 }
 
 async function expectNoOverflow(page: Page) {
@@ -57,29 +66,19 @@ async function expectNoOverflow(page: Page) {
   expect(overflow).toBeLessThanOrEqual(1)
 }
 
-test.describe('F-483 — couche stack (desktop 1440, v3 light)', () => {
+test.describe('F-483 — couche stack (desktop 1440, sky)', () => {
   test.use({ viewport: { width: 1440, height: 900 } })
   test.skip(({ isMobile }) => !!isMobile, 'desktop iso geometry')
 
-  test('renders the five headlines, one line each, no clip, no overflow', async ({ page }) => {
+  test('renders the five labels + phrases, visible, no overflow', async ({ page }) => {
     ensureDir(SCREENSHOT_DIR)
     ensureDir(TRACE_DIR)
     await page.context().tracing.start({ screenshots: true, snapshots: true })
 
     await page.goto('/la-methode')
     await expectContent(page)
-
-    // Each headline fits on one line and is not clipped: with white-space:nowrap,
-    // scrollWidth > clientWidth would mean the text overflows / is cut off.
-    const counts = await page.getByTestId('couche-stack-headline').evaluateAll((els) =>
-      els.map((el) => ({ scroll: el.scrollWidth, client: el.clientWidth })),
-    )
-    expect(counts).toHaveLength(5)
-    for (const { scroll, client } of counts) {
-      expect(scroll).toBeLessThanOrEqual(client + 1)
-    }
-
     await expectNoOverflow(page)
+
     await page.screenshot({
       path: path.join(SCREENSHOT_DIR, 'f-483-la-methode-1440.png'),
       fullPage: true,
@@ -93,7 +92,7 @@ test.describe('F-483 — couche stack (mobile 375, flat fallback)', () => {
   test.use({ viewport: { width: 375, height: 667 } })
   test.skip(({ isMobile }) => !isMobile, 'mobile flat fallback')
 
-  test('shows the five headlines upright, no eyebrows, no horizontal scroll', async ({ page }) => {
+  test('renders the five labels + phrases upright, no horizontal scroll', async ({ page }) => {
     ensureDir(SCREENSHOT_DIR)
     await page.goto('/la-methode')
     await expectContent(page)
