@@ -1500,78 +1500,117 @@
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
-   F-483 — La Méthode 5-couche skewed-stack visualizer (/la-methode).
+   F-483 — La Méthode 5-couche isometric 3D stack visualizer (/la-methode).
 
-   The five couches rendered as stacked strata, tilted with the uiverse skewY
-   effect. Each band leads with a plain-English How-to headline; the French
-   couche name sits above it as a small eyebrow for method identity. On hover
-   and on keyboard focus the band lifts (translateX) and its detail line
-   expands. On touch (no hover) every detail stays visible.
+   The five couches rendered as a thick isometric stack. The wrapper is tilted
+   with skewY; each layer is an extruded block: a front face (holds the text)
+   plus two depth faces built from pseudo-elements — ::before is the left face
+   (skewY 45deg, origin right), ::after is the top face (skewX 45deg, origin
+   bottom). That is what gives the stack visible thickness instead of reading as
+   a flat tilted plane. Per-layer z-index keeps the blocks ordered front to back.
 
-   The angular skew is intentional for this one component and overrides the
+   Each layer leads with a plain-English How-to headline (Inter); the French
+   couche name sits above it as a small DM Mono eyebrow for method identity. On
+   hover and on keyboard focus the block lifts (translateX) and its detail line
+   expands. On touch (no hover) every detail stays visible. Mobile drops the
+   skew + faces for a flat, full-width fallback.
+
+   The angular geometry is intentional for this one component and overrides the
    general no-sharp-corners default. All raw uiverse hex is replaced with v3
-   tokens; per-band fill is the computed coral ramp below.
+   coral tokens; the only new hex is the computed coral ramp below.
 
-   Skewed-stack effect adapted from a uiverse.io community component (MIT).
+   Isometric stacked-list effect adapted from a uiverse.io community component
+   (by andrew-demchenk0), MIT License. Geometry kept; colors reskinned to v3.
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Computed coral ramp — anchored on --accent-soft #F87171 (lightest, top
-     band) and --accent #E05C42 (deepest, bottom band); the three middle steps
-     are even RGB interpolations between the two anchors. Placeholder ramp;
-     Chadi refines the exact steps on preview. */
-  --couche-ramp-1: #F87171;   /* Le Propos          — lightest (= --accent-soft) */
-  --couche-ramp-2: #F26C65;   /* Le Plan            — interpolated */
-  --couche-ramp-3: #EC675A;   /* La Construction    — interpolated */
-  --couche-ramp-4: #E6614E;   /* Les Pièges Anglais — interpolated */
-  --couche-ramp-5: #E05C42;   /* La Musique         — deepest (= --accent) */
-  --couche-skew: -4deg;
+  /* Stepped coral ramp — five distinct steps, light at the top layer to deep at
+     the bottom (NOT a smooth blend). AA-tuned: the upper three steps take dark
+     text, the lower two take light text, so small text (eyebrow + detail) clears
+     4.5:1 on every layer. Placeholder ramp; Chadi refines the exact steps on
+     preview (incl. whether Les Pièges Anglais gets standout emphasis). */
+  --couche-ramp-1: #FAD4CB;   /* Le Propos          — lightest  (dark text 10.8:1) */
+  --couche-ramp-2: #F4A28F;   /* Le Plan                        (dark text 7.3:1) */
+  --couche-ramp-3: #ED7259;   /* La Construction                (dark text 5.0:1) */
+  --couche-ramp-4: #C43E26;   /* Les Pièges Anglais             (light text 5.2:1) */
+  --couche-ramp-5: #9E3019;   /* La Musique         — deepest   (light text 7.3:1) */
+  --couche-skew: -14deg;      /* wrapper tilt (uiverse reference value) */
+  --couche-depth: clamp(26px, 3vw, 38px);   /* thickness of the 3D faces */
+  --couche-lift: clamp(12px, 1.6vw, 20px);  /* hover / focus translateX */
 }
 
-/* Frame clips the hover lift so a band can never add horizontal scroll. */
+/* Generous top/side room for the iso overhang (skew + top faces); overflow-x is
+   clipped (keeps the lift from ever adding horizontal scroll) while overflow-y
+   stays visible so the thickness above the top layer is never cut. */
 .couche-stack-frame {
-  overflow: hidden;
-  padding: clamp(44px, 5vw, 56px) clamp(12px, 2vw, 24px);
+  overflow-x: clip;
+  overflow-y: visible;
+  padding: clamp(70px, 13vw, 160px) clamp(40px, 6vw, 72px) clamp(48px, 8vw, 90px)
+    clamp(44px, 7vw, 80px);
 }
 
 .couche-stack {
   list-style: none;
   margin: 0;
   padding: 0;
-  max-width: 600px;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--couche-depth);            /* each top face sits in the gap above its block */
   transform: skewY(var(--couche-skew));
 }
 
 .couche-stack__item {
-  display: block;
+  position: relative;
+  z-index: var(--i, 1);                /* front-to-back order (uiverse z-index: var(--i)) */
+}
+/* Bring the hovered / focused block fully forward over its neighbours. */
+.couche-stack__item:has(> .couche-layer:hover),
+.couche-stack__item:has(> .couche-layer:focus-visible) {
+  z-index: 10;
 }
 
 .couche-layer {
   position: relative;
   display: block;
   width: 100%;
-  background-color: var(--layer-bg, var(--couche-ramp-1));
-  color: var(--heading);
-  padding: clamp(16px, 2vw, 22px) clamp(20px, 2.4vw, 28px);
+  background-color: var(--face-top, var(--couche-ramp-1));   /* front face */
+  color: var(--face-text, black);
+  padding: clamp(18px, 2vw, 24px) clamp(20px, 2.4vw, 28px);
   cursor: default;
-  box-shadow: 0 6px 20px color-mix(in srgb, var(--ink) 12%, transparent);
-  transition:
-    transform var(--lm-duration-state, 0.3s) var(--lm-ease, ease),
-    box-shadow var(--lm-duration-state, 0.3s) var(--lm-ease, ease);
+  transition: transform var(--lm-duration-state, 0.3s) var(--lm-ease, ease);
 }
 
-/* Pseudo-element 3D side — a darker extruded left edge that gives the stack its
-   strata thickness (the uiverse effect's depth, reskinned to a coral shade). */
+/* Left depth face — skewY 45deg from the right edge. */
 .couche-layer::before {
   content: "";
   position: absolute;
-  inset: 0 auto 0 0;
-  width: 6px;
-  background-color: color-mix(in srgb, var(--layer-bg, var(--couche-ramp-1)) 78%, black);
+  top: 0;
+  left: calc(-1 * var(--couche-depth));
+  width: var(--couche-depth);
+  height: 100%;
+  background-color: color-mix(in srgb, var(--face-top, var(--couche-ramp-1)) 64%, black);
+  transform-origin: right;
+  transform: skewY(45deg);
 }
 
-/* Counter-skew so the type sits straight on the tilted band. */
+/* Top depth face — skewX 45deg from the bottom edge. */
+.couche-layer::after {
+  content: "";
+  position: absolute;
+  top: calc(-1 * var(--couche-depth));
+  left: 0;
+  width: 100%;
+  height: var(--couche-depth);
+  background-color: color-mix(in srgb, var(--face-top, var(--couche-ramp-1)) 80%, black);
+  transform-origin: bottom;
+  transform: skewX(45deg);
+}
+
+/* Counter-skew so the type sits upright on the tilted front face. The wrapper's
+   skewY and this inverse skewY compose to identity, so text reads straight. */
 .couche-layer__content {
   position: relative;
+  z-index: 1;                          /* above the depth faces */
   transform: skewY(calc(-1 * var(--couche-skew)));
 }
 
@@ -1582,7 +1621,7 @@
   font-size: 0.75rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--heading);
+  color: var(--face-text, black);
   margin: 0 0 4px;
 }
 
@@ -1592,7 +1631,7 @@
   font-size: clamp(1.0625rem, 1.8vw, 1.375rem);
   line-height: 1.25;
   letter-spacing: -0.01em;
-  color: var(--heading);
+  color: var(--face-text, black);
   margin: 0;
 }
 
@@ -1612,20 +1651,19 @@
   font-weight: 400;
   font-size: 0.9375rem;
   line-height: 1.5;
-  color: var(--heading);
+  color: var(--face-text, black);
   margin: 0;
   padding-top: 8px;
 }
 
-/* Hover + keyboard focus: lift the band out of the stack, reveal its detail. */
+/* Hover + keyboard focus: lift the block out of the stack, reveal its detail. */
 .couche-layer:hover,
 .couche-layer:focus-visible {
-  transform: translateX(clamp(10px, 1.5vw, 18px));
-  box-shadow: 0 14px 34px color-mix(in srgb, var(--ink) 22%, transparent);
+  transform: translateX(calc(-1 * var(--couche-lift)));
 }
 .couche-layer:focus-visible {
-  outline: 2px solid var(--heading);
-  outline-offset: 3px;
+  outline: 2px solid var(--face-text, black);
+  outline-offset: 4px;
 }
 .couche-layer:hover .couche-layer__detail-wrap,
 .couche-layer:focus-visible .couche-layer__detail-wrap {
@@ -1639,8 +1677,8 @@
   }
 }
 
-/* Narrow viewports: drop the skew (the angular geometry fights small widths),
-   go full width, and keep all details open. */
+/* Narrow viewports: drop the iso geometry entirely (skew + depth faces fight
+   small widths). Flat, full-width, all details open, no horizontal overflow. */
 @media (max-width: 640px) {
   .couche-stack-frame {
     overflow: visible;
@@ -1648,7 +1686,12 @@
   }
   .couche-stack {
     max-width: 100%;
+    gap: 12px;
     transform: none;
+  }
+  .couche-layer::before,
+  .couche-layer::after {
+    display: none;
   }
   .couche-layer__content {
     transform: none;
@@ -1658,7 +1701,7 @@
   }
 }
 
-/* Reduced motion: keep the static skew (it is layout, not motion), but no
+/* Reduced motion: keep the static geometry (it is layout, not motion), but no
    lift or reveal transitions. */
 @media (prefers-reduced-motion: reduce) {
   .couche-layer,
