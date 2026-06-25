@@ -621,3 +621,42 @@ Image generation uses Nano Banana Pro with the protocol locked in PEDAGOGY.md:
 - Storage: /public/iles/[theme]/ in FE repo for Phase 2; migrate to DigitalOcean Spaces with CDN at Phase 5.
 
 Per-île image density: 6 to 8 images (5 essential plus 2 to 3 supplementary). Phase 2 (3 îles) totals approximately 18 to 24 images.
+
+## Journey Backbone (Persona-as-Config)
+
+Root principle: Persona is the only thing that varies. The UX flow is identical for every persona. A persona is configuration, not code. New personas (TEF, DELF A2/B1/B2, DALF C1, Business French, Hobby, AP French) ship as config rows, never as new screens or flow.
+
+Acceptance invariants:
+1. The backbone runs with every slot bientot (zero content) and lights up slot by slot.
+2. A new persona ships as config only.
+
+### Entities
+- Persona (= Target Profile): { type: exam | learning, levelBand subset of [A1,A2,B1,B2,C1], themes: ordered persona-local Theme[], methods: MethodStatus[], skillWeights: {CO,CE,EO,EE}, terminus: mock | capstone, diagnosticRef }. Personas are user-selectable; a user may hold several and switch the active one.
+- Level: global enum A1 to C1.
+- Theme: persona-local, authored, ordered. Schema { id, label, order, pins: UnitRef[] (ordered, the default), query: optional Filter, excludes: UnitRef[] }. Themes differ per persona; TCF Theme 1 and Business Theme 1 are different entities. Until content exists, labels are molds ("Theme 1" to "Theme N").
+- Method: global registry. { id, scope: cell | global, skills, seanceShape }. The seance shape is method-defined. The CLE structure (dialogue, grammaire, vocabulaire, phonetique, activites, Tache) is the islands method only, not universal.
+- Station: (cell x method), where cell = (persona, theme, level). The Station is the masterable and lightable atom. A grid cell is a summary of its stations. L'Ile is the islands-method station; audio, conversation, writing, and pieges stations are siblings at the same cell.
+- Seance: one Station engagement; shape from the Method.
+- Progress: per Station, rolled up to cell and persona.
+
+### Two data layers
+- User-global: vocabulary mastery, SRS, Le Lexique, and a per-skill CEFR estimate that carries across personas. Switching persona resets nothing.
+- Persona-scoped: Carte, cells, stations, mocks, capstone, progress-by-station.
+
+### Mastery and SRS
+Mastery is a recency-decayed estimate per (skill, topic), updated from seance performance. It requires per-skill estimates with timestamps from day one. SRS is a view of decayed mastery, not a separate engine; its rail surfaces what is slipping.
+
+### Cross-cutting surfaces are derived, not authored
+SRS, Le Lexique, the skill view, and search are read-only queries over the global tagged pool. They derive from tags applied once at authoring. They are never hand-curated. The single source of truth is the unit's tags; to change where a unit appears, fix the tag, not the view. Taught themes are authored by hand (curated, ordered); only the cross-cutting collections are query-driven.
+
+### Views
+Theme and skill are co-primary projections of the same tagged Station set. Theme view groups by the persona's authored themes; skill view groups by CO, CE, EO, EE. Skill balance is co-primary because for exam personas it is the scoring reality.
+
+### Access vs readiness
+No gates. Every cell and every live method is accessible at any time, including attempting. Readiness is a signal computed from mastery against the persona's level-band targets, always visible as a climbing percentage. The only surface gated on a readiness threshold is the terminus mock; it is surfaced only past threshold, with readiness visible throughout so the gate is legible.
+
+### Bientot
+Unauthored stations, methods, and personas render as visible, inert bientot slots with a notify-me affordance.
+
+### Le Cap (orchestrator)
+Le Cap recommends one session plan (one review, one new, one stretch) over the live surface only, so the backbone behaves before any content exists. The full method menu is always the override. Priority: due review (decaying mastery), then diagnosed weakness, then next unmastered station in band, then spiral up a level. Surfaced through Le Maitre.

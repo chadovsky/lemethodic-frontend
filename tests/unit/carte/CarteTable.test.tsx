@@ -48,15 +48,19 @@ describe('CarteTable (default B1)', () => {
     expect(within(iles[0]).getByText(/parcours et d'apprentissage/i)).toBeInTheDocument()
   })
 
-  it('marks education current + the rest locked, with the right state cells', async () => {
+  it('marks education current + the rest bientot, with the right state cells', async () => {
+    // F-484 no-gates doctrine: the carte has no locked/Verrouillé state. The one
+    // current theme holds the single CTA; every other theme is an inert bientot
+    // slot (accessible, not gated). The journey model still gates the seance.
     render(<CarteTable />)
     const iles = await screen.findAllByTestId('carte-ile')
     expect(iles[0]).toHaveAttribute('data-status', 'current')
-    // Current row holds the single CTA, not a "Verrouillé" pill.
     expect(within(iles[0]).getByTestId('carte-current-cta')).toBeInTheDocument()
     for (const ile of iles.slice(1)) {
-      expect(ile).toHaveAttribute('data-status', 'locked')
-      expect(within(ile).getByText('Verrouillé')).toBeInTheDocument()
+      expect(ile).toHaveAttribute('data-status', 'bientot')
+      // No gate: no Verrouillé pill, no nav link, an inert bientot slot instead.
+      expect(within(ile).queryByText('Verrouillé')).toBeNull()
+      expect(within(ile).getAllByTestId('carte-cell-slot').length).toBeGreaterThan(0)
       expect(ile.querySelector('a')).toBeNull()
     }
   })

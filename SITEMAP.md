@@ -159,3 +159,14 @@ do not show the TopNav.
 | Route | Surface | Notes |
 |---|---|---|
 | `/dev` | Dev utilities | Dev only |
+
+---
+
+## Persona-driven surfaces
+- /onboarding: persona (Target Profile) selection plus the persona diagnostic. Public (only /onboarding/waitlist is authed).
+- La Methode -> La Carte: the active persona's themes x the persona's levels grid. Cells are summaries of their stations. Twin-view toggle: theme | skill (co-primary). Le Cap session-plan slot on top. Global rail: SRS, Mock, Reading. Readiness signal visible.
+- Station routes: L'Ile (islands), plus audio, conversation, writing, and pieges stations at the same cell coordinate; global stations (SRS, Mock, Reading) on the rail.
+- La Seance: one station engagement.
+- L'Examen: terminus. Exam personas: mock, surfaced only past a readiness threshold. Learning personas (Business, Hobby): capstone or competence milestones.
+- Le Lexique (/le-lexique): user-global vocabulary, a derived view.
+All non-lit stations, methods, and personas render bientot.
