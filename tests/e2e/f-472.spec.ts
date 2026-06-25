@@ -50,11 +50,13 @@ async function expectContract(page: Page) {
   await expect(iles.first()).toHaveAttribute('data-theme', 'education')
   await expect(iles.first()).toHaveAttribute('data-status', 'current')
 
-  // States present: a locked row shows the Verrouillé pill (and no link).
-  const locked = page.locator('[data-testid="carte-ile"][data-theme="famille"]')
-  await expect(locked).toHaveAttribute('data-status', 'locked')
-  await expect(locked.getByText('Verrouillé')).toBeVisible()
-  await expect(locked.locator('a')).toHaveCount(0)
+  // F-484 no-gates: a non-current theme is an inert bientot slot, not a locked
+  // gate. No Verrouillé, no nav link.
+  const bientot = page.locator('[data-testid="carte-ile"][data-theme="famille"]')
+  await expect(bientot).toHaveAttribute('data-status', 'bientot')
+  await expect(bientot.getByTestId('carte-cell-slot').first()).toBeVisible()
+  await expect(bientot.getByText('Verrouillé')).toHaveCount(0)
+  await expect(bientot.locator('a')).toHaveCount(0)
 
   // Exactly one current CTA -> the canonical ile route.
   const cta = page.getByTestId('carte-current-cta')
