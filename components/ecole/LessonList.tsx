@@ -1,8 +1,17 @@
+import type { ReactNode } from 'react'
 import { SERIF_FONT, SANS_FONT } from '@/lib/typography'
 import type { Lesson } from '@/lib/types'
 import LessonCard from './LessonCard'
 
-export default function LessonList({ lessons }: { lessons: Lesson[] }) {
+export default function LessonList({
+  lessons,
+  methodology,
+}: {
+  lessons: Lesson[]
+  // F-483 - optional slot rendered between the page h1 header and the lesson
+  // sections (so the methodology visualizer is the h2 right under the h1).
+  methodology?: ReactNode
+}) {
   const fondations = lessons.filter((l) => l.phase === 1)
   const approfondissement = lessons.filter((l) => l.phase === 2)
 
@@ -49,6 +58,8 @@ export default function LessonList({ lessons }: { lessons: Lesson[] }) {
           l&rsquo;expression à l&rsquo;oral.
         </p>
       </header>
+
+      {methodology}
 
       <Section
         id="fondations"
