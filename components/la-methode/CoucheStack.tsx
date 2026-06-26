@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
 
-// F-483 — La Méthode 5-couche isometric 3D stack visualizer.
+// F-483 - La Méthode 5-couche isometric 3D stack visualizer.
 //
 // The five couches are the lens over Beacco that defines the method; they must
 // be visible in-product (launch criterion). This renders them as an isometric
@@ -9,7 +9,7 @@ import type { CSSProperties } from 'react'
 //
 // Each block carries ONE short How-to headline that lies ON the slanted face
 // (it inherits the wrapper skew, like the reference). No couche-name eyebrows,
-// no detail line on the face — one clean line per block. Copy and the coral ramp
+// no detail line on the face - one clean line per block. Copy and the coral ramp
 // are placeholders; Chadi refines both on preview.
 
 type Couche = {

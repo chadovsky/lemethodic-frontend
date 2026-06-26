@@ -8,7 +8,7 @@ export default function LessonList({
   methodology,
 }: {
   lessons: Lesson[]
-  // F-483 — optional slot rendered between the page h1 header and the lesson
+  // F-483 - optional slot rendered between the page h1 header and the lesson
   // sections (so the methodology visualizer is the h2 right under the h1).
   methodology?: ReactNode
 }) {

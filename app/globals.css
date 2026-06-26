@@ -1500,17 +1500,17 @@
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
-   F-483 — La Méthode 5-couche isometric 3D stack visualizer (/la-methode).
+   F-483 - La Méthode 5-couche isometric 3D stack visualizer (/la-methode).
 
    The five couches rendered as a thick isometric stack. The wrapper is tilted
    with skewY; each layer is an extruded block: a top face (holds the headline)
-   plus two depth faces built from pseudo-elements — ::before is the left face
+   plus two depth faces built from pseudo-elements - ::before is the left face
    (skewY 45deg, origin right), ::after is the back/top face (skewX 45deg, origin
    bottom). That gives the stack visible thickness. Per-layer z-index keeps the
    blocks ordered front to back.
 
    Each block carries ONE short How-to headline (Inter) that lies ON the slanted
-   face — it inherits the wrapper skew and is NOT counter-skewed, so the type
+   face - it inherits the wrapper skew and is NOT counter-skewed, so the type
    sits on the same isometric plane as the face, exactly like the uiverse
    reference. No couche-name eyebrows, no detail line on the face: one line only,
    sized + nowrap so it never wraps or clips. Mobile drops the skew + faces for a
@@ -1524,16 +1524,16 @@
    (by andrew-demchenk0), MIT License. Geometry kept; colors reskinned to v3.
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Stepped coral ramp — five distinct steps, light at the top layer to deep at
+  /* Stepped coral ramp - five distinct steps, light at the top layer to deep at
      the bottom (NOT a smooth blend). AA-tuned: the upper three steps take dark
      text, the lower two take light text, so the headline clears 4.5:1 on every
      layer. Placeholder ramp; Chadi refines the exact steps on preview (incl.
      whether Les Pièges Anglais gets standout emphasis). */
-  --couche-ramp-1: #FAD4CB;   /* Le Propos          — lightest  (dark text 10.8:1) */
+  --couche-ramp-1: #FAD4CB;   /* Le Propos          (lightest, dark text 10.8:1) */
   --couche-ramp-2: #F4A28F;   /* Le Plan                        (dark text 7.3:1) */
   --couche-ramp-3: #ED7259;   /* La Construction                (dark text 5.0:1) */
   --couche-ramp-4: #C43E26;   /* Les Pièges Anglais             (light text 5.2:1) */
-  --couche-ramp-5: #9E3019;   /* La Musique         — deepest   (light text 7.3:1) */
+  --couche-ramp-5: #9E3019;   /* La Musique         (deepest, light text 7.3:1) */
   --couche-skew: -14deg;      /* wrapper tilt (uiverse reference value) */
   --couche-depth: clamp(26px, 3vw, 38px);   /* thickness of the 3D faces */
   --couche-lift: clamp(10px, 1.4vw, 16px);  /* hover translateX */
@@ -1579,7 +1579,7 @@
   transition: transform var(--lm-duration-state, 0.3s) var(--lm-ease, ease);
 }
 
-/* Left depth face — skewY 45deg from the right edge. */
+/* Left depth face - skewY 45deg from the right edge. */
 .couche-layer::before {
   content: "";
   position: absolute;
@@ -1592,7 +1592,7 @@
   transform: skewY(45deg);
 }
 
-/* Back/top depth face — skewX 45deg from the bottom edge. */
+/* Back/top depth face - skewX 45deg from the bottom edge. */
 .couche-layer::after {
   content: "";
   position: absolute;
@@ -1607,7 +1607,7 @@
 
 /* The headline lies ON the slanted face: it inherits the wrapper skew (NOT
    counter-skewed), so the type sits on the isometric plane like the reference.
-   One line — sized + nowrap so it never wraps or clips off the face edge. */
+   One line - sized + nowrap so it never wraps or clips off the face edge. */
 .couche-layer__headline {
   position: relative;
   z-index: 1;                          /* above the depth faces */

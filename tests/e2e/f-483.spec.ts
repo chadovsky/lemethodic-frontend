@@ -1,4 +1,4 @@
-// F-483 — La Méthode 5-couche isometric 3D stack visualizer (/la-methode).
+// F-483 - La Méthode 5-couche isometric 3D stack visualizer (/la-methode).
 // Receipts:
 //   f-483-la-methode-1440.png  (isometric 3D stack, v3 light, desktop)
 //   f-483-la-methode-375.png   (flat upright fallback, mobile)
@@ -57,7 +57,7 @@ async function expectNoOverflow(page: Page) {
   expect(overflow).toBeLessThanOrEqual(1)
 }
 
-test.describe('F-483 — couche stack (desktop 1440, v3 light)', () => {
+test.describe('F-483 - couche stack (desktop 1440, v3 light)', () => {
   test.use({ viewport: { width: 1440, height: 900 } })
   test.skip(({ isMobile }) => !!isMobile, 'desktop iso geometry')
 
@@ -89,7 +89,7 @@ test.describe('F-483 — couche stack (desktop 1440, v3 light)', () => {
   })
 })
 
-test.describe('F-483 — couche stack (mobile 375, flat fallback)', () => {
+test.describe('F-483 - couche stack (mobile 375, flat fallback)', () => {
   test.use({ viewport: { width: 375, height: 667 } })
   test.skip(({ isMobile }) => !isMobile, 'mobile flat fallback')
 

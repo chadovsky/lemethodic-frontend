@@ -7213,7 +7213,7 @@ Unit tests: `CalendarWidget.test.tsx` (9 new tests: loading skeleton, heading, c
 
 ## F-483 -- FE: 5-couche methodology visualizer on /la-methode (isometric 3D stack)
 
-**Status:** Built on `feat/f-483-couche-visualizer` (off main `6472f8a`). NOT merged -- holds for Chadi's preview to lock copy and the exact coral ramp, then squash-merge on his confirmation (per brief). Local gates: full unit suite 589/589 (incl. `CoucheStack` suite, 7); clean `pnpm build` (fresh `rm -rf .next`); f-483 + ecole-list e2e green (26 passed / 2 cross-project skips). F-225 receipts `tests/screenshots/f-483-la-methode-{1440,375}.png` + trace `f-483.zip` (gitignored).
+**Status:** Built on `feat/f-483-couche-visualizer`, **rebased onto current main `ad5de74`** (includes F-484 / PR #18; only conflict was the BACKLOG append, resolved keeping both entries; ARCHITECTURE.md + SITEMAP.md F-484 sections preserved untouched since F-483 does not edit them). NOT merged -- holds for Chadi's Vercel branch-preview to (a) lock copy + the exact coral ramp and (b) make the final isometric keep/drop call (the brief's escape hatch); squash-merge on his confirmation. Post-rebase tidy: em-dash sweep over all F-483-authored comments + test titles (the only remaining em-dash on `/la-methode` is the pre-existing `LessonList` subtitle copy, untouched per scope). `CoucheStack` unit suite 7/7 green locally; CI (unit + e2e) is the merge gate. F-225 receipts `tests/screenshots/f-483-la-methode-{1440,375}.png` + trace `f-483.zip` (gitignored).
 
 **Why:** The five couches are the lens over Beacco that defines the method and are a launch criterion to be visible in-product. /la-methode previously rendered only the 27-lesson list; the methodology itself was not shown on its own surface.
 

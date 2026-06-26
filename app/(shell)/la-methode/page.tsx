@@ -6,7 +6,7 @@ export const metadata = {
 }
 
 export default function EcolePage() {
-  // F-483 — the page h1 ("La Méthode") leads; the 5-couche visualizer is the h2
+  // F-483 - the page h1 ("La Méthode") leads; the 5-couche visualizer is the h2
   // section right under it (passed as the methodology slot), then the 27 lessons.
   return <LessonListContainer methodology={<CoucheStack />} />
 }
